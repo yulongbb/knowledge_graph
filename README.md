@@ -80,7 +80,7 @@ RETURN l.mainsnak.property)
 3. 转换到excel
 
 
-
+```
 FOR l IN link
 FILTER l['_from'] IN ["entity/Q22099965","entity/Q21040218"]
 FILTER l.mainsnak.property IN [
@@ -107,10 +107,11 @@ LET gs = (
 
 
 RETURN MERGE(gs)
-
+```
 
 总结
 
+```
 let items = ["entity/Q22099965","entity/Q21040218","entity/Q21040220"]
 
 let properties = (RETURN UNIQUE(FOR l IN link FILTER l['_from'] IN items RETURN {id:l.mainsnak.property, label:DOCUMENT(CONCAT('entity/',l.mainsnak.property))['labels']['zh']['value']}))[0]
@@ -119,7 +120,7 @@ FOR i in items
 let values = (FOR p in properties LET value = (FOR l IN link FILTER l['_from'] == i AND l.mainsnak.property==p.id RETURN l.mainsnak.datavalue) RETURN value[0]['type']=='wikibase-entityid'? TO_ARRAY(DOCUMENT(CONCAT('entity/',value[0]['value']['id']))['labels']['zh']['value']): value[0]['type']=='time'?value[0]['value']['time']:value)
 
 RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNION( [DOCUMENT(i)['_key'], TO_ARRAY(DOCUMENT(i).labels.zh.value), TO_ARRAY(DOCUMENT(i).descriptions.zh.value), DOCUMENT(i).aliases.zh[*].value],values))
-
+```
 
 
 实体
@@ -128,6 +129,7 @@ RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNIO
 提供通过关键词搜索实体目标的标签、描述、别名信息
 要求：不区分大小写、不区分繁简
 
+```
 FOR doc IN entity_view
 SEARCH LIKE(doc.labels.zh.value, TOKENS(@keyword, "en")[0])
 OR LIKE(doc.labels.zh.value, TOKENS(@keyword, "norm_en")[0])
@@ -151,7 +153,7 @@ RETURN {
     aliases:  doc.aliases.zh,
     aliases_en:  doc.aliases.en,
 }
-  
+```  
 
 
 值
@@ -160,65 +162,74 @@ RETURN {
 
 分析：首先筛选属性值是数量类型且值等于80的边，在筛选属性是年龄
 
-
+```
 FOR document IN link
 FILTER document.mainsnak.property=='P2044'
 FILTER document.mainsnak.datatype=='quantity'
 FILTER document.mainsnak.datavalue.value.amount=='+20'
 LIMIT 10
 RETURN {id: document['_from'], property: document.mainsnak.property,document:document.mainsnak.datavalue.value}
+```
 
 
 
-
-
+```
 FOR doc IN entity 
 FILTER doc.labels
 LIMIT 100
 RETURN {id:doc['_key'], label: doc.labels.zh.value}
+```
 
-
+```
 FOR e IN entity
 FILTER e['_key']==@id
 RETURN e
+```
 
-
+```
 FOR v, e, p IN 0..1 OUTBOUND @id GRAPH "graph"
 FILTER e!=null
 SORT e.mainsnak.property
 LIMIT 0, 10
 RETURN e
+```
 
 
+```
 FOR l IN link
 FILTER l.mainsnak.datatype=='globe-coordinate'
 SORT  GEO_DISTANCE([l.mainsnak.datavalue.value.latitude, l.mainsnak.datavalue.value.longitude], GEO_POINT(74,40)) ASC
 LIMIT 100
 RETURN {l:DOCUMENT('entity',l['_from']).labels.zh.value, loc: [l.mainsnak.datavalue.value.latitude, l.mainsnak.datavalue.value.longitude]}
+```
 
 
+```
 FOR document IN FULLTEXT(link, 'mainsnak.datavalue.value', '123') 
 FILTER document.mainsnak.datavalue.type=='string'
 RETURN {id: document['_from'], property: document.mainsnak.property,document:document.mainsnak.datavalue.value}
+```
 
 
+```
 FOR doc IN entity OPTIONS { indexHint: "idx_1778095045005541376", forceIndexHint: true }
 FILTER LIKE(doc.labels.zh.value, TOKENS("b", "norm_en")[0])
 RETURN doc.labels.zh
+```
 
 
-
+```
 SEARCH doc.labels.zh.value LIKE @keyword
 OR doc.labels.en.value LIKE @keyword
 OR doc.descriptions.zh.value LIKE @keyword
 OR doc.descriptions.en.value LIKE @keyword
 OR doc.aliases.zh.value LIKE @keyword
 OR doc.aliases.en.value LIKE @keyword
-
+```
 
 检索并导出
 
-
+```
 let langulage = 'zh'
 
 let items = (FOR doc IN entity_view
@@ -245,3 +256,4 @@ FOR i in items
 let values = (FOR p in properties LET value = (FOR l IN link FILTER l['_from'] == i AND l.mainsnak.property==p.id RETURN l.mainsnak.datavalue) RETURN value[0]['type']=='wikibase-entityid'? TO_ARRAY(DOCUMENT(CONCAT('entity/',value[0]['value']['id']))['labels'][langulage]['value']): value[0]['type']=='time'?TO_ARRAY(value[0]['value']['time']):value[0]['type']=='string'? TO_ARRAY(value[0]['value']): value[0]['type']=='quantity'?TO_ARRAY(value[*]['value']['amount']):value)
 
 RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNION( [TO_ARRAY(DOCUMENT(i)['_key']), TO_ARRAY(DOCUMENT(i).labels[langulage].value), TO_ARRAY(DOCUMENT(i).descriptions[langulage].value), DOCUMENT(i).aliases[langulage][*].value],values))
+```
