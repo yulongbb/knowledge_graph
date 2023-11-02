@@ -1,0 +1,28 @@
+<x-row space="1">
+  <x-col span="8">
+    <x-card>
+      <x-statistic label="实体对齐" value="{{ 2981231 | number }}"> </x-statistic>
+    </x-card>
+  </x-col>
+  <x-col span="8">
+    <x-card>
+      <x-statistic label="属性对齐" value="{{ 1023123.122 | number: '1.0-2' }}"> </x-statistic>
+    </x-card>
+  </x-col>
+  <x-col span="8">
+    <x-card>
+      <x-statistic label="值对齐" value="{{ 1023123.122 | number: '1.0-2' }}"> </x-statistic>
+    </x-card>
+  </x-col>
+</x-row>
+<x-input-group compact>
+  <x-input
+    [style.width.%]="25"
+    placeholder="输入内容"
+    [(ngModel)]="keyword"
+    (keyup.enter)="search(keyword)"
+  ></x-input>
+  <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+</x-input-group>
+
+<x-table [columns]="columns" [data]="data" loading> </x-table>
