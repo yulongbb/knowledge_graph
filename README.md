@@ -57,10 +57,11 @@ arangodb初始化库方法
 2. 配置属性
 通过多个实体id获取属性并集，勾选需要导出的属性
 
+```
 RETURN UNIQUE(FOR l IN link
 FILTER l['_from'] IN ["entity/Q22099965","entity/Q21040218"]
 RETURN l.mainsnak.property)
-
+```
 
 [
     "P31",
