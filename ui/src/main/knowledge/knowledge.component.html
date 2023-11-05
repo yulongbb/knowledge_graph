@@ -1,26 +1,24 @@
 知识库
 
-<x-button icon="fto-save" type="primary" (click)="action('save', selected)" [disabled]="formGroup.invalid || disabled">
-  新增
-</x-button>
+<au-tool>
+  <x-button
+    type="primary"
+    icon="fto-plus"
+    (click)="action('add')"
+    >新增</x-button
+  >
+</au-tool>
 
-<x-form class="au-panel au-overflow-auto" au-adaption [outerHeight]="128" [formGroup]="formGroup" [controls]="controls" [disabled]="disabled"
-direction="row" labelSuffix=":" labelWidth="6rem" width="24rem" labelAlign="end" span="20" space="2"></x-form>
-
-<div class="row ">
-  <x-row space="1">
-    <x-col span="4" *ngFor="let d of data.list">
-      <x-card class="card" [bodyStyle]="{ padding: 0 }">
-        <img src="https://ngnest.com/assets/img/logo/logo-144x144.png" />
-        <div class="bottom">
-          <p>{{d.name}}</p>
-          <div class="time">
-            <span>2019-10-11 22:10</span>
-            <x-button type="text">操作按钮</x-button>
-          </div>
-        </div>
-      </x-card>
-    </x-col>
-  
-  </x-row>
-</div>
+<x-table
+#tableCom
+[columns]="columns"
+[rowHeight]="35"
+[data]="data"
+[size]="20"
+[(index)]="index"
+[query]="query"
+[bodyHeight]="100"
+[adaptionHeight]="128"
+virtualScroll
+loading
+></x-table>

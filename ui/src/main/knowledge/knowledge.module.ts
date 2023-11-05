@@ -6,6 +6,7 @@ import { ShareModule } from "src/share/share.module";
 import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
+import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.component";
 
 
 @NgModule({
@@ -17,6 +18,6 @@ import { NgNestModule } from "src/share/ng-nest.module";
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],
-  declarations: [KnowledgeComponent]
+  declarations: [KnowledgeComponent, KnowledgeDetailComponent]
 })
 export class KnowledgeModule {}

@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('extraction')
 export class Extraction {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn('uuid', { length: 36 })
   id: string;
 
   @Column()
@@ -13,5 +13,4 @@ export class Extraction {
 
   @Column()
   object: string;
-
 }

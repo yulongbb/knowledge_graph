@@ -7,12 +7,11 @@ import {
   Body,
 } from '@nestjs/common';
 import { FusionService } from './fusion.service';
-import { XIdType, XQuery } from 'src/core';
+import { XIdType } from 'src/core';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('fusion')
 @ApiTags('知识融合') // 分组
-
 export class FusionController {
   constructor(private readonly fusionService: FusionService) {}
 
@@ -26,7 +25,6 @@ export class FusionController {
     db: string = 'kgms',
     @Body() query: any,
   ): any {
-
     return this.fusionService.getEntityList(index, size, query, db);
   }
 

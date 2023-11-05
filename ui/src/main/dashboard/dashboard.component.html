@@ -1,1 +1,24 @@
-dashboard
+<x-row space="1">
+  <x-col span="6">
+    <x-card>
+      <x-statistic label="本体" value="{{ 2981231 | number }}"> </x-statistic>
+    </x-card>
+  </x-col>
+  <x-col span="6">
+    <x-card>
+      <x-statistic label="三元组" value="{{ 2981231 | number }}"> </x-statistic>
+    </x-card>
+  </x-col>
+  <x-col span="6">
+    <x-card>
+      <x-statistic label="实体" value="{{ 1023123.122 | number : '1.0-2' }}">
+      </x-statistic>
+    </x-card>
+  </x-col>
+  <x-col span="6">
+    <x-card>
+      <x-statistic label="知识库" value="{{ 1023123.122 | number : '1.0-2' }}">
+      </x-statistic>
+    </x-card>
+  </x-col>
+</x-row>

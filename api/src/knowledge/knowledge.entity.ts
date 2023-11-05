@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('knowledge')
 export class Knowledge {
@@ -8,4 +8,6 @@ export class Knowledge {
   @Column()
   name: string;
 
+  @Column()
+  description: string;
 }

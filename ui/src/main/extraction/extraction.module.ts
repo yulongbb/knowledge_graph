@@ -7,6 +7,7 @@ import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
+import { ExtractionDetailComponent } from "./extraction-detail/extraction-detail.component";
 
 
 @NgModule({
@@ -19,6 +20,6 @@ import { XTreeModule } from '@ng-nest/ui/tree';
     XTreeModule,
     ExtractionRoutesModule
   ],
-  declarations: [ExtractionComponent]
+  declarations: [ExtractionComponent,ExtractionDetailComponent]
 })
 export class ExtractionModule {}

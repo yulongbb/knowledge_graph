@@ -1,3 +1,47 @@
 知识抽取
 
-<x-table [columns]="columns" [data]="data" loading> </x-table>
+<!-- <x-button
+  icon="fto-save"
+  type="primary"
+  (click)="action('save', selected)"
+  [disabled]="formGroup.invalid || disabled"
+>
+  新增
+</x-button>
+
+<x-form
+  au-adaption
+  [outerHeight]="128"
+  [formGroup]="formGroup"
+  [controls]="controls"
+  [disabled]="disabled"
+  direction="row"
+  labelSuffix=":"
+
+  labelAlign="end"
+  span="8"
+  space="1.5"
+></x-form> -->
+
+<au-tool>
+  <x-button
+    type="primary"
+    icon="fto-plus"
+    (click)="action('add')"
+    >新增</x-button
+  >
+</au-tool>
+
+<x-table
+#tableCom
+[columns]="columns"
+[rowHeight]="35"
+[data]="data"
+[size]="20"
+[(index)]="index"
+[query]="query"
+[bodyHeight]="100"
+[adaptionHeight]="128"
+virtualScroll
+loading
+></x-table>
