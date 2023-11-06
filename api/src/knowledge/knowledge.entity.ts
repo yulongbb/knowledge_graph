@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('knowledge')
 export class Knowledge {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn('uuid', { length: 36 })
   id: string;
+
 
   @Column()
   name: string;

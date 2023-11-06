@@ -3,15 +3,15 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { KnowledgeService } from '../knowledge.service';
+import { PropertyService } from '../property.service';
 
 @Component({
-  selector: 'app-knowledge-detail',
-  templateUrl: './knowledge-detail.component.html',
-  styleUrls: ['./knowledge-detail.component.scss'],
+  selector: 'app-property-detail',
+  templateUrl: './property-detail.component.html',
+  styleUrls: ['./property-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KnowledgeDetailComponent implements OnInit {
+export class PropertyDetailComponent implements OnInit {
   id: string = '';
   type: string = '';
   @ViewChild('form') form!: XFormComponent;
@@ -41,7 +41,7 @@ export class KnowledgeDetailComponent implements OnInit {
   }
   disabled = false;
   constructor(
-    private knowledgeService: KnowledgeService,
+    private propertyService: PropertyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService
@@ -68,7 +68,7 @@ export class KnowledgeDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.knowledgeService.get(this.id).subscribe((x) => {
+        this.propertyService.get(this.id).subscribe((x) => {
           this.form.formGroup.patchValue(x);
         });
         break;
@@ -78,19 +78,19 @@ export class KnowledgeDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           console.log(this.form.formGroup.value)
-          this.knowledgeService.post(this.form.formGroup.value).subscribe((x) => {
+          this.propertyService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
-            this.router.navigate(['/index/knowledge']);
+            this.router.navigate(['/index/extraction']);
           });
         } else if (this.type === 'edit') {
-          this.knowledgeService.put(this.form.formGroup.value).subscribe((x) => {
+          this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
-            this.router.navigate(['/index/knowledge']);
+            this.router.navigate(['/index/extraction']);
           });
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/knowledge']);
+        this.router.navigate(['/index/extraction']);
         break;
     }
   }

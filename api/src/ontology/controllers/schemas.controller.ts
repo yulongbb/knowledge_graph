@@ -7,7 +7,6 @@ import { ApiTags } from '@nestjs/swagger';
 
 
 @Controller('schemas')
-@UseGuards(AuthGuard('jwt'))
 @ApiTags('本体建模') // 分组
 export class SchemasController extends XControllerService<Schema, XQuery> {
   constructor(public readonly schemasService: SchemasService) {

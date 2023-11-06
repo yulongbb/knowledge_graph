@@ -1,0 +1,24 @@
+知识库
+
+<au-tool>
+  <x-button
+    type="primary"
+    icon="fto-plus"
+    (click)="action('add')"
+    >新增</x-button
+  >
+</au-tool>
+
+<x-table
+#tableCom
+[columns]="columns"
+[rowHeight]="35"
+[data]="data"
+[size]="20"
+[(index)]="index"
+[query]="query"
+[bodyHeight]="100"
+[adaptionHeight]="128"
+virtualScroll
+loading
+></x-table>

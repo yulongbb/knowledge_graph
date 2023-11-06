@@ -43,4 +43,15 @@ export class FusionController {
   ): any {
     return this.fusionService.getLinks(id, index, size);
   }
+
+
+  @Get('property/:size/:index')
+  getProperties(
+    @Param('index', new ParseIntPipe())
+    index: number = 1,
+    @Param('size', new ParseIntPipe())
+    size: number = 10,
+  ): any {
+    return this.fusionService.getProperties(index, size);
+  }
 }

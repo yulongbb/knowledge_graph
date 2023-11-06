@@ -119,12 +119,24 @@ export const layoutRoutes: Routes = [
   {
     path: "ontology",
     loadChildren: () =>
-      import("../main/ontology/ontology.module").then(x => x.OntologyModule),
+      import("../main/ontology/ontology/ontology.module").then(x => x.OntologyModule),
     canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
   },
+
+   // 本体
+   {
+    path: "property",
+    loadChildren: () =>
+      import("../main/ontology/property/property.module").then(x => x.PropertyModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
 
   // 抽取
   {

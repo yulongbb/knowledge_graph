@@ -257,3 +257,13 @@ let values = (FOR p in properties LET value = (FOR l IN link FILTER l['_from'] =
 
 RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNION( [TO_ARRAY(DOCUMENT(i)['_key']), TO_ARRAY(DOCUMENT(i).labels[langulage].value), TO_ARRAY(DOCUMENT(i).descriptions[langulage].value), DOCUMENT(i).aliases[langulage][*].value],values))
 ```
+
+
+
+
+
+FOR e IN entity_view
+SEARCH STARTS_WITH(e['_key'], 'P')
+SORT +SUBSTRING(e['_key'], 1)
+LIMIT 100
+RETURN {id: e['_key'], label: e['labels']['zh']}

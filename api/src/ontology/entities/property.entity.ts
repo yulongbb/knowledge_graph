@@ -7,11 +7,17 @@ export class Property {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column('text', { nullable: true })
   name: string;
 
   @Column('text', { nullable: true })
   description: string;
+
+  @Column()
+  enName: string;
+
+  @Column('text', { nullable: true })
+  enDescription: string;
 
   @ManyToMany(() => Schema, (schema) => schema.properties)
   schemas: Schema[]
