@@ -8,6 +8,10 @@ import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { XInputModule } from '@ng-nest/ui/input';
+import { FusionEntityComponent } from "./fusion-entity/fusion-entity.component";
+import { FusionItemComponent } from "./fusion-item/fusion-item.component";
+import { FusionPropertyComponent } from "./fusion-property/fusion-property.component";
+import { FusionValueComponent } from "./fusion-value/fusion-value.component";
 
 
 
@@ -22,6 +26,6 @@ import { XInputModule } from '@ng-nest/ui/input';
     XInputModule,
     FusionRoutesModule
   ],
-  declarations: [FusionComponent]
+  declarations: [FusionComponent, FusionEntityComponent, FusionItemComponent, FusionPropertyComponent, FusionValueComponent]
 })
 export class FusionModule {}

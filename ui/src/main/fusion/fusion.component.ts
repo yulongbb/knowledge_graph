@@ -1,10 +1,11 @@
 import { PageBase } from 'src/share/base/base-page';
 import { Component } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
-import { XTableColumn } from '@ng-nest/ui/table';
+import { XTableColumn, XTableRow } from '@ng-nest/ui/table';
 import { tap, map } from 'rxjs';
 import { FusionService } from 'src/main/fusion/fusion.service';
 import { Query } from 'src/services/repository.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-fusion',
@@ -25,9 +26,13 @@ export class FusionComponent extends PageBase {
     { id: 'label', label: '标签', flex: 1.5, sort: true },
     { id: 'description', label: '描述', flex: 0.5, sort: true },
     { id: 'aliases', label: '别名', flex: 1 },
+    { id: 'actions', label: '操作', width: 100, right: 0 }
+
   ];
 
   constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
     private service: FusionService,
     public override indexService: IndexService
   ) {
@@ -42,5 +47,12 @@ export class FusionComponent extends PageBase {
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
+  }
+
+  detail(row: XTableRow, column: XTableColumn) {
+    console.log(row.id[0].split('/')[1]);
+    this.router.navigate([`./item/${row.id[0].split('/')[1]}`], {
+      relativeTo: this.activatedRoute,
+    });
   }
 }
