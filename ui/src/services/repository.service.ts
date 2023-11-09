@@ -41,6 +41,7 @@ export type Operation = '%' | '=' | '>' | '>=' | '<' | '<=' | '';
 
 export class RepositoryService<Entity extends Id> {
   constructor(public http: HttpService, public option: RepositoryOption) {}
+  
 
   getList(index?: number, size?: number, query?: Query): Observable<ResultList<Entity>> {
     index = index ? index : 1;

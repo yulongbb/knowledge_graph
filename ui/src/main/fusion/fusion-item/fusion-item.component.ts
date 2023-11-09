@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, Input, OnInit, } from '@angular/core';
+import { XTableColumn, XTableRow } from '@ng-nest/ui';
 import { XGuid } from '@ng-nest/ui/core';
-import { XFormComponent, XControl } from '@ng-nest/ui/form';
-import { XMessageService } from '@ng-nest/ui/message';
+import { FusionService } from '../fusion.service';
+import { map, tap } from 'rxjs';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Query } from 'src/services/repository.service';
 
 @Component({
   selector: 'app-fusion-item',
@@ -11,44 +13,44 @@ import { XMessageService } from '@ng-nest/ui/message';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FusionItemComponent implements OnInit {
-  id: string = '';
-  type: string = '';
-  @ViewChild('form') form!: XFormComponent;
-  controls: XControl[] = [
-    {
-      control: 'input',
-      id: 'name',
-      label: '名称',
-      required: true,
-      maxlength: 16,
-      // pattern: /^[A-Za-z0-9]{4,16}$/,
-      // message: '只能包括数字、字母的组合，长度为4-16位'
-    },
-    {
-      control: 'input',
-      id: 'description',
-      label: '描述',
-      required: true,
-      // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
-      // message: '邮箱格式不正确，admin@ngnest.com'
-    },
-    { control: 'input', id: 'id', hidden: true, value: XGuid() }
-  ];
+  @Input() id:any
+
+  keyword = '';
   title = '实体详情';
-  get formInvalid() {
-    return this.form?.formGroup?.invalid;
-  }
-  disabled = false;
-  constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private message: XMessageService
-  ) {
-   
+  data:any;
+
+  columns: XTableColumn[] = [
+    { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
+    { id: 'property', label: '属性名', width: 200 },
+    { id: 'value', label: '值', flex: 1 },
+  ];
+
+  constructor(   
+    private service: FusionService,
+    ) {
+      this.data = (index: number, size: number,id: string, query: Query) =>
+      this.service.getLinks(index, size, this.id, query).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
+    }
+    
+
+  
+
+  ngOnInit() {}
+
+  add() {
+    // this.data = [...this.data, { id: XGuid(), name: '', position: '', status: false }];
   }
 
-  ngOnInit(): void {
+  del(row: XTableRow) {
+    const index = this.data.findIndex((x:any) => x.id === row.id);
+    if (index >= 0) {
+      this.data.splice(index, 1);
+    }
   }
+
 
 
 }

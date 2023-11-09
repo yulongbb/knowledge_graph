@@ -33,15 +33,16 @@ export class FusionController {
     return this.fusionService.getEntity(id);
   }
 
-  @Get('link/:id/:size/:index')
+  @Post('link/:id/:size/:index')
   getLinks(
     @Param('id') id: XIdType,
     @Param('index', new ParseIntPipe())
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
+    @Body() query: any,
   ): any {
-    return this.fusionService.getLinks(id, index, size);
+    return this.fusionService.getLinks(id, index, size, query);
   }
 
 

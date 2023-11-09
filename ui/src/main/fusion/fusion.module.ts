@@ -12,6 +12,7 @@ import { FusionEntityComponent } from "./fusion-entity/fusion-entity.component";
 import { FusionItemComponent } from "./fusion-item/fusion-item.component";
 import { FusionPropertyComponent } from "./fusion-property/fusion-property.component";
 import { FusionValueComponent } from "./fusion-value/fusion-value.component";
+import { XDrawerModule } from "@ng-nest/ui";
 
 
 
@@ -24,6 +25,7 @@ import { FusionValueComponent } from "./fusion-value/fusion-value.component";
     AuAdaptionModule,
     XTreeModule,
     XInputModule,
+    XDrawerModule,
     FusionRoutesModule
   ],
   declarations: [FusionComponent, FusionEntityComponent, FusionItemComponent, FusionPropertyComponent, FusionValueComponent]

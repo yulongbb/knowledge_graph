@@ -61,7 +61,7 @@ export class FusionService {
   }
 
 
-  async getLinks(id: XIdType, index: number, size: number): Promise<any> {
+  async getLinks(id: XIdType, index: number, size: number,query:any): Promise<any> {
     
     try {
       let start = size * (index - 1);
@@ -76,7 +76,7 @@ export class FusionService {
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果
-      return result;
+      return {total:100, list:result};
     } catch (error) {
       console.error('Query Error:', error);
     }
