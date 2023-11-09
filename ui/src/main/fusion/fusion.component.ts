@@ -14,6 +14,7 @@ import { XPosition } from '@ng-nest/ui';
   styleUrls: ['./fusion.component.scss'],
 })
 export class FusionComponent extends PageBase {
+  id:any;
   keyword = '';
 
   value: XPosition = 'right';
@@ -22,10 +23,12 @@ export class FusionComponent extends PageBase {
 
   detail(row: XTableRow, column: XTableColumn) {
     console.log(row.id[0].split('/')[1]);
+    this.id = row.id[0].split('/')[1];
     this.visible = true;
   }
 
   close() {
+    this.id=null;
     this.visible = false;
   }
 

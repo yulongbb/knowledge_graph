@@ -28,17 +28,20 @@ export class FusionItemComponent implements OnInit {
   constructor(   
     private service: FusionService,
     ) {
-      this.data = (index: number, size: number,id: string, query: Query) =>
-      this.service.getLinks(index, size, this.id, query).pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
+   
     }
     
 
   
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.id)
+    this.data = (index: number, size: number,id: string, query: Query) =>
+    this.service.getLinks(index, size, this.id, query).pipe(
+      tap((x: any) => console.log(x)),
+      map((x: any) => x)
+    );
+  }
 
   add() {
     // this.data = [...this.data, { id: XGuid(), name: '', position: '', status: false }];

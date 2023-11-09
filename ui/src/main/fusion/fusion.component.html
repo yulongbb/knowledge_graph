@@ -29,5 +29,5 @@
   [placement]="value"
   (close)="close()"
 >
-  <app-fusion-item [id]="'Q58'"></app-fusion-item>
+  <app-fusion-item *ngIf="id" [id]="id"></app-fusion-item>
 </x-drawer>
