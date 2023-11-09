@@ -26,27 +26,16 @@
 <ng-template #bodyTdTpl let-column="$column" let-row="$row">
   <ng-container [ngSwitch]="column.id">
     <ng-container *ngSwitchCase="'property'">
-      <x-input
+      {{ row.mainsnak.property | property | async }}
+      <!-- <x-input
         [style.width.%]="100"
         [(ngModel)]="row.mainsnak.property"
-      ></x-input>
-    </ng-container>
-    <ng-container *ngSwitchCase="'datatype'">
-      <x-input
-        [style.width.%]="100"
-        [(ngModel)]="row.mainsnak.datatype"
-      ></x-input>
+      ></x-input> -->
     </ng-container>
     <ng-container *ngSwitchCase="'value'">
       <x-input
         [style.width.%]="100"
         [(ngModel)]="row.mainsnak.datavalue.value"
-      ></x-input>
-    </ng-container>
-    <ng-container *ngSwitchCase="'type'">
-      <x-input
-        [style.width.%]="100"
-        [(ngModel)]="row.mainsnak.datavalue.type"
       ></x-input>
     </ng-container>
 

@@ -1,4 +1,3 @@
-
 <x-input-group compact>
   <x-input
     [style.width.%]="25"
@@ -9,16 +8,26 @@
   <x-button icon="fto-search" (click)="search(keyword)"></x-button>
 </x-input-group>
 
-<x-table [columns]="columns" [data]="data"   [bodyColumnTpl]="{ actions: actionsTpl }" loading> </x-table>
-
+<x-table
+  [columns]="columns"
+  [data]="data"
+  [bodyColumnTpl]="{ actions: actionsTpl }"
+  loading
+>
+</x-table>
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">
   <div>
-    <x-link type="primary" (click)="detail(row, column)">查看</x-link> &nbsp;&nbsp;
+    <x-link type="primary" (click)="detail(row, column)">查看</x-link>
+    &nbsp;&nbsp;
   </div>
 </ng-template>
 
-
-<x-drawer title="标题" [visible]="visible" [placement]="value" (close)="close()">
-  <app-fusion-item [id]="'Q31'"></app-fusion-item>
+<x-drawer
+  title="标题"
+  [visible]="visible"
+  [placement]="value"
+  (close)="close()"
+>
+  <app-fusion-item [id]="'Q58'"></app-fusion-item>
 </x-drawer>
