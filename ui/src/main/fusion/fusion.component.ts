@@ -47,8 +47,6 @@ export class FusionComponent extends PageBase {
   ];
 
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private service: FusionService,
     public override indexService: IndexService
   ) {

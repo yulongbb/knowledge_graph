@@ -11,6 +11,10 @@ export class FusionService extends RepositoryService<Item> {
     super(http, { controller: { name: 'api/fusion' } });
   }
 
+  getItem(id: number | string): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/entity/${id}`);
+  }
+
   getLinks(
     index?: number,
     size?: number,

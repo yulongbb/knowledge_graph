@@ -1,4 +1,11 @@
 <h3>{{ title }}</h3>
+
+
+<x-form *ngIf="controls" [controls]="controls" direction="row" labelSuffix=":"  labelAlign="end" span="20"></x-form>
+
+
+
+
 <x-button
   [style.marginBottom.rem]="1"
   (click)="add()"
