@@ -10,7 +10,7 @@ export class PropertyPipe implements PipeTransform {
     console.log(property);
 
     return this.http
-      .get(`/api/properties/${property.replace('P', '')}`)
-      .pipe(map((p: any) => p.name))
+      .get(`assets/json/ontology_property.json`)
+      .pipe(map((data: any) => data.RECORDS.filter((p:any) => p.id==property.replace('P', ''))[0].name))
   }
 }

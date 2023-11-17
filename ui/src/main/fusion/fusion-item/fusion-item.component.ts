@@ -21,6 +21,7 @@ export class FusionItemComponent implements OnInit {
   @Input() id: any = '';
 
   keyword = '';
+  size=20;
   title = '实体详情';
   data: any;
 
@@ -62,7 +63,7 @@ export class FusionItemComponent implements OnInit {
     });
 
     this.data = (index: number, size: number, id: string, query: Query) =>
-      this.service.getLinks(index, size, this.id, query).pipe(
+      this.service.getLinks(index, this.size, this.id, query).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

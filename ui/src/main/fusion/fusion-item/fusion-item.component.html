@@ -1,10 +1,13 @@
 <h3>{{ title }}</h3>
 
-
-<x-form *ngIf="controls" [controls]="controls" direction="row" labelSuffix=":"  labelAlign="end" span="20"></x-form>
-
-
-
+<x-form
+  *ngIf="controls"
+  [controls]="controls"
+  direction="row"
+  labelSuffix=":"
+  labelAlign="end"
+  span="20"
+></x-form>
 
 <x-button
   [style.marginBottom.rem]="1"
@@ -33,7 +36,7 @@
 <ng-template #bodyTdTpl let-column="$column" let-row="$row">
   <ng-container [ngSwitch]="column.id">
     <ng-container *ngSwitchCase="'property'">
-      {{ row.mainsnak.property | property | async }}
+      {{ row.mainsnak.property }}
       <!-- <x-input
         [style.width.%]="100"
         [(ngModel)]="row.mainsnak.property"
@@ -41,11 +44,28 @@
     </ng-container>
     <ng-container *ngSwitchCase="'value'">
       <x-input
+        *ngIf="row.mainsnak.datavalue.type == 'string'"
         [style.width.%]="100"
         [(ngModel)]="row.mainsnak.datavalue.value"
+      ></x-input>
+
+      <x-input
+        *ngIf="row.mainsnak.datavalue.type == 'quantity'"
+        [style.width.%]="100"
+        [(ngModel)]="row.mainsnak.datavalue.value.amount"
+      ></x-input>
+
+      <x-input
+        [before]="afterButtonTpl"
+        *ngIf="row.mainsnak.datavalue.type == 'wikibase-entityid'"
+        [style.width.%]="100"
+        [(ngModel)]="row.mainsnak.datavalue.value.id"
       ></x-input>
     </ng-container>
 
     <ng-container *ngSwitchDefault>{{ row[column.id] }}</ng-container>
   </ng-container>
+</ng-template>
+<ng-template #afterButtonTpl>
+  <x-button icon="fto-search"></x-button>
 </ng-template>

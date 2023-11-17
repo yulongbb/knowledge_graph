@@ -16,6 +16,7 @@ import { XPosition } from '@ng-nest/ui';
 export class FusionComponent extends PageBase {
   id:any;
   keyword = '';
+  size = 20;
 
   value: XPosition = 'right';
 
@@ -33,7 +34,7 @@ export class FusionComponent extends PageBase {
   }
 
   data = (index: number, size: number, query: Query) =>
-    this.service.getList(index, size, { keyword: `%${this.keyword}%` }).pipe(
+    this.service.getList(index, this.size, { keyword: `%${this.keyword}%` }).pipe(
       tap((x: any) => console.log(x)),
       map((x: any) => x)
     );
@@ -57,7 +58,7 @@ export class FusionComponent extends PageBase {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, size, { keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

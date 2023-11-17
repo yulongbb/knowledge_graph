@@ -45,7 +45,8 @@ export class RepositoryService<Entity extends Id> {
 
   getList(index?: number, size?: number, query?: Query): Observable<ResultList<Entity>> {
     index = index ? index : 1;
-    size = size ? size : 10;
+    size = size ? size : 20;
+    console.log(size)
     return this.http.post(`${this.option.controller?.name}/${size}/${index}`, query);
   }
 
