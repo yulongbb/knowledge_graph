@@ -6,6 +6,56 @@ import { XIdType, XQuery } from 'src/core';
 export class FusionService {
   constructor(@Inject('ARANGODB') private db: Database) {}
 
+  async addEntity(entity: any): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('entity');
+
+    // 插入数据
+    const document = {
+      _key: entity.id,
+      id: entity.id,
+      labels: { zh: { language: 'zh', value: entity.label } },
+      descriptions: { zh: { language: 'zh', value: entity.description } },
+      modified: new Date().toISOString(),
+    };
+
+    return myCollection.save(document).then(
+      (doc) => console.log('Document saved:', doc),
+      (err) => console.error('Failed to save document:', err),
+    );
+  }
+
+  async updateEntity(entity: any): Promise<any> {
+    // Fetch the existing document
+    const myCollection = this.db.collection('entity');
+
+    return myCollection
+      .document(entity.id)
+      .then((existingDocument) => {
+        // Update the document fields
+        existingDocument.labels = {
+          zh: { language: 'zh', value: entity.label },
+        };
+        existingDocument.descriptions = {
+          zh: { language: 'zh', value: entity.description },
+        };
+        existingDocument.modified = new Date().toISOString();
+        return myCollection.update(existingDocument._key, existingDocument);
+      })
+      .then(
+        (updatedDocument) => console.log('Document updated:', updatedDocument),
+        (err) => console.error('Failed to update document:', err),
+      );
+  }
+
+  async deleteEntity(id: any): Promise<any> {
+    const myCollection = this.db.collection('entity');
+    return myCollection.remove(id).then(
+      () => console.log('Document removed successfully'),
+      (err) => console.error('Failed to remove document:', err),
+    );
+  }
+
   async getEntityList(
     index: number,
     size: number,
@@ -23,7 +73,19 @@ export class FusionService {
       let cursor = null;
       console.log(start);
       console.log(size);
+      console.log(query.keyword);
       if (query.keyword == '%%') {
+        console.log(123);
+        console.log(`
+        LET langulage = 'zh'
+        LET list = (FOR doc IN entity
+        FILTER  doc.modified
+        SORT doc.modified
+        LIMIT ${start}, ${size}
+        RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
+        RETURN {total: COUNT(entity), list: list}
+    `);
+
         cursor = await this.db.query(aql`
         LET langulage = 'zh'
         LET list = (FOR doc IN entity
@@ -40,15 +102,15 @@ export class FusionService {
         let langulage = 'zh'
 
         LET total = COUNT(FOR doc IN entity_view
-        SEARCH LIKE(doc['labels'][langulage]['value'], TOKENS(${query.keyword}, "en")[0] )
-        OR LIKE(doc['descriptions'][langulage]['value'], TOKENS(${query.keyword}, "en")[0])
-        OR LIKE(doc['aliases'][langulage]['value'],  TOKENS(${query.keyword}, "en")[0]) RETURN doc)
+        SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
+        OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
+        OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword}) RETURN doc)
 
 
         LET list = (FOR doc IN entity_view
-        SEARCH LIKE(doc['labels'][langulage]['value'], TOKENS(${query.keyword}, "en")[0] )
-        OR LIKE(doc['descriptions'][langulage]['value'], TOKENS(${query.keyword}, "en")[0])
-        OR LIKE(doc['aliases'][langulage]['value'],  TOKENS(${query.keyword}, "en")[0])
+        SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
+        OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
+        OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword})
         LIMIT ${start}, ${size}
         RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
 

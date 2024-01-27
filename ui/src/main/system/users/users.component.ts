@@ -85,6 +85,8 @@ export class UsersComponent extends PageBase {
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
             action === 'confirm' &&
+            console.log(this.tableCom);
+            console.log(this.index);
               this.service.delete(item.id).subscribe(() => {
                 this.tableCom.change(this.index);
                 this.message.success('删除成功！');

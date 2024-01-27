@@ -1,3 +1,9 @@
+<au-tool>
+  <x-button type="primary" icon="fto-plus" (click)="action('add')"
+    >新增</x-button
+  >
+</au-tool>
+
 <x-input-group compact>
   <x-input
     [style.width.%]="25"
@@ -9,24 +15,30 @@
 </x-input-group>
 
 <x-table
+  #tableCom
+  au-adaption
   [columns]="columns"
   [data]="data"
   [bodyColumnTpl]="{ actions: actionsTpl }"
+  (activatedChange)="action('info', $event)"
   loading
 >
 </x-table>
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">
   <div>
-    <x-link type="primary" (click)="detail(row, column)">查看</x-link>
+    <x-link type="info" (click)="action('info', row)">查看</x-link>
     &nbsp;&nbsp;
+    <x-link type="primary" (click)="action('edit', row)">编辑</x-link>
+    &nbsp;&nbsp;
+    <x-link type="danger" (click)="action('delete', row)">删除</x-link>
   </div>
 </ng-template>
 
 <x-drawer
-title="标题"
-size="50%"
-[visible]="visible"
+  title="标题"
+  size="50%"
+  [visible]="visible"
   [placement]="value"
   (close)="close()"
 >

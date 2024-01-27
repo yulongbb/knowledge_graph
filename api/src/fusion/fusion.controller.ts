@@ -5,6 +5,8 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { FusionService } from './fusion.service';
 import { XIdType } from 'src/core';
@@ -14,6 +16,21 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('知识融合') // 分组
 export class FusionController {
   constructor(private readonly fusionService: FusionService) {}
+
+  @Post()
+  async addEntity(@Body() entity: any): Promise<any> {
+    return await this.fusionService.addEntity(entity);
+  }
+
+  @Put()
+  async updateEntity(@Body() entity: any): Promise<any> {
+    return await this.fusionService.updateEntity(entity);
+  }
+
+  @Delete('entity/:id')
+  deleteEntity(@Param('id') id: XIdType): any {
+    return this.fusionService.deleteEntity(id);
+  }
 
   @Post(':size/:index')
   getEntityList(
@@ -44,7 +61,6 @@ export class FusionController {
   ): any {
     return this.fusionService.getLinks(id, index, size, query);
   }
-
 
   @Get('property/:size/:index')
   getProperties(

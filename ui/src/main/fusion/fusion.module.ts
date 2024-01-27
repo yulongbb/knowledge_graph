@@ -14,6 +14,7 @@ import { FusionPropertyComponent } from "./fusion-property/fusion-property.compo
 import { FusionValueComponent } from "./fusion-value/fusion-value.component";
 import { XDrawerModule } from "@ng-nest/ui";
 import { PropertyPipe } from "src/pipes/property.pipe";
+import { FusionDetailComponent } from "./fusion-detail/fusion-detail.component";
 
 
 
@@ -29,6 +30,6 @@ import { PropertyPipe } from "src/pipes/property.pipe";
     XDrawerModule,
     FusionRoutesModule
   ],
-  declarations: [FusionComponent, FusionEntityComponent, FusionItemComponent, FusionPropertyComponent, FusionValueComponent,PropertyPipe]
+  declarations: [FusionComponent, FusionDetailComponent,FusionEntityComponent, FusionItemComponent, FusionPropertyComponent, FusionValueComponent,PropertyPipe]
 })
 export class FusionModule {}
