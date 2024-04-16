@@ -5,12 +5,14 @@ import { XMessageModule } from '@ng-nest/ui/message';
 import { XMessageBoxModule } from '@ng-nest/ui/message-box';
 import { AuAuthDirective } from './auth/auth.directive';
 import { CommonModule } from '@angular/common';
+import { XFindModule } from '@ng-nest/ui/find';
+
 
 // 视图
 const declarations = [AuAuthDirective];
 
 // 模块
-const modules = [FormsModule, CommonModule, ReactiveFormsModule, HttpClientModule, XMessageModule, XMessageBoxModule];
+const modules = [FormsModule, CommonModule, ReactiveFormsModule, HttpClientModule, XMessageModule, XMessageBoxModule,XFindModule];
 
 /**
  * 共享模块

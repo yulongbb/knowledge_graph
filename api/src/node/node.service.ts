@@ -1,10 +1,69 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
-import { XIdType } from 'src/core';
+import { XIdType, XQuery } from 'src/core';
+import { Extraction } from 'src/extraction/extraction.entity';
+import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
-export class NodeService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+export class FusionService {
+
+  constructor(@Inject('ARANGODB') private db: Database) { }
+
+
+  async fusion(extraction: Extraction): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('entity');
+
+    this.getEntityBylabel(extraction.subject).then((x) => {
+      var from;
+      var to;
+      if (x == null) {
+        from = UUID;
+      } else {
+        from = x['_key'];
+      }
+      x = { id: from, label: extraction.subject, description: extraction.subject };
+
+      this.addEntity(x).then((s) => {
+        console.log(s)
+        this.getEntityBylabel(extraction.object).then((y) => {
+          if (y == null) {
+            to = UUID;
+          } else {
+            to = y['_key'];
+          }
+          y = { id: to, label: extraction.subject, description: extraction.subject };
+
+          this.addEntity(y).then((o) => {
+            console.log(o)
+
+            const link = {
+              id: UUID,
+              from: from,
+              to: to,
+            }
+            this.addLink(link);
+
+          })
+        });
+
+      });
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
 
   async addEntity(entity: any): Promise<any> {
     // 获取集合（Collection）
@@ -18,6 +77,41 @@ export class NodeService {
       descriptions: { zh: { language: 'zh', value: entity.description } },
       modified: new Date().toISOString(),
     };
+
+    return myCollection.save(document).then(
+      (doc) => console.log('Document saved:', doc),
+      (err) => console.error('Failed to save document:', err),
+    );
+  }
+
+
+  async addLink(entity: any): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('link');
+
+    // 插入数据
+    const document = {
+      "_from": entity.from,
+      "_to": entity.to,
+      "id": entity.id,
+      "mainsnak": {
+        "snaktype": "value",
+        "property": "P21",
+        "hash": "8f7599319c8f07055134a500cf67fc22d1b3142d",
+        "datavalue": {
+          "value": {
+            "entity-type": "item",
+            "numeric-id": 40014,
+            "id": "Q40014"
+          },
+          "type": "wikibase-entityid"
+        },
+        "datatype": "wikibase-item"
+      },
+      "type": "statement",
+      "rank": "normal",
+    }
+
 
     return myCollection.save(document).then(
       (doc) => console.log('Document saved:', doc),
@@ -142,6 +236,23 @@ export class NodeService {
     }
   }
 
+
+  async getEntityBylabel(label: String): Promise<any> {
+    try {
+      // 执行查询
+      const cursor = await this.db.query(aql`FOR e IN entity
+      FILTER e['labels']['zh']['value']==${label}
+      RETURN e`);
+      // 获取查询结果
+      const result = await cursor.next();
+      // 处理查询结果
+      return result;
+    } catch (error) {
+      console.error('Query Error:', error);
+    }
+  }
+
+
   async getLinks(
     id: XIdType,
     index: number,
@@ -153,9 +264,8 @@ export class NodeService {
       let end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}

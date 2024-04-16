@@ -9,6 +9,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { map, tap } from 'rxjs';
 import { XGuid } from '@ng-nest/ui/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-ontology',
@@ -60,11 +61,11 @@ export class OntologyComponent extends PageBase {
       },
     },
     {
-      id: 'actions',
+      id: 'properties',
       label: '属性',
       icon: 'fto-list',
       handler: (schema: Schema) => {
-        this.action('actions', schema);
+        this.action('properties', schema);
       },
     },
     {
@@ -108,6 +109,8 @@ export class OntologyComponent extends PageBase {
     private service: OntologyService,
     public override indexService: IndexService,
     private message: XMessageService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
     private msgBox: XMessageBoxService
   ) {
     super(indexService);
@@ -146,11 +149,11 @@ export class OntologyComponent extends PageBase {
             this.message.success('新增成功！');
           });
         } else if (this.type === 'edit') {
-          // this.service.put(this.formGroup.value).subscribe(() => {
-          //   this.type = 'info';
-          //   this.treeCom.updateNode(node, this.formGroup.value);
-          //   this.message.success('修改成功！');
-          // });
+          this.service.put(this.formGroup.value).subscribe(() => {
+            this.type = 'info';
+            this.treeCom.updateNode(schema, this.formGroup.value);
+            this.message.success('修改成功！');
+          });
         }
         break;
       case 'delete':
@@ -169,7 +172,10 @@ export class OntologyComponent extends PageBase {
           },
         });
         break;
+      case 'properties':
+        this.router.navigate([`./properties/${schema.id}`], { relativeTo: this.activatedRoute });
+        break;
     }
   }
-  
+
 }
