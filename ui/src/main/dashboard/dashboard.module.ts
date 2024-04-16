@@ -7,7 +7,6 @@ import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
 import { XInputModule, XTreeModule } from '@ng-nest/ui';
-import { FusionRoutesModule } from '../fusion/fusion-routes.module';
 
 @NgModule({
   declarations: [DashboardComponent],

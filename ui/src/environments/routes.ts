@@ -153,9 +153,19 @@ export const layoutRoutes: Routes = [
 
   // 融合
   {
-    path: "fusion",
+    path: "node",
     loadChildren: () =>
-      import("../main/fusion/fusion.module").then(x => x.FusionModule),
+      import("../main/node/node.module").then(x => x.NodeModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
+  {
+    path: "edge",
+    loadChildren: () =>
+      import("../main/edge/edge.module").then(x => x.EdgeModule),
     canLoad: [AuthGuard],
     data: {
       shouldReuse: true

@@ -5,7 +5,7 @@ import { DesignModule } from './design/design.module';
 
 import { AuthModule } from './auth/auth.module';
 import { OntologynModule } from 'src/ontology/ontology.module';
-import { FusionModule } from 'src/fusion/fusion.module';
+import { NodeModule } from 'src/node/node.module';
 import { ExtractionModule } from 'src/extraction/extraction.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
@@ -27,7 +27,7 @@ import { MinioClientModule } from './minio/minio-client.module';
     DesignModule,
     OntologynModule,
     ExtractionModule,
-    FusionModule,
+    NodeModule,
     KnowledgeModule,
     MinioClientModule,
     AuthModule,
