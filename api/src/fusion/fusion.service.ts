@@ -15,23 +15,42 @@ export class FusionService {
     const myCollection = this.db.collection('entity');
 
     this.getEntityBylabel(extraction.subject).then((x) => {
+      var from;
+      var to;
       if (x == null) {
-        x = { id: UUID, label: extraction.subject, description: extraction.subject };
+        from = UUID;
       } else {
-        x = { id: x['_key'], label: extraction.subject, description: extraction.subject };
+        from = x['_key'];
       }
-      this.addEntity(x);
+      x = { id: from, label: extraction.subject, description: extraction.subject };
+
+      this.addEntity(x).then((s) => {
+        console.log(s)
+        this.getEntityBylabel(extraction.object).then((y) => {
+          if (y == null) {
+            to = UUID;
+          } else {
+            to = y['_key'];
+          }
+          y = { id: to, label: extraction.subject, description: extraction.subject };
+
+          this.addEntity(y).then((o) => {
+            console.log(o)
+
+            const link = {
+              id: UUID,
+              from: from,
+              to: to,
+            }
+            this.addLink(link);
+
+          })
+        });
+
+      });
     });
 
 
-    this.getEntityBylabel(extraction.object).then((x) => {
-      if (x == null) {
-        x = { id: UUID, label: extraction.object, description: extraction.object };
-      } else {
-        x = { id: x['_key'], label: extraction.subject, description: extraction.subject };
-      }
-      this.addEntity(x);
-    });
 
 
 
@@ -58,6 +77,41 @@ export class FusionService {
       descriptions: { zh: { language: 'zh', value: entity.description } },
       modified: new Date().toISOString(),
     };
+
+    return myCollection.save(document).then(
+      (doc) => console.log('Document saved:', doc),
+      (err) => console.error('Failed to save document:', err),
+    );
+  }
+
+
+  async addLink(entity: any): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('link');
+
+    // 插入数据
+    const document = {
+      "_from": entity.from,
+      "_to": entity.to,
+      "id": entity.id,
+      "mainsnak": {
+        "snaktype": "value",
+        "property": "P21",
+        "hash": "8f7599319c8f07055134a500cf67fc22d1b3142d",
+        "datavalue": {
+          "value": {
+            "entity-type": "item",
+            "numeric-id": 40014,
+            "id": "Q40014"
+          },
+          "type": "wikibase-entityid"
+        },
+        "datatype": "wikibase-item"
+      },
+      "type": "statement",
+      "rank": "normal",
+    }
+
 
     return myCollection.save(document).then(
       (doc) => console.log('Document saved:', doc),
