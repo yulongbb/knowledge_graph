@@ -25,6 +25,7 @@ export class OntologyPropertiesComponent implements OnInit {
     columns: XTableColumn[] = [
         { id: 'id', label: '序号', flex: 0.5, left: 0, },
         { id: 'actions', label: '操作', width: 100 },
+
         { id: 'name', label: '名称', flex: 0.5, sort: true },
         { id: 'description', label: '描述', flex: 2.5, sort: true },
     ];
@@ -38,10 +39,10 @@ export class OntologyPropertiesComponent implements OnInit {
         private msgBox: XMessageBoxService,
         private nav: NavService
     ) {
-        // this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-        //     this.schemaId = x.get('schemaId') as string;
-        //     this.query.filter = [{ field: 'schemaId', value: this.schemaId as string, operation: '=' }];
-        // });
+        this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+            this.schemaId = x.get('schemaId') as string;
+            this.query.filter = [{ field: 'id', value: this.schemaId as string, relation:'schemas', operation: '=' }];
+        });
     }
 
     ngOnInit() { }
