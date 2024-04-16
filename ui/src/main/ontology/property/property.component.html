@@ -1,24 +1,7 @@
-知识库
+<h4>
+  <span>属性</span>
+  <x-link icon="fto-plus" title="增加根节点" (click)="action('add-root', selected)"></x-link>
+</h4>
 
-<au-tool>
-  <x-button
-    type="primary"
-    icon="fto-plus"
-    (click)="action('add')"
-    >新增</x-button
-  >
-</au-tool>
-
-<x-table
-#tableCom
-[columns]="columns"
-[rowHeight]="35"
-[data]="data"
-[size]="20"
-[(index)]="index"
-[query]="query"
-[bodyHeight]="100"
-[adaptionHeight]="128"
-virtualScroll
-loading
-></x-table>
+<x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index" [query]="query"
+  [bodyHeight]="100" [adaptionHeight]="128" virtualScroll loading></x-table>

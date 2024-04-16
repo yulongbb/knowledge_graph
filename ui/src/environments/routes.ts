@@ -126,9 +126,9 @@ export const layoutRoutes: Routes = [
     }
   },
 
-   // 本体
+   // 属性
    {
-    path: "property",
+    path: "properties",
     loadChildren: () =>
       import("../main/ontology/property/property.module").then(x => x.PropertyModule),
     canLoad: [AuthGuard],

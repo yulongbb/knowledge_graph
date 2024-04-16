@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { SettingService } from './setting.service';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService } from '@ng-nest/ui/message-box';
