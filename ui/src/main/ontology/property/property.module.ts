@@ -7,6 +7,8 @@ import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { PropertyDetailComponent } from "./property-detail/property-detail.component";
+import { XFindModule } from '@ng-nest/ui/find';
+
 
 
 @NgModule({

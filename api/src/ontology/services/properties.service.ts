@@ -14,5 +14,7 @@ export class PropertiesService extends XRepositoryService<Property, XQuery> {
   ) {
     super(propertiesRepository, dataSource);
   }
-
+  async get(id: XIdType): Promise<Property> {
+    return await this.propertiesRepository.findOneBy({ id: id });
+  }
 }

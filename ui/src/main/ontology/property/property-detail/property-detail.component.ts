@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { XGuid } from '@ng-nest/ui/core';
+import { XGuid, XQuery } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
+import { map } from 'rxjs';
+import { OntologyService } from '../../ontology/ontology.service';
 import { PropertyService } from '../property.service';
 
 @Component({
@@ -33,6 +35,24 @@ export class PropertyDetailComponent implements OnInit {
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
+
+    {
+      control: 'find',
+      id: 'schemas',
+      label: '挂载点',
+      required: true,
+      multiple: true,
+      treeData: () => this.ontologyService
+        .getList(1, Number.MAX_SAFE_INTEGER, {
+          sort: [
+            { field: 'pid', value: 'asc' },
+            { field: 'sort', value: 'asc' },
+          ],
+        })
+        .pipe(
+          map((x) => x.list)
+        )
+    },
     { control: 'input', id: 'id', hidden: true, value: XGuid() }
   ];
   title = '';
@@ -40,7 +60,12 @@ export class PropertyDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
+
+  query: XQuery = { filter: [] };
+
   constructor(
+    private ontologyService: OntologyService,
+
     private propertyService: PropertyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -51,12 +76,12 @@ export class PropertyDetailComponent implements OnInit {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
       if (this.type === 'info') {
-        this.title = '查看知识库';
+        this.title = '查看属性';
         this.disabled = true;
       } else if (this.type === 'add') {
-        this.title = '新增知识库';
+        this.title = '新增属性';
       } else if (this.type === 'update') {
-        this.title = '修改知识库';
+        this.title = '修改属性';
       }
     });
   }
@@ -68,8 +93,16 @@ export class PropertyDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.propertyService.get(this.id).subscribe((x) => {
-          this.form.formGroup.patchValue(x);
+        this.propertyService.get(this.id).subscribe((x:any) => {
+          this.query.filter = [{ field: 'id', value: x.id as string, relation: 'properties', operation: '=' }];
+
+          this.ontologyService.getList(1, 10, this.query).subscribe((y:any)=> {
+            x['schemas'] = y.list;
+            console.log(x.list);
+
+            this.form.formGroup.patchValue(x);
+
+          })
         });
         break;
       case 'edit':
@@ -80,17 +113,18 @@ export class PropertyDetailComponent implements OnInit {
           console.log(this.form.formGroup.value)
           this.propertyService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
-            this.router.navigate(['/index/extraction']);
+            this.router.navigate(['/index/properties']);
           });
         } else if (this.type === 'edit') {
+          console.log(this.form.formGroup.value);
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
-            this.router.navigate(['/index/extraction']);
+            this.router.navigate(['/index/properties']);
           });
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/extraction']);
+        this.router.navigate(['/index/properties']);
         break;
     }
   }

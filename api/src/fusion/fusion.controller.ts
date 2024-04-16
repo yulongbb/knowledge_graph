@@ -11,6 +11,7 @@ import {
 import { FusionService } from './fusion.service';
 import { XIdType } from 'src/core';
 import { ApiTags } from '@nestjs/swagger';
+import { Extraction } from 'src/extraction/extraction.entity';
 
 @Controller('fusion')
 @ApiTags('知识融合') // 分组
@@ -18,11 +19,17 @@ export class FusionController {
   constructor(private readonly fusionService: FusionService) {}
 
   @Post()
+  async fusion(@Body() extraction: Extraction): Promise<any> {
+    return await this.fusionService.fusion(extraction);
+  }
+
+
+  @Post('entity')
   async addEntity(@Body() entity: any): Promise<any> {
     return await this.fusionService.addEntity(entity);
   }
 
-  @Put()
+  @Put('entity')
   async updateEntity(@Body() entity: any): Promise<any> {
     return await this.fusionService.updateEntity(entity);
   }

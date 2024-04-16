@@ -2,11 +2,12 @@ import { PageBase } from 'src/share/base/base-page';
 import { Component, Query, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
-import { XFormRow, XGuid, XQuery, XTableColumn, XTableComponent } from '@ng-nest/ui';
+import { XFormRow, XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
 import { Extraction, ExtractionService } from './extraction.service';
 import { map, tap } from 'rxjs';
 import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FusionService } from '../fusion/fusion.service';
 
 @Component({
   selector: 'app-extraction',
@@ -64,9 +65,13 @@ export class ExtractionComponent extends PageBase {
     this.service.getList(index, size, query).pipe((x: any) => {
       return x;
     });
+  checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
+    { id: 'checked', label: '', rowChecked: true, headChecked: true, type: 'checkbox', width: 60 },
+
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
+    { id: 'actions', label: '操作', width: 100 },
     { id: 'subject', label: '实体', flex: 1.5, sort: true },
     { id: 'property', label: '属性', flex: 0.5, sort: true },
     { id: 'object', label: '值', flex: 1 },
@@ -76,11 +81,46 @@ export class ExtractionComponent extends PageBase {
   constructor(
     public override indexService: IndexService,
     private service: ExtractionService,
+    private fusionService: FusionService,
+
     private message: XMessageService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private msgBox: XMessageBoxService
+
   ) {
     super(indexService);
+  }
+
+
+  setCheckedRows(checked: boolean, row: XTableRow) {
+    if (checked) {
+      if (!this.checkedRows.some((x) => x.id === row.id)) {
+        this.checkedRows.push(row);
+      }
+    } else {
+      if (this.checkedRows.some((x) => x.id === row.id)) {
+        let index = this.checkedRows.findIndex((x) => x.id === row.id);
+        this.checkedRows.splice(index, 1);
+      }
+    }
+  }
+
+  headCheckboxChange(headCheckbox: XTableHeadCheckbox) {
+    // checked 属性来源于定义的 id 列
+    const checked = headCheckbox.checkbox['checked'];
+    for (let row of headCheckbox.rows) {
+      this.setCheckedRows(checked, row);
+    }
+
+    console.log(this.checkedRows);
+  }
+
+  bodyCheckboxChange(row: XTableRow) {
+    // checked 属性来源于定义的 id 列
+    this.setCheckedRows(row['checked'], row);
+
+    console.log(this.checkedRows);
   }
 
   action(type: string, item?: any) {
@@ -99,6 +139,24 @@ export class ExtractionComponent extends PageBase {
       case 'edit':
         this.router.navigate([`./${type}/${item.id}`], {
           relativeTo: this.activatedRoute,
+        });
+        break;
+      case 'upload':
+        console.log(this.checkedRows);
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将此条数据推送融合：${this.checkedRows[0].toString()}，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' &&
+              this.checkedRows.forEach(row => {
+                this.fusionService.fusion(row).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('融合成功！');
+                });
+              })
+
+          },
         });
         break;
       case 'delete':

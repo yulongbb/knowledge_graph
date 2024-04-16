@@ -1,10 +1,50 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType, XQuery } from 'src/core';
+import { Extraction } from 'src/extraction/extraction.entity';
+import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+
+  constructor(@Inject('ARANGODB') private db: Database) { }
+
+
+  async fusion(extraction: Extraction): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('entity');
+
+    this.getEntityBylabel(extraction.subject).then((x) => {
+      if (x == null) {
+        x = { id: UUID, label: extraction.subject, description: extraction.subject };
+      } else {
+        x = { id: x['_key'], label: extraction.subject, description: extraction.subject };
+      }
+      this.addEntity(x);
+    });
+
+
+    this.getEntityBylabel(extraction.object).then((x) => {
+      if (x == null) {
+        x = { id: UUID, label: extraction.object, description: extraction.object };
+      } else {
+        x = { id: x['_key'], label: extraction.subject, description: extraction.subject };
+      }
+      this.addEntity(x);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+  }
 
   async addEntity(entity: any): Promise<any> {
     // 获取集合（Collection）
@@ -142,6 +182,23 @@ export class FusionService {
     }
   }
 
+
+  async getEntityBylabel(label: String): Promise<any> {
+    try {
+      // 执行查询
+      const cursor = await this.db.query(aql`FOR e IN entity
+      FILTER e['labels']['zh']['value']==${label}
+      RETURN e`);
+      // 获取查询结果
+      const result = await cursor.next();
+      // 处理查询结果
+      return result;
+    } catch (error) {
+      console.error('Query Error:', error);
+    }
+  }
+
+
   async getLinks(
     id: XIdType,
     index: number,
@@ -153,9 +210,8 @@ export class FusionService {
       let end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}

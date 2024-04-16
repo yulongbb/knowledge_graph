@@ -94,7 +94,7 @@ export class FusionDetailComponent implements OnInit {
         this.fusionService.getItem(this.id).subscribe((x) => {
           console.log(x)
           let item:any = {};
-          item['id']=x.id;
+          item['id']=x['_key'];
           item['label']=x?.labels?.zh?.value;
           item['description']=x?.descriptions?.zh?.value;
           this.form.formGroup.patchValue(item);
@@ -111,12 +111,12 @@ export class FusionDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           console.log(this.form.formGroup.value)
-          this.fusionService.post(this.form.formGroup.value).subscribe((x) => {
+          this.fusionService.addItem(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/fusion']);
           });
         } else if (this.type === 'edit') {
-          this.fusionService.put(this.form.formGroup.value).subscribe((x) => {
+          this.fusionService.updateItem(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
             this.router.navigate(['/index/fusion']);
           });
