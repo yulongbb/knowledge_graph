@@ -102,20 +102,12 @@ export class EdgeDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           console.log(this.form.formGroup.value)
-<<<<<<< HEAD:ui/src/main/edge/edge-detail/edge-detail.component.ts
           this.edgeService.post(this.form.formGroup.value).subscribe((x) => {
-=======
-          this.fusionService.addItem(this.form.formGroup.value).subscribe((x) => {
->>>>>>> a336371c9f1779d9c2e88ab180d4afeb6467311d:ui/src/main/fusion/fusion-detail/fusion-detail.component.ts
             this.message.success('新增成功！');
             this.router.navigate(['/index/fusion']);
           });
         } else if (this.type === 'edit') {
-<<<<<<< HEAD:ui/src/main/edge/edge-detail/edge-detail.component.ts
           this.edgeService.put(this.form.formGroup.value).subscribe((x) => {
-=======
-          this.fusionService.updateItem(this.form.formGroup.value).subscribe((x) => {
->>>>>>> a336371c9f1779d9c2e88ab180d4afeb6467311d:ui/src/main/fusion/fusion-detail/fusion-detail.component.ts
             this.message.success('修改成功！');
             this.router.navigate(['/index/fusion']);
           });

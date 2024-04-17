@@ -9,6 +9,7 @@ import { NodeModule } from 'src/node/node.module';
 import { ExtractionModule } from 'src/extraction/extraction.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
+import { FusionModule } from './fusion/fusion.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MinioClientModule } from './minio/minio-client.module';
     OntologynModule,
     ExtractionModule,
     NodeModule,
+    FusionModule,
     KnowledgeModule,
     MinioClientModule,
     AuthModule,

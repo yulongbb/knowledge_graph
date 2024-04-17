@@ -2,55 +2,110 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
 import { Extraction } from 'src/extraction/extraction.entity';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class NodeService {
+export class FusionService {
   constructor(@Inject('ARANGODB') private db: Database) {}
 
   async fusion(extraction: Extraction): Promise<any> {
     // 获取集合（Collection）
+    // 通过名称判断节点是否存在，如果节点存在进行更新，如果节点不存在进行新增
 
     this.getEntityBylabel(extraction.subject).then((x) => {
-      let from;
-      let to;
-      if (x == null) {
-        from = UUID;
-      } else {
-        from = x['_key'];
-      }
-      x = {
-        id: from,
-        label: extraction.subject,
-        description: extraction.subject,
-      };
+      console.log('x:' + x);
 
-      this.addEntity(x).then((s) => {
-        console.log(s);
-        this.getEntityBylabel(extraction.object).then((y) => {
-          if (y == null) {
-            to = UUID;
-          } else {
-            to = y['_key'];
-          }
-          y = {
-            id: to,
-            label: extraction.subject,
-            description: extraction.subject,
-          };
+      // 节点不存在
+      if (x == undefined) {
+        x = {
+          id: uuidv4(),
+          label: extraction.subject,
+          description: extraction.subject,
+        };
+        // 新增节点
+        this.addEntity(x).then(() => {
+          this.getEntityBylabel(extraction.object).then((y) => {
+            // 如果节点不存在
+            if (y == undefined) {
+              y = {
+                id: uuidv4(),
+                label: extraction.object,
+                description: extraction.object,
+              };
+              this.addEntity(y).then(() => {
+                console.log(x);
+                console.log(y);
 
-          this.addEntity(y).then((o) => {
-            console.log(o);
-
-            const link = {
-              id: UUID,
-              from: from,
-              to: to,
-            };
-            this.addLink(link);
+                const link = {
+                  id: uuidv4(),
+                  from: 'entity/' + x.id,
+                  to: 'entity/' + y.id,
+                };
+                this.addLink(link);
+              });
+            } else {
+              y = {
+                id: y['_key'],
+                label: extraction.object,
+                description: extraction.object,
+              };
+              // 更新节点
+              this.updateEntity(y).then(() => {});
+            }
           });
         });
-      });
+        // this.getEntityBylabel(extraction.object).then((y) => {
+        //   console.log(y);
+        //   if (y == null) {
+        //     to = UUID;
+        //   } else {
+        //     to = y['_key'];
+        //   }
+        //   y = {
+        //     id: to,
+        //     label: extraction.subject,
+        //     description: extraction.subject,
+        //   };
+        //   this.addEntity(y).then(() => {
+        //     const link = {
+        //       id: UUID,
+        //       from: from,
+        //       to: to,
+        //     };
+        //     console.log(link);
+        //     this.addLink(link);
+        //   });
+        // });
+      } else {
+        // 节点存在
+        x = {
+          id: x['_key'],
+          label: extraction.subject,
+          description: extraction.subject,
+        };
+        // 更新节点
+        this.updateEntity(x).then(() => {
+          this.getEntityBylabel(extraction.object).then((y) => {
+            // 如果节点不存在
+            if (y == undefined) {
+              y = {
+                id: uuidv4(),
+                label: extraction.object,
+                description: extraction.object,
+              };
+              this.addEntity(y).then(() => {});
+            } else {
+              y = {
+                id: y['_key'],
+                label: extraction.object,
+                description: extraction.object,
+              };
+              // 更新节点
+              this.updateEntity(y).then(() => {});
+            }
+          });
+        });
+      }
     });
   }
 
@@ -223,7 +278,7 @@ export class NodeService {
     }
   }
 
-  async getEntityBylabel(label: string): Promise<any> {
+  async getEntityBylabel(label: any): Promise<any> {
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR e IN entity
