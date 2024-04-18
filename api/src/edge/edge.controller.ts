@@ -5,7 +5,6 @@ import {
   ParseIntPipe,
   Post,
   Body,
-  Put,
   Delete,
 } from '@nestjs/common';
 import { EdgeService } from './edge.service';
@@ -25,7 +24,7 @@ export class EdgeController {
     size: number = 10,
     @Body() query: any,
   ): any {
-    return this.nodeService.getLinks( index, size, query);
+    return this.nodeService.getLinks(index, size, query);
   }
 
   @Get('property/:size/:index')
@@ -36,5 +35,10 @@ export class EdgeController {
     size: number = 10,
   ): any {
     return this.nodeService.getProperties(index, size);
+  }
+
+  @Delete(':id')
+  deleteEdge(@Param('id') id: XIdType): any {
+    return this.nodeService.deleteEdge(id);
   }
 }

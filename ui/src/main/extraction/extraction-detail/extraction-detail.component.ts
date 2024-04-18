@@ -89,17 +89,10 @@ export class ExtractionDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value)
-          this.propertyService.getPropertyByName(this.form.formGroup.value.property).subscribe((property) => {
-            console.log(property);
-            this.form.formGroup.value.property = 'P' + property.id;
-            this.extractionService.post(this.form.formGroup.value).subscribe((x) => {
-              this.message.success('新增成功！');
-              this.router.navigate(['/index/extraction']);
-            });
-          })
-
-
+          this.extractionService.post(this.form.formGroup.value).subscribe((x) => {
+            this.message.success('新增成功！');
+            this.router.navigate(['/index/extraction']);
+          });
         } else if (this.type === 'edit') {
           this.extractionService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');

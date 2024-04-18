@@ -68,7 +68,7 @@ export class ExtractionComponent extends PageBase {
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
-    { id: 'checked', label: '', rowChecked: true, headChecked: true, type: 'checkbox', width: 60 },
+    { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
 
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'actions', label: '操作', width: 100 },
@@ -159,18 +159,18 @@ export class ExtractionComponent extends PageBase {
         });
         break;
       case 'delete':
-        // this.msgBox.confirm({
-        //   title: '提示',
-        //   content: `此操作将永久删除此条数据：${item.account}，是否继续？`,
-        //   type: 'warning',
-        //   callback: (action: XMessageBoxAction) => {
-        //     action === 'confirm' &&
-        //       this.service.delete(item.id).subscribe(() => {
-        //         this.tableCom.change(this.index);
-        //         this.message.success('删除成功！');
-        //       });
-        //   },
-        // });
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将永久删除此条数据：${item.account}，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' &&
+              this.service.delete(item.id).subscribe(() => {
+                this.tableCom.change(this.index);
+                this.message.success('删除成功！');
+              });
+          },
+        });
         break;
       case 'tree-info':
         // this.selected = item;

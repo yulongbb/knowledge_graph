@@ -1,25 +1,20 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
-import { XIdType } from 'src/core';
 
 @Injectable()
 export class EdgeService {
-  constructor(@Inject('ARANGODB') private db: Database) { }
+  constructor(@Inject('ARANGODB') private db: Database) {}
 
-  async getLinks(
-    index: number,
-    size: number,
-    query: any,
-  ): Promise<any> {
+  async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
-      let start = size * (index - 1);
-      let end = start + size;
+      const start = size * (index - 1);
+      const end = start + size;
       console.log(query.toString());
 
       // 执行查询
       const cursor = await this.db.query(aql`FOR edge IN link
       LIMIT ${start}, ${end}
-      RETURN {from: Document(edge['_from']), to: Document(edge['_to']), property: edge['mainsnak']['property']}
+      RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property'])}
      
       `);
       // 获取查询结果
@@ -33,8 +28,8 @@ export class EdgeService {
 
   async getProperties(index: number, size: number): Promise<any> {
     try {
-      let start = size * (index - 1);
-      let end = start + size;
+      const start = size * (index - 1);
+      const end = start + size;
 
       // 执行查询
       const cursor = await this.db.query(aql`FOR e IN entity_view
@@ -49,5 +44,13 @@ export class EdgeService {
     } catch (error) {
       console.error('Query Error:', error);
     }
+  }
+
+  async deleteEdge(id: any): Promise<any> {
+    const myCollection = this.db.collection('link');
+    return myCollection.remove(id).then(
+      () => console.log('Document removed successfully'),
+      (err) => console.error('Failed to remove document:', err),
+    );
   }
 }
