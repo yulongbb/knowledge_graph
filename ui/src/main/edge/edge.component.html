@@ -8,7 +8,8 @@
 </x-input-group>
 
 <x-table #tableCom au-adaption [columns]="columns" [data]="data"
-  [bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl,  property: propertyTpl }" (activatedChange)="action('info', $event)" loading>
+  [bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl,  property: propertyTpl }"
+  (activatedChange)="action('info', $event)" loading>
 </x-table>
 
 <ng-template #fromTpl let-column="$column" let-row="$row">
@@ -26,7 +27,7 @@
 
 <ng-template #propertyTpl let-column="$column" let-row="$row">
   <div>
-    {{row.property.name}}
+    {{row.property}}
   </div>
 </ng-template>
 
