@@ -31,18 +31,38 @@ export class FusionService {
                 };
                 this.addEntity(y).then((o) => {
                   this.getPropertyByName(extraction.property).then((p) => {
-                    const link = {
-                      from: s['_id'],
-                      to: o['_id'],
-                      property: p['_key'],
-                    };
-                    this.getLinkByFromAndTo(link).then((l) => {
-                      if (l == undefined) {
-                        // 关系不存在
-                        this.addLink(link);
-                      }
-                    })
+                    if (p != null) {
+                      const link = {
+                        from: s['_id'],
+                        to: o['_id'],
+                        property: p['_key'],
+                      };
+                      this.getLinkByFromAndTo(link).then((l) => {
+                        if (l == undefined) {
+                          // 关系不存在
+                          this.addLink(link);
+                        }
+                      })
+                    } else {
+                      const property = {
+                        name: extraction.property,
+                        description: extraction.property,
+                      };
+                      this.addProperty(property).then((p) => {
+                        const link = {
+                          from: s['_id'],
+                          to: o['_id'],
+                          property: p['_key'],
+                        };
+                        this.getLinkByFromAndTo(link).then((l) => {
+                          if (l == undefined) {
+                            // 关系不存在
+                            this.addLink(link);
+                          }
+                        })
+                      });
 
+                    }
                   });
                 });
               } else {
@@ -54,18 +74,38 @@ export class FusionService {
                 // 更新节点
                 this.updateEntity(y).then((o) => {
                   this.getPropertyByName(extraction.property).then((p) => {
-                    const link = {
-                      id: uuidv4(),
-                      from: s['_id'],
-                      to: o['_id'],
-                      property: p['_key'],
-                    };
-                    this.getLinkByFromAndTo(link).then((l) => {
-                      if (l == undefined) {
-                        // 关系不存在
-                        this.addLink(link);
-                      }
-                    })
+                    if (p != null) {
+                      const link = {
+                        from: s['_id'],
+                        to: o['_id'],
+                        property: p['_key'],
+                      };
+                      this.getLinkByFromAndTo(link).then((l) => {
+                        if (l == undefined) {
+                          // 关系不存在
+                          this.addLink(link);
+                        }
+                      })
+                    } else {
+                      const property = {
+                        name: extraction.property,
+                        description: extraction.property,
+                      };
+                      this.addProperty(property).then((p) => {
+                        const link = {
+                          from: s['_id'],
+                          to: o['_id'],
+                          property: p['_key'],
+                        };
+                        this.getLinkByFromAndTo(link).then((l) => {
+                          if (l == undefined) {
+                            // 关系不存在
+                            this.addLink(link);
+                          }
+                        })
+                      });
+
+                    }
                   });
                 });
               }
@@ -89,18 +129,38 @@ export class FusionService {
                 };
                 this.addEntity(y).then((o) => {
                   this.getPropertyByName(extraction.property).then((p) => {
-                    const link = {
-                      id: uuidv4(),
-                      from: s['_id'],
-                      to: o['_id'],
-                      property: p['_key'],
-                    };
-                    this.getLinkByFromAndTo(link).then((l) => {
-                      if (l == undefined) {
-                        // 关系不存在
-                        this.addLink(link);
-                      }
-                    })
+                    if (p != null) {
+                      const link = {
+                        from: s['_id'],
+                        to: o['_id'],
+                        property: p['_key'],
+                      };
+                      this.getLinkByFromAndTo(link).then((l) => {
+                        if (l == undefined) {
+                          // 关系不存在
+                          this.addLink(link);
+                        }
+                      })
+                    } else {
+                      const property = {
+                        name: extraction.property,
+                        description: extraction.property,
+                      };
+                      this.addProperty(property).then((p) => {
+                        const link = {
+                          from: s['_id'],
+                          to: o['_id'],
+                          property: p['_key'],
+                        };
+                        this.getLinkByFromAndTo(link).then((l) => {
+                          if (l == undefined) {
+                            // 关系不存在
+                            this.addLink(link);
+                          }
+                        })
+                      });
+
+                    }
                   });
                 });
               } else {
@@ -112,18 +172,38 @@ export class FusionService {
                 // 更新节点
                 this.updateEntity(y).then((o) => {
                   this.getPropertyByName(extraction.property).then((p) => {
-                    const link = {
-                      id: uuidv4(),
-                      from: s['_id'],
-                      to: o['_id'],
-                      property: p['_key'],
-                    };
-                    this.getLinkByFromAndTo(link).then((l) => {
-                      if (l == undefined) {
-                        // 关系不存在
-                        this.addLink(link);
-                      }
-                    })
+                    if (p != null) {
+                      const link = {
+                        from: s['_id'],
+                        to: o['_id'],
+                        property: p['_key'],
+                      };
+                      this.getLinkByFromAndTo(link).then((l) => {
+                        if (l == undefined) {
+                          // 关系不存在
+                          this.addLink(link);
+                        }
+                      })
+                    } else {
+                      const property = {
+                        name: extraction.property,
+                        description: extraction.property,
+                      };
+                      this.addProperty(property).then((p) => {
+                        const link = {
+                          from: s['_id'],
+                          to: o['_id'],
+                          property: p['_key'],
+                        };
+                        this.getLinkByFromAndTo(link).then((l) => {
+                          if (l == undefined) {
+                            // 关系不存在
+                            this.addLink(link);
+                          }
+                        })
+                      });
+
+                    }
                   });
                 });
               }
@@ -235,6 +315,24 @@ export class FusionService {
     } catch (error) {
       console.error('Query Error:', error);
     }
+  }
+
+
+  async addProperty(property: any): Promise<any> {
+    // 获取集合（Collection）
+    const myCollection = this.db.collection('property');
+
+    // 插入数据
+    const document = {
+      _key: property.id,
+      id: property.id,
+      name: property.name,
+      enName: null,
+      description: property.description,
+      enDescription: null,
+    };
+
+    return myCollection.save(document);
   }
 
 
