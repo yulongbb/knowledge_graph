@@ -19,7 +19,7 @@ export class EdgeService {
       // 执行查询
       const cursor = await this.db.query(aql`FOR edge IN link
       LIMIT ${start}, ${end}
-      RETURN {from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property'])}
+      RETURN {from: Document(edge['_from']), to: Document(edge['_to']), property: edge['mainsnak']['property']}
      
       `);
       // 获取查询结果

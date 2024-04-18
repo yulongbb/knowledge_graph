@@ -3,6 +3,8 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
+import { property } from 'lodash';
+import { PropertyService } from 'src/main/ontology/property/property.service';
 import { ExtractionService } from '../extraction.service';
 
 @Component({
@@ -49,6 +51,8 @@ export class ExtractionDetailComponent implements OnInit {
   }
   disabled = false;
   constructor(
+    private propertyService: PropertyService,
+
     private extractionService: ExtractionService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -86,10 +90,16 @@ export class ExtractionDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           console.log(this.form.formGroup.value)
-          this.extractionService.post(this.form.formGroup.value).subscribe((x) => {
-            this.message.success('新增成功！');
-            this.router.navigate(['/index/extraction']);
-          });
+          this.propertyService.getPropertyByName(this.form.formGroup.value.property).subscribe((property) => {
+            console.log(property);
+            this.form.formGroup.value.property = 'P' + property.id;
+            this.extractionService.post(this.form.formGroup.value).subscribe((x) => {
+              this.message.success('新增成功！');
+              this.router.navigate(['/index/extraction']);
+            });
+          })
+
+
         } else if (this.type === 'edit') {
           this.extractionService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');

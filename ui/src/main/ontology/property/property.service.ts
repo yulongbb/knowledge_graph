@@ -11,8 +11,13 @@ export class PropertyService extends RepositoryService<Property> {
     super(http, { controller: { name: 'api/properties' } });
   }
 
-  
+  getPropertyByName(name: number | string): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/${name}`);
+  }
+
 }
+
+
 
 
 export interface Property extends XId {

@@ -7,6 +7,7 @@ import { Property } from 'src/ontology/entities/property.entity';
 
 @Injectable()
 export class PropertiesService extends XRepositoryService<Property, XQuery> {
+
   constructor(
     @InjectRepository(Property)
     public readonly propertiesRepository: Repository<Property>,
@@ -16,5 +17,14 @@ export class PropertiesService extends XRepositoryService<Property, XQuery> {
   }
   async get(id: XIdType): Promise<Property> {
     return await this.propertiesRepository.findOneBy({ id: id });
+  }
+
+  async getPropertyByName(name: string): Promise<Property> {
+    console.log(name);
+    return await this.propertiesRepository.findOne({
+      where: {
+        name: name,
+      }
+    })
   }
 }
