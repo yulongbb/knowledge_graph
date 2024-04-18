@@ -10,6 +10,7 @@ import { ExtractionModule } from 'src/extraction/extraction.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { FusionModule } from './fusion/fusion.module';
+import { EdgeModule } from './edge/edge.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { FusionModule } from './fusion/fusion.module';
     KnowledgeModule,
     MinioClientModule,
     AuthModule,
+    EdgeModule
   ],
   controllers: [],
   providers: [],

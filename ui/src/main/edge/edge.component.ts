@@ -40,7 +40,7 @@ export class EdgeComponent extends PageBase {
 
   data = (index: number, size: number, query: Query) =>
     this.service
-      .getList(index, this.size, { keyword: `%${this.keyword}%` })
+      .getLinks(index, this.size)
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
@@ -48,9 +48,9 @@ export class EdgeComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'label', label: '标签', flex: 1.5, sort: true },
-    { id: 'description', label: '描述', flex: 0.5, sort: true },
-    { id: 'aliases', label: '别名', flex: 1 },
+    { id: 'from', label: '起始节点', flex: 1.5, sort: true },
+    { id: 'property', label: '关系', flex: 0.5, sort: true },
+    { id: 'to', label: '目标节点', flex: 1 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
   ];
 
@@ -70,7 +70,7 @@ export class EdgeComponent extends PageBase {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { keyword: `%${keyword}%` }).pipe(
+      this.service.getLinks(index, this.size).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

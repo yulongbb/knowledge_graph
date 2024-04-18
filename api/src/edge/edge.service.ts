@@ -4,10 +4,9 @@ import { XIdType } from 'src/core';
 
 @Injectable()
 export class EdgeService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database) { }
 
   async getLinks(
-    id: XIdType,
     index: number,
     size: number,
     query: any,
@@ -15,21 +14,14 @@ export class EdgeService {
     try {
       let start = size * (index - 1);
       let end = start + size;
+      console.log(query.toString());
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
-      FILTER e!=null
-      SORT e.mainsnak.property
+      const cursor = await this.db.query(aql`FOR edge IN link
       LIMIT ${start}, ${end}
-      RETURN e['mainsnak']['datavalue']['type']=='wikibase-entityid'?MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue:{value:{'entity-type':"item",'numeric-id':e['mainsnak']['datavalue']["value"]['numeric-id'],id:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]['value']:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["en"]['value']},type:"wikibase-entityid"},datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-):MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue: e['mainsnak']['datavalue'],datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-)`);
+      RETURN {from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property'])}
+     
+      `);
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果

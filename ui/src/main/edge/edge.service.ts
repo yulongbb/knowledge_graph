@@ -18,15 +18,11 @@ export class EdgeService extends RepositoryService<Item> {
   getLinks(
     index?: number,
     size?: number,
-    id?: string,
-    query?: Query
   ): Observable<any> {
     index = index ? index : 1;
     size = size ? size : 10;
-    console.log( `${this.option.controller?.name}/${id}/${size}/${index}`)
     return this.http.post(
-      `${this.option.controller?.name}/${id}/${size}/${index}`,
-      query
+      `${this.option.controller?.name}/${size}/${index}`,
     );
   }
 }

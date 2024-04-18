@@ -82,19 +82,19 @@ export class EdgeDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.edgeService.getItem(this.id).subscribe((x) => {
-          console.log(x)
-          let item:any = {};
-          item['id']=x['_key'];
-          item['label']=x?.labels?.zh?.value;
-          item['description']=x?.descriptions?.zh?.value;
-          this.form.formGroup.patchValue(item);
-          this.data = (index: number, size: number, id: string, query: Query) =>
-          this.edgeService.getLinks(index, this.size, this.id, this.query).pipe(
-            tap((x: any) => console.log(x)),
-            map((x: any) => x)
-          );
-        });
+        // this.edgeService.getItem(this.id).subscribe((x) => {
+        //   console.log(x)
+        //   let item:any = {};
+        //   item['id']=x['_key'];
+        //   item['label']=x?.labels?.zh?.value;
+        //   item['description']=x?.descriptions?.zh?.value;
+        //   this.form.formGroup.patchValue(item);
+        //   this.data = (index: number, size: number, id: string, query: Query) =>
+        //   this.edgeService.getLinks(index, this.size, this.id, this.query).pipe(
+        //     tap((x: any) => console.log(x)),
+        //     map((x: any) => x)
+        //   );
+        // });
         break;
       case 'edit':
         this.action('info');

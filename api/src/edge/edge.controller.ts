@@ -19,14 +19,13 @@ export class EdgeController {
 
   @Post(':size/:index')
   getLinks(
-    @Param('id') id: XIdType,
     @Param('index', new ParseIntPipe())
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
     @Body() query: any,
   ): any {
-    return this.nodeService.getLinks(id, index, size, query);
+    return this.nodeService.getLinks( index, size, query);
   }
 
   @Get('property/:size/:index')

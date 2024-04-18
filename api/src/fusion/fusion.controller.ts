@@ -19,8 +19,8 @@ export class FusionController {
   constructor(private readonly fusionService: FusionService) {}
 
   @Post()
-  async fusion(@Body() extraction: Extraction): Promise<any> {
-    return await this.fusionService.fusion(extraction);
+  async fusion(@Body() extractions: Array<Extraction>): Promise<any> {
+    return await this.fusionService.fusion({ extractions });
   }
 
   @Post('entity')

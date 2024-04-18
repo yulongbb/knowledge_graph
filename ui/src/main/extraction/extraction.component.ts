@@ -145,16 +145,15 @@ export class ExtractionComponent extends PageBase {
         console.log(this.checkedRows);
         this.msgBox.confirm({
           title: '提示',
-          content: `此操作将此条数据推送融合：${this.checkedRows[0].toString()}，是否继续？`,
+          content: `此操作将：${this.checkedRows.length}条数据推送融合，是否继续？`,
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
+            var arr = [];
             action === 'confirm' &&
-              this.checkedRows.forEach(row => {
-                this.fusionService.fusion(row).subscribe(() => {
-                  this.tableCom.change(this.index);
-                  this.message.success('融合成功！');
-                });
-              })
+              this.fusionService.fusion(this.checkedRows).subscribe(() => {
+                this.tableCom.change(this.index);
+                this.message.success('融合成功！');
+              });
 
           },
         });
