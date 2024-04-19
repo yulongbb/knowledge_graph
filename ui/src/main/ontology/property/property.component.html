@@ -7,6 +7,11 @@
   >
 </au-tool>
 
+<x-input-group compact>
+  <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
+  <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+</x-input-group>
+
 <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="size" [(index)]="index" [query]="query"
    [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" 
   loading></x-table>

@@ -1,28 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository, SelectQueryBuilder, getConnection } from 'typeorm';
-import { XQuery, XFilter, XGroupItem, XSort, XId, XResultList, XIdType } from '../interfaces';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  XQuery,
+  XFilter,
+  XGroupItem,
+  XSort,
+  XId,
+  XResultList,
+  XIdType,
+} from '../interfaces';
 import { orderBy, slice, map } from 'lodash';
 
 @Injectable()
 export class XRepositoryService<Entity extends XId, Query extends XQuery> {
-  constructor(private repository: Repository<Entity>, private dataSouce: DataSource) {}
+  constructor(
+    private repository: Repository<Entity>,
+    private dataSouce: DataSource,
+  ) {}
 
-  async getList(index: number, size: number, query: Query): Promise<XResultList<Entity | XGroupItem>> {
+  async getList(
+    index: number,
+    size: number,
+    query: Query,
+  ): Promise<XResultList<Entity | XGroupItem>> {
     return new Promise<XResultList<Entity | XGroupItem>>(async (x) => {
-      let qb = this.repository.createQueryBuilder('entity');
+      const qb = this.repository.createQueryBuilder('entity');
       let list: Entity[] | XGroupItem[] = [];
       let total: number = 0;
       this.setFilter(qb, query.filter);
       if (query.group) {
         let group = await this.setGroup(qb, query.group);
-        let sort = this.transformSort(query.sort, '');
+        const sort = this.transformSort(query.sort, '');
         group = orderBy(
           group,
           map(sort, (v, k) => k),
-          map(sort, (v: string, k) => v.toLowerCase() as 'desc' | 'asc')
+          map(sort, (v: string) => v.toLowerCase() as 'desc' | 'asc'),
         );
-        let start = size * (index - 1);
-        let end = start + size;
+        const start = size * (index - 1);
+        const end = start + size;
         list = slice(group, start, end);
         total = group.length;
       } else {
@@ -33,10 +48,10 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
           .getMany();
         total = await qb.getCount();
       }
-      let result: XResultList<Entity | XGroupItem> = {
+      const result: XResultList<Entity | XGroupItem> = {
         list: list,
         total: total,
-        query: query
+        query: query,
       };
       x(result);
     });
@@ -51,25 +66,27 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
   }
 
   async put(entity: Entity): Promise<Entity> {
-    let index = await this.repository.findOneBy({ id: entity.id });
+    const index = await this.repository.findOneBy({ id: entity.id });
     if (index) {
       Object.assign(index, entity);
-      await this.repository.manager.transaction(async (transactionalEntityManager) => {
-        await transactionalEntityManager.save(index);
-      });
+      await this.repository.manager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(index);
+        },
+      );
 
       return index;
     }
   }
 
   async delete(id: XIdType): Promise<Entity> {
-    let entity = await this.repository.findOneBy({ id });
+    const entity = await this.repository.findOneBy({ id });
     return await this.repository.remove(entity);
   }
 
   private setFilter(rep: SelectQueryBuilder<Entity>, filter: XFilter[]) {
     if (filter && filter.length > 0) {
-      let param = {};
+      const param = {};
       filter.forEach((x, index) => {
         param[`param${index}`] = x.value;
         if (x.relation) {
@@ -98,7 +115,9 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
               break;
             default:
               // '%'
-              rep.andWhere(`entity.${x.field} like concat('%',:param${index},'%')`);
+              rep.andWhere(
+                `entity.${x.field} like concat('%',:param${index},'%')`,
+              );
               break;
           }
         }
@@ -116,7 +135,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
           .select([`entity.${group}`, `count(entity.${group}) as count`])
           .getRawMany()
       ).map((y) => {
-        let mapTo = {};
+        const mapTo = {};
         mapTo[group] = y[`entity_${group}`];
         mapTo['count'] = parseInt(y.count);
         return mapTo;
@@ -133,7 +152,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
   }
 
   private transformSort(sort: XSort[], entity = 'entity'): any {
-    let condition: { [prop: string]: 'ASC' | 'DESC' } = {};
+    const condition: { [prop: string]: 'ASC' | 'DESC' } = {};
     if (sort && sort.length > 0) {
       sort.forEach((x) => {
         const order: 'ASC' | 'DESC' = x.value.toUpperCase() as 'ASC' | 'DESC';

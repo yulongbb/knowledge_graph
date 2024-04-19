@@ -5,9 +5,7 @@ import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
-
-  constructor(@Inject('ARANGODB') private db: Database) { }
-
+  constructor(@Inject('ARANGODB') private db: Database) {}
 
   async fusion({
     extractions,
@@ -58,7 +56,6 @@ export class FusionService {
   }
 
   async knowledge(nodes: Node[], knowledge: string): Promise<any> {
-
     for (const node of nodes) {
       try {
         // 执行查询
@@ -67,7 +64,8 @@ export class FusionService {
         INSERT   v INTO ${knowledge}_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
         INSERT   link INTO ${knowledge}_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
         RETURN { "node": v, "edge": link }`);
-        const cursor = await this.db.query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/168012' GRAPH 'graph'
+        const cursor = await this.db
+          .query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/168012' GRAPH 'graph'
         LET link = MERGE(e, {'_from': CONCAT('person_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('person_entity/', SPLIT(e['_to'], "/")[1]),})
         INSERT   v INTO person_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
         INSERT   link INTO person_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
@@ -80,12 +78,10 @@ export class FusionService {
         console.error('Query Error:', error);
       }
     }
-
   }
 
-
   async addOrUpdateEntity(entity) {
-    let existingEntity = await this.getEntityBylabel(entity.label);
+    const existingEntity = await this.getEntityBylabel(entity.label);
     if (existingEntity) {
       entity.id = existingEntity['_key'];
       return await this.updateEntity(entity);
@@ -95,7 +91,7 @@ export class FusionService {
   }
 
   async addOrUpdateLink(link) {
-    let existingLink = await this.getLinkByFromAndTo(link);
+    const existingLink = await this.getLinkByFromAndTo(link);
     if (!existingLink) {
       return await this.addLink(link);
     }
@@ -330,8 +326,9 @@ export class FusionService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
-        } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
+        'entity/' + id
+      } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}

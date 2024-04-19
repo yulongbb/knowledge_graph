@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Query,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
@@ -11,7 +17,7 @@ import { map, tap } from 'rxjs';
   selector: 'app-fusion-detail',
   templateUrl: './edge-detail.component.html',
   styleUrls: ['./edge-detail.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EdgeDetailComponent implements OnInit {
   id: string = '';
@@ -23,7 +29,7 @@ export class EdgeDetailComponent implements OnInit {
       id: 'label',
       label: '标签',
       required: true,
-      
+
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
@@ -35,13 +41,12 @@ export class EdgeDetailComponent implements OnInit {
       // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
       // message: '手机号格式不正确，+8615212345678'
     },
-    { control: 'input', id: 'id', hidden: true, value: XGuid() }
+    { control: 'input', id: 'id', hidden: true, value: XGuid() },
   ];
 
   data: any;
-  size=20;
-  query:any;
-
+  size = 20;
+  query: any;
 
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
@@ -65,12 +70,12 @@ export class EdgeDetailComponent implements OnInit {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
       if (this.type === 'info') {
-        this.title = '查看实体';
+        this.title = '查看关系';
         this.disabled = true;
       } else if (this.type === 'add') {
-        this.title = '新增实体';
+        this.title = '新增关系';
       } else if (this.type === 'update') {
-        this.title = '修改实体';
+        this.title = '修改关系';
       }
     });
   }
@@ -82,18 +87,20 @@ export class EdgeDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        // this.edgeService.getItem(this.id).subscribe((x) => {
-        //   console.log(x)
-        //   let item:any = {};
-        //   item['id']=x['_key'];
-        //   item['label']=x?.labels?.zh?.value;
-        //   item['description']=x?.descriptions?.zh?.value;
+        console.log(this.id);
+
+        // this.edgeService.get(this.id).subscribe((x:any) => {
+        //   console.log(x);
+        //   let item: any = {};
+        //   item['id'] = x['_key'];
+        //   item['label'] = x?.labels?.zh?.value;
+        //   item['description'] = x?.descriptions?.zh?.value;
         //   this.form.formGroup.patchValue(item);
-        //   this.data = (index: number, size: number, id: string, query: Query) =>
-        //   this.edgeService.getLinks(index, this.size, this.id, this.query).pipe(
-        //     tap((x: any) => console.log(x)),
-        //     map((x: any) => x)
-        //   );
+        //   // this.data = (index: number, size: number, id: string, query: Query) =>
+        //   // this.edgeService.getLinks(index, this.size, this.id, this.query).pipe(
+        //   //   tap((x: any) => console.log(x)),
+        //   //   map((x: any) => x)
+        //   // );
         // });
         break;
       case 'edit':
@@ -101,7 +108,7 @@ export class EdgeDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value)
+          console.log(this.form.formGroup.value);
           this.edgeService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/fusion']);

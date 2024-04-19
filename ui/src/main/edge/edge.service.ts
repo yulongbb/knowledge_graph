@@ -11,9 +11,9 @@ export class EdgeService extends RepositoryService<Item> {
     super(http, { controller: { name: 'api/edge' } });
   }
 
-  getItem(id: number | string): Observable<any> {
-    return this.http.get(`${this.option.controller?.name}/entity/${id}`);
-  }
+  // getItem(id: number | string): Observable<any> {
+  //   return this.http.get(`${this.option.controller?.name}/${id}`);
+  // }
 
   getLinks(
     index?: number,

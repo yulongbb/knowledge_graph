@@ -1,10 +1,6 @@
 import {
   Entity,
-  Tree,
   Column,
-  PrimaryGeneratedColumn,
-  TreeChildren,
-  TreeParent,
   JoinTable,
   ManyToMany,
   PrimaryColumn,
@@ -19,6 +15,8 @@ export class Schema {
   id: string;
 
   @Column() label: string;
+
+  @Column() description: string;
 
   @Column({ nullable: true, type: 'text' })
   router?: string;
@@ -35,17 +33,25 @@ export class Schema {
   @Column({ nullable: true, type: 'text' })
   path?: string;
 
-  @ManyToOne(type => Schema, schema => schema.children)
+  @ManyToOne(() => Schema, (schema) => schema.children)
   parent: Schema;
 
-  @OneToMany(type => Schema, schema => schema.parent)
+  @OneToMany(() => Schema, (schema) => schema.parent)
   children: Schema[];
 
-  @ManyToMany(() => Property, property => property.schemas)
+  @ManyToMany(() => Property, (property) => property.schemas)
   @JoinTable({
     name: 'ontology_schema_property',
     joinColumn: { name: 'schemaId' },
     inverseJoinColumn: { name: 'propertyId' },
   })
   properties: Property[];
+
+  @ManyToMany(() => Property, (property) => property.types)
+  @JoinTable({
+    name: 'ontology_type_value',
+    joinColumn: { name: 'schemaId' },
+    inverseJoinColumn: { name: 'propertyId' },
+  })
+  values: Property[];
 }

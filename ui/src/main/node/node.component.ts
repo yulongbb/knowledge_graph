@@ -115,6 +115,8 @@ export class NodeComponent extends PageBase {
 
     console.log(this.checkedRows);
   }
+
+  
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, { keyword: `%${keyword}%` }).pipe(

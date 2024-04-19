@@ -3,7 +3,7 @@ import { Database, aql } from 'arangojs';
 
 @Injectable()
 export class EdgeService {
-  constructor(@Inject('ARANGODB') private db: Database) { }
+  constructor(@Inject('ARANGODB') private db: Database) {}
 
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
@@ -23,7 +23,7 @@ export class EdgeService {
         
   RETURN {total: total, list: list}
       `);
-    
+
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果

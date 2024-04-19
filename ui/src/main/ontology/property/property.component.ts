@@ -14,6 +14,7 @@ import {
 import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OntologyService } from '../ontology/ontology.service';
+import { map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-property',
@@ -22,13 +23,13 @@ import { OntologyService } from '../ontology/ontology.service';
 })
 export class PropertyComponent extends PageBase {
   formGroup = new UntypedFormGroup({});
-
+  keyword = '';
   selected!: Property;
   type = 'add';
   loading = true;
 
   index = 1;
-  size = 20;
+  size = 15;
 
   query: XQuery = { filter: [] };
 
@@ -71,6 +72,15 @@ export class PropertyComponent extends PageBase {
   }
 
   ngOnInit() {}
+
+  search(keyword: any) {
+    this.query.filter = [{ field: 'name', value: keyword as string}];
+    this.data = (index: number, size: number, query: Query) =>
+      this.service.getList(index, this.size, this.query).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
+  }
 
   action(type: string, item?: any) {
     switch (type) {

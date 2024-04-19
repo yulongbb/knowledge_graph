@@ -1,9 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, Tree, TreeParent, TreeChildren } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
 
-@Entity("ontology_property")
+@Entity('ontology_property')
 export class Property {
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,5 +19,8 @@ export class Property {
   enDescription: string;
 
   @ManyToMany(() => Schema, (schema) => schema.properties)
-  schemas: Schema[]
+  schemas: Schema[];
+
+  @ManyToMany(() => Schema, (schema) => schema.values)
+  types: Schema[];
 }

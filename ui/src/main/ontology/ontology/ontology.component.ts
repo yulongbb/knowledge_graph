@@ -4,7 +4,10 @@ import { PageBase } from 'src/share/base/base-page';
 import { XTreeAction, XTreeComponent } from '@ng-nest/ui/tree';
 import { XFormRow } from '@ng-nest/ui/form';
 import { UntypedFormGroup } from '@angular/forms';
-import { Schema, OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import {
+  Schema,
+  OntologyService,
+} from 'src/main/ontology/ontology/ontology.service';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { map, tap } from 'rxjs';
@@ -149,6 +152,7 @@ export class OntologyComponent extends PageBase {
             this.message.success('新增成功！');
           });
         } else if (this.type === 'edit') {
+          console.log(this.formGroup.value);
           this.service.put(this.formGroup.value).subscribe(() => {
             this.type = 'info';
             this.treeCom.updateNode(schema, this.formGroup.value);
@@ -172,10 +176,18 @@ export class OntologyComponent extends PageBase {
           },
         });
         break;
+      case 'edit':
+        this.selected = schema;
+        this.type = type;
+        this.service.get(schema?.id).subscribe((x) => {
+          this.formGroup.patchValue(x);
+        });
+        break;
       case 'properties':
-        this.router.navigate([`./properties/${schema.id}`], { relativeTo: this.activatedRoute });
+        this.router.navigate([`./properties/${schema.id}`], {
+          relativeTo: this.activatedRoute,
+        });
         break;
     }
   }
-
 }

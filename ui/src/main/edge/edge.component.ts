@@ -121,7 +121,7 @@ export class EdgeComponent extends PageBase {
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id}`],
           {
             relativeTo: this.activatedRoute,
           }

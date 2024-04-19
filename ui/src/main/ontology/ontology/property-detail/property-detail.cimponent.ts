@@ -61,7 +61,9 @@ export class PropertyDetailComponent implements OnInit {
   action(type: string | null) {
     switch (type) {
       case 'info':
+        console.log(this.id);
         this.service.get(this.id as string).subscribe((x) => {
+          console.log(x);
           this.form.formGroup.patchValue(x);
         });
         break;
