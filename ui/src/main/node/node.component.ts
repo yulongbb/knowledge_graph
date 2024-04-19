@@ -1,7 +1,7 @@
 import { PageBase } from 'src/share/base/base-page';
 import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
-import { XTableColumn, XTableComponent, XTableRow } from '@ng-nest/ui/table';
+import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map } from 'rxjs';
 import { NodeService } from 'src/main/node/node.service';
 import { Query } from 'src/services/repository.service';
@@ -45,8 +45,11 @@ export class NodeComponent extends PageBase {
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
+  checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
+    { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
+
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'label', label: '标签', flex: 1.5, sort: true },
     { id: 'description', label: '描述', flex: 0.5, sort: true },
@@ -67,7 +70,35 @@ export class NodeComponent extends PageBase {
     super(indexService);
   }
 
+  setCheckedRows(checked: boolean, row: XTableRow) {
+    if (checked) {
+      if (!this.checkedRows.some((x) => x.id === row.id)) {
+        this.checkedRows.push(row);
+      }
+    } else {
+      if (this.checkedRows.some((x) => x.id === row.id)) {
+        let index = this.checkedRows.findIndex((x) => x.id === row.id);
+        this.checkedRows.splice(index, 1);
+      }
+    }
+  }
 
+  headCheckboxChange(headCheckbox: XTableHeadCheckbox) {
+    // checked 属性来源于定义的 id 列
+    const checked = headCheckbox.checkbox['checked'];
+    for (let row of headCheckbox.rows) {
+      this.setCheckedRows(checked, row);
+    }
+
+    console.log(this.checkedRows);
+  }
+
+  bodyCheckboxChange(row: XTableRow) {
+    // checked 属性来源于定义的 id 列
+    this.setCheckedRows(row['checked'], row);
+
+    console.log(this.checkedRows);
+  }
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, { keyword: `%${keyword}%` }).pipe(
@@ -103,19 +134,36 @@ export class NodeComponent extends PageBase {
         );
         break;
       case 'delete':
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将永久删除此条数据：${item.label}，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            action === 'confirm' && console.log(this.tableCom);
-            console.log(item);
-            this.service.delete(item.id[0].split('/')[1]).subscribe(() => {
-              this.tableCom.change(this.index);
-              this.message.success('删除成功！');
-            });
-          },
-        });
+
+        if (this.checkedRows.length > 0) {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' && this.checkedRows.forEach((item) => {
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+              })
+
+            },
+          });
+        } else {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' &&
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+            },
+          });
+        }
         break;
       case 'tree-info':
         // this.selected = item;

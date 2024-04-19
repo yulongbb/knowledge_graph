@@ -24,15 +24,17 @@
 ></x-form> -->
 
 <au-tool>
-  <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+  <div>
+    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+  </div>
+
   <x-button type="success" icon="fto-upload" (click)="action('upload')">推送</x-button>
 </au-tool>
 
 <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index" [query]="query"
   [bodyHeight]="100" [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" [adaptionHeight]="128" virtualScroll
-  loading 
-  [allowSelectRow]="false"
-  (headCheckboxChange)="headCheckboxChange($event)"
+  loading [allowSelectRow]="true" (headCheckboxChange)="headCheckboxChange($event)"
   (bodyCheckboxChange)="bodyCheckboxChange($event)"></x-table>
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">

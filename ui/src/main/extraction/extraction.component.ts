@@ -159,18 +159,36 @@ export class ExtractionComponent extends PageBase {
         });
         break;
       case 'delete':
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将永久删除此条数据：${item.account}，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            action === 'confirm' &&
-              this.service.delete(item.id).subscribe(() => {
-                this.tableCom.change(this.index);
-                this.message.success('删除成功！');
-              });
-          },
-        });
+        if (this.checkedRows.length > 0) {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' && this.checkedRows.forEach((item) => {
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+              })
+
+            },
+          });
+        } else {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' &&
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+            },
+          });
+        }
+
         break;
       case 'tree-info':
         // this.selected = item;

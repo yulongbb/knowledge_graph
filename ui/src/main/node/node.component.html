@@ -1,28 +1,20 @@
 <au-tool>
-  <x-button type="primary" icon="fto-plus" (click)="action('add')"
-    >新增</x-button
-  >
+
+
+  <div>
+    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+  </div>
 </au-tool>
 
 <x-input-group compact>
-  <x-input
-    [style.width.%]="25"
-    placeholder="输入内容"
-    [(ngModel)]="keyword"
-    (keyup.enter)="search(keyword)"
-  ></x-input>
+  <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
   <x-button icon="fto-search" (click)="search(keyword)"></x-button>
 </x-input-group>
 
-<x-table
-  #tableCom
-  au-adaption
-  [columns]="columns"
-  [data]="data"
-  [bodyColumnTpl]="{ actions: actionsTpl }"
-  (activatedChange)="action('info', $event)"
-  loading
->
+<x-table #tableCom au-adaption [columns]="columns" [data]="data" [bodyColumnTpl]="{ actions: actionsTpl }"
+  (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
+  (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">
