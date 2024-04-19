@@ -28,6 +28,7 @@ export class PropertyComponent extends PageBase {
   loading = true;
 
   index = 1;
+  size = 20;
 
   query: XQuery = { filter: [] };
 

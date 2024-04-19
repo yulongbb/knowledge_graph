@@ -1,7 +1,7 @@
 import { PageBase } from 'src/share/base/base-page';
 import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
-import { XTableColumn, XTableComponent, XTableRow } from '@ng-nest/ui/table';
+import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -45,13 +45,16 @@ export class EdgeComponent extends PageBase {
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
+  checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
+    { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
+    { id: 'actions', label: '操作', width: 150, right: 0 },
+
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'from', label: '起始节点', flex: 1.5, sort: true },
     { id: 'property', label: '关系', flex: 0.5, sort: true },
     { id: 'to', label: '目标节点', flex: 1 },
-    { id: 'actions', label: '操作', width: 150, right: 0 },
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
@@ -65,6 +68,36 @@ export class EdgeComponent extends PageBase {
     private msgBox: XMessageBoxService
   ) {
     super(indexService);
+  }
+
+  setCheckedRows(checked: boolean, row: XTableRow) {
+    if (checked) {
+      if (!this.checkedRows.some((x) => x.id === row.id)) {
+        this.checkedRows.push(row);
+      }
+    } else {
+      if (this.checkedRows.some((x) => x.id === row.id)) {
+        let index = this.checkedRows.findIndex((x) => x.id === row.id);
+        this.checkedRows.splice(index, 1);
+      }
+    }
+  }
+
+  headCheckboxChange(headCheckbox: XTableHeadCheckbox) {
+    // checked 属性来源于定义的 id 列
+    const checked = headCheckbox.checkbox['checked'];
+    for (let row of headCheckbox.rows) {
+      this.setCheckedRows(checked, row);
+    }
+
+    console.log(this.checkedRows);
+  }
+
+  bodyCheckboxChange(row: XTableRow) {
+    // checked 属性来源于定义的 id 列
+    this.setCheckedRows(row['checked'], row);
+
+    console.log(this.checkedRows);
   }
 
 
@@ -103,19 +136,36 @@ export class EdgeComponent extends PageBase {
         );
         break;
       case 'delete':
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将永久删除此条数据：${item.label}，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            action === 'confirm' && console.log(this.tableCom);
-            console.log(this.index);
-            this.service.delete(item.id).subscribe(() => {
-              this.tableCom.change(this.index);
-              this.message.success('删除成功！');
-            });
-          },
-        });
+
+        if (this.checkedRows.length > 0) {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除${this.checkedRows.length}关系，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' && this.checkedRows.forEach((item) => {
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+              })
+
+            },
+          });
+        } else {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              action === 'confirm' &&
+                this.service.delete(item.id).subscribe(() => {
+                  this.tableCom.change(this.index);
+                  this.message.success('删除成功！');
+                });
+            },
+          });
+        }
         break;
       case 'tree-info':
         // this.selected = item;

@@ -7,8 +7,8 @@
   >
 </au-tool>
 
-<x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index" [query]="query"
-  [bodyHeight]="100" [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" [adaptionHeight]="128" virtualScroll
+<x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="size" [(index)]="index" [query]="query"
+   [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" 
   loading></x-table>
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">

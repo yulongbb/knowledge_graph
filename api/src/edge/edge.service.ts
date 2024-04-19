@@ -3,7 +3,7 @@ import { Database, aql } from 'arangojs';
 
 @Injectable()
 export class EdgeService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database) { }
 
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
@@ -12,15 +12,22 @@ export class EdgeService {
       console.log(query.toString());
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR edge IN link
-      LIMIT ${start}, ${end}
-      RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property'])}
-     
+      const cursor = await this.db.query(aql`
+      
+      LET total = COUNT(FOR doc IN link
+        RETURN doc)
+        
+  LET list = (FOR edge IN link
+    LIMIT ${start}, ${end} 
+           RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property'])})
+        
+  RETURN {total: total, list: list}
       `);
+    
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果
-      return { total: 100, list: result };
+      return result[0];
     } catch (error) {
       console.error('Query Error:', error);
     }

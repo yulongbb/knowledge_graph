@@ -14,6 +14,7 @@ import { PropertyService } from '../../property/property.service';
 })
 export class OntologyPropertiesComponent implements OnInit {
     index = 1;
+    size = 20;
 
     query: XQuery = { filter: [] };
 
