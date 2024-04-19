@@ -5,211 +5,71 @@ import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database) { }
+
 
   async fusion({
     extractions,
   }: {
     extractions: Array<Extraction>;
   }): Promise<any> {
-    // 获取集合（Collection）
-    // 通过名称判断节点是否存在，如果节点存在进行更新，如果节点不存在进行新增
-    extractions.forEach((extraction) => {
-      this.getEntityBylabel(extraction.subject).then((x) => {
-        // 节点不存在
-        if (x == undefined) {
-          x = {
-            label: extraction.subject,
-            description: extraction.subject,
-          };
-          // 新增节点
-          this.addEntity(x).then((s) => {
-            this.getEntityBylabel(extraction.object).then((y) => {
-              // 如果节点不存在
-              if (y == undefined) {
-                y = {
-                  label: extraction.object,
-                  description: extraction.object,
-                };
-                this.addEntity(y).then((o) => {
-                  this.getPropertyByName(extraction.property).then((p) => {
-                    if (p != null) {
-                      const link = {
-                        from: s['_id'],
-                        to: o['_id'],
-                        property: p['_key'],
-                      };
-                      this.getLinkByFromAndTo(link).then((l) => {
-                        if (l == undefined) {
-                          // 关系不存在
-                          this.addLink(link);
-                        }
-                      });
-                    } else {
-                      const property = {
-                        name: extraction.property,
-                        description: extraction.property,
-                      };
-                      this.addProperty(property).then((p) => {
-                        const link = {
-                          from: s['_id'],
-                          to: o['_id'],
-                          property: p['_key'],
-                        };
-                        this.getLinkByFromAndTo(link).then((l) => {
-                          if (l == undefined) {
-                            // 关系不存在
-                            this.addLink(link);
-                          }
-                        });
-                      });
-                    }
-                  });
-                });
-              } else {
-                y = {
-                  id: y['_key'],
-                  label: extraction.object,
-                  description: extraction.object,
-                };
-                // 更新节点
-                this.updateEntity(y).then((o) => {
-                  this.getPropertyByName(extraction.property).then((p) => {
-                    if (p != null) {
-                      const link = {
-                        from: s['_id'],
-                        to: o['_id'],
-                        property: p['_key'],
-                      };
-                      this.getLinkByFromAndTo(link).then((l) => {
-                        if (l == undefined) {
-                          // 关系不存在
-                          this.addLink(link);
-                        }
-                      });
-                    } else {
-                      const property = {
-                        name: extraction.property,
-                        description: extraction.property,
-                      };
-                      this.addProperty(property).then((p) => {
-                        const link = {
-                          from: s['_id'],
-                          to: o['_id'],
-                          property: p['_key'],
-                        };
-                        this.getLinkByFromAndTo(link).then((l) => {
-                          if (l == undefined) {
-                            // 关系不存在
-                            this.addLink(link);
-                          }
-                        });
-                      });
-                    }
-                  });
-                });
-              }
-            });
-          });
-        } else {
-          // 节点存在
-          x = {
-            id: x['_key'],
-            label: extraction.subject,
-            description: extraction.subject,
-          };
-          // 更新节点
-          this.updateEntity(x).then((s) => {
-            this.getEntityBylabel(extraction.object).then((y) => {
-              // 如果节点不存在
-              if (y == undefined) {
-                y = {
-                  label: extraction.object,
-                  description: extraction.object,
-                };
-                this.addEntity(y).then((o) => {
-                  this.getPropertyByName(extraction.property).then((p) => {
-                    if (p != null) {
-                      const link = {
-                        from: s['_id'],
-                        to: o['_id'],
-                        property: p['_key'],
-                      };
-                      this.getLinkByFromAndTo(link).then((l) => {
-                        if (l == undefined) {
-                          // 关系不存在
-                          this.addLink(link);
-                        }
-                      });
-                    } else {
-                      const property = {
-                        name: extraction.property,
-                        description: extraction.property,
-                      };
-                      this.addProperty(property).then((p) => {
-                        const link = {
-                          from: s['_id'],
-                          to: o['_id'],
-                          property: p['_key'],
-                        };
-                        this.getLinkByFromAndTo(link).then((l) => {
-                          if (l == undefined) {
-                            // 关系不存在
-                            this.addLink(link);
-                          }
-                        });
-                      });
-                    }
-                  });
-                });
-              } else {
-                y = {
-                  id: y['_key'],
-                  label: extraction.object,
-                  description: extraction.object,
-                };
-                // 更新节点
-                this.updateEntity(y).then((o) => {
-                  this.getPropertyByName(extraction.property).then((p) => {
-                    if (p != null) {
-                      const link = {
-                        from: s['_id'],
-                        to: o['_id'],
-                        property: p['_key'],
-                      };
-                      this.getLinkByFromAndTo(link).then((l) => {
-                        if (l == undefined) {
-                          // 关系不存在
-                          this.addLink(link);
-                        }
-                      });
-                    } else {
-                      const property = {
-                        name: extraction.property,
-                        description: extraction.property,
-                      };
-                      this.addProperty(property).then((p) => {
-                        const link = {
-                          from: s['_id'],
-                          to: o['_id'],
-                          property: p['_key'],
-                        };
-                        this.getLinkByFromAndTo(link).then((l) => {
-                          if (l == undefined) {
-                            // 关系不存在
-                            this.addLink(link);
-                          }
-                        });
-                      });
-                    }
-                  });
-                });
-              }
-            });
-          });
-        }
-      });
-    });
+    for (const extraction of extractions) {
+      let s = await this.getEntityBylabel(extraction.subject);
+      if (!s) {
+        s = {
+          label: extraction.subject,
+          description: extraction.subject,
+        };
+        s = await this.addOrUpdateEntity(s);
+      }
+
+      let o = await this.getEntityBylabel(extraction.object);
+      if (!o) {
+        o = {
+          label: extraction.object,
+          description: extraction.object,
+        };
+        o = await this.addOrUpdateEntity(o);
+      }
+
+      const p = await this.getPropertyByName(extraction.property);
+      if (p) {
+        const link = {
+          from: s['_id'],
+          to: o['_id'],
+          property: p['_key'],
+        };
+        await this.addOrUpdateLink(link);
+      } else {
+        const property = {
+          name: extraction.property,
+          description: extraction.property,
+        };
+        const newProperty = await this.addProperty(property);
+        const link = {
+          from: s['_id'],
+          to: o['_id'],
+          property: newProperty['_key'],
+        };
+        await this.addOrUpdateLink(link);
+      }
+    }
+  }
+  async addOrUpdateEntity(entity) {
+    let existingEntity = await this.getEntityBylabel(entity.label);
+    if (existingEntity) {
+      entity.id = existingEntity['_key'];
+      return await this.updateEntity(entity);
+    } else {
+      return await this.addEntity(entity);
+    }
+  }
+
+  async addOrUpdateLink(link) {
+    let existingLink = await this.getLinkByFromAndTo(link);
+    if (!existingLink) {
+      return await this.addLink(link);
+    }
   }
 
   async addEntity(entity: any): Promise<any> {
@@ -440,9 +300,8 @@ export class FusionService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
