@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class FusionService extends RepositoryService<Item> {
+
   constructor(public override http: HttpService) {
     super(http, { controller: { name: 'api/fusion' } });
   }
@@ -16,8 +17,12 @@ export class FusionService extends RepositoryService<Item> {
     return this.http.post(`${this.option.controller?.name}`, extractions);
   }
 
-  addItem(item: Item): Observable<Item> {
-    return this.http.post(`${this.option.controller?.name}/entity`, item);
+  knowledge(nodes: any, collection: any) {
+    return this.http.post(`${this.option.controller?.name}/${collection}`, nodes);
+  }
+
+  addItem(item: Item, collection: string): Observable<Item> {
+    return this.http.post(`${this.option.controller?.name}/entity/${collection}`, item);
   }
 
   updateItem(item: Item): Observable<Item> {

@@ -5,7 +5,20 @@
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
   </div>
+  <div>
+    <x-select [data]="data1" [(ngModel)]="model1" async  [nodeTpl]="nodeTpl"></x-select>
+
+    <x-button type="success" icon="fto-upload" (click)="action('upload')">入库</x-button>
+
+  </div>
+
 </au-tool>
+
+<ng-template #nodeTpl let-node="$node">
+  <span class="select-item"> {{ node?.name }} </span>
+</ng-template>
+
+
 
 <x-input-group compact>
   <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>

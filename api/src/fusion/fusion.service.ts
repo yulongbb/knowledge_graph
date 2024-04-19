@@ -5,6 +5,7 @@ import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
+
   constructor(@Inject('ARANGODB') private db: Database) { }
 
 
@@ -55,13 +56,41 @@ export class FusionService {
       }
     }
   }
+
+  async knowledge(nodes: Node[], knowledge: string): Promise<any> {
+
+    for (const node of nodes) {
+      try {
+        // 执行查询
+        console.log(`FOR v, e IN 1..1 OUTBOUND '${node['id'][0]}' GRAPH 'graph'
+        LET link = MERGE(e, {'_from': CONCAT('${knowledge}_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('${knowledge}_entity/', SPLIT(e['_to'], "/")[1]),})
+        INSERT   v INTO ${knowledge}_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+        INSERT   link INTO ${knowledge}_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+        RETURN { "node": v, "edge": link }`);
+        const cursor = await this.db.query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/168012' GRAPH 'graph'
+        LET link = MERGE(e, {'_from': CONCAT('person_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('person_entity/', SPLIT(e['_to'], "/")[1]),})
+        INSERT   v INTO person_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+        INSERT   link INTO person_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+        RETURN { "node": v, "edge": link }`);
+        // 获取查询结果
+        const result = await cursor.next();
+        // 处理查询结果
+        return result;
+      } catch (error) {
+        console.error('Query Error:', error);
+      }
+    }
+
+  }
+
+
   async addOrUpdateEntity(entity) {
     let existingEntity = await this.getEntityBylabel(entity.label);
     if (existingEntity) {
       entity.id = existingEntity['_key'];
       return await this.updateEntity(entity);
     } else {
-      return await this.addEntity(entity);
+      return await this.addEntity(entity, 'entity');
     }
   }
 
@@ -72,9 +101,10 @@ export class FusionService {
     }
   }
 
-  async addEntity(entity: any): Promise<any> {
+  async addEntity(entity: any, collection: string): Promise<any> {
     // 获取集合（Collection）
-    const myCollection = this.db.collection('entity');
+    console.log(collection);
+    const myCollection = this.db.collection(collection);
 
     // 插入数据
     const document = {

@@ -5,6 +5,8 @@ import { Knowledge, KnowledgeService } from './knowledge.service';
 import {
   XFormRow,
   XGuid,
+  XMessageBoxAction,
+  XMessageBoxService,
   XMessageService,
   XQuery,
   XTableColumn,
@@ -36,8 +38,9 @@ export class KnowledgeComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
+    { id: 'actions', label: '操作', width: 150, right: 0 },
     { id: 'name', label: '名称', flex: 1.5, sort: true },
-    { id: 'descsription', label: '描述', flex: 0.5, sort: true },
+    { id: 'description', label: '描述', flex: 0.5, sort: true },
   ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
 
@@ -46,7 +49,8 @@ export class KnowledgeComponent extends PageBase {
     public override indexService: IndexService,
     private message: XMessageService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private msgBox: XMessageBoxService
   ) {
     super(indexService);
   }
@@ -72,18 +76,18 @@ export class KnowledgeComponent extends PageBase {
         });
         break;
       case 'delete':
-        // this.msgBox.confirm({
-        //   title: '提示',
-        //   content: `此操作将永久删除此条数据：${item.account}，是否继续？`,
-        //   type: 'warning',
-        //   callback: (action: XMessageBoxAction) => {
-        //     action === 'confirm' &&
-        //       this.service.delete(item.id).subscribe(() => {
-        //         this.tableCom.change(this.index);
-        //         this.message.success('删除成功！');
-        //       });
-        //   },
-        // });
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将永久删除此条数据：${item.name}，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' &&
+              this.service.delete(item.id).subscribe(() => {
+                this.tableCom.change(this.index);
+                this.message.success('删除成功！');
+              });
+          },
+        });
         break;
       case 'tree-info':
         // this.selected = item;

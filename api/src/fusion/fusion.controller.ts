@@ -16,16 +16,23 @@ import { Extraction } from 'src/extraction/extraction.entity';
 @Controller('fusion')
 @ApiTags('知识融合') // 分组
 export class FusionController {
-  constructor(private readonly fusionService: FusionService) {}
+  constructor(private readonly fusionService: FusionService) { }
 
   @Post()
   async fusion(@Body() extractions: Array<Extraction>): Promise<any> {
     return await this.fusionService.fusion({ extractions });
   }
 
-  @Post('entity')
-  async addEntity(@Body() entity: any): Promise<any> {
-    return await this.fusionService.addEntity(entity);
+  @Post("/:collection")
+  async knowledge(@Param('collection')
+  collection: string, @Body() nodes: Array<Node>): Promise<any> {
+    return await this.fusionService.knowledge(nodes, collection);
+  }
+
+  @Post('entity/:collection')
+  async addEntity(@Param('collection')
+  collection: string, @Body() entity: any): Promise<any> {
+    return await this.fusionService.addEntity(entity, collection);
   }
 
   @Put('entity')

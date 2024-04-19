@@ -2,7 +2,7 @@ import { PageBase } from 'src/share/base/base-page';
 import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
-import { tap, map } from 'rxjs';
+import { tap, map, Observable } from 'rxjs';
 import { NodeService } from 'src/main/node/node.service';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,6 +12,8 @@ import {
   XMessageService,
   XPosition,
 } from '@ng-nest/ui';
+import { KnowledgeService } from '../knowledge/knowledge.service';
+import { FusionService } from '../fusion/fusion.service';
 
 @Component({
   selector: 'app-node',
@@ -49,17 +51,31 @@ export class NodeComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-
+    { id: 'actions', label: '操作', width: 150, right: 0 },
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'label', label: '标签', flex: 1.5, sort: true },
     { id: 'description', label: '描述', flex: 0.5, sort: true },
     { id: 'aliases', label: '别名', flex: 1 },
-    { id: 'actions', label: '操作', width: 150, right: 0 },
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
+  model1: any;
+
+  data1 = (index: number, size: number, query: any) =>
+
+    new Observable<string[]>((x) => {
+      this.knowledgeService.getList(index, size, query).subscribe((data: any) => {
+        console.log(data.list);
+        x.next(data.list);
+        x.complete();
+      })
+
+    });
 
   constructor(
+    private knowledgeService: KnowledgeService,
+    private fusionService: FusionService,
+
     private service: NodeService,
     public override indexService: IndexService,
     private router: Router,
@@ -134,8 +150,6 @@ export class NodeComponent extends PageBase {
         );
         break;
       case 'delete':
-
-
         if (this.checkedRows.length > 0) {
           this.msgBox.confirm({
             title: '提示',
@@ -165,6 +179,25 @@ export class NodeComponent extends PageBase {
             },
           });
         }
+        break;
+      case 'upload':
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' && this.knowledgeService.get(this.model1).subscribe((knowledge: any) => {
+              console.log(this.checkedRows);
+              console.log(knowledge);
+              this.fusionService.knowledge(this.checkedRows, knowledge.description).subscribe(() => {
+                this.tableCom.change(this.index);
+                this.message.success('成功！');
+              })
+
+
+            })
+          },
+        });
         break;
       case 'tree-info':
         // this.selected = item;
