@@ -267,3 +267,16 @@ SEARCH STARTS_WITH(e['_key'], 'P')
 SORT +SUBSTRING(e['_key'], 1)
 LIMIT 100
 RETURN {id: e['_key'], label: e['labels']['zh']}
+
+
+python设置国内源
+
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+
+cannot import name 'XXX' from partially initialized module
+
+文件名重名
+
+
+openEI不支持中文

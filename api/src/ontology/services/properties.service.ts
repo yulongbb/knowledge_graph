@@ -15,16 +15,6 @@ export class PropertiesService extends XRepositoryService<Property, XQuery> {
   ) {
     super(propertiesRepository, dataSource);
   }
-  async get(id: XIdType): Promise<Property> {
-    return await this.propertiesRepository.findOneBy({ id: id });
-  }
+  
 
-  async getPropertyByName(name: string): Promise<Property> {
-    console.log(name);
-    return await this.propertiesRepository.findOne({
-      where: {
-        name: name,
-      }
-    })
-  }
 }

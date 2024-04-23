@@ -16,7 +16,7 @@ import { Extraction } from 'src/extraction/extraction.entity';
 @Controller('fusion')
 @ApiTags('知识融合') // 分组
 export class FusionController {
-  constructor(private readonly fusionService: FusionService) {}
+  constructor(private readonly fusionService: FusionService) { }
 
   @Post()
   async fusion(@Body() extractions: Array<Extraction>): Promise<any> {

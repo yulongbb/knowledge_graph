@@ -126,8 +126,8 @@ export const layoutRoutes: Routes = [
     }
   },
 
-   // 属性
-   {
+  // 属性
+  {
     path: "properties",
     loadChildren: () =>
       import("../main/ontology/property/property.module").then(x => x.PropertyModule),
