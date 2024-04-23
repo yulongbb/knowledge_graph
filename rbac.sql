@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 23/04/2024 17:20:08
+ Date: 23/04/2024 17:21:51
 */
 
 SET NAMES utf8mb4;
@@ -8722,7 +8722,7 @@ INSERT INTO `ontology_schema` VALUES ('31794138-42bb-99c5-7197-db792da75595', 'e
 INSERT INTO `ontology_schema` VALUES ('36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '');
 INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '');
 INSERT INTO `ontology_schema` VALUES ('420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time');
-INSERT INTO `ontology_schema` VALUES ('50e1a010-dc7d-1590-4b0c-126771a728a1', '事物', NULL, NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '');
+INSERT INTO `ontology_schema` VALUES ('50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype', NULL, NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype');
 INSERT INTO `ontology_schema` VALUES ('5c50770b-4f01-24b0-6a58-299a895e739f', ' 图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.5c50770b-4f01-24b0-6a58-299a895e739f', '');
 INSERT INTO `ontology_schema` VALUES ('648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext');
 INSERT INTO `ontology_schema` VALUES ('730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity');
