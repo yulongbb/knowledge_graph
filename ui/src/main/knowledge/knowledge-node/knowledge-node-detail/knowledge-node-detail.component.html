@@ -2,8 +2,9 @@
 <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
   width="30rem" labelAlign="end" span="20" space="2"></x-form>
 
-  <div class="row" *ngIf="data">
-    <x-card *ngFor="let property of data.list"  width="100%" [header]="header" >
+
+  <div class="row">
+    <x-card *ngFor="let property of data  | async"  width="100%" [header]="header" >
       <ng-template #header>
         <span>{{property['name']}}</span>
         <x-button type="text">操作按钮</x-button>

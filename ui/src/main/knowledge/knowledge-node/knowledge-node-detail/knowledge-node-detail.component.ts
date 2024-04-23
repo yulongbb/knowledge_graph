@@ -4,8 +4,8 @@ import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XTableColumn } from '@ng-nest/ui';
-import { map, tap } from 'rxjs';
 import { NodeService } from 'src/main/node/node.service';
+import { map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-knowledge-node-detail',
@@ -38,9 +38,10 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     { control: 'input', id: 'id', hidden: true, value: XGuid() }
   ];
 
-  data: any;
-  size = 20;
   query: any;
+  data: any;
+
+
 
 
   columns: XTableColumn[] = [
@@ -72,11 +73,10 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      this.nodeService.getLinks(1, 10, this.id, this.query).subscribe(properties => {
-        console.log(properties);
-        this.data = properties;
-      });
-
+      this.data = this.nodeService.getLinks(1, 10, this.id, {}).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x.list)
+      );
     });
   }
 
@@ -87,6 +87,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
+
         this.nodeService.getItem(this.id).subscribe((x) => {
           console.log(x)
           let item: any = {};
@@ -95,7 +96,6 @@ export class KnowledgeNodeDetailComponent implements OnInit {
           item['description'] = x?.descriptions?.zh?.value;
           this.form.formGroup.patchValue(item);
 
-        
         });
         break;
       case 'edit':

@@ -31,10 +31,7 @@ export class KnowledgeComponent extends PageBase {
 
   query: XQuery = { filter: [] };
 
-  data = (index: number, size: number, query: any) =>
-    this.service.getList(index, size, query).pipe((x: any) => {
-      return x;
-    });
+  data: any;
 
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
@@ -55,7 +52,11 @@ export class KnowledgeComponent extends PageBase {
     super(indexService);
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.service.getList(1, 10, this.query).subscribe((data) => {
+      this.data = data;
+    });
+  }
 
   action(type: string, item?: any) {
     switch (type) {
