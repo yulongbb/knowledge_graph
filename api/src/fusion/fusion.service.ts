@@ -5,7 +5,7 @@ import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database) { }
+  constructor(@Inject('ARANGODB') private db: Database,) { }
 
   async fusion({
     extractions,
@@ -27,7 +27,7 @@ export class FusionService {
       const p = await this.getPropertyByName(extraction.property);
       console.log(p);
 
-      if (p['tail'] !== '字符串') {
+      if (p['tail'] !== 'string') {
         let o = await this.getEntityBylabel(extraction.object);
         if (!o) {
           o = {
@@ -92,13 +92,9 @@ export class FusionService {
     for (const node of nodes) {
       try {
         // 执行查询
-        console.log(`FOR v, e IN 1..1 OUTBOUND '${node['id'][0]}' GRAPH 'graph'
-        LET link = MERGE(e, {'_from': CONCAT('${knowledge}_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('${knowledge}_entity/', SPLIT(e['_to'], "/")[1]),})
-        INSERT   v INTO ${knowledge}_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-        INSERT   link INTO ${knowledge}_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-        RETURN { "node": v, "edge": link }`);
+
         const cursor = await this.db
-          .query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/168012' GRAPH 'graph'
+          .query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/290795' GRAPH 'graph'
         LET link = MERGE(e, {'_from': CONCAT('person_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('person_entity/', SPLIT(e['_to'], "/")[1]),})
         INSERT   v INTO person_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
         INSERT   link INTO person_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
@@ -197,9 +193,9 @@ export class FusionService {
       };
 
       return myCollection.save(document);
-    }else{
-       // 插入数据
-       const document = {
+    } else {
+      // 插入数据
+      const document = {
         _from: entity.from,
         _to: entity.to,
         id: entity.id,
@@ -363,6 +359,7 @@ export class FusionService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: any,
   ): Promise<any> {
+ 
     try {
       const start = size * (index - 1);
       const end = start + size;
@@ -373,13 +370,7 @@ export class FusionService {
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
-      RETURN e['mainsnak']['datavalue']['type']=='wikibase-entityid'?MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue:{value:{'entity-type':"item",'numeric-id':e['mainsnak']['datavalue']["value"]['numeric-id'],id:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]['value']:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["en"]['value']},type:"wikibase-entityid"},datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-):MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue: e['mainsnak']['datavalue'],datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-)`);
+      RETURN e`);
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果

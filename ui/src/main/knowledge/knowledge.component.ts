@@ -55,7 +55,7 @@ export class KnowledgeComponent extends PageBase {
     super(indexService);
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   action(type: string, item?: any) {
     switch (type) {
@@ -87,6 +87,11 @@ export class KnowledgeComponent extends PageBase {
                 this.message.success('删除成功！');
               });
           },
+        });
+        break;
+      case 'data':
+        this.router.navigate([`./${type}/nodes`], {
+          relativeTo: this.activatedRoute,
         });
         break;
       case 'tree-info':

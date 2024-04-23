@@ -7,6 +7,9 @@ import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.component";
+import { KnowledgeNodeComponent } from "./knowledge-node/knowledge-node.component";
+import { XInputModule } from "@ng-nest/ui";
+import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-detail/knowledge-node-detail.component";
 
 
 @NgModule({
@@ -15,9 +18,11 @@ import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.co
     ShareModule,
     NgNestModule,
     AuToolModule,
+    XInputModule,
+
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],
-  declarations: [KnowledgeComponent, KnowledgeDetailComponent]
+  declarations: [KnowledgeComponent, KnowledgeDetailComponent, KnowledgeNodeComponent, KnowledgeNodeDetailComponent]
 })
-export class KnowledgeModule {}
+export class KnowledgeModule { }

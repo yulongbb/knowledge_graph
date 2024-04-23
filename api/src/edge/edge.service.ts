@@ -19,7 +19,7 @@ export class EdgeService {
         
   LET list = (FOR edge IN link
     LIMIT ${start}, ${end} 
-           RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property']), value:edge['mainsnak']['datavalue']['value'] })
+           RETURN edge)
         
   RETURN {total: total, list: list}
       `);

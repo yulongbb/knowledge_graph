@@ -78,6 +78,7 @@ export class FusionController {
     size: number = 10,
     @Body() query: any,
   ): any {
+
     return this.fusionService.getLinks(id, index, size, query);
   }
 
