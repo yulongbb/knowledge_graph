@@ -12,11 +12,12 @@ import { NodeService } from './node.service';
 import { XIdType } from 'src/core';
 import { ApiTags } from '@nestjs/swagger';
 import { PropertiesService } from 'src/ontology/services/properties.service';
+import { FusionService } from 'src/fusion/fusion.service';
 
 @Controller('node')
 @ApiTags('知识融合') // 分组
 export class NodeController {
-  constructor(private readonly nodeService: NodeService, private readonly propertiesService: PropertiesService) {}
+  constructor(private readonly nodeService: NodeService, private readonly fusionService: FusionService, private readonly propertiesService: PropertiesService) { }
 
   @Post('')
   async addEntity(@Body() entity: any): Promise<any> {
@@ -52,16 +53,23 @@ export class NodeController {
   }
 
   @Post('link/:id/:size/:index')
-  getLinks(
+  async getLinks(
     @Param('id') id: XIdType,
     @Param('index', new ParseIntPipe())
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
     @Body() query: any,
-  ): any {
-    return this.propertiesService.getList(1, 10, { 'filter': [{ field: 'id', value: 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', relation: 'schemas', operation: '=' }] });
-    // return this.fusionService.getLinks(id, index, size, query);
+  ): Promise<any> {
+    let claims = {};
+    const properties = await this.propertiesService.getList(1, 10, { 'filter': [{ field: 'id', value: 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', relation: 'schemas', operation: '=' }] });
+    const links = await this.fusionService.getLinks(id, index, size, query);
+    properties.list.forEach((p) => {
+      claims[ p['name']] = links.list.filter((l) => l.mainsnak.property == 'P' + p['id']);
+    })
+    console.log(123);
+    return claims ;
+
   }
 
   // @Get('property/:size/:index')

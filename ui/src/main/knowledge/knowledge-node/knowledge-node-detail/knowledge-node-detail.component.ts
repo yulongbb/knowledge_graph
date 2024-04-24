@@ -75,7 +75,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       }
       this.data = this.nodeService.getLinks(1, 10, this.id, {}).pipe(
         tap((x: any) => console.log(x)),
-        map((x: any) => x.list)
+        map((x: any) => x)
       );
     });
   }

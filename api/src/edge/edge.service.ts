@@ -3,7 +3,7 @@ import { Database, aql } from 'arangojs';
 
 @Injectable()
 export class EdgeService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database) { }
 
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
@@ -19,7 +19,7 @@ export class EdgeService {
         
   LET list = (FOR edge IN link
     LIMIT ${start}, ${end} 
-           RETURN edge)
+           RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property']), value:edge['mainsnak']['datavalue']['value'] })
         
   RETURN {total: total, list: list}
       `);

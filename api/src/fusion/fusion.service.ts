@@ -359,7 +359,7 @@ export class FusionService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: any,
   ): Promise<any> {
- 
+
     try {
       const start = size * (index - 1);
       const end = start + size;
