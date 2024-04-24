@@ -43,14 +43,14 @@ for p in properties['list']:
         'http://localhost:3000/api/schemas/1/1', headers=headers, data=json.dumps(query)),
 
     values = json.loads(values_response[0].text)
-    prop = property['P'+ str(p['id'])]
+    prop = property['P' + str(p['id'])]
     prop['name'] = p['name']
     prop['enName'] = p['enName']
     prop['description'] = p['description']
     prop['enDescription'] = p['enDescription']
-    if( schemas['list']):
+    if (schemas['list']):
         prop['head'] = schemas['list'][0]['label']
-    if( values['list']):
+    if (values['list']):
         prop['tail'] = values['list'][0]['label']
     prop.save()
 

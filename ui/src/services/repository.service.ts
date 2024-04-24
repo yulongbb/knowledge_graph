@@ -21,6 +21,7 @@ export interface ResultList<Entity extends Id> {
 
 export interface Query {
   keyword?: string;
+  collection?: any;
   index?: number;
   size?: number;
   sort?: Sort[];

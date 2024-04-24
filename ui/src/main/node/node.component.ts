@@ -42,7 +42,7 @@ export class NodeComponent extends PageBase {
 
   data = (index: number, size: number, query: Query) =>
     this.service
-      .getList(index, this.size, { keyword: `%${this.keyword}%` })
+      .getList(index, this.size, { collection: 'entity', keyword: `%${this.keyword}%` })
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
@@ -119,7 +119,7 @@ export class NodeComponent extends PageBase {
   
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

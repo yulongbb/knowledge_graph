@@ -141,11 +141,10 @@ export class NodeService {
     index: number,
     size: number,
     query: any,
-    db: string,
   ): Promise<any> {
     this.db = new Database({
       url: 'http://localhost:8529',
-      databaseName: db,
+      databaseName: 'kgms',
       auth: { username: 'root', password: 'root' },
     });
     try {
@@ -154,27 +153,20 @@ export class NodeService {
       let cursor = null;
       console.log(start);
       console.log(size);
+      const collection =  this.db.collection(query.collection);
+      console.log(collection);
       console.log(query.keyword);
       if (query.keyword == '%%') {
-        console.log(123);
-        console.log(`
-        LET langulage = 'zh'
-        LET list = (FOR doc IN entity
-        FILTER  doc.modified
-        SORT doc.modified
-        LIMIT ${start}, ${size}
-        RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
-        RETURN {total: COUNT(entity), list: list}
-    `);
+  
 
         cursor = await this.db.query(aql`
         LET langulage = 'zh'
-        LET list = (FOR doc IN entity
+        LET list = (FOR doc IN ${collection}
         FILTER  doc.modified
         SORT doc.modified
         LIMIT ${start}, ${size}
         RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
-        RETURN {total: COUNT(entity), list: list}
+        RETURN {total: COUNT(${collection}), list: list}
     `);
       } else {
         cursor = await this.db.query(aql`
@@ -182,13 +174,13 @@ export class NodeService {
 
         let langulage = 'zh'
 
-        LET total = COUNT(FOR doc IN entity_view
+        LET total = COUNT(FOR doc IN ${query.collection}_view
         SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
         OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
         OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword}) RETURN doc)
 
 
-        LET list = (FOR doc IN entity_view
+        LET list = (FOR doc IN ${query.collection}_view
         SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
         OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
         OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword})

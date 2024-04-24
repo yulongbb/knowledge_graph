@@ -40,11 +40,9 @@ export class NodeController {
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
-    @Param('db')
-    db: string = 'kgms',
     @Body() query: any,
   ): any {
-    return this.nodeService.getEntityList(index, size, query, db);
+    return this.nodeService.getEntityList(index, size, query);
   }
 
   @Get(':id')
