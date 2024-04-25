@@ -8,8 +8,8 @@ import { KnowledgeNodeDetailComponent } from './knowledge-node/knowledge-node-de
 const routes: Routes = [
   { path: '', component: KnowledgeComponent, data: { title: 'extraction' } },
   { path: ':type', component: KnowledgeDetailComponent },
-  { path: ':type/nodes', component: KnowledgeNodeComponent, },
-  { path: ':type/nodes/:type/:id', component: KnowledgeNodeDetailComponent, },
+  { path: ':type/:id/nodes', component: KnowledgeNodeComponent, },
+  { path: ':type/:id/nodes/:type/:id', component: KnowledgeNodeDetailComponent, },
   { path: ':type/:id', component: KnowledgeDetailComponent }
 ];
 

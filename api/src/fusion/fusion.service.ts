@@ -88,17 +88,23 @@ export class FusionService {
     }
   }
 
-  async knowledge(nodes: Node[], knowledge: string): Promise<any> {
+  async knowledge(nodes: Array<any>, knowledge: string): Promise<any> {
+    console.log(nodes);
+    console.log(knowledge);
+    const collection = this.db.collection(knowledge + '_entity');
+    const edge = this.db.collection(knowledge + '_link');
+
     for (const node of nodes) {
       try {
         // 执行查询
-
         const cursor = await this.db
-          .query(aql`FOR v, e IN 1..1 OUTBOUND 'entity/290795' GRAPH 'graph'
-        LET link = MERGE(e, {'_from': CONCAT('person_entity/', SPLIT(e['_from'], "/")[1]),'_to': CONCAT('person_entity/', SPLIT(e['_to'], "/")[1]),})
-        INSERT   v INTO person_entity OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-        INSERT   link INTO person_link OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-        RETURN { "node": v, "edge": link }`);
+          .query(aql`FOR v, e, p IN 1..1 OUTBOUND ${node.id[0]} GRAPH 'graph'
+        FOR n IN p['vertices']
+          INSERT  n INTO ${collection} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+        LET link = MERGE(e, {'_from': CONCAT(${knowledge + '_entity/'}, SPLIT(e['_from'], "/")[1]),'_to': CONCAT(${knowledge + '_entity/'}, SPLIT(e['_to'], "/")[1]),})
+        INSERT   link INTO ${edge} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+      RETURN { "node": v, "edge": link, "path": p['vertices'][0] }`)
+
         // 获取查询结果
         const result = await cursor.next();
         // 处理查询结果

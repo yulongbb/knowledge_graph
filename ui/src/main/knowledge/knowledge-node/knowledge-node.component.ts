@@ -5,7 +5,7 @@ import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@n
 import { tap, map, Observable } from 'rxjs';
 import { NodeService } from 'src/main/node/node.service';
 import { Query } from 'src/services/repository.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
   XMessageBoxAction,
   XMessageBoxService,
@@ -20,7 +20,7 @@ import { FusionService } from 'src/main/fusion/fusion.service';
   templateUrl: 'knowledge-node.component.html',
   styleUrls: ['./knowledge-node.component.scss'],
 })
-export class KnowledgeNodeComponent extends PageBase {
+export class KnowledgeNodeComponent  {
   id: any;
   keyword = '';
   size = 20;
@@ -40,13 +40,15 @@ export class KnowledgeNodeComponent extends PageBase {
     this.visible = false;
   }
 
-  data = (index: number, size: number, query: Query) =>
-    this.service
-      .getList(index, this.size, {collection: 'person_entity', keyword: `%${this.keyword}%` })
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
+
+
+  data = (index: number, size: number, query: Query) => this.service
+    .getList(index, this.size, { collection: this.id + '_entity', keyword: `%${this.keyword}%` })
+    .pipe(
+      tap((x: any) => console.log(x)),
+      map((x: any) => x)
+    );
+
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -77,13 +79,14 @@ export class KnowledgeNodeComponent extends PageBase {
     private fusionService: FusionService,
 
     private service: NodeService,
-    public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
     private msgBox: XMessageBoxService
   ) {
-    super(indexService);
+    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+      this.id = x.get('id') as string;
+    });
   }
 
   setCheckedRows(checked: boolean, row: XTableRow) {
@@ -119,7 +122,7 @@ export class KnowledgeNodeComponent extends PageBase {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'person_entity', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: this.id + '_entity', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
