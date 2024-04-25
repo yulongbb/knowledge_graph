@@ -16,6 +16,8 @@ import { map, tap } from 'rxjs';
 export class KnowledgeNodeDetailComponent implements OnInit {
   id: string = '';
   type: string = '';
+  schema: string = '';
+  item: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -26,6 +28,15 @@ export class KnowledgeNodeDetailComponent implements OnInit {
 
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
+    },
+    {
+      control: 'input',
+      id: 'type.label',
+      label: '类型',
+      required: true,
+      maxlength: 16,
+      // pattern: /^[A-Za-z0-9]{4,16}$/,
+      // message: '只能包括数字、字母的组合，长度为4-16位'
     },
     {
       control: 'input',
@@ -65,6 +76,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
+      this.schema = x.get('schema') as string;
       if (this.type === 'info') {
         this.title = '查看实体';
         this.disabled = true;
@@ -73,8 +85,8 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      this.data = this.nodeService.getLinks(1, 10, this.id, {}).pipe(
-        tap((x: any) => console.log(x)),
+      this.data = this.nodeService.getLinks(1, 10, this.id, { schema: this.schema }).pipe(
+        tap((x: any) => console.log(123)),
         map((x: any) => x)
       );
     });
@@ -89,12 +101,14 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       case 'info':
 
         this.nodeService.getItem(this.id).subscribe((x) => {
+          this.item = x;
           console.log(x)
           let item: any = {};
           item['id'] = x.id;
           item['label'] = x?.labels?.zh?.value;
           item['description'] = x?.descriptions?.zh?.value;
-          this.form.formGroup.patchValue(item);
+
+          // this.form.formGroup.patchValue(item);
 
         });
         break;

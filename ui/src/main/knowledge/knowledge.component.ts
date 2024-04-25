@@ -91,7 +91,7 @@ export class KnowledgeComponent extends PageBase {
         });
         break;
       case 'data':
-        this.router.navigate([`./${type}/${item.description}/nodes`], {
+        this.router.navigate([`./${type}/${item.id}/nodes`], {
           relativeTo: this.activatedRoute,
         });
         break;

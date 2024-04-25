@@ -12,54 +12,7 @@
   space="2"
 ></x-form>
 
-<!-- <x-table *ngIf="type=='edit'"
-  [columns]="columns"
-  [data]="data"
-  loading
-  [showPagination]="true"
-  [allowSelectRow]="false"
-  [bodyColumnTpl]="{ actions: actionsTpl }"
-  [bodyTdTpl]="bodyTdTpl"
->
-</x-table> -->
-<!-- 
-<ng-template #actionsTpl let-column="$column" let-row="$row">
-  <div>
-  </div>
-</ng-template>
 
-<ng-template #bodyTdTpl let-column="$column" let-row="$row">
-  <ng-container [ngSwitch]="column.id">
-    <ng-container *ngSwitchCase="'property'">
-      {{ row.mainsnak.property }}
-    </ng-container>
-    <ng-container *ngSwitchCase="'value'">
-      <x-input
-        *ngIf="row.mainsnak.datavalue.type == 'string'"
-        [style.width.%]="100"
-        [(ngModel)]="row.mainsnak.datavalue.value"
-      ></x-input>
-
-      <x-input
-        *ngIf="row.mainsnak.datavalue.type == 'quantity'"
-        [style.width.%]="100"
-        [(ngModel)]="row.mainsnak.datavalue.value.amount"
-      ></x-input>
-
-      <x-input
-        [before]="afterButtonTpl"
-        *ngIf="row.mainsnak.datavalue.type == 'wikibase-entityid'"
-        [style.width.%]="100"
-        [(ngModel)]="row.mainsnak.datavalue.value.id"
-      ></x-input>
-    </ng-container>
-
-    <ng-container *ngSwitchDefault>{{ row[column.id] }}</ng-container>
-  </ng-container>
-</ng-template>
-<ng-template #afterButtonTpl>
-  <x-button icon="fto-search"></x-button>
-</ng-template> -->
 
 
 

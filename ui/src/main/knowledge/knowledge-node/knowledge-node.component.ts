@@ -20,8 +20,9 @@ import { FusionService } from 'src/main/fusion/fusion.service';
   templateUrl: 'knowledge-node.component.html',
   styleUrls: ['./knowledge-node.component.scss'],
 })
-export class KnowledgeNodeComponent  {
+export class KnowledgeNodeComponent {
   id: any;
+  knowledge: any;
   keyword = '';
   size = 20;
   index = 1;
@@ -42,12 +43,7 @@ export class KnowledgeNodeComponent  {
 
 
 
-  data = (index: number, size: number, query: Query) => this.service
-    .getList(index, this.size, { collection: this.id + '_entity', keyword: `%${this.keyword}%` })
-    .pipe(
-      tap((x: any) => console.log(x)),
-      map((x: any) => x)
-    );
+  data: any;
 
   checkedRows: XTableRow[] = [];
 
@@ -56,6 +52,7 @@ export class KnowledgeNodeComponent  {
     { id: 'actions', label: '操作', width: 150, right: 0 },
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'label', label: '标签', flex: 1.5, sort: true },
+    { id: 'type', label: '类型', flex: 1.5, sort: true },
     { id: 'description', label: '描述', flex: 0.5, sort: true },
     { id: 'aliases', label: '别名', flex: 1 },
   ];
@@ -76,7 +73,6 @@ export class KnowledgeNodeComponent  {
 
   constructor(
     private knowledgeService: KnowledgeService,
-    private fusionService: FusionService,
 
     private service: NodeService,
     private router: Router,
@@ -86,8 +82,37 @@ export class KnowledgeNodeComponent  {
   ) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
+
+      this.knowledgeService.get(this.id).subscribe((x) => {
+        console.log(x);
+
+        this.knowledge = x;
+        console.log(this.knowledge);
+        this.data = (index: number, size: number, query: Query) => this.service
+          .getList(index, this.size, { collection: this.knowledge.description + '_entity', type: this.knowledge.name, keyword: `%${this.keyword}%` })
+          .pipe(
+            tap((x: any) => console.log(x)),
+            map((x: any) => x)
+          );
+
+      });
     });
   }
+
+  ngOnInit() {
+    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+      this.id = x.get('id') as string;
+
+      this.knowledgeService.get(this.id).subscribe((x) => {
+        console.log(x);
+
+        this.knowledge = x;
+        console.log(this.knowledge);
+
+      });
+    });
+  }
+
 
   setCheckedRows(checked: boolean, row: XTableRow) {
     if (checked) {
@@ -122,7 +147,7 @@ export class KnowledgeNodeComponent  {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: this.id + '_entity', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: this.id + '_entity', type: '组织', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -140,7 +165,7 @@ export class KnowledgeNodeComponent  {
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id.toString().split('/')[1]}/${item.type.id}`],
           {
             relativeTo: this.activatedRoute,
           }

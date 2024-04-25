@@ -54,6 +54,7 @@ export class NodeComponent extends PageBase {
     { id: 'actions', label: '操作', width: 150, right: 0 },
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'label', label: '标签', flex: 1.5, sort: true },
+    { id: 'type', label: '类型', flex: 1.5, sort: true },
     { id: 'description', label: '描述', flex: 0.5, sort: true },
     { id: 'aliases', label: '别名', flex: 1 },
   ];
@@ -116,7 +117,7 @@ export class NodeComponent extends PageBase {
     console.log(this.checkedRows);
   }
 
-  
+
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(

@@ -1,8 +1,8 @@
 <au-tool>
 
 
-    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
-    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+  <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+  <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
 
 
 </au-tool>
@@ -18,11 +18,16 @@
   <x-button icon="fto-search" (click)="search(keyword)"></x-button>
 </x-input-group>
 
-<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" [bodyColumnTpl]="{ actions: actionsTpl }"
-  (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
-  (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
+<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
+  [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl   }" (activatedChange)="action('info', $event)" loading
+  [allowSelectRow]="true" (headCheckboxChange)="headCheckboxChange($event)"
+  (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>
-
+<ng-template #typeTpl let-column="$column" let-row="$row">
+  <div>
+    {{row.type.label}}
+  </div>
+</ng-template>
 <ng-template #actionsTpl let-column="$column" let-row="$row">
   <div class="au-table-actions">
 

@@ -6,6 +6,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { NodeService } from '../node.service';
 import { XTableColumn } from '@ng-nest/ui';
 import { map, tap } from 'rxjs';
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-node-detail',
@@ -23,9 +24,24 @@ export class NodeDetailComponent implements OnInit {
       id: 'label',
       label: '标签',
       required: true,
-      
+
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
+    },
+    {
+      control: 'find',
+      id: 'type',
+      label: '类型',
+      treeData: () =>
+        this.ontologyService
+          .getList(1, Number.MAX_SAFE_INTEGER, {
+            sort: [
+              { field: 'pid', value: 'asc' },
+              { field: 'sort', value: 'asc' },
+            ],
+          })
+          .pipe(map((x) => x.list)),
+   
     },
     {
       control: 'input',
@@ -39,8 +55,8 @@ export class NodeDetailComponent implements OnInit {
   ];
 
   data: any;
-  size=20;
-  query:any;
+  size = 20;
+  query: any;
 
 
   columns: XTableColumn[] = [
@@ -56,6 +72,7 @@ export class NodeDetailComponent implements OnInit {
   disabled = false;
   constructor(
     private nodeService: NodeService,
+    private ontologyService: OntologyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService
@@ -84,16 +101,17 @@ export class NodeDetailComponent implements OnInit {
       case 'info':
         this.nodeService.getItem(this.id).subscribe((x) => {
           console.log(x)
-          let item:any = {};
-          item['id']=x.id;
-          item['label']=x?.labels?.zh?.value;
-          item['description']=x?.descriptions?.zh?.value;
+          let item: any = {};
+          item['id'] = x._id;
+          item['type'] = x?.type;
+          item['label'] = x?.labels?.zh?.value;
+          item['description'] = x?.descriptions?.zh?.value;
           this.form.formGroup.patchValue(item);
           this.data = (index: number, size: number, id: string, query: Query) =>
-          this.nodeService.getLinks(index, this.size, this.id, this.query).pipe(
-            tap((x: any) => console.log(x)),
-            map((x: any) => x)
-          );
+            this.nodeService.getLinks(index, this.size, this.id, this.query).pipe(
+              tap((x: any) => console.log(x)),
+              map((x: any) => x)
+            );
         });
         break;
       case 'edit':
@@ -107,6 +125,8 @@ export class NodeDetailComponent implements OnInit {
             this.router.navigate(['/index/node']);
           });
         } else if (this.type === 'edit') {
+          console.log(this.form.formGroup.value)
+
           this.nodeService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
             this.router.navigate(['/index/node']);

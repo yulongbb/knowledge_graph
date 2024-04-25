@@ -25,6 +25,8 @@ export class KnowledgeDetailComponent implements OnInit {
       // pattern: /^[A-Za-z0-9]{4,16}$/,
       // message: '只能包括数字、字母的组合，长度为4-16位'
     },
+
+
     {
       control: 'input',
       id: 'description',

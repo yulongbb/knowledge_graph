@@ -6,7 +6,7 @@ import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
 export class NodeService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database) { }
 
   async fusion(extraction: Extraction): Promise<any> {
     // 获取集合（Collection）
@@ -61,7 +61,8 @@ export class NodeService {
     // 插入数据
     const document = {
       _key: entity.id,
-      id: entity.id,
+      _id: entity.id,
+      type: entity.type,
       labels: { zh: { language: 'zh', value: entity.label } },
       descriptions: { zh: { language: 'zh', value: entity.description } },
       modified: new Date().toISOString(),
@@ -114,6 +115,7 @@ export class NodeService {
       .document(entity.id)
       .then((existingDocument) => {
         // Update the document fields
+        existingDocument.type = entity.type;
         existingDocument.labels = {
           zh: { language: 'zh', value: entity.label },
         };
@@ -153,21 +155,34 @@ export class NodeService {
       let cursor = null;
       console.log(start);
       console.log(size);
-      const collection =  this.db.collection(query.collection);
+      const collection = this.db.collection(query.collection);
       console.log(collection);
       console.log(query.keyword);
+      console.log(query.type);
       if (query.keyword == '%%') {
-  
+        if (query.type) {
+          cursor = await this.db.query(aql`
+          LET langulage = 'zh'
+          LET list = (FOR doc IN ${collection} 
+            FILTER  doc.type.label==${query.type} 
+            FILTER  doc.modified
+            SORT doc.modified
+          LIMIT ${start}, ${size}
+          RETURN {id:TO_ARRAY(doc['_id']), type:doc['type'], label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
+          RETURN {total: COUNT(${collection}), list: list}
+      `);
+        } else {
+          cursor = await this.db.query(aql`
+          LET langulage = 'zh'
+          LET list = (FOR doc IN ${collection} 
+            FILTER  doc.modified
+            SORT doc.modified
+          LIMIT ${start}, ${size}
+          RETURN {id:TO_ARRAY(doc['_id']), type:doc['type'], label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
+          RETURN {total: COUNT(${collection}), list: list}
+      `);
+        }
 
-        cursor = await this.db.query(aql`
-        LET langulage = 'zh'
-        LET list = (FOR doc IN ${collection}
-        FILTER  doc.modified
-        SORT doc.modified
-        LIMIT ${start}, ${size}
-        RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
-        RETURN {total: COUNT(${collection}), list: list}
-    `);
       } else {
         cursor = await this.db.query(aql`
 
@@ -242,9 +257,8 @@ export class NodeService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}

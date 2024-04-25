@@ -9,7 +9,7 @@ const routes: Routes = [
   { path: '', component: KnowledgeComponent, data: { title: 'extraction' } },
   { path: ':type', component: KnowledgeDetailComponent },
   { path: ':type/:id/nodes', component: KnowledgeNodeComponent, },
-  { path: ':type/:id/nodes/:type/:id', component: KnowledgeNodeDetailComponent, },
+  { path: ':type/:id/nodes/:type/:id/:schema', component: KnowledgeNodeDetailComponent, },
   { path: ':type/:id', component: KnowledgeDetailComponent }
 ];
 
