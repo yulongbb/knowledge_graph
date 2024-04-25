@@ -27,7 +27,7 @@ export class FusionController {
   async knowledge(
     @Param('collection')
     collection: string,
-    @Body() nodes: Array<Node>,
+    @Body() nodes: Array<any>,
   ): Promise<any> {
     return await this.fusionService.knowledge(nodes, collection);
   }
