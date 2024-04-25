@@ -9,6 +9,9 @@ import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { XInputModule } from '@ng-nest/ui/input';
 import { XDrawerModule } from "@ng-nest/ui";
+import { XUploadModule } from '@ng-nest/ui/upload';
+
+
 import { NodeDetailComponent } from "./node-detail/node-detail.component";
 
 
@@ -23,8 +26,9 @@ import { NodeDetailComponent } from "./node-detail/node-detail.component";
     XTreeModule,
     XInputModule,
     XDrawerModule,
+    XUploadModule,
     FusionRoutesModule
   ],
   declarations: [NodeComponent, NodeDetailComponent]
 })
-export class NodeModule {}
+export class NodeModule { }

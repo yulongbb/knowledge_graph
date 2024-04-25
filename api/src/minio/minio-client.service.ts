@@ -40,7 +40,7 @@ export class MinioClientService {
           throw new HttpException('Error upload file', HttpStatus.BAD_REQUEST);
         }
         // 上传成功回传文件信息
-        resolve('上传成功');
+        resolve({name: fileName});
       });
     });
   }

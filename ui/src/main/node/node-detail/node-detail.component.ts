@@ -41,7 +41,7 @@ export class NodeDetailComponent implements OnInit {
             ],
           })
           .pipe(map((x) => x.list)),
-   
+
     },
     {
       control: 'input',
@@ -95,6 +95,14 @@ export class NodeDetailComponent implements OnInit {
   ngOnInit(): void {
     this.action(this.type);
   }
+
+  uploadSuccess($event: any) {
+    let item: any = {};
+    item['label'] = $event.body.name;
+    this.form.formGroup.patchValue(item);
+    console.log('uploadSuccess', $event);
+  }
+
 
   action(type: string) {
     switch (type) {

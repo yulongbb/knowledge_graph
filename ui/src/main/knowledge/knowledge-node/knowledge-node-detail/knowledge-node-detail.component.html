@@ -2,23 +2,38 @@
 <x-form *ngIf="type=='edit'" #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":"
   labelWidth="6rem" width="30rem" labelAlign="end" span="20" space="2"></x-form>
 
+
+
+<img width="500" *ngIf="item.type.label=='图像'" [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']">
+
+<video width="500" *ngIf="item.type.label=='视频'" controls>
+  <source  [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']" type="video/mp4" />
+  <p>
+    你的浏览器不支持 HTML5 视频。这里有一个<a
+      href="myVideo.mp4"
+      download="myVideo.mp4"
+      >视频</a
+    >链接。
+  </p>
+</video>
+
+
 {{item|json}}
+  <div class="row">
+    <x-card *ngFor="let property of data  | async | keyvalue" width="100%" [header]="header">
+      <ng-template #header>
+        <span>{{property.key}}</span>
+        <x-button type="text">操作按钮</x-button>
+      </ng-template>
+      {{property.value|json}}
+    </x-card>
+  </div>
 
 
-<div class="row">
-  <x-card *ngFor="let property of data  | async | keyvalue" width="100%" [header]="header">
-    <ng-template #header>
-      <span>{{property.key}}</span>
-      <x-button type="text">操作按钮</x-button>
-    </ng-template>
-    {{property.value|json}}
-  </x-card>
-</div>
-
-
-<div class="app-footer">
-  <x-buttons space="0.5">
-    <x-button (click)="action('cancel')">取消</x-button>
-    <x-button type="primary" (click)="!formInvalid && action('save')" [disabled]="formInvalid || disabled">保存</x-button>
-  </x-buttons>
-</div>
+  <div class="app-footer">
+    <x-buttons space="0.5">
+      <x-button (click)="action('cancel')">取消</x-button>
+      <x-button type="primary" (click)="!formInvalid && action('save')" [disabled]="formInvalid || disabled">保存
+      </x-button>
+    </x-buttons>
+  </div>

@@ -98,12 +98,12 @@ export class FusionService {
       try {
         // 执行查询
         const cursor = await this.db
-          .query(aql`FOR v, e, p IN 1..1 OUTBOUND ${node.id[0]} GRAPH 'graph'
-        FOR n IN p['vertices']
-          INSERT  n INTO ${collection} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-        LET link = MERGE(e, {'_from': CONCAT(${knowledge + '_entity/'}, SPLIT(e['_from'], "/")[1]),'_to': CONCAT(${knowledge + '_entity/'}, SPLIT(e['_to'], "/")[1]),})
-        INSERT   link INTO ${edge} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-      RETURN { "node": v, "edge": link, "path": p['vertices'][0] }`)
+          .query(aql`FOR v, e, p IN 0..1 OUTBOUND ${node.id[0]} GRAPH 'graph'
+          INSERT  v INTO ${collection} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+          FOR edge IN p['edges']
+            LET link = MERGE(edge, {'_from': CONCAT(${knowledge + '_entity/'}, SPLIT(edge['_from'], "/")[1]),'_to': CONCAT(${knowledge + '_entity/'}, SPLIT(edge['_to'], "/")[1]),})
+            INSERT   link INTO ${edge} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
+          RETURN { "v": v, "e": e, "p":p }`)
 
         // 获取查询结果
         const result = await cursor.next();

@@ -60,8 +60,7 @@ export class NodeService {
 
     // 插入数据
     const document = {
-      _key: entity.id,
-      _id: entity.id,
+
       type: entity.type,
       labels: { zh: { language: 'zh', value: entity.label } },
       descriptions: { zh: { language: 'zh', value: entity.description } },
