@@ -6,6 +6,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { XTableColumn } from '@ng-nest/ui';
 import { NodeService } from 'src/main/node/node.service';
 import { map, tap } from 'rxjs';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-knowledge-node-detail',
@@ -67,6 +68,8 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   }
   disabled = false;
   constructor(
+    private sanitizer: DomSanitizer,
+
     private nodeService: NodeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -94,6 +97,12 @@ export class KnowledgeNodeDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.action(this.type);
+  }
+
+  trustUrl(url: string) {
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
   }
 
   action(type: string) {

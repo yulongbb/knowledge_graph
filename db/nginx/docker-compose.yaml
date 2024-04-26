@@ -1,0 +1,17 @@
+version: "2"
+services:
+ nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+    - ./conf:/etc/nginx
+    - ./html:/usr/share/nginx/html
+    restart: always
+    ports:
+      - 80:80
+      - 7777:7777
+      - 443:443
+
+networks:
+  my_network:
+    driver: bridge

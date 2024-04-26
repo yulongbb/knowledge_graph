@@ -20,6 +20,11 @@
   <a [href]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']"> 下载音频 </a>
 </figure>
 
+<iframe *ngIf="item.type.label=='PDF'" id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%"
+  height="800"
+  [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+item['labels']['zh']['value'])">
+</iframe>
+
 
 
 {{item|json}}

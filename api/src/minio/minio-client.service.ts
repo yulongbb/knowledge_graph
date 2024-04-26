@@ -30,18 +30,43 @@ export class MinioClientService {
       file.originalname.length,
     );
     const filename = hashedFileName + ext;
-
+  
     const fileName = `${filename}`;
     const fileBuffer = file.buffer;
-
+  
+    // 定义一个函数来映射文件扩展名到内容类型
+    const getContentType = (extension: string): string => {
+      switch (extension.toLowerCase()) {
+        case '.jpg':
+        case '.jpeg':
+          return 'image/jpeg';
+        case '.png':
+          return 'image/png';
+        case '.pdf':
+          return 'application/pdf';
+        // 根据需要添加更多文件扩展名和对应的内容类型
+        default:
+          return 'application/octet-stream'; // 默认为二进制数据
+      }
+    };
+  
+    const contentType = getContentType(ext);
+  
     return new Promise<any>((resolve) => {
-      this.client.putObject(baseBucket, fileName, fileBuffer, async (err) => {
-        if (err) {
-          throw new HttpException('Error upload file', HttpStatus.BAD_REQUEST);
-        }
-        // 上传成功回传文件信息
-        resolve({name: fileName});
-      });
+      this.client.putObject(
+        baseBucket,
+        fileName,
+        fileBuffer,
+        null,
+        { 'Content-Type': contentType }, // 在这里设置内容类型
+        async (err) => {
+          if (err) {
+            throw new HttpException('上传文件出错', HttpStatus.BAD_REQUEST);
+          }
+          // 上传成功，返回文件信息
+          resolve({ name: fileName });
+        },
+      );
     });
   }
 
