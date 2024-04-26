@@ -356,11 +356,12 @@ export class FusionService {
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
-      RETURN e`);
+      RETURN MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'label': Document(e['_to']).labels.zh.value}} })`);
       // 获取查询结果
       const result = await cursor.all();
+      console.log(result);
       // 处理查询结果
-      return { total: 100, list: result };
+      return { total: 100, list: result};
     } catch (error) {
       console.error('Query Error:', error);
     }

@@ -5,7 +5,7 @@ import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XCommentNode, XTableColumn } from '@ng-nest/ui';
 import { NodeService } from 'src/main/node/node.service';
-import { map, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
@@ -51,7 +51,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   ];
 
   query: any;
-  data: any;
+  data!: Observable<Array<any>>;
 
  
   columns: XTableColumn[] = [
