@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 23/04/2024 17:21:51
+ Date: 26/04/2024 17:52:41
 */
 
 SET NAMES utf8mb4;
@@ -153,11 +153,16 @@ INSERT INTO `extraction` VALUES ('0af1a757-e599-9708-99b3-589838360703', '约瑟
 INSERT INTO `extraction` VALUES ('1675f341-892c-e3dc-01d2-8c455f788dd2', '约瑟夫·拜登', '教育背景', '特拉华大学');
 INSERT INTO `extraction` VALUES ('226ddf15-47aa-ee26-3edf-a162ec9db495', '约瑟夫·拜登', '出生日期', '1942年11月20日');
 INSERT INTO `extraction` VALUES ('2ef9a525-0da0-5d78-b3a7-e31a9d1caef9', '约瑟夫·拜登', '民族', '爱尔兰人');
+INSERT INTO `extraction` VALUES ('38cd5ac6-16a3-6bfd-593c-f833c21e7f12', '约瑟夫·拜登', '孩子', '约瑟夫·罗比内特·拜登');
 INSERT INTO `extraction` VALUES ('3bfbd13b-f12c-8fde-96ee-990342d7eaaf', '约瑟夫·拜登', '配偶', '吉尔·拜登');
-INSERT INTO `extraction` VALUES ('50d2bd75-18a1-06fb-383c-4bd07972ca11', '约瑟夫·拜登', '出生地', '美国宾夕法尼亚州斯克兰顿');
+INSERT INTO `extraction` VALUES ('41b4433c-872a-622a-7c7c-7b7975570993', '约瑟夫·拜登', '图像', '489b6df1e22ce2ab7177200e760567c8.png');
+INSERT INTO `extraction` VALUES ('4ae4a47c-4b73-df9e-677a-8d4faa659e6c', '美国国防部', '领导者', '劳埃德·奥斯汀');
+INSERT INTO `extraction` VALUES ('50d2bd75-18a1-06fb-383c-4bd07972ca11', '约瑟夫·拜登', '出生地', '斯克兰顿');
 INSERT INTO `extraction` VALUES ('57ff1940-222e-b4e7-c926-24c014e97f5e', '约瑟夫·拜登', '国籍', '美国');
 INSERT INTO `extraction` VALUES ('5d8f482b-20c2-5312-687d-9d564bf0b24b', '约瑟夫·拜登', '职业', '政治家');
+INSERT INTO `extraction` VALUES ('6edc77fa-c1db-162e-2ddc-098241c4b7b8', '快乐储存所', '说', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈丑到自带表情');
 INSERT INTO `extraction` VALUES ('914f0a01-3ffa-e007-b6cb-32e592d4f19c', '约瑟夫·拜登', '党派	', '美国民主党');
+INSERT INTO `extraction` VALUES ('e932689f-2a89-0f30-bb4e-562e8618e42d', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈', '发言人', '快乐储存所');
 INSERT INTO `extraction` VALUES ('f6fdd0fc-3f94-d0d0-0e49-c17191568d66', '约瑟夫·拜登', '职务', '就任美国第46任总统');
 INSERT INTO `extraction` VALUES ('ff1c7fa7-c3e2-7c77-9194-7dd043925942', '约瑟夫·拜登', '教育背景', '雪城大学');
 
@@ -175,8 +180,13 @@ CREATE TABLE `knowledge`  (
 -- ----------------------------
 -- Records of knowledge
 -- ----------------------------
-INSERT INTO `knowledge` VALUES ('2fea6cd6-5867-9023-68c0-bed5adb2adeb', '组织', 'organization');
-INSERT INTO `knowledge` VALUES ('6ddb5afd-0270-200c-c2bb-b5529009116c', '人物', 'person');
+INSERT INTO `knowledge` VALUES ('26e1f5fd-9370-5017-bb82-817ae7362125', 'PDF', 'PDF');
+INSERT INTO `knowledge` VALUES ('comment', '评论', 'comment');
+INSERT INTO `knowledge` VALUES ('dcdc81ed-8b43-6ddd-8f13-e8c4c25495ef', '音频', 'audio');
+INSERT INTO `knowledge` VALUES ('image', '图像', 'image');
+INSERT INTO `knowledge` VALUES ('organization', '组织', 'organization');
+INSERT INTO `knowledge` VALUES ('person', '人物', 'person');
+INSERT INTO `knowledge` VALUES ('video', '视频', 'video');
 
 -- ----------------------------
 -- Table structure for ontology_property
@@ -787,7 +797,7 @@ INSERT INTO `ontology_property` VALUES (819, NULL, 'ADS bibcode', 'bibcode in th
 INSERT INTO `ontology_property` VALUES (820, NULL, 'arXiv classification', 'arXiv classification of pre-print articles', NULL);
 INSERT INTO `ontology_property` VALUES (821, NULL, 'CGNDB Unique ID', 'identifier(s) for a geographical feature contained in the Canadian Geographical Names Data Base (CGNDB)', NULL);
 INSERT INTO `ontology_property` VALUES (822, NULL, 'mascot', 'mascot of an organization, e.g. a sports team or university', NULL);
-INSERT INTO `ontology_property` VALUES (823, NULL, 'speaker', 'person who is speaker for this event, ceremony, keynote, presentation or in a literary work', NULL);
+INSERT INTO `ontology_property` VALUES (823, '发表言论的人', 'speaker', 'person who is speaker for this event, ceremony, keynote, presentation or in a literary work', '发言人');
 INSERT INTO `ontology_property` VALUES (824, NULL, 'Meteoritical Bulletin Database ID', 'identifier for a meteorite in the database of the Meteoritical Society', NULL);
 INSERT INTO `ontology_property` VALUES (825, NULL, 'dedicated to', 'person or organization to whom the subject was dedicated', NULL);
 INSERT INTO `ontology_property` VALUES (826, NULL, 'tonality', 'key of a musical composition', '音调');
@@ -8717,13 +8727,14 @@ CREATE TABLE `ontology_schema`  (
 INSERT INTO `ontology_schema` VALUES ('0031026a-ba85-f065-fbad-e467d2136c3d', 'datatype', NULL, NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', 'datatype');
 INSERT INTO `ontology_schema` VALUES ('059ff5c4-310b-f9ac-40a3-80fbcb7acd93', 'url', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93', 'string');
 INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '');
-INSERT INTO `ontology_schema` VALUES ('184f3f6c-9255-79a2-b704-cfe64455acea', ' 音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea', '');
+INSERT INTO `ontology_schema` VALUES ('184f3f6c-9255-79a2-b704-cfe64455acea', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea', '');
 INSERT INTO `ontology_schema` VALUES ('31794138-42bb-99c5-7197-db792da75595', 'external-id', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.31794138-42bb-99c5-7197-db792da75595', 'string');
 INSERT INTO `ontology_schema` VALUES ('36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '');
+INSERT INTO `ontology_schema` VALUES ('3e9159fe-0622-a386-e65b-43628fa82b53', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.3e9159fe-0622-a386-e65b-43628fa82b53', 'PDF');
 INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '');
 INSERT INTO `ontology_schema` VALUES ('420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time');
 INSERT INTO `ontology_schema` VALUES ('50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype', NULL, NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype');
-INSERT INTO `ontology_schema` VALUES ('5c50770b-4f01-24b0-6a58-299a895e739f', ' 图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.5c50770b-4f01-24b0-6a58-299a895e739f', '');
+INSERT INTO `ontology_schema` VALUES ('5c50770b-4f01-24b0-6a58-299a895e739f', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.5c50770b-4f01-24b0-6a58-299a895e739f', '');
 INSERT INTO `ontology_schema` VALUES ('648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext');
 INSERT INTO `ontology_schema` VALUES ('730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity');
 INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44', '');
@@ -8778,6 +8789,7 @@ INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff1
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 172);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 569);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 570);
+INSERT INTO `ontology_schema_property` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', 823);
 
 -- ----------------------------
 -- Table structure for ontology_type_value
@@ -8796,12 +8808,18 @@ CREATE TABLE `ontology_type_value`  (
 -- ----------------------------
 -- Records of ontology_type_value
 -- ----------------------------
+INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 6);
 INSERT INTO `ontology_type_value` VALUES ('d6776fd4-38de-913c-e549-89e6199313ee', 18);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 19);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 20);
+INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 19);
+INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 20);
 INSERT INTO `ontology_type_value` VALUES ('9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 21);
+INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 22);
 INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 25);
-INSERT INTO `ontology_type_value` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 26);
+INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 26);
+INSERT INTO `ontology_type_value` VALUES ('9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 27);
+INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 40);
+INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 91);
+INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 823);
 
 -- ----------------------------
 -- Table structure for system_action

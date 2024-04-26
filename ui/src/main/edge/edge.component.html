@@ -24,8 +24,11 @@
 
 
 <ng-template #toTpl let-column="$column" let-row="$row">
-  <div>
+  <div  *ngIf="row.from['_key']!=row.to['_key']">
     {{row.to.labels.zh.value}}
+  </div>
+  <div  *ngIf="row.from['_key']==row.to['_key']">
+    {{row.value}}
   </div>
 </ng-template>
 
