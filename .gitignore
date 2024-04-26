@@ -7,5 +7,5 @@ ui/dist
 ui/.angular/cache
 db/MySQL/db
 db/arangodb/data
-db/arangodb/data
 db/minio/data
+db/nginx
