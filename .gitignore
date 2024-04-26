@@ -8,4 +8,4 @@ ui/.angular/cache
 db/MySQL/db
 db/arangodb/data
 db/minio/data
-db/nginx
+db/nginx/html
