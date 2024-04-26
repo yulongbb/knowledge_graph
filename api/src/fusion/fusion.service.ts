@@ -27,7 +27,7 @@ export class FusionService {
       const p = await this.getPropertyByName(extraction.property);
       console.log(p);
 
-      if (p['tail'] !== 'string') {
+      if (p['tail'] == 'wikibase-item') {
         let o = await this.getEntityBylabel(extraction.object);
         if (!o) {
           o = {
@@ -39,8 +39,19 @@ export class FusionService {
         const link = {
           from: s['_id'],
           to: o['_id'],
-          property: p['_key'],
+          mainsnak: {
+            snaktype: "value",
+            property: p['_key'],
+            hash: "8f7599319c8f07055134a500cf67fc22d1b3142d",
+            datavalue: {
+              value:
+                { "entity-type": "item", "numeric-id": Number.parseInt(o['_id'].split('/')[1]), "id": o['_id'] },
+              type: "wikibase-entityid"
+            },
+            datatype: p['tail']
+          }
         };
+
         await this.addOrUpdateLink(link);
 
       } else {
@@ -48,8 +59,16 @@ export class FusionService {
           from: s['_id'],
           to: s['_id'],
           value: extraction.object,
-          property: p['_key'],
+          mainsnak: {
+            snaktype: "value",
+            property: p['_key'],
+            hash: "8f7599319c8f07055134a500cf67fc22d1b3142d",
+            datavalue: { value: extraction.object, type: "string" },
+            datatype: p['tail']
+          }
         };
+        console.log(link);
+
         await this.addOrUpdateLink(link);
       }
 
@@ -83,6 +102,7 @@ export class FusionService {
 
   async addOrUpdateLink(link) {
     const existingLink = await this.getLinkByFromAndTo(link);
+    console.log(existingLink);
     if (!existingLink) {
       return await this.addLink(link);
     }
@@ -174,62 +194,22 @@ export class FusionService {
   async addLink(entity: any): Promise<any> {
     // 获取集合（Collection）
     const myCollection = this.db.collection('link');
-    if (entity.from != entity.to) {
-      // 插入数据
-      const document = {
-        _from: entity.from,
-        _to: entity.to,
-        id: entity.id,
-        mainsnak: {
-          snaktype: 'value',
-          property: entity.property,
-          hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-          datavalue: {
-            value: {
-              'entity-type': 'item',
-              'numeric-id': Number.parseInt(entity.to.split('/')[1]),
-              id: 'Q' + entity.to.split('/')[1],
-            },
-            type: 'wikibase-entityid',
-          },
-          datatype: 'wikibase-item',
-        },
-        type: 'statement',
-        rank: 'normal',
-      };
-
-      return myCollection.save(document);
-    } else {
-      // 插入数据
-      const document = {
-        _from: entity.from,
-        _to: entity.to,
-        id: entity.id,
-        mainsnak: {
-          snaktype: 'value',
-          property: entity.property,
-          hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-          datavalue: {
-            value: entity.value,
-            type: 'string',
-          },
-          datatype: 'string',
-        },
-        type: 'statement',
-        rank: 'normal',
-      };
-
-      return myCollection.save(document);
-    }
-
-
+    const document = {
+      _from: entity.from,
+      _to: entity.to,
+      id: entity.id,
+      mainsnak: entity['mainsnak'],
+      type: 'statement',
+      rank: 'normal',
+    };
+    return myCollection.save(document);
   }
 
   async getLinkByFromAndTo(link: any): Promise<any> {
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR l IN link
-      FILTER l['_from']==${link['from']} AND l['_to']==${link['to']}
+      FILTER l['_from']==${link['from']} AND l['_to']==${link['to']} AND l['mainsnak']['property'] == ${link['mainsnak']['property']}
       RETURN l`);
       // 获取查询结果
       const result = await cursor.next();

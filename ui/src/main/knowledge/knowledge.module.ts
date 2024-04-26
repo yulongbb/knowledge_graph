@@ -12,6 +12,7 @@ import { XInputModule } from "@ng-nest/ui";
 import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-detail/knowledge-node-detail.component";
 
 
+
 @NgModule({
   imports: [
     CommonModule,
@@ -19,7 +20,6 @@ import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-de
     NgNestModule,
     AuToolModule,
     XInputModule,
-
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],

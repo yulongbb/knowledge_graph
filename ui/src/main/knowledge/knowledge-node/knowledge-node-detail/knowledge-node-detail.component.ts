@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { XGuid } from '@ng-nest/ui/core';
+import { XAddHours, XAddMinutes, XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XTableColumn } from '@ng-nest/ui';
+import { XCommentNode, XTableColumn } from '@ng-nest/ui';
 import { NodeService } from 'src/main/node/node.service';
 import { map, tap } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -53,9 +53,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   query: any;
   data: any;
 
-
-
-
+ 
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
     { id: 'property', label: '属性名', width: 200 },
