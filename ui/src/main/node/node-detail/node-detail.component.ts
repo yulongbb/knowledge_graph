@@ -35,6 +35,7 @@ export class NodeDetailComponent implements OnInit {
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
+      
             sort: [
               { field: 'pid', value: 'asc' },
               { field: 'sort', value: 'asc' },

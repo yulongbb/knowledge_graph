@@ -4,22 +4,20 @@ import { PageBase } from 'src/share/base/base-page';
 import { XTreeAction, XTreeComponent } from '@ng-nest/ui/tree';
 import { XFormRow } from '@ng-nest/ui/form';
 import { UntypedFormGroup } from '@angular/forms';
-import {
-  Schema,
-  OntologyService,
-} from 'src/main/ontology/ontology/ontology.service';
+
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { map, tap } from 'rxjs';
 import { XGuid } from '@ng-nest/ui/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Type, TypeService } from './type.service';
 
 @Component({
-  selector: 'app-ontology',
-  templateUrl: 'ontology.component.html',
-  styleUrls: ['./ontology.component.scss'],
+  selector: 'app-type',
+  templateUrl: 'type.component.html',
+  styleUrls: ['./type.component.scss'],
 })
-export class OntologyComponent extends PageBase {
+export class TypeComponent extends PageBase {
   @ViewChild('treeCom') treeCom!: XTreeComponent;
 
   formGroup = new UntypedFormGroup({});
@@ -30,7 +28,7 @@ export class OntologyComponent extends PageBase {
 
   type = 'info';
 
-  selected!: Schema;
+  selected!: Type;
   treeLoading = true;
 
   data = () =>
@@ -43,7 +41,7 @@ export class OntologyComponent extends PageBase {
       })
       .pipe(
         tap((x) => (console.log(x))),
-        map((x) => x.list)
+        map((x:any) => x.list)
       );
 
   treeActions: XTreeAction[] = [
@@ -51,7 +49,7 @@ export class OntologyComponent extends PageBase {
       id: 'add',
       label: '新增',
       icon: 'fto-plus-square',
-      handler: (schema: Schema) => {
+      handler: (schema: Type) => {
         this.action('add', schema);
       },
     },
@@ -59,7 +57,7 @@ export class OntologyComponent extends PageBase {
       id: 'edit',
       label: '修改',
       icon: 'fto-edit',
-      handler: (schema: Schema) => {
+      handler: (schema: Type) => {
         this.action('edit', schema);
       },
     },
@@ -67,7 +65,7 @@ export class OntologyComponent extends PageBase {
       id: 'properties',
       label: '属性',
       icon: 'fto-list',
-      handler: (schema: Schema) => {
+      handler: (schema: Type) => {
         this.action('properties', schema);
       },
     },
@@ -75,7 +73,7 @@ export class OntologyComponent extends PageBase {
       id: 'delete',
       label: '删除',
       icon: 'fto-trash-2',
-      handler: (schema: Schema) => {
+      handler: (schema: Type) => {
         this.action('delete', schema);
       },
     },
@@ -109,7 +107,7 @@ export class OntologyComponent extends PageBase {
   ];
 
   constructor(
-    private service: OntologyService,
+    private service: TypeService,
     public override indexService: IndexService,
     private message: XMessageService,
     private router: Router,
@@ -119,7 +117,7 @@ export class OntologyComponent extends PageBase {
     super(indexService);
   }
 
-  action(type: string, schema: Schema) {
+  action(type: string, schema: Type) {
     console.log(schema);
     switch (type) {
       case 'add-root':

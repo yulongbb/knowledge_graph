@@ -10,6 +10,7 @@ import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
+import { TypeService } from '../../type/type.service';
 import { PropertyService } from '../property.service';
 
 @Component({
@@ -63,7 +64,7 @@ export class PropertyDetailComponent implements OnInit {
       required: true,
       multiple: true,
       treeData: () =>
-        this.ontologyService
+        this.typeService
           .getList(1, Number.MAX_SAFE_INTEGER, {
             sort: [
               { field: 'pid', value: 'asc' },
@@ -85,6 +86,7 @@ export class PropertyDetailComponent implements OnInit {
 
   constructor(
     private ontologyService: OntologyService,
+    private typeService: TypeService,
 
     private propertyService: PropertyService,
     private router: Router,
@@ -131,17 +133,19 @@ export class PropertyDetailComponent implements OnInit {
             .subscribe((y: any) => {
               x['schemas'] = y.list;
 
-              this.query.filter = [
-                {
-                  field: 'id',
-                  value: x.id as string,
-                  relation: 'values',
-                  operation: '=',
-                },
-              ];
+
 
               this.ontologyService
-                .getList(1, 10, this.query)
+                .getList(1, 10, {
+                  filter: [
+                    {
+                      field: 'id',
+                      value: x.id as string,
+                      relation: 'properties',
+                      operation: '=',
+                    },
+                  ]
+                })
                 .subscribe((t: any) => {
                   x['types'] = t.list;
                   this.form.formGroup.patchValue(x);

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
+import { Type } from './type.entity';
 
 @Entity('ontology_property')
 export class Property {
@@ -21,6 +22,6 @@ export class Property {
   @ManyToMany(() => Schema, (schema) => schema.properties)
   schemas: Schema[];
 
-  @ManyToMany(() => Schema, (schema) => schema.values)
-  types: Schema[];
+  @ManyToMany(() => Type, (type) => type.properties)
+  types: Type[];
 }

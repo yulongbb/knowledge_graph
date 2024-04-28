@@ -6,11 +6,14 @@ import { SchemasController } from 'src/ontology/controllers/schemas.controller';
 import { SchemasService } from 'src/ontology/services/schemas.service';
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { PropertiesController } from 'src/ontology/controllers/properties.controller';
+import { Type } from './entities/type.entity';
+import { TypesController } from './controllers/types.compopnent';
+import { TypesService } from './services/types.service';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Schema, Property])],
-  controllers: [SchemasController, PropertiesController],
-  providers: [SchemasService, PropertiesService]
+  imports: [TypeOrmModule.forFeature([Schema, Property, Type])],
+  controllers: [SchemasController, PropertiesController, TypesController],
+  providers: [SchemasService, PropertiesService, TypesService]
 })
 export class OntologynModule {}
