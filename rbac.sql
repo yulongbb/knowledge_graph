@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 26/04/2024 17:52:41
+ Date: 28/04/2024 16:48:53
 */
 
 SET NAMES utf8mb4;
@@ -8724,31 +8724,19 @@ CREATE TABLE `ontology_schema`  (
 -- ----------------------------
 -- Records of ontology_schema
 -- ----------------------------
-INSERT INTO `ontology_schema` VALUES ('0031026a-ba85-f065-fbad-e467d2136c3d', 'datatype', NULL, NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', 'datatype');
-INSERT INTO `ontology_schema` VALUES ('059ff5c4-310b-f9ac-40a3-80fbcb7acd93', 'url', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93', 'string');
-INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '');
-INSERT INTO `ontology_schema` VALUES ('184f3f6c-9255-79a2-b704-cfe64455acea', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea', '');
-INSERT INTO `ontology_schema` VALUES ('31794138-42bb-99c5-7197-db792da75595', 'external-id', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.31794138-42bb-99c5-7197-db792da75595', 'string');
-INSERT INTO `ontology_schema` VALUES ('36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.36a78acd-e2ed-0c7e-ee4a-f78ebaa51bd0', '');
-INSERT INTO `ontology_schema` VALUES ('3e9159fe-0622-a386-e65b-43628fa82b53', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.3e9159fe-0622-a386-e65b-43628fa82b53', 'PDF');
-INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '');
-INSERT INTO `ontology_schema` VALUES ('420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.420ff434-5b5c-8bda-ab04-8ba7d2c65c54', 'time');
-INSERT INTO `ontology_schema` VALUES ('50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype', NULL, NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', 'entitytype');
-INSERT INTO `ontology_schema` VALUES ('5c50770b-4f01-24b0-6a58-299a895e739f', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '184f3f6c-9255-79a2-b704-cfe64455acea.5c50770b-4f01-24b0-6a58-299a895e739f', '');
-INSERT INTO `ontology_schema` VALUES ('648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.648bc651-1fb6-99af-6a08-f7ccb13c4248', 'monolingualtext');
-INSERT INTO `ontology_schema` VALUES ('730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.730ecf3c-1d58-676a-f62d-8b2c6fe028de', 'quantity');
-INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44', '');
-INSERT INTO `ontology_schema` VALUES ('837d0576-883f-374e-4344-fead8c905a95', 'wikibase-property', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.837d0576-883f-374e-4344-fead8c905a95', 'wikibase-entityid');
-INSERT INTO `ontology_schema` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.8a924fb2-1438-8539-7e48-0b0fc02f44db', '');
-INSERT INTO `ontology_schema` VALUES ('977867fe-d710-efdf-c3e9-bd9251ae0d77', '地点', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.977867fe-d710-efdf-c3e9-bd9251ae0d77', '');
-INSERT INTO `ontology_schema` VALUES ('9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 'string', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 'string');
-INSERT INTO `ontology_schema` VALUES ('abbbcdf2-2296-b13b-3f3b-1724ce566401', '嵌入式非文本对象', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.abbbcdf2-2296-b13b-3f3b-1724ce566401', '');
-INSERT INTO `ontology_schema` VALUES ('ba140a9f-8888-cb0f-fff9-d073057a43e8', '产品', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.ba140a9f-8888-cb0f-fff9-d073057a43e8', '');
-INSERT INTO `ontology_schema` VALUES ('d6776fd4-38de-913c-e549-89e6199313ee', 'commonsMedia', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.d6776fd4-38de-913c-e549-89e6199313ee', 'string');
-INSERT INTO `ontology_schema` VALUES ('e288ec3e-bb4d-4ae6-c05c-aea8b561f300', 'monolingualtext', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.e288ec3e-bb4d-4ae6-c05c-aea8b561f300', 'monolingualtext');
-INSERT INTO `ontology_schema` VALUES ('e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '创造性工作', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '');
-INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', NULL, NULL, NULL, '50e1a010-dc7d-1590-4b0c-126771a728a1', '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '');
-INSERT INTO `ontology_schema` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 'wikibase-item', NULL, NULL, NULL, '0031026a-ba85-f065-fbad-e467d2136c3d', '059ff5c4-310b-f9ac-40a3-80fbcb7acd93.f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 'wikibase-entityid');
+INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '');
+INSERT INTO `ontology_schema` VALUES ('35b7855a-0b3a-fba8-2771-daa305523feb', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb', '音频');
+INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '');
+INSERT INTO `ontology_schema` VALUES ('76706ce5-298f-5144-802a-7c0306be49f9', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9', '视频');
+INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44', '');
+INSERT INTO `ontology_schema` VALUES ('7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.7e60636c-c3ce-9308-543f-3e77e2c85862', '图像');
+INSERT INTO `ontology_schema` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.8a924fb2-1438-8539-7e48-0b0fc02f44db', '');
+INSERT INTO `ontology_schema` VALUES ('977867fe-d710-efdf-c3e9-bd9251ae0d77', '地点', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.977867fe-d710-efdf-c3e9-bd9251ae0d77', '');
+INSERT INTO `ontology_schema` VALUES ('abbbcdf2-2296-b13b-3f3b-1724ce566401', '嵌入式非文本对象', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.abbbcdf2-2296-b13b-3f3b-1724ce566401', '');
+INSERT INTO `ontology_schema` VALUES ('ba140a9f-8888-cb0f-fff9-d073057a43e8', '产品', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.ba140a9f-8888-cb0f-fff9-d073057a43e8', '');
+INSERT INTO `ontology_schema` VALUES ('e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '创造性工作', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '');
+INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '');
+INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF');
 
 -- ----------------------------
 -- Table structure for ontology_schema_property
@@ -8767,59 +8755,57 @@ CREATE TABLE `ontology_schema_property`  (
 -- ----------------------------
 -- Records of ontology_schema_property
 -- ----------------------------
-INSERT INTO `ontology_schema_property` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', 6);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 18);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 19);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 20);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 21);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 22);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 25);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 26);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 27);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 39);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 40);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 59);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 69);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 91);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 106);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 108);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 109);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 119);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 140);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 172);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 569);
-INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 570);
-INSERT INTO `ontology_schema_property` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', 823);
+
+-- ----------------------------
+-- Table structure for ontology_type
+-- ----------------------------
+DROP TABLE IF EXISTS `ontology_type`;
+CREATE TABLE `ontology_type`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `router` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `icon` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `sort` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_1195b0fab025f689375d994d950`(`parentId`) USING BTREE,
+  CONSTRAINT `FK_1195b0fab025f689375d994d950` FOREIGN KEY (`parentId`) REFERENCES `ontology_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ontology_type
+-- ----------------------------
+INSERT INTO `ontology_type` VALUES ('231a71f0-0abe-98ef-67d4-a29b8fa785c8', 'time', 'time', NULL, NULL, NULL, NULL, '231a71f0-0abe-98ef-67d4-a29b8fa785c8');
+INSERT INTO `ontology_type` VALUES ('25e8d1d0-faa0-82e4-aba1-bd8a375e01cb', 'external-id', 'string', NULL, NULL, NULL, NULL, '25e8d1d0-faa0-82e4-aba1-bd8a375e01cb');
+INSERT INTO `ontology_type` VALUES ('30f74cea-fa5e-ec52-f8a5-911cb6dbb905', 'monolingualtext', 'monolingualtext', NULL, NULL, NULL, NULL, '30f74cea-fa5e-ec52-f8a5-911cb6dbb905');
+INSERT INTO `ontology_type` VALUES ('517af5c3-f910-5be4-e6f2-df1f86308aed', 'url', 'string', NULL, NULL, NULL, NULL, '517af5c3-f910-5be4-e6f2-df1f86308aed');
+INSERT INTO `ontology_type` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 'wikibase-item', 'wikibase-entityid', NULL, NULL, NULL, NULL, '6a24ed4a-487a-f730-8eae-2559238ac2a9');
+INSERT INTO `ontology_type` VALUES ('72b5009e-9a06-c377-6a75-3fb15b73dfde', 'quantity', 'quantity', NULL, NULL, NULL, NULL, '72b5009e-9a06-c377-6a75-3fb15b73dfde');
+INSERT INTO `ontology_type` VALUES ('9a4ab10c-4ee9-f337-d46c-e53a7c441261', 'commonsMedia', 'string', NULL, NULL, NULL, NULL, '9a4ab10c-4ee9-f337-d46c-e53a7c441261');
+INSERT INTO `ontology_type` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 'string', 'string', NULL, NULL, NULL, NULL, 'e6cbe090-b601-8b30-4b03-4298c0e1cb50');
+INSERT INTO `ontology_type` VALUES ('feb4c3fd-ad97-b112-e4c0-55741b08a488', 'wikibase-property', 'wikibase-entityid', NULL, NULL, NULL, NULL, 'feb4c3fd-ad97-b112-e4c0-55741b08a488');
 
 -- ----------------------------
 -- Table structure for ontology_type_value
 -- ----------------------------
 DROP TABLE IF EXISTS `ontology_type_value`;
 CREATE TABLE `ontology_type_value`  (
-  `schemaId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `typeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `propertyId` int(0) NOT NULL,
-  PRIMARY KEY (`schemaId`, `propertyId`) USING BTREE,
-  INDEX `IDX_8cfb0bbbb55188caf1a68ede0a`(`schemaId`) USING BTREE,
+  PRIMARY KEY (`typeId`, `propertyId`) USING BTREE,
   INDEX `IDX_568b9b5d75bd3865d279766916`(`propertyId`) USING BTREE,
+  INDEX `IDX_1670cbd28db91600d952242a1a`(`typeId`) USING BTREE,
   CONSTRAINT `FK_568b9b5d75bd3865d279766916f` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `FK_8cfb0bbbb55188caf1a68ede0ae` FOREIGN KEY (`schemaId`) REFERENCES `ontology_schema` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_1670cbd28db91600d952242a1ac` FOREIGN KEY (`typeId`) REFERENCES `ontology_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_type_value
 -- ----------------------------
-INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 6);
-INSERT INTO `ontology_type_value` VALUES ('d6776fd4-38de-913c-e549-89e6199313ee', 18);
-INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 19);
-INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 20);
-INSERT INTO `ontology_type_value` VALUES ('9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 21);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 22);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 25);
-INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 26);
-INSERT INTO `ontology_type_value` VALUES ('9a2d7930-9eda-bd0c-2dbe-1ace3025cabd', 27);
-INSERT INTO `ontology_type_value` VALUES ('f872d988-a5be-2e72-2a83-2ae4c19b4c4b', 40);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 91);
-INSERT INTO `ontology_type_value` VALUES ('31794138-42bb-99c5-7197-db792da75595', 823);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 22);
 
 -- ----------------------------
 -- Table structure for system_action
@@ -8856,6 +8842,7 @@ INSERT INTO `system_action` VALUES ('75056496-6ca6-1346-7a60-be72cab7d72b', '删
 INSERT INTO `system_action` VALUES ('792340cf-a275-f209-b16e-8dc79d5e5934', '查看', 'info', '', 'a2036646-7b02-7f9a-8a4b-18a1679c90a3', 1);
 INSERT INTO `system_action` VALUES ('7adad23f-636d-6bee-0f37-7d29d5b29585', '操作设置', 'actions', 'fto-list', '10f15681-0d11-78db-bc92-76d43298a5f8', 4);
 INSERT INTO `system_action` VALUES ('811047d2-ac97-96a5-686d-59d5a54fcc62', '新增', 'add', 'fto-plus', '32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 2);
+INSERT INTO `system_action` VALUES ('8225d6c8-35a7-9d72-e1ad-684e18965abc', '查看', 'info', 'ado-setting', 'f3bef769-af62-779f-800d-a49533766d01', 1);
 INSERT INTO `system_action` VALUES ('8eedb227-6be9-7571-ed0b-9e181c6e6716', '修改', 'edit', 'fto-edit', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 3);
 INSERT INTO `system_action` VALUES ('9067e591-16f5-b7a7-9336-a09a8b10fa5e', '查看', 'info', 'fto-eye', 'e2203f49-23da-5372-a260-ba8f71dc9e08', 1);
 INSERT INTO `system_action` VALUES ('9b76a100-df1c-88ad-1ce8-7c71b5797896', '查看', 'info', 'fto-eye', '29ecd267-2707-8c74-d508-730526ddd7ee', 1);
@@ -8902,6 +8889,7 @@ INSERT INTO `system_menu` VALUES ('90d5153c-3241-0ef6-27a8-6d00012d1838', '首�
 INSERT INTO `system_menu` VALUES ('a2036646-7b02-7f9a-8a4b-18a1679c90a3', '关系', 'edge', 'fto-command', NULL, 'a2036646-7b02-7f9a-8a4b-18a1679c90a3', 7);
 INSERT INTO `system_menu` VALUES ('c0232814-4938-a378-17b8-5a4eae56618b', '媒体库', 'media', 'fto-database', NULL, 'c0232814-4938-a378-17b8-5a4eae56618b', 8);
 INSERT INTO `system_menu` VALUES ('e2203f49-23da-5372-a260-ba8f71dc9e08', '仪表盘', 'dashboard', 'ado-radar-chart', NULL, 'e2203f49-23da-5372-a260-ba8f71dc9e08', 2);
+INSERT INTO `system_menu` VALUES ('f3bef769-af62-779f-800d-a49533766d01', '类型', 'type', 'ado-setting', NULL, 'f3bef769-af62-779f-800d-a49533766d01', 4);
 INSERT INTO `system_menu` VALUES ('f97d223d-b777-3dfa-c76a-d24244eba25e', '角色管理', 'roles', 'ado-user', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.f97d223d-b777-3dfa-c76a-d24244eba25e', 2);
 
 -- ----------------------------
@@ -8986,6 +8974,7 @@ INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01',
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '7adad23f-636d-6bee-0f37-7d29d5b29585');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '811047d2-ac97-96a5-686d-59d5a54fcc62');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '811047d2-ac97-96a5-686d-59d5a54fcc62');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '8225d6c8-35a7-9d72-e1ad-684e18965abc');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '8eedb227-6be9-7571-ed0b-9e181c6e6716');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '9067e591-16f5-b7a7-9336-a09a8b10fa5e');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '9067e591-16f5-b7a7-9336-a09a8b10fa5e');
