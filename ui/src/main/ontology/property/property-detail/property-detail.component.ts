@@ -11,6 +11,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
 import { TypeService } from '../../type/type.service';
+import { PredicateService } from '../predicate.service';
 import { PropertyService } from '../property.service';
 
 @Component({
@@ -22,6 +23,7 @@ import { PropertyService } from '../property.service';
 export class PropertyDetailComponent implements OnInit {
   id: string = '';
   type: string = '';
+  predicate: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -87,7 +89,7 @@ export class PropertyDetailComponent implements OnInit {
   constructor(
     private ontologyService: OntologyService,
     private typeService: TypeService,
-
+    private predicateService: PredicateService,
     private propertyService: PropertyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -117,6 +119,11 @@ export class PropertyDetailComponent implements OnInit {
       case 'info':
         console.log(this.id);
 
+        this.predicateService.get(`P${this.id}`).subscribe((predicate) => {
+          console.log(predicate);
+          this.predicate = predicate;
+        })
+
         this.propertyService.get(this.id as string).subscribe((x: any) => {
           console.log(x);
           this.query.filter = [
@@ -132,10 +139,7 @@ export class PropertyDetailComponent implements OnInit {
             .getList(1, 10, this.query)
             .subscribe((y: any) => {
               x['schemas'] = y.list;
-
-
-
-              this.ontologyService
+              this.typeService
                 .getList(1, 10, {
                   filter: [
                     {
@@ -167,9 +171,16 @@ export class PropertyDetailComponent implements OnInit {
             });
         } else if (this.type === 'edit') {
           console.log(this.form.formGroup.value);
+          this.predicate['head'] = this.form.formGroup.value['schemas'][0]['label'];
+          this.predicate['tail'] = this.form.formGroup.value['types'][0]['label'];
+
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
-            this.message.success('修改成功！');
-            this.router.navigate(['/index/properties']);
+            this.predicateService.put(this.predicate).subscribe((p) => {
+              console.log(p);
+              this.message.success('修改成功！');
+              this.router.navigate(['/index/properties']);
+            })
+
           });
         }
         break;

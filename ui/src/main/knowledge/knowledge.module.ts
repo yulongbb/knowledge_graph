@@ -6,6 +6,9 @@ import { ShareModule } from "src/share/share.module";
 import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
+import { XPageHeaderModule } from '@ng-nest/ui/page-header';
+
+
 import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.component";
 import { KnowledgeNodeComponent } from "./knowledge-node/knowledge-node.component";
 import { XInputModule } from "@ng-nest/ui";
@@ -20,6 +23,7 @@ import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-de
     NgNestModule,
     AuToolModule,
     XInputModule,
+    XPageHeaderModule,
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],

@@ -52,10 +52,12 @@ export class PropertyComponent extends PageBase {
     ];
 
   columns: XTableColumn[] = [
-    { id: 'id', label: '序号', flex: 0.5, left: 0,},
+    { id: 'id', label: '序号', flex: 0.1, left: 0,},
     { id: 'actions', label: '操作', width: 100 },
     { id: 'name', label: '名称', flex: 0.5, sort: true },
+    { id: 'enName', label: '英文名称', flex: 0.5, sort: true },
     { id: 'description', label: '描述', flex: 2.5, sort: true },
+    { id: 'enDescription', label: '英文描述', flex: 2.5, sort: true },
   ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
 

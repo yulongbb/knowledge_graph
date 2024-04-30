@@ -18,3 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 distributionUrl=file:///C:/gradle-6.5-all.zip
 
 maven { url 'https://mirrors.tuna.tsinghua.edu.cn/flutter/download.flutter.io' }
+
+
+
+--web-hostname 127.0.0.1

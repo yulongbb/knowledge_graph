@@ -16,6 +16,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class KnowledgeNodeDetailComponent implements OnInit {
   id: string = '';
+  nid: string = '';
   type: string = '';
   schema: string = '';
   item: any;
@@ -53,7 +54,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   query: any;
   data!: Observable<Array<any>>;
 
- 
+
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
     { id: 'property', label: '属性名', width: 200 },
@@ -76,6 +77,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
+      this.nid = x.get('nid') as string;
       this.type = x.get('type') as string;
       this.schema = x.get('schema') as string;
       if (this.type === 'info') {
@@ -86,7 +88,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      this.data = this.nodeService.getLinks(1, 10, this.id, { schema: this.schema }).pipe(
+      this.data = this.nodeService.getLinks(1, 10, this.nid, { schema: this.schema }).pipe(
         tap((x: any) => console.log(123)),
         map((x: any) => x)
       );
@@ -107,7 +109,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     switch (type) {
       case 'info':
 
-        this.nodeService.getItem(this.id).subscribe((x) => {
+        this.nodeService.getItem(this.nid).subscribe((x) => {
           this.item = x;
           console.log(x)
           let item: any = {};
@@ -140,5 +142,10 @@ export class KnowledgeNodeDetailComponent implements OnInit {
         this.router.navigate(['/index/node']);
         break;
     }
+  }
+
+  backClick() {
+    this.router.navigate([`/index/knowledge/data/${this.id}/nodes`], { replaceUrl: true });
+
   }
 }

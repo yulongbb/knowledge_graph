@@ -6,6 +6,22 @@ export class PredicateService {
 
     constructor(@Inject('ARANGODB') private db: Database) { }
 
+    async getPredicate(id: any): Promise<any> {
+        try {
+            // 执行查询
+            const cursor = await this.db.query(aql`FOR p IN property
+            FILTER p['_key']==${id}
+            RETURN p`);
+            // 获取查询结果
+            const result = await cursor.next();
+            // 处理查询结果
+            return result;
+        } catch (error) {
+            console.error('Query Error:', error);
+        }
+    }
+
+
     async addPredicate(predicate: any): Promise<any> {
 
         const myCollection = this.db.collection('property');

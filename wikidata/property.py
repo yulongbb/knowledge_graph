@@ -26,13 +26,13 @@ for p in properties['list']:
     }
 
     schemas_response = requests.post(
-        'http://localhost:3000/api/schemas/1/1', headers=headers, data=json.dumps(query)),
+        'http://localhost:3000/api/types/1/1', headers=headers, data=json.dumps(query)),
 
     schemas = json.loads(schemas_response[0].text)
     # 获取尾部部实体
    # 获取头部实体
     query = {"filter": [{"field": "id", "value": p['id'],
-                         "relation": "values", "operation": "="}]}
+                         "relation": "properties", "operation": "="}]}
     headers = {
         "X-Member-Id": "23832170000",
         "X-Region": "1100000",

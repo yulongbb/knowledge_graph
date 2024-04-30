@@ -18,8 +18,6 @@ export class PropertyService extends RepositoryService<Property> {
 }
 
 
-
-
 export interface Property extends XId {
   name?: string;
   description?: string;

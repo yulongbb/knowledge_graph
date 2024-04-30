@@ -11,6 +11,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { FusionModule } from './fusion/fusion.module';
 import { EdgeModule } from './edge/edge.module';
+import { PredicateModule } from './predicate/predicate.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { EdgeModule } from './edge/edge.module';
     SystemModule,
     DesignModule,
     OntologynModule,
+    PredicateModule,
     ExtractionModule,
     NodeModule,
     FusionModule,

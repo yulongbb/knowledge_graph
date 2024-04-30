@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 28/04/2024 16:48:53
+ Date: 28/04/2024 17:30:29
 */
 
 SET NAMES utf8mb4;
@@ -8755,7 +8755,14 @@ CREATE TABLE `ontology_schema_property`  (
 -- ----------------------------
 -- Records of ontology_schema_property
 -- ----------------------------
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 18);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 19);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 20);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 21);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 22);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 25);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 26);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 27);
 
 -- ----------------------------
 -- Table structure for ontology_type
@@ -8805,7 +8812,14 @@ CREATE TABLE `ontology_type_value`  (
 -- ----------------------------
 -- Records of ontology_type_value
 -- ----------------------------
+INSERT INTO `ontology_type_value` VALUES ('9a4ab10c-4ee9-f337-d46c-e53a7c441261', 18);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 19);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 20);
+INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 21);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 22);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 25);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 26);
+INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 27);
 
 -- ----------------------------
 -- Table structure for system_action

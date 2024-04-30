@@ -1,8 +1,13 @@
+
+<x-page-header title="标题" subTitle="小标题" (backClick)="backClick()"> </x-page-header>
+
+
 <h3>{{ title }}</h3>
 <x-form *ngIf="type=='edit'" #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":"
   labelWidth="6rem" width="30rem" labelAlign="end" span="20" space="2"></x-form>
 
-
+<h1>{{item?.labels?.zh?.value}}<small>({{item?.type?.label}})</small></h1>
+<p>{{item?.descriptions?.zh?.value}}</p>
 
 <img width="500" *ngIf="item?.type?.label=='图像'" [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']">
 
@@ -20,16 +25,12 @@
   <a [href]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']"> 下载音频 </a>
 </figure>
 
-<iframe *ngIf="item?.type?.label=='PDF'" id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%"
-  height="800"
+<iframe *ngIf="item?.type?.label=='PDF'" id="inlineFrameExample" title="Inline Frame Example" frameborder="0"
+  width="100%" height="1500"
   [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+item['labels']['zh']['value'])">
 </iframe>
 
 
-
-
-<h1>{{item?.labels?.zh?.value}}<small>({{item?.type?.label}})</small></h1>
-<p>{{item?.descriptions?.zh?.value}}</p>
 <div class="row">
   <x-card *ngFor="let property of data  | async | keyvalue;" width="100%" [header]="header">
     <ng-template #header>
@@ -37,12 +38,15 @@
       <x-button type="text">操作按钮</x-button>
     </ng-template>
     <div *ngIf="property.value.length>0">
-      <p *ngIf="property.value[0]['mainsnak']['datatype']=='string'">{{property.value[0]['mainsnak']['datavalue']['value'] }}</p>
-      <img *ngIf="property.value[0]['mainsnak']['datatype']=='commonsMedia'" width="500"  [src]="'http://localhost:9000/kgms/'+property.value[0]['mainsnak']['datavalue']['value']">
-      <a  *ngIf="property.value[0]['mainsnak']['datatype']=='wikibase-item'" >{{property.value[0]['mainsnak']['datavalue']['label'] }}</a>
-      
+      <p *ngIf="property.value[0]['mainsnak']['datatype']=='string'">
+        {{property.value[0]['mainsnak']['datavalue']['value'] }}</p>
+      <img *ngIf="property.value[0]['mainsnak']['datatype']=='commonsMedia'" width="500"
+        [src]="'http://localhost:9000/kgms/'+property.value[0]['mainsnak']['datavalue']['value']">
+      <a *ngIf="property.value[0]['mainsnak']['datatype']=='wikibase-item'">{{property.value[0]['mainsnak']['datavalue']['label']
+        }}</a>
+
     </div>
-   
+
   </x-card>
 </div>
 
