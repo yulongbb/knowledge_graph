@@ -23,7 +23,9 @@ import { map, tap } from 'rxjs';
 })
 export class PropertyComponent extends PageBase {
   formGroup = new UntypedFormGroup({});
-  keyword = '';
+  name = '';
+  enName = '';
+  description= '';
   selected!: Property;
   type = 'add';
   loading = true;
@@ -38,21 +40,21 @@ export class PropertyComponent extends PageBase {
       return x;
     });
 
-    model: any;
-    tree: XTreeNode[] = [
-      { id: 1, label: '雷浩集团' },
-      { id: 2, label: '企业发展事业群', pid: 1 },
-      { id: 3, label: '社交网络事业群', pid: 1 },
-      { id: 4, label: '互动娱乐事业群', pid: 1 },
-      { id: 5, label: '移动互联网事业群', pid: 1 },
-      { id: 6, label: '网络媒体事业群', pid: 1 },
-      { id: 7, label: '人事部', pid: 4 },
-      { id: 8, label: '行政部', pid: 4 },
-      { id: 9, label: '财务部', pid: 4 }
-    ];
+  model: any;
+  tree: XTreeNode[] = [
+    { id: 1, label: '雷浩集团' },
+    { id: 2, label: '企业发展事业群', pid: 1 },
+    { id: 3, label: '社交网络事业群', pid: 1 },
+    { id: 4, label: '互动娱乐事业群', pid: 1 },
+    { id: 5, label: '移动互联网事业群', pid: 1 },
+    { id: 6, label: '网络媒体事业群', pid: 1 },
+    { id: 7, label: '人事部', pid: 4 },
+    { id: 8, label: '行政部', pid: 4 },
+    { id: 9, label: '财务部', pid: 4 },
+  ];
 
   columns: XTableColumn[] = [
-    { id: 'id', label: '序号', flex: 0.1, left: 0,},
+    { id: 'id', label: '序号', flex: 0.4, left: 0 },
     { id: 'actions', label: '操作', width: 100 },
     { id: 'name', label: '名称', flex: 0.5, sort: true },
     { id: 'enName', label: '英文名称', flex: 0.5, sort: true },
@@ -62,7 +64,6 @@ export class PropertyComponent extends PageBase {
   @ViewChild('tableCom') tableCom!: XTableComponent;
 
   constructor(
-
     private service: PropertyService,
     public override indexService: IndexService,
     private message: XMessageService,
@@ -74,8 +75,26 @@ export class PropertyComponent extends PageBase {
 
   ngOnInit() {}
 
-  search(keyword: any) {
-    this.query.filter = [{ field: 'name', value: keyword as string}];
+  searchName(name: any) {
+    this.query.filter = [{ field: 'name', value: name as string }];
+    this.data = (index: number, size: number, query: Query) =>
+      this.service.getList(index, this.size, this.query).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
+  }
+
+  searchEnName(enName: any) {
+    this.query.filter = [{ field: 'enName', value: enName as string }];
+    this.data = (index: number, size: number, query: Query) =>
+      this.service.getList(index, this.size, this.query).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
+  }
+
+  searchDescription(description: any) {
+    this.query.filter = [{ field: 'description', value: description as string }];
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, this.query).pipe(
         tap((x: any) => console.log(x)),

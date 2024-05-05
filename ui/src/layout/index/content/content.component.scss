@@ -3,6 +3,7 @@
 app-content {
   height: 100%;
   width: 100%;
+  overflow:auto;
   padding-top: $tabs-height + $crumb-height;
   padding-left: $sider-width;
   transition: padding $transition-duration;

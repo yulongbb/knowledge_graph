@@ -89,7 +89,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
         this.title = '修改实体';
       }
       this.data = this.nodeService.getLinks(1, 10, this.nid, { schema: this.schema }).pipe(
-        tap((x: any) => console.log(123)),
+        tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
     });

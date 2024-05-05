@@ -175,6 +175,7 @@ export class PropertyDetailComponent implements OnInit {
           this.predicate['tail'] = this.form.formGroup.value['types'][0]['label'];
 
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
+            console.log(this.predicate);
             this.predicateService.put(this.predicate).subscribe((p) => {
               console.log(p);
               this.message.success('修改成功！');

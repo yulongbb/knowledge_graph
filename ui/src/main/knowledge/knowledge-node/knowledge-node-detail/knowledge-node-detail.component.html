@@ -40,8 +40,11 @@
     <div *ngIf="property.value.length>0">
       <p *ngIf="property.value[0]['mainsnak']['datatype']=='string'">
         {{property.value[0]['mainsnak']['datavalue']['value'] }}</p>
-      <img *ngIf="property.value[0]['mainsnak']['datatype']=='commonsMedia'" width="500"
-        [src]="'http://localhost:9000/kgms/'+property.value[0]['mainsnak']['datavalue']['value']">
+        <div  *ngIf="property.value[0]['mainsnak']['datatype']=='commonsMedia'">
+          <img width="500" *ngFor="let value of property.value"
+        [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']">
+        </div>
+    
       <a *ngIf="property.value[0]['mainsnak']['datatype']=='wikibase-item'">{{property.value[0]['mainsnak']['datavalue']['label']
         }}</a>
 

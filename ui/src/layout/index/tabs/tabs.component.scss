@@ -1,6 +1,7 @@
 @import 'src/layout/index/index.param';
 
 app-tabs {
+  background-color: #fff;
   width: calc(100% - #{$sider-width});
   height: $tabs-height;
   padding-right: calc(#{$tabs-height} * #{$nav-num} + calc(#{$--x-padding-medium} * 2));

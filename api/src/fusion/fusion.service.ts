@@ -5,7 +5,7 @@ import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database,) { }
+  constructor(@Inject('ARANGODB') private db: Database) {}
 
   async fusion({
     extractions,
@@ -23,7 +23,6 @@ export class FusionService {
         s = await this.addOrUpdateEntity(s);
       }
 
-
       const p = await this.getPropertyByName(extraction.property);
       console.log(p);
 
@@ -40,32 +39,34 @@ export class FusionService {
           from: s['_id'],
           to: o['_id'],
           mainsnak: {
-            snaktype: "value",
+            snaktype: 'value',
             property: p['_key'],
-            hash: "8f7599319c8f07055134a500cf67fc22d1b3142d",
+            hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
             datavalue: {
-              value:
-                { "entity-type": "item", "numeric-id": Number.parseInt(o['_id'].split('/')[1]), "id": o['_id'] },
-              type: "wikibase-entityid"
+              value: {
+                'entity-type': 'item',
+                'numeric-id': Number.parseInt(o['_id'].split('/')[1]),
+                id: o['_id'],
+              },
+              type: 'wikibase-entityid',
             },
-            datatype: p['tail']
-          }
+            datatype: p['tail'],
+          },
         };
 
         await this.addOrUpdateLink(link);
-
       } else {
         const link = {
           from: s['_id'],
           to: s['_id'],
           value: extraction.object,
           mainsnak: {
-            snaktype: "value",
+            snaktype: 'value',
             property: p['_key'],
-            hash: "8f7599319c8f07055134a500cf67fc22d1b3142d",
-            datavalue: { value: extraction.object, type: "string" },
-            datatype: p['tail']
-          }
+            hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+            datavalue: { value: extraction.object, type: 'string' },
+            datatype: p['tail'],
+          },
         };
         console.log(link);
 
@@ -113,17 +114,24 @@ export class FusionService {
     console.log(knowledge);
     const collection = this.db.collection(knowledge + '_entity');
     const edge = this.db.collection(knowledge + '_link');
+    console.log(collection);
+    console.log(edge);
 
     for (const node of nodes) {
       try {
         // 执行查询
-        const cursor = await this.db
-          .query(aql`FOR v, e, p IN 0..1 OUTBOUND ${node.id[0]} GRAPH 'graph'
+        const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
+          node.id[0]
+        } GRAPH 'graph'
           INSERT  v INTO ${collection} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
           FOR edge IN p['edges']
-            LET link = MERGE(edge, {'_from': CONCAT(${knowledge + '_entity/'}, SPLIT(edge['_from'], "/")[1]),'_to': CONCAT(${knowledge + '_entity/'}, SPLIT(edge['_to'], "/")[1]),})
+            LET link = MERGE(edge, {'_from': CONCAT(${
+              knowledge + '_entity/'
+            }, SPLIT(edge['_from'], "/")[1]),'_to': CONCAT(${
+              knowledge + '_entity/'
+            }, SPLIT(edge['_to'], "/")[1]),})
             INSERT   link INTO ${edge} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
-          RETURN { "v": v, "e": e, "p":p }`)
+          RETURN { "v": v, "e": e, "p":p }`);
 
         // 获取查询结果
         const result = await cursor.next();
@@ -134,8 +142,6 @@ export class FusionService {
       }
     }
   }
-
-
 
   async addEntity(entity: any, collection: string): Promise<any> {
     // 获取集合（Collection）
@@ -209,7 +215,7 @@ export class FusionService {
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR l IN link
-      FILTER l['_from']==${link['from']} AND l['_to']==${link['to']} AND l['mainsnak']['property'] == ${link['mainsnak']['property']}
+      FILTER l['_from']==${link['from']} AND l['_to']==${link['to']} AND l['mainsnak']['property'] == ${link['mainsnak']['property']} AND l['mainsnak']['datavalue']['value'] == ${link['mainsnak']['datavalue']['value']}
       RETURN l`);
       // 获取查询结果
       const result = await cursor.next();
@@ -345,14 +351,14 @@ export class FusionService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: any,
   ): Promise<any> {
-
     try {
       const start = size * (index - 1);
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
-        } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
+        'entity/' + id
+      } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
@@ -361,7 +367,7 @@ export class FusionService {
       const result = await cursor.all();
       console.log(result);
       // 处理查询结果
-      return { total: 100, list: result};
+      return { total: 100, list: result };
     } catch (error) {
       console.error('Query Error:', error);
     }
