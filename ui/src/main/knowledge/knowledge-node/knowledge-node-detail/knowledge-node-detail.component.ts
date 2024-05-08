@@ -108,7 +108,12 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   ngOnInit(): void {
     this.action(this.type);
   }
-
+  uploadSuccess($event: any) {
+    let item: any = {};
+    item['label'] = $event.body.name;
+    this.form.formGroup.patchValue(item);
+    console.log('uploadSuccess', $event);
+  }
   trustUrl(url: string) {
 
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);

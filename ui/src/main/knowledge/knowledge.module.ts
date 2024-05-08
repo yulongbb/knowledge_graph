@@ -7,6 +7,7 @@ import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
+import { XUploadModule } from '@ng-nest/ui/upload';
 
 
 import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.component";
@@ -24,6 +25,7 @@ import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-de
     AuToolModule,
     XInputModule,
     XPageHeaderModule,
+    XUploadModule,
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],
