@@ -157,10 +157,12 @@ export class KnowledgeNodeComponent {
     console.log(type);
     switch (type) {
       case 'add':
-        let param = {};
-        this.router.navigate([`./${type}`, param], {
-          relativeTo: this.activatedRoute,
-        });
+        this.router.navigate(
+          [`./${type}`],
+          {
+            relativeTo: this.activatedRoute,
+          }
+        );
         break;
       case 'info':
         console.log(item);
@@ -173,7 +175,7 @@ export class KnowledgeNodeComponent {
         break;
       case 'edit':
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id.toString().split('/')[1]}/${item.type.id}`],
           {
             relativeTo: this.activatedRoute,
           }

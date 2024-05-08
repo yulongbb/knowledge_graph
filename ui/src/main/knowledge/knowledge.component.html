@@ -7,6 +7,7 @@
   <x-col *ngFor="let row of data?.list" span="8">
     <div class="row">
       <x-card class="card" [bodyStyle]="{ padding: 0 }">
+        <img (click)="action('data', row)" height="100" [src]="'/assets/img/'+row.name+'.svg'" />
         <div class="bottom">
           <x-link (click)="action('data', row)">{{row.name}}</x-link>
           <div class="time">

@@ -7,6 +7,7 @@ import { XCommentNode, XTableColumn } from '@ng-nest/ui';
 import { NodeService } from 'src/main/node/node.service';
 import { map, Observable, tap } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-knowledge-node-detail',
@@ -32,13 +33,20 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
     {
-      control: 'input',
-      id: 'type.label',
+      control: 'find',
+      id: 'type',
       label: '类型',
-      required: true,
-      maxlength: 16,
-      // pattern: /^[A-Za-z0-9]{4,16}$/,
-      // message: '只能包括数字、字母的组合，长度为4-16位'
+      treeData: () =>
+        this.ontologyService
+          .getList(1, Number.MAX_SAFE_INTEGER, {
+      
+            sort: [
+              { field: 'pid', value: 'asc' },
+              { field: 'sort', value: 'asc' },
+            ],
+          })
+          .pipe(map((x) => x.list)),
+
     },
     {
       control: 'input',
@@ -50,6 +58,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     },
     { control: 'input', id: 'id', hidden: true, value: XGuid() }
   ];
+
 
   query: any;
   data!: Observable<Array<any>>;
@@ -68,6 +77,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   disabled = false;
   constructor(
     private sanitizer: DomSanitizer,
+    private ontologyService: OntologyService,
 
     private nodeService: NodeService,
     private router: Router,
