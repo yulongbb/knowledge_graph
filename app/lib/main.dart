@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,30 +47,30 @@ class _MyHomePageState extends State<MyHomePage> {
   var current = WordPair.random();
   late Widget page;
 
-  late AudioPlayer player = AudioPlayer();
+  // late AudioPlayer player = AudioPlayer();
 
-  @override
-  void dispose() {
-    // Release all sources and dispose the player.
-    player.dispose();
+  // @override
+  // void dispose() {
+  //   // Release all sources and dispose the player.
+  //   player.dispose();
 
-    super.dispose();
-  }
+  //   super.dispose();
+  // }
 
   @override
   void initState() {
     // Create the audio player.
-    player = AudioPlayer();
+    // player = AudioPlayer();
 
-    // Set the release mode to keep the source after playback has completed.
-    player.setReleaseMode(ReleaseMode.stop);
+    // // Set the release mode to keep the source after playback has completed.
+    // player.setReleaseMode(ReleaseMode.stop);
 
-    // Start the player as soon as the app is displayed.
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      await player.setSource(UrlSource(
-          'http://localhost:9000/kgms/54dac35d8f546310ced8ecf0e79507ed.mp3'));
-      await player.resume();
-    });
+    // // Start the player as soon as the app is displayed.
+    // WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    //   await player.setSource(UrlSource(
+    //       'http://localhost:9000/kgms/54dac35d8f546310ced8ecf0e79507ed.mp3'));
+    //   await player.resume();
+    // });
     switch (selectedIndex) {
       case 0:
         page = PeoplePage();
@@ -82,12 +81,12 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         page = PDFsPage();
         break;
-      case 4:
-        page = ImagesPage();
-        break;
-      case 5:
-        page = AudiosPage(player: player);
-        break;
+      // case 4:
+      //   page = ImagesPage();
+      //   break;
+      // case 5:
+      //   page = AudiosPage(player: player);
+      //   break;
       case 6:
         page = VideosPage();
         break;
@@ -108,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 extended: constraints.maxWidth >= 600, // ← Here.
                 destinations: [
                   NavigationRailDestination(
-                    icon: Icon(Icons.people),
+                    icon: Icon(Icons.person),
                     label: Text('人物'),
                   ),
                   NavigationRailDestination(
@@ -154,9 +153,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 4:
                         page = ImagesPage();
                         break;
-                      case 5:
-                        page = AudiosPage(player: player);
-                        break;
+                      // case 5:
+                      //   page = AudiosPage(player: player);
+                      //   break;
                       case 6:
                         page = VideosPage();
                         break;
@@ -398,9 +397,10 @@ class _PDFsPageState extends State<PDFsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: PDFView(
-        filePath:'http://localhost:7777/web/viewer.html?file=/pdf/kgms/c4c3723bc6eb84bf4bf51ae8b6872fa0.pdf',
-      ),// WebView
+      child: Text('pdf')
+      // PDFView(
+      //   filePath:'http://localhost:7777/web/viewer.html?file=/pdf/kgms/c4c3723bc6eb84bf4bf51ae8b6872fa0.pdf',
+      // ),// WebView
     );
   }
 }
@@ -429,188 +429,190 @@ class _ImagesPageState extends State<ImagesPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: PhotoView(
+        child: 
+        PhotoView(
       imageProvider: NetworkImage(
-          'http://localhost:9000/kgms/489b6df1e22ce2ab7177200e760567c8.png'),
-    ));
-  }
-}
-
-class AudiosPage extends StatefulWidget {
-  final AudioPlayer player;
-
-  AudiosPage({Key? key, required this.player}) : super(key: key);
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  @override
-  State<AudiosPage> createState() => _AudiosPageState();
-}
-
-class _AudiosPageState extends State<AudiosPage> {
-  PlayerState? _playerState;
-  Duration? _duration;
-  Duration? _position;
-
-  StreamSubscription? _durationSubscription;
-  StreamSubscription? _positionSubscription;
-  StreamSubscription? _playerCompleteSubscription;
-  StreamSubscription? _playerStateChangeSubscription;
-
-  bool get _isPlaying => _playerState == PlayerState.playing;
-
-  bool get _isPaused => _playerState == PlayerState.paused;
-
-  String get _durationText => _duration?.toString().split('.').first ?? '';
-
-  String get _positionText => _position?.toString().split('.').first ?? '';
-
-  AudioPlayer get player => widget.player;
-
-  @override
-  void initState() {
-    super.initState();
-    // Use initial values from player
-    _playerState = player.state;
-    player.getDuration().then(
-          (value) => setState(() {
-            _duration = value;
-          }),
-        );
-    player.getCurrentPosition().then(
-          (value) => setState(() {
-            _position = value;
-          }),
-        );
-    _initStreams();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    // Subscriptions only can be closed asynchronously,
-    // therefore events can occur after widget has been disposed.
-    if (mounted) {
-      super.setState(fn);
-    }
-  }
-
-  @override
-  void dispose() {
-    _durationSubscription?.cancel();
-    _positionSubscription?.cancel();
-    _playerCompleteSubscription?.cancel();
-    _playerStateChangeSubscription?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              key: const Key('play_button'),
-              onPressed: _isPlaying ? null : _play,
-              iconSize: 48.0,
-              icon: const Icon(Icons.play_arrow),
-              color: color,
-            ),
-            IconButton(
-              key: const Key('pause_button'),
-              onPressed: _isPlaying ? _pause : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.pause),
-              color: color,
-            ),
-            IconButton(
-              key: const Key('stop_button'),
-              onPressed: _isPlaying || _isPaused ? _stop : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.stop),
-              color: color,
-            ),
-          ],
-        ),
-        Slider(
-          onChanged: (value) {
-            final duration = _duration;
-            if (duration == null) {
-              return;
-            }
-            final position = value * duration.inMilliseconds;
-            player.seek(Duration(milliseconds: position.round()));
-          },
-          value: (_position != null &&
-                  _duration != null &&
-                  _position!.inMilliseconds > 0 &&
-                  _position!.inMilliseconds < _duration!.inMilliseconds)
-              ? _position!.inMilliseconds / _duration!.inMilliseconds
-              : 0.0,
-        ),
-        Text(
-          _position != null
-              ? '$_positionText / $_durationText'
-              : _duration != null
-                  ? _durationText
-                  : '',
-          style: const TextStyle(fontSize: 16.0),
-        ),
-      ],
+          'http://192.168.31.87:9000/kgms/782a4b8867611f842e5c9ceb010c0d08.jpg'),
+    )
     );
   }
-
-  void _initStreams() {
-    _durationSubscription = player.onDurationChanged.listen((duration) {
-      setState(() => _duration = duration);
-    });
-
-    _positionSubscription = player.onPositionChanged.listen(
-      (p) => setState(() => _position = p),
-    );
-
-    _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      setState(() {
-        _playerState = PlayerState.stopped;
-        _position = Duration.zero;
-      });
-    });
-
-    _playerStateChangeSubscription =
-        player.onPlayerStateChanged.listen((state) {
-      setState(() {
-        _playerState = state;
-      });
-    });
-  }
-
-  Future<void> _play() async {
-    await player.resume();
-    setState(() => _playerState = PlayerState.playing);
-  }
-
-  Future<void> _pause() async {
-    await player.pause();
-    setState(() => _playerState = PlayerState.paused);
-  }
-
-  Future<void> _stop() async {
-    await player.stop();
-    setState(() {
-      _playerState = PlayerState.stopped;
-      _position = Duration.zero;
-    });
-  }
 }
+
+// class AudiosPage extends StatefulWidget {
+//   final AudioPlayer player;
+
+//   AudiosPage({Key? key, required this.player}) : super(key: key);
+//   // This widget is the home page of your application. It is stateful, meaning
+//   // that it has a State object (defined below) that contains fields that affect
+//   // how it looks.
+
+//   // This class is the configuration for the state. It holds the values (in this
+//   // case the title) provided by the parent (in this case the App widget) and
+//   // used by the build method of the State. Fields in a Widget subclass are
+//   // always marked "final".
+
+//   @override
+//   State<AudiosPage> createState() => _AudiosPageState();
+// }
+
+// class _AudiosPageState extends State<AudiosPage> {
+//   PlayerState? _playerState;
+//   Duration? _duration;
+//   Duration? _position;
+
+//   StreamSubscription? _durationSubscription;
+//   StreamSubscription? _positionSubscription;
+//   StreamSubscription? _playerCompleteSubscription;
+//   StreamSubscription? _playerStateChangeSubscription;
+
+//   bool get _isPlaying => _playerState == PlayerState.playing;
+
+//   bool get _isPaused => _playerState == PlayerState.paused;
+
+//   String get _durationText => _duration?.toString().split('.').first ?? '';
+
+//   String get _positionText => _position?.toString().split('.').first ?? '';
+
+//   AudioPlayer get player => widget.player;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     // Use initial values from player
+//     _playerState = player.state;
+//     player.getDuration().then(
+//           (value) => setState(() {
+//             _duration = value;
+//           }),
+//         );
+//     player.getCurrentPosition().then(
+//           (value) => setState(() {
+//             _position = value;
+//           }),
+//         );
+//     _initStreams();
+//   }
+
+//   @override
+//   void setState(VoidCallback fn) {
+//     // Subscriptions only can be closed asynchronously,
+//     // therefore events can occur after widget has been disposed.
+//     if (mounted) {
+//       super.setState(fn);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _durationSubscription?.cancel();
+//     _positionSubscription?.cancel();
+//     _playerCompleteSubscription?.cancel();
+//     _playerStateChangeSubscription?.cancel();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final color = Theme.of(context).primaryColor;
+//     return Column(
+//       mainAxisSize: MainAxisSize.min,
+//       children: <Widget>[
+//         Row(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             IconButton(
+//               key: const Key('play_button'),
+//               onPressed: _isPlaying ? null : _play,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.play_arrow),
+//               color: color,
+//             ),
+//             IconButton(
+//               key: const Key('pause_button'),
+//               onPressed: _isPlaying ? _pause : null,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.pause),
+//               color: color,
+//             ),
+//             IconButton(
+//               key: const Key('stop_button'),
+//               onPressed: _isPlaying || _isPaused ? _stop : null,
+//               iconSize: 48.0,
+//               icon: const Icon(Icons.stop),
+//               color: color,
+//             ),
+//           ],
+//         ),
+//         Slider(
+//           onChanged: (value) {
+//             final duration = _duration;
+//             if (duration == null) {
+//               return;
+//             }
+//             final position = value * duration.inMilliseconds;
+//             player.seek(Duration(milliseconds: position.round()));
+//           },
+//           value: (_position != null &&
+//                   _duration != null &&
+//                   _position!.inMilliseconds > 0 &&
+//                   _position!.inMilliseconds < _duration!.inMilliseconds)
+//               ? _position!.inMilliseconds / _duration!.inMilliseconds
+//               : 0.0,
+//         ),
+//         Text(
+//           _position != null
+//               ? '$_positionText / $_durationText'
+//               : _duration != null
+//                   ? _durationText
+//                   : '',
+//           style: const TextStyle(fontSize: 16.0),
+//         ),
+//       ],
+//     );
+//   }
+
+//   void _initStreams() {
+//     _durationSubscription = player.onDurationChanged.listen((duration) {
+//       setState(() => _duration = duration);
+//     });
+
+//     _positionSubscription = player.onPositionChanged.listen(
+//       (p) => setState(() => _position = p),
+//     );
+
+//     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
+//       setState(() {
+//         _playerState = PlayerState.stopped;
+//         _position = Duration.zero;
+//       });
+//     });
+
+//     _playerStateChangeSubscription =
+//         player.onPlayerStateChanged.listen((state) {
+//       setState(() {
+//         _playerState = state;
+//       });
+//     });
+//   }
+
+//   Future<void> _play() async {
+//     await player.resume();
+//     setState(() => _playerState = PlayerState.playing);
+//   }
+
+//   Future<void> _pause() async {
+//     await player.pause();
+//     setState(() => _playerState = PlayerState.paused);
+//   }
+
+//   Future<void> _stop() async {
+//     await player.stop();
+//     setState(() {
+//       _playerState = PlayerState.stopped;
+//       _position = Duration.zero;
+//     });
+//   }
+// }
 
 class VideosPage extends StatefulWidget {
   VideosPage({Key? key}) : super(key: key);
@@ -634,7 +636,7 @@ class _VideosPageState extends State<VideosPage> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(
-        'http://localhost:9000/kgms/40fe2df28ae400e7de33e0b428fc049e.mp4')
+        'http://192.168.31.87:9000/kgms/f64def7655d66e4edd738345d3a98b19.mp4')
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
