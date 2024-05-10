@@ -40,6 +40,7 @@ dependencies:
   video_player: ^2.3.0
   http: ^0.13.5
   audioplayers: ^1.1.1
+  webviewx: ^0.2.2
 
 
 dev_dependencies:

@@ -7,6 +7,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
+import 'package:webviewx/webviewx.dart';
 
 void main() {
   runApp(const MyApp());
@@ -369,6 +370,8 @@ class PDFsPage extends StatefulWidget {
 }
 
 class _PDFsPageState extends State<PDFsPage> {
+  late WebViewXController webviewController;
+
   @override
   void initState() {
     super.initState();
@@ -376,11 +379,14 @@ class _PDFsPageState extends State<PDFsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text('pdf')
-        // PDFView(
-        //   filePath:'http://localhost:7777/web/viewer.html?file=/pdf/kgms/c4c3723bc6eb84bf4bf51ae8b6872fa0.pdf',
-        // ),// WebView
-        );
+    return WebViewX(
+      initialContent:
+          'http://localhost:7777/web/viewer.html?file=/pdf/kgms/c4c3723bc6eb84bf4bf51ae8b6872fa0.pdf',
+      initialSourceType: SourceType.url,
+      onWebViewCreated: (controller) => webviewController = controller,
+      height: 500,
+      width: 1000,
+    );
   }
 }
 
@@ -570,7 +576,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   String get _durationText => _duration?.toString().split('.').first ?? '';
 
   String get _positionText => _position?.toString().split('.').first ?? '';
-  
+
   @override
   void initState() {
     super.initState();
@@ -586,7 +592,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       await player.setSource(UrlSource(widget.audioUrl));
       await player.resume();
     });
-      _playerState = player.state;
+    _playerState = player.state;
     player.getDuration().then(
           (value) => setState(() {
             _duration = value;
@@ -598,16 +604,16 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
           }),
         );
     _initStreams();
- 
   }
 
   @override
   Widget build(BuildContext context) {
-     // Use initial values from player
- 
+    // Use initial values from player
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        Text(widget.audioUrl),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -616,7 +622,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               onPressed: _isPlaying ? null : _play,
               iconSize: 48.0,
               icon: const Icon(Icons.play_arrow),
-              color: Colors.blue,
+              color: Colors.black,
             ),
             IconButton(
               key: const Key('pause_button'),
@@ -630,7 +636,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               onPressed: _isPlaying || _isPaused ? _stop : null,
               iconSize: 48.0,
               icon: const Icon(Icons.stop),
-              color: Colors.blue,
+              color: Colors.black,
             ),
           ],
         ),
