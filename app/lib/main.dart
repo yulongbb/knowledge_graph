@@ -1,4 +1,5 @@
 import 'package:app/pdf.dart';
+import 'package:app/person.dart';
 import 'package:app/video.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'audio.dart';
 import 'comment.dart';
 import 'image.dart';
+import 'organization.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,10 +54,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     switch (selectedIndex) {
       case 0:
-        page = PeoplePage();
+        page = PersonPage();
         break;
       case 1:
-        page = FavoritesPage(favorites: favorites);
+        page = OrganizationPage();
         break;
       case 2:
         page = CommentPage();
@@ -124,10 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     selectedIndex = value;
                     switch (selectedIndex) {
                       case 0:
-                        page = PeoplePage();
+                        page = PersonPage();
                         break;
                       case 1:
-                        page = FavoritesPage(favorites: favorites);
+                        page = OrganizationPage();
                         break;
                       case 2:
                         page = CommentPage();
@@ -330,30 +332,3 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 }
 
-class PeoplePage extends StatefulWidget {
-  PeoplePage({
-    Key? key,
-  }) : super(key: key);
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  @override
-  State<PeoplePage> createState() => _PeoplePageState();
-}
-
-class _PeoplePageState extends State<PeoplePage> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Padding(padding: const EdgeInsets.all(20), child: Text('人物')),
-      ],
-    );
-  }
-}
