@@ -80,88 +80,166 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  final List<String> tabs = [
+    '人物',
+    '组织',
+    '评论',
+    'PDF',
+    '图像',
+    '音频',
+    '视频',
+  ];
+  void _handleTabTap(int index) {
+    setState(() {
+      selectedIndex = index;
+      switch (selectedIndex) {
+        case 0:
+          page = PersonPage();
+          break;
+        case 1:
+          page = OrganizationPage();
+          break;
+        case 2:
+          page = CommentPage();
+          break;
+        case 3:
+          page = PDFsPage();
+          break;
+        case 4:
+          page = ImagesPage();
+          break;
+        case 5:
+          page = AudiosPage();
+          break;
+        case 6:
+          page = VideosPage();
+          break;
+        default:
+          throw UnimplementedError('no widget for $selectedIndex');
+      }
+    });
+    // Do something with the selected index, like navigating to a specific page
+    print('Selected tab index: $selectedIndex');
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
-                extended: constraints.maxWidth >= 600, // ← Here.
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.person),
-                    label: Text('人物'),
+      if (constraints.maxWidth >= 600) {
+        return Scaffold(
+          body: Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  extended: constraints.maxWidth >= 600, // ← Here.
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.person),
+                      label: Text('人物'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.group),
+                      label: Text('组织'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.comment),
+                      label: Text('评论'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.picture_as_pdf),
+                      label: Text('PDF'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.picture_in_picture),
+                      label: Text('图像'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.audiotrack),
+                      label: Text('音频'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.video_call),
+                      label: Text('视频'),
+                    ),
+                  ],
+                  selectedIndex: selectedIndex, // ← Change to this.
+                  onDestinationSelected: (value) {
+                    // ↓ Replace print with this.
+                    setState(() {
+                      selectedIndex = value;
+                      switch (selectedIndex) {
+                        case 0:
+                          page = PersonPage();
+                          break;
+                        case 1:
+                          page = OrganizationPage();
+                          break;
+                        case 2:
+                          page = CommentPage();
+                          break;
+                        case 3:
+                          page = PDFsPage();
+                          break;
+                        case 4:
+                          page = ImagesPage();
+                          break;
+                        case 5:
+                          page = AudiosPage();
+                          break;
+                        case 6:
+                          page = VideosPage();
+                          break;
+                        default:
+                          throw UnimplementedError(
+                              'no widget for $selectedIndex');
+                      }
+                    });
+                  },
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  child: page,
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        return Scaffold(
+          body: DefaultTabController(
+            length: tabs.length,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, _) {
+                return [
+                  SliverAppBar(
+                    title: Text('知识图谱'),
+                    floating: true,
+                    pinned:
+                        false, // Set pinned to false to place the app bar at the top of the page
+                    bottom: TabBar(
+                      isScrollable: true,
+                      tabs: tabs.map((tab) => Tab(text: tab)).toList(),
+                      onTap: _handleTabTap,
+                    ),
                   ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.group),
-                    label: Text('组织'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.comment),
-                    label: Text('评论'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.picture_as_pdf),
-                    label: Text('PDF'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.picture_in_picture),
-                    label: Text('图像'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.audiotrack),
-                    label: Text('音频'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.video_call),
-                    label: Text('视频'),
-                  ),
+                ];
+              },
+              body: TabBarView(
+                children: [
+                  PersonPage(),
+                   OrganizationPage(),
+                   CommentPage(),
+                   PDFsPage(),
+                   ImagesPage(),
+                   AudiosPage(),
+                   VideosPage()
                 ],
-                selectedIndex: selectedIndex, // ← Change to this.
-                onDestinationSelected: (value) {
-                  // ↓ Replace print with this.
-                  setState(() {
-                    selectedIndex = value;
-                    switch (selectedIndex) {
-                      case 0:
-                        page = PersonPage();
-                        break;
-                      case 1:
-                        page = OrganizationPage();
-                        break;
-                      case 2:
-                        page = CommentPage();
-                        break;
-                      case 3:
-                        page = PDFsPage();
-                        break;
-                      case 4:
-                        page = ImagesPage();
-                        break;
-                      case 5:
-                        page = AudiosPage();
-                        break;
-                      case 6:
-                        page = VideosPage();
-                        break;
-                      default:
-                        throw UnimplementedError(
-                            'no widget for $selectedIndex');
-                    }
-                  });
-                },
               ),
             ),
-            Expanded(
-              child: Container(
-                child: page,
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        );
+      }
     });
   }
 }
@@ -331,4 +409,3 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 }
-
