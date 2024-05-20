@@ -6,246 +6,86 @@ class PersonPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Person Card'),
+        title: Text('Profile'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Wrap(
-          spacing: 16.0,
-          runSpacing: 16.0,
-          children: [
-            Expanded(
-              child: PersonInfoCard(
-                name: 'John Doe',
-                imageUrl: 'assets/person_avatar.jpg',
-                basicInfo: {
-                  'Date of Birth': 'January 1, 1980',
-                  'Place of Birth': 'New York, USA',
-                  'Nationality': 'American',
-                  'Occupation': 'CEO',
-                },
-              ),
+      body: ListView(
+        padding: EdgeInsets.all(16.0),
+        children: [
+          Center(
+            child: CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage('https://path.to.image'), // Replace with actual image URL
             ),
-            Expanded(
-              child: EducationCard(
-                education: [
-                  'Harvard University',
-                  'Stanford University',
-                ],
-              ),
+          ),
+          SizedBox(height: 16.0),
+          Center(
+            child: Text(
+              '64 years',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            Expanded(
-              child: ExperienceCard(
-                experience: [
-                  'CEO at XYZ Inc.',
-                  'VP of Engineering at ABC Corp.',
-                ],
-              ),
+          ),
+          Center(
+            child: Text(
+              'October 6, 1959',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            Expanded(
-              child: SocialAccountsCard(
-                socialAccounts: {
-                  'Twitter': '@johndoe',
-                  'LinkedIn': 'linkedin.com/in/johndoe',
-                },
-              ),
+          ),
+          SizedBox(height: 16.0),
+          Center(
+            child: Text(
+              'People also search for',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PersonInfoCard extends StatelessWidget {
-  final String name;
-  final String imageUrl;
-  final Map<String, String> basicInfo;
-
-  PersonInfoCard({
-    required this.name,
-    required this.imageUrl,
-    required this.basicInfo,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: AssetImage(imageUrl),
-            ),
-            SizedBox(height: 16),
-            Text(
-              name,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: basicInfo.entries.map((entry) {
-                return Text(
-                  '${entry.key}: ${entry.value}',
-                  style: TextStyle(
-                    color: Colors.grey,
+          ),
+          SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage('https://path.to.image1'), // Replace with actual image URL
                   ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EducationCard extends StatelessWidget {
-  final List<String> education;
-
-  EducationCard({
-    required this.education,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+                  SizedBox(height: 4.0),
+                  Text('Ko Wen-je\n64 years', textAlign: TextAlign.center),
+                ],
+              ),
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage('https://path.to.image2'), // Replace with actual image URL
+                  ),
+                  SizedBox(height: 4.0),
+                  Text('Hou Yu-ih\n66 years', textAlign: TextAlign.center),
+                ],
+              ),
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage('https://path.to.image3'), // Replace with actual image URL
+                  ),
+                  SizedBox(height: 4.0),
+                  Text('Hsiao Bi-khim\n52 years', textAlign: TextAlign.center),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 16.0),
+          Center(
+            child: Text(
               'Education',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: education.map((item) {
-                return Text(
-                  '• $item',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ExperienceCard extends StatelessWidget {
-  final List<String> experience;
-
-  ExperienceCard({
-    required this.experience,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Experience',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: experience.map((item) {
-                return Text(
-                  '• $item',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SocialAccountsCard extends StatelessWidget {
-  final Map<String, String> socialAccounts;
-
-  SocialAccountsCard({
-    required this.socialAccounts,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Social Accounts',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: socialAccounts.entries.map((entry) {
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    children: [
-                      Text(
-                        entry.key + ': ',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(entry.value),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            'National Cheng Kung University (1991), Taipei Municipal Jianguo High School (1979), National Taiwan University, Harvard University, Harvard University, Harvard T...',
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

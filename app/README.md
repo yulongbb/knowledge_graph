@@ -14,6 +14,5 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
-flutter run -d edge --web-port=8080 --web-hostname=127.0.0.1
-
+flutter run -d edge --web-port=8080 --web-hostname=127.0.0.1 --web-renderer html
 flutter run -d chrome --web-port=8080 --web-hostname=127.0.0.1 --web-renderer html
