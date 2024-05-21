@@ -256,7 +256,7 @@ export class NodeService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${'entity/' + id
         } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
