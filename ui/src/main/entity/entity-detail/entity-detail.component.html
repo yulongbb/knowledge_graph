@@ -40,7 +40,25 @@
     [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+item['labels']['zh']['value'])">
   </iframe>
 
+  <div *ngIf="item?.type?.label=='人物'">
+    <p>{{item?.labels?.zh?.value}}的图像</p>
+    <div class="row" *ngFor="let value of statements['图像'];" width="100%">
+      <img width="500" [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']">
+    </div>
+    <p>{{item?.labels?.zh?.value}}的音频</p>
+    <p>{{item?.labels?.zh?.value}}的视频</p>
+    <p>{{item?.labels?.zh?.value}}的PDF</p>
+    <p>{{item?.labels?.zh?.value}}的言论</p>
+    <div class="row" *ngFor="let value of statements['其他'];" width="100%">
+      <p> {{value['mainsnak']['datavalue']['label'] }}</p>
+    </div>
+  </div>
 
+
+
+
+
+  <!-- 
   <div class="row">
     <x-card *ngFor="let property of data  | async | keyvalue;" width="100%" [header]="header">
       <ng-template #header>
@@ -59,9 +77,8 @@
           }}</a>
 
       </div>
-
     </x-card>
-  </div>
+  </div> -->
 
 
   <div class="app-footer">

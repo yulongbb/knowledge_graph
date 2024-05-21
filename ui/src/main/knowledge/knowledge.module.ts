@@ -11,9 +11,7 @@ import { XUploadModule } from '@ng-nest/ui/upload';
 
 
 import { KnowledgeDetailComponent } from "./knowledge-detail/knowledge-detail.component";
-import { KnowledgeNodeComponent } from "./knowledge-node/knowledge-node.component";
 import { XInputModule } from "@ng-nest/ui";
-import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-detail/knowledge-node-detail.component";
 
 
 
@@ -29,6 +27,6 @@ import { KnowledgeNodeDetailComponent } from "./knowledge-node/knowledge-node-de
     AuAdaptionModule,
     KnowledgeRoutesModule
   ],
-  declarations: [KnowledgeComponent, KnowledgeDetailComponent, KnowledgeNodeComponent, KnowledgeNodeDetailComponent]
+  declarations: [KnowledgeComponent, KnowledgeDetailComponent]
 })
 export class KnowledgeModule { }

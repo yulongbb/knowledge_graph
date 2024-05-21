@@ -3,15 +3,15 @@
 
  Source Server         : mysql
  Source Server Type    : MySQL
- Source Server Version : 80300
+ Source Server Version : 80027 (8.0.27)
  Source Host           : localhost:3306
  Source Schema         : rbac
 
  Target Server Type    : MySQL
- Target Server Version : 80300
+ Target Server Version : 80027 (8.0.27)
  File Encoding         : 65001
 
- Date: 28/04/2024 17:30:29
+ Date: 21/05/2024 18:56:28
 */
 
 SET NAMES utf8mb4;
@@ -25,18 +25,22 @@ CREATE TABLE `design_col`  (
   `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `sort` int(0) NOT NULL,
+  `sort` int NOT NULL,
   `type` json NULL,
-  `length` int(0) NULL DEFAULT NULL,
-  `primary` tinyint(0) NULL DEFAULT NULL,
-  `nullable` tinyint(0) NULL DEFAULT NULL,
-  `unique` tinyint(0) NULL DEFAULT NULL,
+  `length` int NULL DEFAULT NULL,
+  `primary` tinyint NULL DEFAULT NULL,
+  `nullable` tinyint NULL DEFAULT NULL,
+  `unique` tinyint NULL DEFAULT NULL,
   `default` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `tableId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_9d68aa9c91c3eafeb94eeb2c0e5`(`tableId`) USING BTREE,
+  INDEX `FK_9d68aa9c91c3eafeb94eeb2c0e5`(`tableId` ASC) USING BTREE,
   CONSTRAINT `FK_9d68aa9c91c3eafeb94eeb2c0e5` FOREIGN KEY (`tableId`) REFERENCES `design_table` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of design_col
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for design_control
@@ -47,20 +51,24 @@ CREATE TABLE `design_control`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `required` tinyint(0) NULL DEFAULT NULL,
-  `disabled` tinyint(0) NULL DEFAULT NULL,
-  `readonly` tinyint(0) NULL DEFAULT NULL,
-  `hide` tinyint(0) NULL DEFAULT NULL,
-  `primary` tinyint(0) NOT NULL,
-  `sort` int(0) NOT NULL,
+  `required` tinyint NULL DEFAULT NULL,
+  `disabled` tinyint NULL DEFAULT NULL,
+  `readonly` tinyint NULL DEFAULT NULL,
+  `hide` tinyint NULL DEFAULT NULL,
+  `primary` tinyint NOT NULL,
+  `sort` int NOT NULL,
   `col` json NULL,
   `type` json NOT NULL,
   `group` json NULL,
   `pageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_e47b37df862d74e39d54d17acc3`(`pageId`) USING BTREE,
+  INDEX `FK_e47b37df862d74e39d54d17acc3`(`pageId` ASC) USING BTREE,
   CONSTRAINT `FK_e47b37df862d74e39d54d17acc3` FOREIGN KEY (`pageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of design_control
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for design_module
@@ -75,7 +83,7 @@ CREATE TABLE `design_module`  (
   `createTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updateTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of design_module
@@ -99,9 +107,13 @@ CREATE TABLE `design_page`  (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `moduleId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_ba2c0903999794b6aa84886cf10`(`moduleId`) USING BTREE,
+  INDEX `FK_ba2c0903999794b6aa84886cf10`(`moduleId` ASC) USING BTREE,
   CONSTRAINT `FK_ba2c0903999794b6aa84886cf10` FOREIGN KEY (`moduleId`) REFERENCES `design_module` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of design_page
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for design_page_relation
@@ -111,11 +123,15 @@ CREATE TABLE `design_page_relation`  (
   `fromPageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `toPageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`fromPageId`, `toPageId`) USING BTREE,
-  INDEX `IDX_a4e7fb1fab5198f676d18d2ee9`(`fromPageId`) USING BTREE,
-  INDEX `IDX_14d9d88c1d57c4f6b685ae33c5`(`toPageId`) USING BTREE,
+  INDEX `IDX_a4e7fb1fab5198f676d18d2ee9`(`fromPageId` ASC) USING BTREE,
+  INDEX `IDX_14d9d88c1d57c4f6b685ae33c5`(`toPageId` ASC) USING BTREE,
   CONSTRAINT `FK_14d9d88c1d57c4f6b685ae33c54` FOREIGN KEY (`toPageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_a4e7fb1fab5198f676d18d2ee9f` FOREIGN KEY (`fromPageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of design_page_relation
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for design_table
@@ -129,9 +145,13 @@ CREATE TABLE `design_table`  (
   `transform` json NULL,
   `moduleId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_8fa8f94fa5cf732303e33f1d7d1`(`moduleId`) USING BTREE,
+  INDEX `FK_8fa8f94fa5cf732303e33f1d7d1`(`moduleId` ASC) USING BTREE,
   CONSTRAINT `FK_8fa8f94fa5cf732303e33f1d7d1` FOREIGN KEY (`moduleId`) REFERENCES `design_module` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of design_table
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for extraction
@@ -143,7 +163,7 @@ CREATE TABLE `extraction`  (
   `property` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `object` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of extraction
@@ -162,6 +182,7 @@ INSERT INTO `extraction` VALUES ('57ff1940-222e-b4e7-c926-24c014e97f5e', '约瑟
 INSERT INTO `extraction` VALUES ('5d8f482b-20c2-5312-687d-9d564bf0b24b', '约瑟夫·拜登', '职业', '政治家');
 INSERT INTO `extraction` VALUES ('6edc77fa-c1db-162e-2ddc-098241c4b7b8', '快乐储存所', '说', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈丑到自带表情');
 INSERT INTO `extraction` VALUES ('914f0a01-3ffa-e007-b6cb-32e592d4f19c', '约瑟夫·拜登', '党派	', '美国民主党');
+INSERT INTO `extraction` VALUES ('cc0a0717-a302-68f7-f038-2dca697216a5', '我今晚的目的既是为了唤醒国会，也', '发言人', '约瑟夫·拜登');
 INSERT INTO `extraction` VALUES ('e932689f-2a89-0f30-bb4e-562e8618e42d', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈', '发言人', '快乐储存所');
 INSERT INTO `extraction` VALUES ('f6fdd0fc-3f94-d0d0-0e49-c17191568d66', '约瑟夫·拜登', '职务', '就任美国第46任总统');
 INSERT INTO `extraction` VALUES ('ff1c7fa7-c3e2-7c77-9194-7dd043925942', '约瑟夫·拜登', '教育背景', '雪城大学');
@@ -175,31 +196,31 @@ CREATE TABLE `knowledge`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of knowledge
 -- ----------------------------
-INSERT INTO `knowledge` VALUES ('26e1f5fd-9370-5017-bb82-817ae7362125', 'PDF', 'PDF');
-INSERT INTO `knowledge` VALUES ('comment', '评论', 'comment');
-INSERT INTO `knowledge` VALUES ('dcdc81ed-8b43-6ddd-8f13-e8c4c25495ef', '音频', 'audio');
-INSERT INTO `knowledge` VALUES ('image', '图像', 'image');
-INSERT INTO `knowledge` VALUES ('organization', '组织', 'organization');
-INSERT INTO `knowledge` VALUES ('person', '人物', 'person');
-INSERT INTO `knowledge` VALUES ('video', '视频', 'video');
+INSERT INTO `knowledge` VALUES ('1a1c3603-bc88-dc4d-f385-b4c25bf0514f', '图像', '图像');
+INSERT INTO `knowledge` VALUES ('2aea9958-e418-6a6e-ecdd-4e96380ea773', '人物', '人物库');
+INSERT INTO `knowledge` VALUES ('2d3a3ff2-b5ec-41df-6c85-3fc880b866d3', '视频', '视频');
+INSERT INTO `knowledge` VALUES ('b6b8b913-cd11-2cf0-e10d-09896bd9a94e', '评论', '评论');
+INSERT INTO `knowledge` VALUES ('cb9497b1-281d-4a1d-664d-f66934b3efea', '组织', '组织');
+INSERT INTO `knowledge` VALUES ('cc8c342f-45ad-2899-938a-ac56fa193d58', 'PDF', 'PDF');
+INSERT INTO `knowledge` VALUES ('ffc3ad15-cfbe-2b28-09dc-d8a4ac0ac655', '音频', '音频');
 
 -- ----------------------------
 -- Table structure for ontology_property
 -- ----------------------------
 DROP TABLE IF EXISTS `ontology_property`;
 CREATE TABLE `ontology_property`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `enName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `enDescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9212 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9212 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ontology_property
@@ -8716,27 +8737,31 @@ CREATE TABLE `ontology_schema`  (
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `knowledgeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `collection` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_16cf37d5711e15bdc49419b6227`(`parentId`) USING BTREE,
-  CONSTRAINT `FK_16cf37d5711e15bdc49419b6227` FOREIGN KEY (`parentId`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+  INDEX `FK_16cf37d5711e15bdc49419b6227`(`parentId` ASC) USING BTREE,
+  INDEX `FK_dfb2d7bb9308b42b266e971a43d`(`knowledgeId` ASC) USING BTREE,
+  CONSTRAINT `FK_16cf37d5711e15bdc49419b6227` FOREIGN KEY (`parentId`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_dfb2d7bb9308b42b266e971a43d` FOREIGN KEY (`knowledgeId`) REFERENCES `knowledge` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ontology_schema
 -- ----------------------------
-INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '');
-INSERT INTO `ontology_schema` VALUES ('35b7855a-0b3a-fba8-2771-daa305523feb', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb', '音频');
-INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '');
-INSERT INTO `ontology_schema` VALUES ('76706ce5-298f-5144-802a-7c0306be49f9', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9', '视频');
-INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44', '');
-INSERT INTO `ontology_schema` VALUES ('7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.7e60636c-c3ce-9308-543f-3e77e2c85862', '图像');
-INSERT INTO `ontology_schema` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.8a924fb2-1438-8539-7e48-0b0fc02f44db', '');
-INSERT INTO `ontology_schema` VALUES ('977867fe-d710-efdf-c3e9-bd9251ae0d77', '地点', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.977867fe-d710-efdf-c3e9-bd9251ae0d77', '');
-INSERT INTO `ontology_schema` VALUES ('abbbcdf2-2296-b13b-3f3b-1724ce566401', '嵌入式非文本对象', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.abbbcdf2-2296-b13b-3f3b-1724ce566401', '');
-INSERT INTO `ontology_schema` VALUES ('ba140a9f-8888-cb0f-fff9-d073057a43e8', '产品', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.ba140a9f-8888-cb0f-fff9-d073057a43e8', '');
-INSERT INTO `ontology_schema` VALUES ('e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '创造性工作', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '');
-INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '');
-INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF');
+INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('35b7855a-0b3a-fba8-2771-daa305523feb', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb', '音频', 'ffc3ad15-cfbe-2b28-09dc-d8a4ac0ac655', 'audio');
+INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('76706ce5-298f-5144-802a-7c0306be49f9', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9', '视频', '2d3a3ff2-b5ec-41df-6c85-3fc880b866d3', 'video');
+INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', 'cb9497b1-281d-4a1d-664d-f66934b3efea', 'organization');
+INSERT INTO `ontology_schema` VALUES ('7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', '1a1c3603-bc88-dc4d-f385-b4c25bf0514f', 'image');
+INSERT INTO `ontology_schema` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', 'b6b8b913-cd11-2cf0-e10d-09896bd9a94e', 'comment');
+INSERT INTO `ontology_schema` VALUES ('977867fe-d710-efdf-c3e9-bd9251ae0d77', '地点', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.977867fe-d710-efdf-c3e9-bd9251ae0d77', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('abbbcdf2-2296-b13b-3f3b-1724ce566401', '嵌入式非文本对象', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.abbbcdf2-2296-b13b-3f3b-1724ce566401', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('ba140a9f-8888-cb0f-fff9-d073057a43e8', '产品', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.ba140a9f-8888-cb0f-fff9-d073057a43e8', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '创造性工作', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', '2aea9958-e418-6a6e-ecdd-4e96380ea773', 'person');
+INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', 'cc8c342f-45ad-2899-938a-ac56fa193d58', 'PDF');
 
 -- ----------------------------
 -- Table structure for ontology_schema_property
@@ -8744,13 +8769,13 @@ INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'P
 DROP TABLE IF EXISTS `ontology_schema_property`;
 CREATE TABLE `ontology_schema_property`  (
   `schemaId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `propertyId` int(0) NOT NULL,
+  `propertyId` int NOT NULL,
   PRIMARY KEY (`schemaId`, `propertyId`) USING BTREE,
-  INDEX `IDX_561afe7a3d5bac2c675d2aaa71`(`schemaId`) USING BTREE,
-  INDEX `IDX_0f06870cfdc06bbdb73550ae18`(`propertyId`) USING BTREE,
+  INDEX `IDX_561afe7a3d5bac2c675d2aaa71`(`schemaId` ASC) USING BTREE,
+  INDEX `IDX_0f06870cfdc06bbdb73550ae18`(`propertyId` ASC) USING BTREE,
   CONSTRAINT `FK_0f06870cfdc06bbdb73550ae180` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_561afe7a3d5bac2c675d2aaa716` FOREIGN KEY (`schemaId`) REFERENCES `ontology_schema` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ontology_schema_property
@@ -8763,6 +8788,7 @@ INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff1
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 25);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 26);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 27);
+INSERT INTO `ontology_schema_property` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', 823);
 
 -- ----------------------------
 -- Table structure for ontology_type
@@ -8778,9 +8804,9 @@ CREATE TABLE `ontology_type`  (
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_1195b0fab025f689375d994d950`(`parentId`) USING BTREE,
+  INDEX `FK_1195b0fab025f689375d994d950`(`parentId` ASC) USING BTREE,
   CONSTRAINT `FK_1195b0fab025f689375d994d950` FOREIGN KEY (`parentId`) REFERENCES `ontology_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ontology_type
@@ -8801,13 +8827,13 @@ INSERT INTO `ontology_type` VALUES ('feb4c3fd-ad97-b112-e4c0-55741b08a488', 'wik
 DROP TABLE IF EXISTS `ontology_type_value`;
 CREATE TABLE `ontology_type_value`  (
   `typeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `propertyId` int(0) NOT NULL,
+  `propertyId` int NOT NULL,
   PRIMARY KEY (`typeId`, `propertyId`) USING BTREE,
-  INDEX `IDX_568b9b5d75bd3865d279766916`(`propertyId`) USING BTREE,
-  INDEX `IDX_1670cbd28db91600d952242a1a`(`typeId`) USING BTREE,
-  CONSTRAINT `FK_568b9b5d75bd3865d279766916f` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `FK_1670cbd28db91600d952242a1ac` FOREIGN KEY (`typeId`) REFERENCES `ontology_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+  INDEX `IDX_568b9b5d75bd3865d279766916`(`propertyId` ASC) USING BTREE,
+  INDEX `IDX_1670cbd28db91600d952242a1a`(`typeId` ASC) USING BTREE,
+  CONSTRAINT `FK_1670cbd28db91600d952242a1ac` FOREIGN KEY (`typeId`) REFERENCES `ontology_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_568b9b5d75bd3865d279766916f` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ontology_type_value
@@ -8820,6 +8846,7 @@ INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9'
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 25);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 26);
 INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 27);
+INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 823);
 
 -- ----------------------------
 -- Table structure for system_action
@@ -8831,11 +8858,11 @@ CREATE TABLE `system_action`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `menuId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort` int(0) NOT NULL,
+  `sort` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_3ed34464adf967339c44f99ff80`(`menuId`) USING BTREE,
+  INDEX `FK_3ed34464adf967339c44f99ff80`(`menuId` ASC) USING BTREE,
   CONSTRAINT `FK_3ed34464adf967339c44f99ff80` FOREIGN KEY (`menuId`) REFERENCES `system_menu` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_action
@@ -8850,6 +8877,7 @@ INSERT INTO `system_action` VALUES ('346594b7-0db7-8790-8869-be827d50a104', '删
 INSERT INTO `system_action` VALUES ('4ea3022d-b867-afd6-b4bc-5f91bb1e77e0', '查看', 'info', '', '47c99575-24ac-d6d5-5353-f000e29e3115', 1);
 INSERT INTO `system_action` VALUES ('54ccd3ee-0f78-e4aa-8643-a92dc2849000', '查看', 'info', 'fto-eye', '90d5153c-3241-0ef6-27a8-6d00012d1838', 1);
 INSERT INTO `system_action` VALUES ('590ac302-cdca-72c7-60c5-0444b4585899', '查看', 'info', 'fto-eye', '10f15681-0d11-78db-bc92-76d43298a5f8', 1);
+INSERT INTO `system_action` VALUES ('59809ff1-86dd-5785-c269-de59396e1db3', '查看', 'info', 'fto-database', '5b09ed61-ae30-e236-d8bb-d73d3f7a4703', 1);
 INSERT INTO `system_action` VALUES ('629d4d09-73b6-2aa0-4e58-7108f4660a50', '新增', 'add', 'fto-plus', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 2);
 INSERT INTO `system_action` VALUES ('6dd07b1d-d431-9bf4-62d5-5db3dc99bddb', '查看', 'info', 'fto-eye', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 1);
 INSERT INTO `system_action` VALUES ('75056496-6ca6-1346-7a60-be72cab7d72b', '删除', 'delete', 'fto-trash-2', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 4);
@@ -8881,11 +8909,11 @@ CREATE TABLE `system_menu`  (
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `sort` int(0) NOT NULL,
+  `sort` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_d7fcb6cbe5c416b793101e32a3f`(`parentId`) USING BTREE,
+  INDEX `FK_d7fcb6cbe5c416b793101e32a3f`(`parentId` ASC) USING BTREE,
   CONSTRAINT `FK_d7fcb6cbe5c416b793101e32a3f` FOREIGN KEY (`parentId`) REFERENCES `system_menu` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_menu
@@ -8899,6 +8927,7 @@ INSERT INTO `system_menu` VALUES ('42e99937-ed68-ea0e-5d61-987e12a66732', '属�
 INSERT INTO `system_menu` VALUES ('43aff638-1ebe-ec01-5427-7578308cc7b7', '节点', 'node', 'fto-command', NULL, '43aff638-1ebe-ec01-5427-7578308cc7b7', 7);
 INSERT INTO `system_menu` VALUES ('47c99575-24ac-d6d5-5353-f000e29e3115', '本体', 'ontology', 'ado-setting', NULL, '47c99575-24ac-d6d5-5353-f000e29e3115', 4);
 INSERT INTO `system_menu` VALUES ('4a305e03-c1b9-1ab7-b9ac-3408dced0194', '组织管理', 'organization', 'ado-apartment', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.4a305e03-c1b9-1ab7-b9ac-3408dced0194', 3);
+INSERT INTO `system_menu` VALUES ('5b09ed61-ae30-e236-d8bb-d73d3f7a4703', '搜索', 'search', 'fto-database', NULL, '5b09ed61-ae30-e236-d8bb-d73d3f7a4703', 9);
 INSERT INTO `system_menu` VALUES ('90d5153c-3241-0ef6-27a8-6d00012d1838', '首页', 'home', 'ado-home', NULL, '90d5153c-3241-0ef6-27a8-6d00012d1838', 1);
 INSERT INTO `system_menu` VALUES ('a2036646-7b02-7f9a-8a4b-18a1679c90a3', '关系', 'edge', 'fto-command', NULL, 'a2036646-7b02-7f9a-8a4b-18a1679c90a3', 7);
 INSERT INTO `system_menu` VALUES ('c0232814-4938-a378-17b8-5a4eae56618b', '媒体库', 'media', 'fto-database', NULL, 'c0232814-4938-a378-17b8-5a4eae56618b', 8);
@@ -8917,11 +8946,11 @@ CREATE TABLE `system_organization`  (
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `sort` int(0) NOT NULL,
+  `sort` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_86110f24fd2d3afdba313c5060d`(`parentId`) USING BTREE,
+  INDEX `FK_86110f24fd2d3afdba313c5060d`(`parentId` ASC) USING BTREE,
   CONSTRAINT `FK_86110f24fd2d3afdba313c5060d` FOREIGN KEY (`parentId`) REFERENCES `system_organization` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_organization
@@ -8938,9 +8967,9 @@ CREATE TABLE `system_role`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `organizationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_af72a2809e8b6fdf8da0955bf03`(`organizationId`) USING BTREE,
+  INDEX `FK_af72a2809e8b6fdf8da0955bf03`(`organizationId` ASC) USING BTREE,
   CONSTRAINT `FK_af72a2809e8b6fdf8da0955bf03` FOREIGN KEY (`organizationId`) REFERENCES `system_organization` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_role
@@ -8956,12 +8985,12 @@ CREATE TABLE `system_role_action`  (
   `roleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `actionId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`roleId`, `actionId`) USING BTREE,
-  INDEX `FK_a0ec504b9c427ffcc85e212594c`(`actionId`) USING BTREE,
-  INDEX `IDX_25439811e232662e2dc087330d`(`roleId`) USING BTREE,
-  INDEX `IDX_a0ec504b9c427ffcc85e212594`(`actionId`) USING BTREE,
+  INDEX `FK_a0ec504b9c427ffcc85e212594c`(`actionId` ASC) USING BTREE,
+  INDEX `IDX_25439811e232662e2dc087330d`(`roleId` ASC) USING BTREE,
+  INDEX `IDX_a0ec504b9c427ffcc85e212594`(`actionId` ASC) USING BTREE,
   CONSTRAINT `FK_25439811e232662e2dc087330d9` FOREIGN KEY (`roleId`) REFERENCES `system_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_a0ec504b9c427ffcc85e212594c` FOREIGN KEY (`actionId`) REFERENCES `system_action` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_role_action
@@ -8979,6 +9008,7 @@ INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01',
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '54ccd3ee-0f78-e4aa-8643-a92dc2849000');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '590ac302-cdca-72c7-60c5-0444b4585899');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '590ac302-cdca-72c7-60c5-0444b4585899');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '59809ff1-86dd-5785-c269-de59396e1db3');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '629d4d09-73b6-2aa0-4e58-7108f4660a50');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '629d4d09-73b6-2aa0-4e58-7108f4660a50');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '6dd07b1d-d431-9bf4-62d5-5db3dc99bddb');
@@ -9017,7 +9047,7 @@ CREATE TABLE `system_user`  (
   `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_user
@@ -9032,12 +9062,12 @@ CREATE TABLE `system_user_organization`  (
   `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `organizationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`userId`, `organizationId`) USING BTREE,
-  INDEX `FK_68941b8e6cc24f7f5cc3898edb4`(`organizationId`) USING BTREE,
-  INDEX `IDX_9a2b15d16e0199fd81dec2407b`(`userId`) USING BTREE,
-  INDEX `IDX_68941b8e6cc24f7f5cc3898edb`(`organizationId`) USING BTREE,
+  INDEX `FK_68941b8e6cc24f7f5cc3898edb4`(`organizationId` ASC) USING BTREE,
+  INDEX `IDX_9a2b15d16e0199fd81dec2407b`(`userId` ASC) USING BTREE,
+  INDEX `IDX_68941b8e6cc24f7f5cc3898edb`(`organizationId` ASC) USING BTREE,
   CONSTRAINT `FK_68941b8e6cc24f7f5cc3898edb4` FOREIGN KEY (`organizationId`) REFERENCES `system_organization` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_9a2b15d16e0199fd81dec2407b2` FOREIGN KEY (`userId`) REFERENCES `system_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_user_organization
@@ -9052,12 +9082,12 @@ CREATE TABLE `system_user_role`  (
   `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `roleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`userId`, `roleId`) USING BTREE,
-  INDEX `FK_4c2ae6cf44ed3a1e1040122db4b`(`roleId`) USING BTREE,
-  INDEX `IDX_4c2ae6cf44ed3a1e1040122db4`(`roleId`) USING BTREE,
-  INDEX `IDX_8b51fc7bf87d9a9aada9c50454`(`userId`) USING BTREE,
+  INDEX `FK_4c2ae6cf44ed3a1e1040122db4b`(`roleId` ASC) USING BTREE,
+  INDEX `IDX_4c2ae6cf44ed3a1e1040122db4`(`roleId` ASC) USING BTREE,
+  INDEX `IDX_8b51fc7bf87d9a9aada9c50454`(`userId` ASC) USING BTREE,
   CONSTRAINT `FK_4c2ae6cf44ed3a1e1040122db4b` FOREIGN KEY (`roleId`) REFERENCES `system_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_8b51fc7bf87d9a9aada9c504544` FOREIGN KEY (`userId`) REFERENCES `system_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_user_role

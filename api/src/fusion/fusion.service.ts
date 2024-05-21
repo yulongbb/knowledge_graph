@@ -356,13 +356,15 @@ export class FusionService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 ANY ${
         'entity/' + id
       } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
-      RETURN MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'label': Document(e['_to']).labels.zh.value}} })`);
+      RETURN MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'label': Document(e['_from']==${
+        'entity/' + id
+      } ?e['_to']:e['_from'] ).labels.zh.value}} })`);
       // 获取查询结果
       const result = await cursor.all();
       console.log(result);

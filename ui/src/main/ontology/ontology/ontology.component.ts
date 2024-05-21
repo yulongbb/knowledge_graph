@@ -91,6 +91,7 @@ export class OntologyComponent extends PageBase {
           required: true,
         },
         { control: 'input', id: 'description', label: '描述' },
+        { control: 'input', id: 'collection', label: '表' },
       ],
     },
     {

@@ -193,6 +193,17 @@ export const layoutRoutes: Routes = [
     }
   },
 
+
+  {
+    path: "entity",
+    loadChildren: () =>
+      import("../main/entity/entity.module").then(x => x.EntityModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页

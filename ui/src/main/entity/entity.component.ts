@@ -3,7 +3,6 @@ import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map, Observable } from 'rxjs';
-import { NodeService } from 'src/main/node/node.service';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
@@ -12,15 +11,17 @@ import {
   XMessageService,
   XPosition,
 } from '@ng-nest/ui';
-import { KnowledgeService } from '../knowledge.service';
-import { FusionService } from 'src/main/fusion/fusion.service';
+import { KnowledgeService } from '../knowledge/knowledge.service';
+import { FusionService } from '../fusion/fusion.service';
+import { EntityService } from './entity.service';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
-  selector: 'app-knowledge-node',
-  templateUrl: 'knowledge-node.component.html',
-  styleUrls: ['./knowledge-node.component.scss'],
+  selector: 'app-entity',
+  templateUrl: 'entity.component.html',
+  styleUrls: ['./entity.component.scss'],
 })
-export class KnowledgeNodeComponent {
+export class EntityComponent extends PageBase {
   id: any;
   knowledge: any;
   keyword = '';
@@ -41,10 +42,7 @@ export class KnowledgeNodeComponent {
     this.visible = false;
   }
 
-
-
   data: any;
-
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -73,46 +71,49 @@ export class KnowledgeNodeComponent {
 
   constructor(
     private knowledgeService: KnowledgeService,
+    private fusionService: FusionService,
+    private ontologyService: OntologyService,
 
-    private service: NodeService,
+    private service: EntityService,
+    public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
     private msgBox: XMessageBoxService
   ) {
+
+    super(indexService);
+    // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      this.id = x.get('id') as string;
+      let id = x.get('knowledge') as string;
+      console.log(id);
+      let query: any = {};
+      query.filter = [
+        {
+          field: 'id',
+          value: id as string,
+          relation: 'knowledge',
+          operation: '=',
+        },
+      ];
 
-      this.knowledgeService.get(this.id).subscribe((x) => {
-        console.log(x);
+      this.ontologyService
+        .getList(1, 10, query)
+        .subscribe((schema: any) => {
+          console.log({ collection: schema.list[0].collection + '_entity', type: schema.list[0].collection, keyword: `%${this.keyword}%` });
 
-        this.knowledge = x;
-        console.log(this.knowledge);
-        this.data = (index: number, size: number, query: Query) => this.service
-          .getList(index, this.size, { collection: this.knowledge.description + '_entity', type: this.knowledge.name, keyword: `%${this.keyword}%` })
-          .pipe(
-            tap((x: any) => console.log(x)),
-            map((x: any) => x)
-          );
+          this.data = (index: number, size: number, query: Query) => this.service
+            .getList(index, this.size, { collection: schema.list[0].collection + '_entity', type: schema.list[0].collection, keyword: `%${this.keyword}%` })
+            .pipe(
+              tap((x: any) => console.log(x)),
+              map((x: any) => x)
+            );
 
-      });
+
+        });
+
     });
   }
-
-  ngOnInit() {
-    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      this.id = x.get('id') as string;
-
-      this.knowledgeService.get(this.id).subscribe((x) => {
-        console.log(x);
-
-        this.knowledge = x;
-        console.log(this.knowledge);
-
-      });
-    });
-  }
-
 
   setCheckedRows(checked: boolean, row: XTableRow) {
     if (checked) {
@@ -147,7 +148,7 @@ export class KnowledgeNodeComponent {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: this.id + '_entity', type: '组织', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -157,17 +158,15 @@ export class KnowledgeNodeComponent {
     console.log(type);
     switch (type) {
       case 'add':
-        this.router.navigate(
-          [`./${type}`],
-          {
-            relativeTo: this.activatedRoute,
-          }
-        );
+        let param = {};
+        this.router.navigate([`./${type}`, param], {
+          relativeTo: this.activatedRoute,
+        });
         break;
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}/${item.type.id}`],
+          [`./${type}/${item.id.toString().split('/')[1]}`],
           {
             relativeTo: this.activatedRoute,
           }
@@ -175,7 +174,7 @@ export class KnowledgeNodeComponent {
         break;
       case 'edit':
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}/${item.type.id}`],
+          [`./${type}/${item.id.toString().split('/')[1]}`],
           {
             relativeTo: this.activatedRoute,
           }
@@ -211,6 +210,44 @@ export class KnowledgeNodeComponent {
             },
           });
         }
+        break;
+      case 'upload':
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' && this.knowledgeService.get(this.model1).subscribe((knowledge: any) => {
+              console.log(this.checkedRows);
+              console.log(knowledge);
+              this.fusionService.knowledge(this.checkedRows, knowledge.description).subscribe(() => {
+                this.tableCom.change(this.index);
+                this.message.success('成功！');
+              })
+
+
+            })
+          },
+        });
+        break;
+      case 'tree-info':
+        // this.selected = item;
+        // let filter = {
+        //   field: 'id',
+        //   value: item.id,
+        //   operation: '=',
+        //   relation: 'organizations',
+        // } as any;
+        // if (!this.query.filter || this.query.filter.length == 0) {
+        //   this.query.filter = [filter];
+        // } else {
+        //   let flt = this.query.filter.find(
+        //     (x) => x.field === 'id' && x.relation === 'organizations'
+        //   );
+        //   if (flt) flt.value = filter.value;
+        //   else this.query.filter = [...this.query.filter, filter];
+        // }
+        // this.tableCom.change(1);
         break;
     }
   }

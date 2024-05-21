@@ -9,10 +9,11 @@ import { PropertiesController } from 'src/ontology/controllers/properties.contro
 import { Type } from './entities/type.entity';
 import { TypesController } from './controllers/types.compopnent';
 import { TypesService } from './services/types.service';
+import { Knowledge } from 'src/knowledge/knowledge.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Schema, Property, Type])],
+  imports: [TypeOrmModule.forFeature([Schema, Property, Type, Knowledge])],
   controllers: [SchemasController, PropertiesController, TypesController],
   providers: [SchemasService, PropertiesService, TypesService]
 })

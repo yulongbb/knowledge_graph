@@ -1,26 +1,28 @@
 import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { XAddHours, XAddMinutes, XGuid } from '@ng-nest/ui/core';
+import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XCommentNode, XTableColumn } from '@ng-nest/ui';
-import { NodeService } from 'src/main/node/node.service';
+import { EntityService } from '../entity.service';
+import { XTableColumn } from '@ng-nest/ui';
 import { map, Observable, tap } from 'rxjs';
-import { DomSanitizer } from '@angular/platform-browser';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { NodeService } from 'src/main/node/node.service';
 
 @Component({
-  selector: 'app-knowledge-node-detail',
-  templateUrl: './knowledge-node-detail.component.html',
-  styleUrls: ['./knowledge-node-detail.component.scss'],
+  selector: 'app-entity-detail',
+  templateUrl: './entity-detail.component.html',
+  styleUrls: ['./entity-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class KnowledgeNodeDetailComponent implements OnInit {
+export class EntityDetailComponent implements OnInit {
   id: string = '';
-  nid: string = '';
+  knowledge: string = '';
   type: string = '';
   schema: string = '';
   item: any;
+  statements: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -39,7 +41,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
-      
+
             sort: [
               { field: 'pid', value: 'asc' },
               { field: 'sort', value: 'asc' },
@@ -61,7 +63,6 @@ export class KnowledgeNodeDetailComponent implements OnInit {
 
 
   query: any;
-  data!: Observable<Array<any>>;
 
 
   columns: XTableColumn[] = [
@@ -87,9 +88,8 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
-      this.nid = x.get('nid') as string;
+      this.knowledge = x.get('knowledge') as string;
       this.type = x.get('type') as string;
-      this.schema = x.get('schema') as string;
       if (this.type === 'info') {
         this.title = '查看实体';
         this.disabled = true;
@@ -98,14 +98,28 @@ export class KnowledgeNodeDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      this.data = this.nodeService.getLinks(1, 10, this.nid, { schema: this.schema }).pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
+      let query: any = {};
+      query.filter = [
+        {
+          field: 'id',
+          value: this.knowledge as string,
+          relation: 'knowledge',
+          operation: '=',
+        },
+      ];
+
+      this.ontologyService
+        .getList(1, 20, query)
+        .subscribe((schema: any) => {
+          this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).subscribe((x: any) => console.log(this.statements = x));
+        });
+
+
     });
   }
 
   ngOnInit(): void {
+    console.log(this.type);
     this.action(this.type);
   }
   uploadSuccess($event: any) {
@@ -124,13 +138,13 @@ export class KnowledgeNodeDetailComponent implements OnInit {
     switch (type) {
       case 'info':
 
-        this.nodeService.getItem(this.nid).subscribe((x) => {
+        this.nodeService.getItem(this.id).subscribe((x) => {
           this.item = x;
-          console.log(x)
-          let item: any = {};
-          item['id'] = x.id;
-          item['label'] = x?.labels?.zh?.value;
-          item['description'] = x?.descriptions?.zh?.value;
+          // console.log(x)
+          // let item: any = {};
+          // item['id'] = x.id;
+          // item['label'] = x?.labels?.zh?.value;
+          // item['description'] = x?.descriptions?.zh?.value;
 
           // this.form.formGroup.patchValue(item);
 
@@ -160,7 +174,7 @@ export class KnowledgeNodeDetailComponent implements OnInit {
   }
 
   backClick() {
-    this.router.navigate([`/index/knowledge/data/${this.id}/nodes`], { replaceUrl: true });
+    this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
 
   }
 }
