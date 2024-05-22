@@ -23,6 +23,7 @@ export class EntityDetailComponent implements OnInit {
   schema: string = '';
   item: any;
   statements: any;
+  data!: Observable<Array<any>>;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -111,9 +112,16 @@ export class EntityDetailComponent implements OnInit {
       this.ontologyService
         .getList(1, 20, query)
         .subscribe((schema: any) => {
-          this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).subscribe((x: any) => console.log(this.statements = x));
-        });
+         
+          this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).subscribe((x: any) => console.log(
+            this.statements = x)
+          );
+          this.data = this.nodeService.getLinks(1, 10, this.id, { schema: schema.list[0].id }).pipe(
+            tap((x: any) => console.log(x)),
+            map((x: any) => x)
+          );
 
+        });
 
     });
   }
@@ -121,6 +129,8 @@ export class EntityDetailComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.type);
     this.action(this.type);
+
+
   }
   uploadSuccess($event: any) {
     let item: any = {};

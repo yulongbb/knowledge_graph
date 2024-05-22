@@ -60,14 +60,11 @@ export class NodeController {
     @Body() query: any,
   ): Promise<any> {
     let claims = {};
-    const properties = await this.propertiesService.getList(1, 10, { 'filter': [{ field: 'id', value: query.schema, relation: 'schemas', operation: '=' }] });
+    const properties = await this.propertiesService.getList(1, 20, { 'filter': [{ field: 'id', value: query.schema, relation: 'schemas', operation: '=' }] });
     const links = await this.fusionService.getLinks(id, index, size, query);
     properties.list.forEach((p) => {
       claims[p['name']] = links.list.filter((l) => l.mainsnak.property == 'P' + p['id']);
     })
-
-    claims['其他'] = links.list.filter((l) => l['_from'] != 'entity/' + id);
-    console.log(123);
     return claims;
 
   }

@@ -103,7 +103,7 @@ export class EntityComponent extends PageBase {
           console.log({ collection: schema.list[0].collection + '_entity', type: schema.list[0].collection, keyword: `%${this.keyword}%` });
 
           this.data = (index: number, size: number, query: Query) => this.service
-            .getList(index, this.size, { collection: schema.list[0].collection + '_entity', type: schema.list[0].collection, keyword: `%${this.keyword}%` })
+            .getList(index, this.size, { collection: schema.list[0].collection + '_entity', type: schema.list[0].label, keyword: `%${this.keyword}%` })
             .pipe(
               tap((x: any) => console.log(x)),
               map((x: any) => x)
