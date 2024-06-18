@@ -3,9 +3,8 @@ import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map, Observable } from 'rxjs';
-import { NodeService } from 'src/main/node/node.service';
 import { Query } from 'src/services/repository.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
   XMessageBoxAction,
   XMessageBoxService,
@@ -13,14 +12,17 @@ import {
   XPosition,
 } from '@ng-nest/ui';
 import { FusionService } from '../fusion/fusion.service';
+import { AudioService } from './audio.service';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
-  selector: 'app-node',
-  templateUrl: 'node.component.html',
-  styleUrls: ['./node.component.scss'],
+  selector: 'app-audio',
+  templateUrl: 'audio.component.html',
+  styleUrls: ['./audio.component.scss'],
 })
-export class NodeComponent extends PageBase {
+export class AudioComponent extends PageBase {
   id: any;
+  knowledge: any;
   keyword = '';
   size = 20;
   index = 1;
@@ -30,7 +32,6 @@ export class NodeComponent extends PageBase {
   visible!: boolean;
 
   detail(row: XTableRow, column: XTableColumn) {
-    console.log(row.id[0].split('/')[1]);
     this.id = row.id[0].split('/')[1];
   }
 
@@ -39,13 +40,7 @@ export class NodeComponent extends PageBase {
     this.visible = false;
   }
 
-  data = (index: number, size: number, query: Query) =>
-    this.service
-      .getList(index, this.size, { collection: 'entity', keyword: `%${this.keyword}%` })
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
+  data: any;
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -61,18 +56,26 @@ export class NodeComponent extends PageBase {
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model1: any;
 
-
   constructor(
-    private fusionService: FusionService,
-
-    private service: NodeService,
+    private service: AudioService,
     public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
     private msgBox: XMessageBoxService
   ) {
+
     super(indexService);
+    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+
+      this.data = (index: number, size: number, query: Query) => this.service
+        .getList(index, this.size, { collection: 'audio_entity', type: '音频', keyword: `%${this.keyword}%` })
+        .pipe(
+          tap((x: any) => console.log(x)),
+          map((x: any) => x)
+        );
+
+    });
   }
 
   setCheckedRows(checked: boolean, row: XTableRow) {
@@ -89,26 +92,20 @@ export class NodeComponent extends PageBase {
   }
 
   headCheckboxChange(headCheckbox: XTableHeadCheckbox) {
-    // checked 属性来源于定义的 id 列
     const checked = headCheckbox.checkbox['checked'];
     for (let row of headCheckbox.rows) {
       this.setCheckedRows(checked, row);
     }
-
-    console.log(this.checkedRows);
   }
 
   bodyCheckboxChange(row: XTableRow) {
-    // checked 属性来源于定义的 id 列
     this.setCheckedRows(row['checked'], row);
-
-    console.log(this.checkedRows);
   }
 
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'audio', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -130,7 +127,8 @@ export class NodeComponent extends PageBase {
           {
             relativeTo: this.activatedRoute,
           }
-        );
+        ).then(() => {
+        });
         break;
       case 'edit':
         this.router.navigate(
@@ -171,42 +169,7 @@ export class NodeComponent extends PageBase {
           });
         }
         break;
-      // case 'upload':
-      //   this.msgBox.confirm({
-      //     title: '提示',
-      //     content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
-      //     type: 'warning',
-      //     callback: (action: XMessageBoxAction) => {
-      //       action === 'confirm' && this.knowledgeService.get(this.model1).subscribe((knowledge: any) => {
-      //         console.log(this.checkedRows);
-      //         console.log(knowledge);
-      //         this.fusionService.knowledge(this.checkedRows, knowledge.description).subscribe(() => {
-      //           this.tableCom.change(this.index);
-      //           this.message.success('成功！');
-      //         });
-      //       })
-      //     },
-      //   });
-      //   break;
-      case 'tree-info':
-        // this.selected = item;
-        // let filter = {
-        //   field: 'id',
-        //   value: item.id,
-        //   operation: '=',
-        //   relation: 'organizations',
-        // } as any;
-        // if (!this.query.filter || this.query.filter.length == 0) {
-        //   this.query.filter = [filter];
-        // } else {
-        //   let flt = this.query.filter.find(
-        //     (x) => x.field === 'id' && x.relation === 'organizations'
-        //   );
-        //   if (flt) flt.value = filter.value;
-        //   else this.query.filter = [...this.query.filter, filter];
-        // }
-        // this.tableCom.change(1);
-        break;
+
     }
   }
 }

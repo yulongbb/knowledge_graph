@@ -11,7 +11,6 @@ import {
   XMessageService,
   XPosition,
 } from '@ng-nest/ui';
-import { KnowledgeService } from '../knowledge/knowledge.service';
 import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
@@ -33,7 +32,6 @@ export class EntityComponent extends PageBase {
   visible!: boolean;
 
   detail(row: XTableRow, column: XTableColumn) {
-    console.log(row.id[0].split('/')[1]);
     this.id = row.id[0].split('/')[1];
   }
 
@@ -58,22 +56,7 @@ export class EntityComponent extends PageBase {
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model1: any;
 
-  data1 = (index: number, size: number, query: any) =>
-
-    new Observable<string[]>((x) => {
-      this.knowledgeService.getList(index, size, query).subscribe((data: any) => {
-        console.log(data.list);
-        x.next(data.list);
-        x.complete();
-      })
-
-    });
-
   constructor(
-    private knowledgeService: KnowledgeService,
-    private fusionService: FusionService,
-    private ontologyService: OntologyService,
-
     private service: EntityService,
     public override indexService: IndexService,
     private router: Router,
@@ -83,34 +66,14 @@ export class EntityComponent extends PageBase {
   ) {
 
     super(indexService);
-    // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      let id = x.get('knowledge') as string;
-      console.log(id);
-      let query: any = {};
-      query.filter = [
-        {
-          field: 'id',
-          value: id as string,
-          relation: 'knowledge',
-          operation: '=',
-        },
-      ];
 
-      this.ontologyService
-        .getList(1, 10, query)
-        .subscribe((schema: any) => {
-          console.log({ collection: schema.list[0].collection + '_entity', type: schema.list[0].collection, keyword: `%${this.keyword}%` });
-
-          this.data = (index: number, size: number, query: Query) => this.service
-            .getList(index, this.size, { collection: schema.list[0].collection + '_entity', type: schema.list[0].label, keyword: `%${this.keyword}%` })
-            .pipe(
-              tap((x: any) => console.log(x)),
-              map((x: any) => x)
-            );
-
-
-        });
+      this.data = (index: number, size: number, query: Query) => this.service
+        .getList(index, this.size, { collection: 'person_entity', type: '人类', keyword: `%${this.keyword}%` })
+        .pipe(
+          tap((x: any) => console.log(x)),
+          map((x: any) => x)
+        );
 
     });
   }
@@ -129,20 +92,14 @@ export class EntityComponent extends PageBase {
   }
 
   headCheckboxChange(headCheckbox: XTableHeadCheckbox) {
-    // checked 属性来源于定义的 id 列
     const checked = headCheckbox.checkbox['checked'];
     for (let row of headCheckbox.rows) {
       this.setCheckedRows(checked, row);
     }
-
-    console.log(this.checkedRows);
   }
 
   bodyCheckboxChange(row: XTableRow) {
-    // checked 属性来源于定义的 id 列
     this.setCheckedRows(row['checked'], row);
-
-    console.log(this.checkedRows);
   }
 
 
@@ -170,7 +127,8 @@ export class EntityComponent extends PageBase {
           {
             relativeTo: this.activatedRoute,
           }
-        );
+        ).then(() => {
+        });
         break;
       case 'edit':
         this.router.navigate(
@@ -211,44 +169,7 @@ export class EntityComponent extends PageBase {
           });
         }
         break;
-      case 'upload':
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            action === 'confirm' && this.knowledgeService.get(this.model1).subscribe((knowledge: any) => {
-              console.log(this.checkedRows);
-              console.log(knowledge);
-              this.fusionService.knowledge(this.checkedRows, knowledge.description).subscribe(() => {
-                this.tableCom.change(this.index);
-                this.message.success('成功！');
-              })
 
-
-            })
-          },
-        });
-        break;
-      case 'tree-info':
-        // this.selected = item;
-        // let filter = {
-        //   field: 'id',
-        //   value: item.id,
-        //   operation: '=',
-        //   relation: 'organizations',
-        // } as any;
-        // if (!this.query.filter || this.query.filter.length == 0) {
-        //   this.query.filter = [filter];
-        // } else {
-        //   let flt = this.query.filter.find(
-        //     (x) => x.field === 'id' && x.relation === 'organizations'
-        //   );
-        //   if (flt) flt.value = filter.value;
-        //   else this.query.filter = [...this.query.filter, filter];
-        // }
-        // this.tableCom.change(1);
-        break;
     }
   }
 }

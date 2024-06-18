@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { EntityRoutesModule } from "./entity-routes.module";
-import { EntityComponent } from "./entity.component";
+import { PdfRoutesModule } from "./pdf-routes.module";
+import { PdfComponent } from "./pdf.component";
 import { ShareModule } from "src/share/share.module";
 import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
@@ -18,7 +18,7 @@ import { XStatisticModule } from '@ng-nest/ui/statistic';
 
 
 
-import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
+import { PdfDetailComponent } from "./pdf-detail/pdf-detail.component";
 
 
 
@@ -36,8 +36,8 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XPageHeaderModule,
     XStatisticModule,
     XImageModule,
-    EntityRoutesModule
+    PdfRoutesModule
   ],
-  declarations: [EntityComponent, EntityDetailComponent]
+  declarations: [PdfComponent, PdfDetailComponent]
 })
-export class EntityModule { }
+export class PdfModule { }

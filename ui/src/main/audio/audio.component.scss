@@ -1,0 +1,8 @@
+:host {
+    x-input-group {
+      display: block;
+    }
+    x-input-group:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }

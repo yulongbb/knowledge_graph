@@ -15,7 +15,6 @@ docker run --name ui  --restart=always -d -p 80:80 ui
 
 docker-compose up -d
 
-
 ng build --configuration production
 
 ng serve --proxy-config proxy.conf.json
@@ -30,20 +29,12 @@ wikidata数据dump到arangodb的方法
 arangoimport --threads 4  --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password root --server.database kgms --file "\mnt\entity.json" --type json --collection "entity" --batch-size 33554432
 arangoimport --threads 4  --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password root --server.database kgms --file "\mnt\link.json" --type json --collection "link" --batch-size 33554432
 
-
-
-
-
 arangodb初始化库方法
 
 第一步：创建数据库
 第二部：创建数据表
 第三步：创建图
 第四步：创建视图
-
-
-
-
 
 需求：批量筛选实体列表导出属性到excel
 
@@ -62,7 +53,6 @@ RETURN UNIQUE(FOR l IN link
 FILTER l['_from'] IN ["entity/Q22099965","entity/Q21040218"]
 RETURN l.mainsnak.property)
 ```
-
 [
     "P31",
     "P569",
@@ -280,3 +270,4 @@ cannot import name 'XXX' from partially initialized module
 
 
 openEI不支持中文
+

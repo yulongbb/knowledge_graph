@@ -3,7 +3,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { EntityService } from '../entity.service';
+import { PdfService } from '../pdf.service';
 import { XTableColumn } from '@ng-nest/ui';
 import { map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
@@ -11,12 +11,12 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NodeService } from 'src/main/node/node.service';
 
 @Component({
-  selector: 'app-entity-detail',
-  templateUrl: './entity-detail.component.html',
-  styleUrls: ['./entity-detail.component.scss'],
+  selector: 'app-pdf-detail',
+  templateUrl: './pdf-detail.component.html',
+  styleUrls: ['./pdf-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EntityDetailComponent implements OnInit {
+export class PdfDetailComponent implements OnInit {
   id: string = '';
   knowledge: string = '';
   type: string = '';
@@ -89,6 +89,7 @@ export class EntityDetailComponent implements OnInit {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
+      this.knowledge = x.get('knowledge') as string;
       this.type = x.get('type') as string;
       if (this.type === 'info') {
         this.title = '查看实体';
@@ -98,14 +99,30 @@ export class EntityDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
+      let query: any = {};
+      query.filter = [
+        {
+          field: 'id',
+          value: this.knowledge as string,
+          relation: 'knowledge',
+          operation: '=',
+        },
+      ];
 
-      this.data = this.nodeService.getLinks(1, 20, this.id, { schema: 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf' }).pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
-      this.nodeService.getLinks(1, 20, this.id, { schema: 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf' }).subscribe((x: any) => console.log(
-        this.statements = x)
-      );
+      this.ontologyService
+        .getList(1, 20, query)
+        .subscribe((schema: any) => {
+         
+          this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).subscribe((x: any) => console.log(
+            this.statements = x)
+          );
+          this.data = this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).pipe(
+            tap((x: any) => console.log(x)),
+            map((x: any) => x)
+          );
+
+        });
+
     });
   }
 
@@ -132,7 +149,6 @@ export class EntityDetailComponent implements OnInit {
       case 'info':
         this.nodeService.getItem(this.id).subscribe((x) => {
           this.item = x;
-       
           // console.log(x)
           // let item: any = {};
           // item['id'] = x.id;
@@ -165,7 +181,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   backClick() {
-    this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
+    this.router.navigate([`/index/pdf/${this.knowledge}`], { replaceUrl: true });
 
   }
 }

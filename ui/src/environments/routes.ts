@@ -182,18 +182,6 @@ export const layoutRoutes: Routes = [
     }
   },
 
-  // 库
-  {
-    path: "knowledge",
-    loadChildren: () =>
-      import("../main/knowledge/knowledge.module").then(x => x.KnowledgeModule),
-    canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
-
-
   {
     path: "entity",
     loadChildren: () =>
@@ -203,6 +191,48 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
+
+
+  {
+    path: "pdf",
+    loadChildren: () =>
+      import("../main/pdf/pdf.module").then(x => x.PdfModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
+  {
+    path: "image",
+    loadChildren: () =>
+      import("../main/image/image.module").then(x => x.ImageModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
+  {
+    path: "audio",
+    loadChildren: () =>
+      import("../main/audio/audio.module").then(x => x.AudioModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
+  {
+    path: "video",
+    loadChildren: () =>
+      import("../main/video/video.module").then(x => x.VideoModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
 
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
