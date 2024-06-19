@@ -1,23 +1,25 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, signal } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map, Observable } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
+  XData,
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
   XPosition,
+  XRadioNode,
 } from '@ng-nest/ui';
-import { FusionService } from '../fusion/fusion.service';
 import { ImageService } from './image.service';
-import { OntologyService } from '../ontology/ontology/ontology.service';
+
 
 @Component({
   selector: 'app-image',
   templateUrl: 'image.component.html',
+
   styleUrls: ['./image.component.scss'],
 })
 export class ImageComponent extends PageBase {
@@ -41,6 +43,7 @@ export class ImageComponent extends PageBase {
   }
 
   data: any;
+  data$!: Observable<any>;
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -56,6 +59,18 @@ export class ImageComponent extends PageBase {
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model1: any;
 
+
+  layout: XData<XRadioNode> = [
+    { label: '列表', icon: 'fto-list' },
+    { label: '卡片', icon: 'fto-grid' },
+  ];
+  model = '列表';
+
+  changeLayout(model: any) {
+    console.log(model);
+  }
+
+
   constructor(
     private service: ImageService,
     public override indexService: IndexService,
@@ -66,16 +81,21 @@ export class ImageComponent extends PageBase {
   ) {
 
     super(indexService);
-    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
 
-      this.data = (index: number, size: number, query: Query) => this.service
-        .getList(index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
-        .pipe(
-          tap((x: any) => console.log(x)),
-          map((x: any) => x)
-        );
+    this.data$ = this.service
+      .getList(this.index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
+      .pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
 
-    });
+    this.data = (index: number, size: number, query: Query) => this.service
+      .getList(index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
+      .pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
+
   }
 
   setCheckedRows(checked: boolean, row: XTableRow) {
@@ -104,6 +124,12 @@ export class ImageComponent extends PageBase {
 
 
   search(keyword: any) {
+    this.data$ = this.service
+    .getList(this.index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
+    .pipe(
+      tap((x: any) => console.log(x)),
+      map((x: any) => x)
+    );
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, { collection: 'image', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),

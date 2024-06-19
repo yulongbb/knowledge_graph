@@ -20,7 +20,7 @@
     <div class="row">
       <x-card width="100%" class="card">
         <div class="bottom">
-          <p>{{item?.labels?.zh?.value}}</p>
+          <h1>{{item?.labels?.zh?.value}}</h1>
           <div class="time">
             <span>{{item?.descriptions?.zh?.value}}</span>
             <span>{{item?.type?.label}}</span>
@@ -49,16 +49,18 @@
 <br>
 <x-row>
   <x-col span="24">
-    <x-card [header]="header1" *ngIf="statements">
+    <x-card [header]="header1">
       <div class="row scroll">
         <div class="box">
           <ng-template #header1>
             <span>{{item?.labels?.zh?.value}}的图像</span>
           </ng-template>
-          <x-image-group>
-            <x-image *ngFor="let value of statements['图像'];" width="200px" height="200px"
-              [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></x-image>
-          </x-image-group>
+          <div *ngFor="let property of data  | async | keyvalue">
+            <x-image-group *ngIf="property.key=='图像'">
+              <x-image *ngFor="let value of property.value;" width="200px" height="200px"
+                [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></x-image>
+            </x-image-group>
+          </div>
         </div>
       </div>
     </x-card>
@@ -68,15 +70,19 @@
 <x-row space="1">
   <x-col span="24">
     <div>
-      <x-card [header]="header2" *ngIf="statements">
+      <x-card [header]="header2">
         <ng-template #header2>
           <span>{{item?.labels?.zh?.value}}的音频</span>
         </ng-template>
-        <figure *ngFor="let value of statements['音频'];" width="100%">
-          <figcaption>点击播放音频:</figcaption>
-          <audio controls [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></audio>
-          <a [href]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"> 下载音频 </a>
-        </figure>
+        <div *ngFor="let property of data  | async | keyvalue">
+          <div *ngIf="property.key=='音频'">
+            <figure *ngFor="let value of property.value;" width="100%">
+              <figcaption>点击播放音频:</figcaption>
+              <audio controls [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></audio>
+              <a [href]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"> 下载音频 </a>
+            </figure>
+          </div>
+        </div>
       </x-card>
     </div>
   </x-col>
@@ -85,32 +91,39 @@
 <x-row space="1">
   <x-col span="24">
     <div>
-      <x-card [header]="header3" *ngIf="statements">
+      <x-card [header]="header3">
         <ng-template #header3>
           <span>{{item?.labels?.zh?.value}}的视频</span>
         </ng-template>
-        <video *ngFor="let value of statements['视频'];" width="100%" controls>
-          <source [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']" type="video/mp4" />
-          <p>
-            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-          </p>
-        </video>
+        <div *ngFor="let property of data  | async | keyvalue">
+          <div *ngIf="property.key=='视频'">
+            <video *ngFor="let value of property.value;" width="100%" controls>
+              <source [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']" type="video/mp4" />
+              <p>
+                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+              </p>
+            </video>
+          </div>
+        </div>
       </x-card>
     </div>
   </x-col>
 </x-row>
 <br>
 <x-row space="1">
-
   <x-col span="24">
-    <x-card [header]="header5" *ngIf="statements">
+    <x-card [header]="header5">
       <ng-template #header5>
         <span>{{item?.labels?.zh?.value}}的文件</span>
       </ng-template>
-      <iframe *ngFor="let value of statements['文件'];" id="inlineFrameExample" title="Inline Frame Example"
-        frameborder="0" width="100%" height="500"
-        [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+value['mainsnak']['datavalue']['value'])">
-      </iframe>
+      <div *ngFor="let property of data  | async | keyvalue">
+        <div *ngIf="property.key=='文件'">
+          <iframe *ngFor="let value of property.value;" id="inlineFrameExample" title="Inline Frame Example"
+            frameborder="0" width="100%" height="500"
+            [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+value['mainsnak']['datavalue']['value'])">
+          </iframe>
+        </div>
+      </div>
     </x-card>
   </x-col>
 </x-row>
@@ -123,5 +136,4 @@
       </ng-template>
     </x-card>
   </x-col>
-
 </x-row>

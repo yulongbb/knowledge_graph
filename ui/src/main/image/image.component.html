@@ -7,8 +7,10 @@
   </div>
   <div>
 
-    <x-button type="success" icon="fto-upload" (click)="action('upload')">入库</x-button>
 
+    <div class="row">
+      <x-radio [data]="layout" [(ngModel)]="model" icon (click)="changeLayout(model)"></x-radio>
+    </div>
   </div>
 
 </au-tool>
@@ -24,7 +26,23 @@
   <x-button icon="fto-search" (click)="search(keyword)"></x-button>
 </x-input-group>
 
-<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
+<x-container *ngIf="model=='卡片'">
+  <x-main><x-row>
+      <x-col *ngFor="let row of (data$ | async)['list'] " span="6">
+        <x-card [bodyStyle]="{height:'250px', display:'flex', 'justify-content':'center', 'align-items': 'center'}">
+          <x-image [src]="'http://localhost:9000/kgms/'+row['label'][0]"></x-image>
+        </x-card>
+      </x-col>
+    </x-row></x-main>
+  <x-footer>
+    <div class="row">
+      <x-pagination [index]="index" [size]="size" [total]="(data$ | async)['total']"></x-pagination>
+    </div>
+  </x-footer>
+</x-container>
+
+
+<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
   [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">

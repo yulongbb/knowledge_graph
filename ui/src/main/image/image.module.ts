@@ -13,6 +13,10 @@ import { XUploadModule } from '@ng-nest/ui/upload';
 import { XDescriptionModule } from '@ng-nest/ui/description';
 import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
+import { XRadioModule } from '@ng-nest/ui/radio';
+import { XPaginationModule } from '@ng-nest/ui/pagination';
+
+
 
 
 
@@ -36,7 +40,9 @@ import { ImageDetailComponent } from "./image-detail/image-detail.component";
     XPageHeaderModule,
     XStatisticModule,
     XImageModule,
-    ImageRoutesModule
+    XRadioModule,
+    ImageRoutesModule,
+    XPaginationModule
   ],
   declarations: [ImageComponent, ImageDetailComponent]
 })

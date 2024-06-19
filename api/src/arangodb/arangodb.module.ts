@@ -7,7 +7,7 @@ import { Database } from 'arangojs';
       provide: 'ARANGODB',
       useFactory: async () =>
         await new Database({
-          url: 'http://localhost:8529',
+          url: 'http://127.0.0.1:8529',
           databaseName: 'kgms',
           auth: { username: 'root', password: 'root' },
         }),
