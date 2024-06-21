@@ -1,161 +1,21 @@
-<x-page-header title="标题" subTitle="小标题" (backClick)="backClick()"> </x-page-header>
-
-
-
-<h3>{{ title }}</h3>
-<x-form *ngIf="type!='info'" #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":"
-  labelWidth="6rem" width="30rem" labelAlign="end" span="20" space="2"></x-form>
-<x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)">
-</x-upload>
-<div class="app-footer">
-  <x-buttons space="0.5">
-    <x-button (click)="action('cancel')">取消</x-button>
-    <x-button type="primary" (click)="!formInvalid && action('save')" [disabled]="formInvalid || disabled">保存</x-button>
-  </x-buttons>
-</div>
-
-<div *ngIf="type=='info'">
-  {{item|json}}
-
-  <!-- <h1>{{item?.labels?.zh?.value}}<small>({{item?.type?.label}})</small></h1>
-  <p>{{item?.descriptions?.zh?.value}}</p> -->
-
-  <img width="500" *ngIf="item?.type?.label=='图像'" [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']">
-
-  <video width="500" *ngIf="item?.type?.label=='视频'" controls>
-    <source [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']" type="video/mp4" />
-    <p>
-      你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-    </p>
-  </video>
-
-
-  <figure width="500" *ngIf="item?.type?.label=='音频'">
-    <figcaption>点击播放音频:</figcaption>
-    <audio controls [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']"></audio>
-    <a [href]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']"> 下载音频 </a>
-  </figure>
-
-  <iframe *ngIf="item?.type?.label=='PDF'" id="inlineFrameExample" title="Inline Frame Example" frameborder="0"
-    width="100%" height="1500"
-    [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+item['labels']['zh']['value'])">
-  </iframe>
-  <div *ngIf="item?.type?.label=='人类'">
-
-    <x-row space="1">
-      <x-col span="16">
-        <div class="row">
-          <x-card width="100%" class="card">
-            <div class="bottom">
-              <p>{{item?.labels?.zh?.value}}</p>
-              <div class="time">
-                <span>{{item?.descriptions?.zh?.value}}</span>
-                <span>{{item?.type?.label}}</span>
-              </div>
-            </div>
-          </x-card>
-        </div>
-
-      </x-col></x-row>
-
-    <x-row space="1">
-      <x-col span="16">
-        <div *ngFor="let property of data  | async | keyvalue">
-          <x-card
-            *ngIf="property.value.length>0&&property.key!='图像'&&property.key!='视频'&&property.key!='音频'&&property.key!='文件'">
-            <x-statistic *ngIf="property?.value[0]&&property?.value[0]['mainsnak']['datatype']=='string'"
-              [label]="property.key" [value]="property.value[0]['mainsnak']['datavalue']['value']">
-            </x-statistic>
-            <x-statistic *ngIf="property?.value[0]&&property?.value[0]['mainsnak']['datatype']=='wikibase-item'"
-              [label]="property.key" [value]="property.value[0]['mainsnak']['datavalue']['label']">
-            </x-statistic>
-          </x-card>
-        </div>
-      </x-col>
-    </x-row>
-    <x-row>
-      <x-col span="16">
-
-        <x-card [header]="header1" *ngIf="statements">
-          <div class="row scroll">
-            <div class="box">
-              <ng-template #header1>
-                <span>{{item?.labels?.zh?.value}}的图像</span>
-              </ng-template>
-              <x-image-group>
-                <x-image *ngFor="let value of statements['图像'];" width="200px" height="200px"
-                  [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></x-image>
-              </x-image-group>
-            </div>
+<x-row space="1">
+  <x-col span="24">
+    <div class="row">
+      <x-card width="100%" class="card">
+        <div class="bottom">
+          <h1>{{item?.labels?.zh?.value}}</h1>
+          <div class="time">
+            <span>{{item?.descriptions?.zh?.value}}</span>
+            <span>{{item?.type?.label}}</span>
           </div>
-        </x-card>
-      </x-col>
-    </x-row>
-    <x-row space="1">
-      <x-col span="16">
-        <div>
-          <x-card [header]="header2" *ngIf="statements">
-            <ng-template #header2>
-              <span>{{item?.labels?.zh?.value}}的音频</span>
-            </ng-template>
-            <figure *ngFor="let value of statements['音频'];" width="100%">
-              <figcaption>点击播放音频:</figcaption>
-              <audio controls [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"></audio>
-              <a [href]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']"> 下载音频 </a>
-            </figure>
-          </x-card>
         </div>
-      </x-col>
-    </x-row>
-    <x-row space="1">
-      <x-col span="16">
-        <div>
-          <x-card [header]="header3" *ngIf="statements">
-            <ng-template #header3>
-              <span>{{item?.labels?.zh?.value}}的视频</span>
-            </ng-template>
-            <video *ngFor="let value of statements['视频'];" width="100%" controls>
-              <source [src]="'http://localhost:9000/kgms/'+value['mainsnak']['datavalue']['value']" type="video/mp4" />
-              <p>
-                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-              </p>
-            </video>
-          </x-card>
-        </div>
-      </x-col>
-    </x-row>
-
-    <x-row space="1">
-
-      <x-col span="16">
-        <x-card [header]="header5" *ngIf="statements">
-          <ng-template #header5>
-            <span>{{item?.labels?.zh?.value}}的文件</span>
-          </ng-template>
-          <iframe *ngFor="let value of statements['文件'];" id="inlineFrameExample" title="Inline Frame Example"
-            frameborder="0" width="100%" height="500"
-            [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+value['mainsnak']['datavalue']['value'])">
-          </iframe>
-        </x-card>
-      </x-col>
-    </x-row>
-
-    <x-row space="1">
-      <x-col span="16">
-        <x-card [header]="header4">
-          <ng-template #header4>
-            <span>{{item?.labels?.zh?.value}}的评论</span>
-          </ng-template>
-        </x-card>
-      </x-col>
-
-    </x-row>
-
-    <div class="app-footer">
-      <x-buttons space="0.5">
-        <x-button (click)="action('cancel')">取消</x-button>
-        <x-button type="primary" (click)="!formInvalid && action('save')" [disabled]="formInvalid || disabled">保存
-        </x-button>
-      </x-buttons>
+      </x-card>
     </div>
-  </div>
+  </x-col>
+</x-row>
+<br>
+<x-row space="1">
+  <x-col span="24">
+    <img width="100%" [src]="'http://localhost:9000/kgms/'+item['labels']['zh']['value']">
+  </x-col>
+</x-row>

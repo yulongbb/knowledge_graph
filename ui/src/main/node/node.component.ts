@@ -29,6 +29,8 @@ export class NodeComponent extends PageBase {
 
   visible!: boolean;
 
+
+
   detail(row: XTableRow, column: XTableColumn) {
     console.log(row.id[0].split('/')[1]);
     this.id = row.id[0].split('/')[1];
@@ -59,7 +61,8 @@ export class NodeComponent extends PageBase {
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
-  model1: any;
+  model1: any = 'person';
+  data1 = ['person', 'PDF', 'image', 'audio', 'video',];
 
 
   constructor(
@@ -171,23 +174,19 @@ export class NodeComponent extends PageBase {
           });
         }
         break;
-      // case 'upload':
-      //   this.msgBox.confirm({
-      //     title: '提示',
-      //     content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
-      //     type: 'warning',
-      //     callback: (action: XMessageBoxAction) => {
-      //       action === 'confirm' && this.knowledgeService.get(this.model1).subscribe((knowledge: any) => {
-      //         console.log(this.checkedRows);
-      //         console.log(knowledge);
-      //         this.fusionService.knowledge(this.checkedRows, knowledge.description).subscribe(() => {
-      //           this.tableCom.change(this.index);
-      //           this.message.success('成功！');
-      //         });
-      //       })
-      //     },
-      //   });
-      //   break;
+      case 'upload':
+        this.msgBox.confirm({
+          title: '提示',
+          content: `此操作将：${this.checkedRows.length}条数据推送到知识库，是否继续？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            action === 'confirm' && this.fusionService.knowledge(this.checkedRows, 'PDF').subscribe(() => {
+              this.tableCom.change(this.index);
+              this.message.success('成功！');
+            });
+          },
+        });
+        break;
       case 'tree-info':
         // this.selected = item;
         // let filter = {

@@ -105,7 +105,7 @@ export class VideoComponent extends PageBase {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'video', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'video_entity', type: '视频', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -121,14 +121,12 @@ export class VideoComponent extends PageBase {
         });
         break;
       case 'info':
-        console.log(item);
         this.router.navigate(
           [`./${type}/${item.id.toString().split('/')[1]}`],
           {
             relativeTo: this.activatedRoute,
           }
-        ).then(() => {
-        });
+        );
         break;
       case 'edit':
         this.router.navigate(

@@ -1,30 +1,26 @@
+<!-- 搜索栏 -->
+<x-input-group compact>
+  <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
+  <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+</x-input-group>
+
+<!-- 工具栏 -->
 <au-tool>
-
-
   <div>
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
   </div>
   <div>
-
     <x-button type="success" icon="fto-upload" (click)="action('upload')">入库</x-button>
-
   </div>
-
 </au-tool>
 
 <ng-template #nodeTpl let-node="$node">
   <span class="select-item"> {{ node?.name }} </span>
 </ng-template>
 
-
-
-<x-input-group compact>
-  <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
-  <x-button icon="fto-search" (click)="search(keyword)"></x-button>
-</x-input-group>
-
-<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
+<!-- 表格栏 -->
+<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"  virtualScroll   [scroll]="{ x: 1500, y: 600 }" 
   [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
@@ -43,7 +39,6 @@
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">
   <div class="au-table-actions">
-
     <x-link icon="fto-eye" (click)="action('info', row)" title="查看"></x-link>
     <x-link icon="fto-edit" (click)="action('edit', row)" title="修改"></x-link>
     <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除"></x-link>

@@ -130,13 +130,6 @@ export class EntityDetailComponent implements OnInit {
       case 'info':
         this.nodeService.getItem(this.id).subscribe((x) => {
           this.item = x;
-       
-          // console.log(x)
-          // let item: any = {};
-          // item['id'] = x.id;
-          // item['label'] = x?.labels?.zh?.value;
-          // item['description'] = x?.descriptions?.zh?.value;
-          // this.form.formGroup.patchValue(item);
         });
         break;
       case 'edit':

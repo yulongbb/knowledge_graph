@@ -1,30 +1,27 @@
-<au-tool>
 
-
-  <div>
-    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
-    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
-  </div>
-  <div>
-
-
-    <div class="row">
-      <x-radio [data]="layout" [(ngModel)]="model" icon (click)="changeLayout(model)"></x-radio>
-    </div>
-  </div>
-
-</au-tool>
-
-<ng-template #nodeTpl let-node="$node">
-  <span class="select-item"> {{ node?.name }} </span>
-</ng-template>
-
-
+<!-- 搜索栏 -->
 
 <x-input-group compact>
   <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
   <x-button icon="fto-search" (click)="search(keyword)"></x-button>
 </x-input-group>
+
+<!-- 工具栏 -->
+<au-tool>
+  <div>
+    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+  </div>
+  <div>
+    <div class="row">
+      <x-radio [data]="layout" [(ngModel)]="model" icon (click)="changeLayout(model)"></x-radio>
+    </div>
+  </div>
+</au-tool>
+<ng-template #nodeTpl let-node="$node">
+  <span class="select-item"> {{ node?.name }} </span>
+</ng-template>
+
 
 <x-container *ngIf="model=='卡片'">
   <x-main><x-row>
@@ -42,7 +39,7 @@
 </x-container>
 
 
-<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
+<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll   [scroll]="{ x: 1500, y: 600 }"
   [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">

@@ -89,7 +89,6 @@ export class ImageDetailComponent implements OnInit {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
-      this.knowledge = x.get('knowledge') as string;
       this.type = x.get('type') as string;
       if (this.type === 'info') {
         this.title = '查看实体';
@@ -99,29 +98,12 @@ export class ImageDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      let query: any = {};
-      query.filter = [
-        {
-          field: 'id',
-          value: this.knowledge as string,
-          relation: 'knowledge',
-          operation: '=',
-        },
-      ];
+    
 
-      this.ontologyService
-        .getList(1, 20, query)
-        .subscribe((schema: any) => {
-         
-          this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).subscribe((x: any) => console.log(
-            this.statements = x)
-          );
-          this.data = this.nodeService.getLinks(1, 20, this.id, { schema: schema.list[0].id }).pipe(
-            tap((x: any) => console.log(x)),
-            map((x: any) => x)
-          );
-
-        });
+      this.data = this.nodeService.getLinks(1, 20, this.id, { schema: '9308-543f-3e77e2c85862' }).pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
 
     });
   }
