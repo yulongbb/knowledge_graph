@@ -1,4 +1,3 @@
-
 <!-- 搜索栏 -->
 
 <x-input-group compact>
@@ -9,14 +8,15 @@
 <!-- 工具栏 -->
 <au-tool>
   <div>
+    <div class="row">
+      <x-radio [data]="layout" [(ngModel)]="model" icon></x-radio>
+    </div>
+  </div>
+  <div>
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
   </div>
-  <div>
-    <div class="row">
-      <x-radio [data]="layout" [(ngModel)]="model" icon (click)="changeLayout(model)"></x-radio>
-    </div>
-  </div>
+
 </au-tool>
 <ng-template #nodeTpl let-node="$node">
   <span class="select-item"> {{ node?.name }} </span>
@@ -24,10 +24,20 @@
 
 
 <x-container *ngIf="model=='卡片'">
-  <x-main><x-row>
+  <x-main><x-row class="row">
       <x-col *ngFor="let row of (data$ | async)['list'] " span="6">
-        <x-card [bodyStyle]="{height:'250px', display:'flex', 'justify-content':'center', 'align-items': 'center'}">
-          <x-image [src]="'http://localhost:9000/kgms/'+row['label'][0]"></x-image>
+        <x-card class="card" [bodyStyle]="{height:'250px',padding: 0}">
+          <div style="height: 180px; overflow: hidden; display:flex; justify-content:center; align-items: center">
+            <x-image [src]="'http://localhost:9000/kgms/'+row['label'][0]"></x-image>
+          </div>
+          <div class="bottom">
+            <p>{{row['description'][0]}}</p>
+            <div class="time">
+              <x-button type="primary">查看</x-button>
+              <x-button type="info">编辑</x-button>
+              <x-button type="danger">删除</x-button>
+            </div>
+          </div>
         </x-card>
       </x-col>
     </x-row></x-main>
@@ -39,8 +49,8 @@
 </x-container>
 
 
-<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll   [scroll]="{ x: 1500, y: 600 }"
-  [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
+<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll
+  [scroll]="{ x: 1500, y: 600 }" [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>

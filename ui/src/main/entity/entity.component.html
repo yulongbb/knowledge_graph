@@ -6,7 +6,7 @@
 
 <au-tool>
   <div>
-    目标列表
+    <x-radio [data]="layout" [(ngModel)]="model" icon></x-radio>
   </div>
   <div>
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>

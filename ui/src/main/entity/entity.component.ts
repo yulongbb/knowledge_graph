@@ -6,10 +6,12 @@ import { tap, map, Observable } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
+  XData,
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
   XPosition,
+  XRadioNode,
 } from '@ng-nest/ui';
 import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
@@ -55,6 +57,13 @@ export class EntityComponent extends PageBase {
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model1: any;
+
+  layout: XData<XRadioNode> = [
+    { label: '列表', icon: 'fto-list' },
+    { label: '卡片', icon: 'fto-grid' },
+  ];
+  model = '列表'
+
 
   constructor(
     private service: EntityService,

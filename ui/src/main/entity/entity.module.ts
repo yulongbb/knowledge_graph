@@ -10,9 +10,9 @@ import { XTreeModule } from '@ng-nest/ui/tree';
 import { XInputModule } from '@ng-nest/ui/input';
 import { XDrawerModule, XPageHeaderModule } from "@ng-nest/ui";
 import { XUploadModule } from '@ng-nest/ui/upload';
-import { XDescriptionModule } from '@ng-nest/ui/description';
 import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
+import { XRadioModule } from '@ng-nest/ui/radio';
 
 
 
@@ -36,6 +36,7 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XPageHeaderModule,
     XStatisticModule,
     XImageModule,
+    XRadioModule,
     EntityRoutesModule
   ],
   declarations: [EntityComponent, EntityDetailComponent]

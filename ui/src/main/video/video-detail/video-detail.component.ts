@@ -109,19 +109,17 @@ export class VideoDetailComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.type);
     this.action(this.type);
-
-
   }
+
   uploadSuccess($event: any) {
     let item: any = {};
     item['label'] = $event.body.name;
     this.form.formGroup.patchValue(item);
     console.log('uploadSuccess', $event);
   }
+  
   trustUrl(url: string) {
-
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
   }
 
   action(type: string) {

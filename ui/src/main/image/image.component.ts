@@ -66,10 +66,6 @@ export class ImageComponent extends PageBase {
   ];
   model = '列表';
 
-  changeLayout(model: any) {
-    console.log(model);
-  }
-
 
   constructor(
     private service: ImageService,
