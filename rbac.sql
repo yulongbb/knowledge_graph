@@ -3,15 +3,15 @@
 
  Source Server         : mysql
  Source Server Type    : MySQL
- Source Server Version : 80027 (8.0.27)
+ Source Server Version : 80027
  Source Host           : localhost:3306
  Source Schema         : rbac
 
  Target Server Type    : MySQL
- Target Server Version : 80027 (8.0.27)
+ Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 21/05/2024 18:56:28
+ Date: 06/07/2024 16:46:51
 */
 
 SET NAMES utf8mb4;
@@ -25,22 +25,18 @@ CREATE TABLE `design_col`  (
   `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `sort` int NOT NULL,
+  `sort` int(0) NOT NULL,
   `type` json NULL,
-  `length` int NULL DEFAULT NULL,
-  `primary` tinyint NULL DEFAULT NULL,
-  `nullable` tinyint NULL DEFAULT NULL,
-  `unique` tinyint NULL DEFAULT NULL,
+  `length` int(0) NULL DEFAULT NULL,
+  `primary` tinyint(0) NULL DEFAULT NULL,
+  `nullable` tinyint(0) NULL DEFAULT NULL,
+  `unique` tinyint(0) NULL DEFAULT NULL,
   `default` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `tableId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_9d68aa9c91c3eafeb94eeb2c0e5`(`tableId` ASC) USING BTREE,
+  INDEX `FK_9d68aa9c91c3eafeb94eeb2c0e5`(`tableId`) USING BTREE,
   CONSTRAINT `FK_9d68aa9c91c3eafeb94eeb2c0e5` FOREIGN KEY (`tableId`) REFERENCES `design_table` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of design_col
--- ----------------------------
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_control
@@ -51,24 +47,20 @@ CREATE TABLE `design_control`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `required` tinyint NULL DEFAULT NULL,
-  `disabled` tinyint NULL DEFAULT NULL,
-  `readonly` tinyint NULL DEFAULT NULL,
-  `hide` tinyint NULL DEFAULT NULL,
-  `primary` tinyint NOT NULL,
-  `sort` int NOT NULL,
+  `required` tinyint(0) NULL DEFAULT NULL,
+  `disabled` tinyint(0) NULL DEFAULT NULL,
+  `readonly` tinyint(0) NULL DEFAULT NULL,
+  `hide` tinyint(0) NULL DEFAULT NULL,
+  `primary` tinyint(0) NOT NULL,
+  `sort` int(0) NOT NULL,
   `col` json NULL,
   `type` json NOT NULL,
   `group` json NULL,
   `pageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_e47b37df862d74e39d54d17acc3`(`pageId` ASC) USING BTREE,
+  INDEX `FK_e47b37df862d74e39d54d17acc3`(`pageId`) USING BTREE,
   CONSTRAINT `FK_e47b37df862d74e39d54d17acc3` FOREIGN KEY (`pageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of design_control
--- ----------------------------
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_module
@@ -83,7 +75,7 @@ CREATE TABLE `design_module`  (
   `createTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `updateTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of design_module
@@ -107,13 +99,9 @@ CREATE TABLE `design_page`  (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `moduleId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_ba2c0903999794b6aa84886cf10`(`moduleId` ASC) USING BTREE,
+  INDEX `FK_ba2c0903999794b6aa84886cf10`(`moduleId`) USING BTREE,
   CONSTRAINT `FK_ba2c0903999794b6aa84886cf10` FOREIGN KEY (`moduleId`) REFERENCES `design_module` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of design_page
--- ----------------------------
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_page_relation
@@ -123,15 +111,11 @@ CREATE TABLE `design_page_relation`  (
   `fromPageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `toPageId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`fromPageId`, `toPageId`) USING BTREE,
-  INDEX `IDX_a4e7fb1fab5198f676d18d2ee9`(`fromPageId` ASC) USING BTREE,
-  INDEX `IDX_14d9d88c1d57c4f6b685ae33c5`(`toPageId` ASC) USING BTREE,
+  INDEX `IDX_a4e7fb1fab5198f676d18d2ee9`(`fromPageId`) USING BTREE,
+  INDEX `IDX_14d9d88c1d57c4f6b685ae33c5`(`toPageId`) USING BTREE,
   CONSTRAINT `FK_14d9d88c1d57c4f6b685ae33c54` FOREIGN KEY (`toPageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_a4e7fb1fab5198f676d18d2ee9f` FOREIGN KEY (`fromPageId`) REFERENCES `design_page` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of design_page_relation
--- ----------------------------
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_table
@@ -145,13 +129,9 @@ CREATE TABLE `design_table`  (
   `transform` json NULL,
   `moduleId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_8fa8f94fa5cf732303e33f1d7d1`(`moduleId` ASC) USING BTREE,
+  INDEX `FK_8fa8f94fa5cf732303e33f1d7d1`(`moduleId`) USING BTREE,
   CONSTRAINT `FK_8fa8f94fa5cf732303e33f1d7d1` FOREIGN KEY (`moduleId`) REFERENCES `design_module` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of design_table
--- ----------------------------
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for extraction
@@ -163,29 +143,7 @@ CREATE TABLE `extraction`  (
   `property` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `object` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of extraction
--- ----------------------------
-INSERT INTO `extraction` VALUES ('046a9d3d-cd80-ce85-3899-fb73729be468', '约瑟夫·拜登', '职业', '律师');
-INSERT INTO `extraction` VALUES ('0af1a757-e599-9708-99b3-589838360703', '约瑟夫·拜登', '性别', '男');
-INSERT INTO `extraction` VALUES ('1675f341-892c-e3dc-01d2-8c455f788dd2', '约瑟夫·拜登', '教育背景', '特拉华大学');
-INSERT INTO `extraction` VALUES ('226ddf15-47aa-ee26-3edf-a162ec9db495', '约瑟夫·拜登', '出生日期', '1942年11月20日');
-INSERT INTO `extraction` VALUES ('2ef9a525-0da0-5d78-b3a7-e31a9d1caef9', '约瑟夫·拜登', '民族', '爱尔兰人');
-INSERT INTO `extraction` VALUES ('38cd5ac6-16a3-6bfd-593c-f833c21e7f12', '约瑟夫·拜登', '孩子', '约瑟夫·罗比内特·拜登');
-INSERT INTO `extraction` VALUES ('3bfbd13b-f12c-8fde-96ee-990342d7eaaf', '约瑟夫·拜登', '配偶', '吉尔·拜登');
-INSERT INTO `extraction` VALUES ('41b4433c-872a-622a-7c7c-7b7975570993', '约瑟夫·拜登', '图像', '489b6df1e22ce2ab7177200e760567c8.png');
-INSERT INTO `extraction` VALUES ('4ae4a47c-4b73-df9e-677a-8d4faa659e6c', '美国国防部', '领导者', '劳埃德·奥斯汀');
-INSERT INTO `extraction` VALUES ('50d2bd75-18a1-06fb-383c-4bd07972ca11', '约瑟夫·拜登', '出生地', '斯克兰顿');
-INSERT INTO `extraction` VALUES ('57ff1940-222e-b4e7-c926-24c014e97f5e', '约瑟夫·拜登', '国籍', '美国');
-INSERT INTO `extraction` VALUES ('5d8f482b-20c2-5312-687d-9d564bf0b24b', '约瑟夫·拜登', '职业', '政治家');
-INSERT INTO `extraction` VALUES ('6edc77fa-c1db-162e-2ddc-098241c4b7b8', '快乐储存所', '说', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈丑到自带表情');
-INSERT INTO `extraction` VALUES ('914f0a01-3ffa-e007-b6cb-32e592d4f19c', '约瑟夫·拜登', '党派	', '美国民主党');
-INSERT INTO `extraction` VALUES ('cc0a0717-a302-68f7-f038-2dca697216a5', '我今晚的目的既是为了唤醒国会，也', '发言人', '约瑟夫·拜登');
-INSERT INTO `extraction` VALUES ('e932689f-2a89-0f30-bb4e-562e8618e42d', '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈', '发言人', '快乐储存所');
-INSERT INTO `extraction` VALUES ('f6fdd0fc-3f94-d0d0-0e49-c17191568d66', '约瑟夫·拜登', '职务', '就任美国第46任总统');
-INSERT INTO `extraction` VALUES ('ff1c7fa7-c3e2-7c77-9194-7dd043925942', '约瑟夫·拜登', '教育背景', '雪城大学');
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for knowledge
@@ -196,13 +154,13 @@ CREATE TABLE `knowledge`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of knowledge
 -- ----------------------------
-INSERT INTO `knowledge` VALUES ('1a1c3603-bc88-dc4d-f385-b4c25bf0514f', '图像', '图像');
-INSERT INTO `knowledge` VALUES ('2aea9958-e418-6a6e-ecdd-4e96380ea773', '人物', '人物库');
+INSERT INTO `knowledge` VALUES ('1a1c3603-bc88-dc4d-f385-b4c25bf0514f', '图像', 'image');
+INSERT INTO `knowledge` VALUES ('2aea9958-e418-6a6e-ecdd-4e96380ea773', '人物', 'person');
 INSERT INTO `knowledge` VALUES ('2d3a3ff2-b5ec-41df-6c85-3fc880b866d3', '视频', '视频');
 INSERT INTO `knowledge` VALUES ('b6b8b913-cd11-2cf0-e10d-09896bd9a94e', '评论', '评论');
 INSERT INTO `knowledge` VALUES ('cb9497b1-281d-4a1d-664d-f66934b3efea', '组织', '组织');
@@ -214,19 +172,19 @@ INSERT INTO `knowledge` VALUES ('ffc3ad15-cfbe-2b28-09dc-d8a4ac0ac655', '音频'
 -- ----------------------------
 DROP TABLE IF EXISTS `ontology_property`;
 CREATE TABLE `ontology_property`  (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(0) NOT NULL AUTO_INCREMENT,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `enName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `enDescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9212 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 9211 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_property
 -- ----------------------------
 INSERT INTO `ontology_property` VALUES (6, '村镇、城市、直辖区、国家或其他行政区域的最高管治者', 'head of government', 'head of the executive power of this town, city, municipality, state, country, or other governmental body', '政府首长');
-INSERT INTO `ontology_property` VALUES (10, NULL, 'video', 'relevant video. For images, use the property P18. For film trailers, qualify with \"object has role\" (P3831)=\"trailer\" (Q622550)', '视频');
+INSERT INTO `ontology_property` VALUES (10, '视频', 'video', 'relevant video. For images, use the property P18. For film trailers, qualify with \"object has role\" (P3831)=\"trailer\" (Q622550)', '视频');
 INSERT INTO `ontology_property` VALUES (14, NULL, 'traffic sign', 'graphic symbol describing the item, used at the side of or above roads to give instructions or provide information to road users', '交通标识');
 INSERT INTO `ontology_property` VALUES (15, NULL, 'route map', 'image of route map at Wikimedia Commons', NULL);
 INSERT INTO `ontology_property` VALUES (16, NULL, 'highway system', 'system (or specific country specific road type) of which the highway is a part', NULL);
@@ -250,7 +208,7 @@ INSERT INTO `ontology_property` VALUES (40, '孩子', 'child', 'subject has obje
 INSERT INTO `ontology_property` VALUES (41, NULL, 'flag image', 'image of the item\'s flag', '旗帜图像');
 INSERT INTO `ontology_property` VALUES (47, '国家或同等级行政区属在陆地或海洋上相邻的项目', 'shares border with', 'countries or administrative subdivisions, of equal level, that this item borders, either by land or water. A single common point is enough.', '接壤');
 INSERT INTO `ontology_property` VALUES (50, '书面作品的主要创作者', 'author', 'main creator(s) of a written work (use on works, not humans); use P2093 when Wikidata item is unknown or does not exist', '作者');
-INSERT INTO `ontology_property` VALUES (51, NULL, 'audio', 'relevant sound. If available, use a more specific property. Samples: \"spoken text audio\" (P989), \"pronunciation audio\" (P443)', '音频');
+INSERT INTO `ontology_property` VALUES (51, '音频', 'audio', 'relevant sound. If available, use a more specific property. Samples: \"spoken text audio\" (P989), \"pronunciation audio\" (P443)', '音频');
 INSERT INTO `ontology_property` VALUES (53, NULL, 'family', 'family, including dynasty and nobility houses. Not family name (use P734 for family name).', NULL);
 INSERT INTO `ontology_property` VALUES (54, NULL, 'member of sports team', 'sports teams or clubs that the subject currently represents or formerly represented', '所属运动队');
 INSERT INTO `ontology_property` VALUES (57, '电影、戏剧、游戏，等作品的导演', 'director', 'director(s) of film, TV-series, stageplay, video game or similar', '导演');
@@ -960,7 +918,7 @@ INSERT INTO `ontology_property` VALUES (991, NULL, 'successful candidate', 'pers
 INSERT INTO `ontology_property` VALUES (993, NULL, 'NFPA Health', 'NFPA rating for a chemical\'s hazard to health (blue quadrant in fire diamond)', NULL);
 INSERT INTO `ontology_property` VALUES (994, NULL, 'NFPA Fire', 'NFPA rating for a chemical\'s flammability (red quadrant in fire diamond)', NULL);
 INSERT INTO `ontology_property` VALUES (995, NULL, 'NFPA Instability', 'NFPA rating for chemical or physical reactivity (yellow quadrant in fire diamond)', NULL);
-INSERT INTO `ontology_property` VALUES (996, NULL, 'document file on Wikimedia Commons', 'file on Wikimedia Commons related to the content of the source/book/report', '维基共享资源上的扫描文件');
+INSERT INTO `ontology_property` VALUES (996, '文件', 'document file on Wikimedia Commons', 'file on Wikimedia Commons related to the content of the source/book/report', '文件');
 INSERT INTO `ontology_property` VALUES (998, NULL, 'Curlie ID', 'category path at Open Directory Project', NULL);
 INSERT INTO `ontology_property` VALUES (999, NULL, 'ARICNS', 'identifier for stars in ARICNS', NULL);
 INSERT INTO `ontology_property` VALUES (1000, '某实体所取得的纪录', 'record held', 'notable record achieved by a person or entity, include qualifiers for dates held', '纪录');
@@ -8740,28 +8698,140 @@ CREATE TABLE `ontology_schema`  (
   `knowledgeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `collection` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_16cf37d5711e15bdc49419b6227`(`parentId` ASC) USING BTREE,
-  INDEX `FK_dfb2d7bb9308b42b266e971a43d`(`knowledgeId` ASC) USING BTREE,
+  INDEX `FK_16cf37d5711e15bdc49419b6227`(`parentId`) USING BTREE,
+  INDEX `FK_dfb2d7bb9308b42b266e971a43d`(`knowledgeId`) USING BTREE,
   CONSTRAINT `FK_16cf37d5711e15bdc49419b6227` FOREIGN KEY (`parentId`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_dfb2d7bb9308b42b266e971a43d` FOREIGN KEY (`knowledgeId`) REFERENCES `knowledge` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_schema
 -- ----------------------------
+INSERT INTO `ontology_schema` VALUES ('00f8541c-1874-d94a-7669-8b35fb94ce1b', '游泳运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b', '游泳运动员', NULL, '游泳运动员');
+INSERT INTO `ontology_schema` VALUES ('037eb47f-666f-7835-38e7-b08e21e2af72', '曲棍球球员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72', '曲棍球球员', NULL, '曲棍球球员');
+INSERT INTO `ontology_schema` VALUES ('04ef6197-746a-51bf-e1f6-59eb5205d259', '政治人物', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259', '政治人物', NULL, '政治人物');
+INSERT INTO `ontology_schema` VALUES ('074b3183-c078-1760-71c5-becb2c10d02e', '体育', NULL, NULL, NULL, 'e541152a-e57d-4794-f1af-711c306237a3', '074b3183-c078-1760-71c5-becb2c10d02e', '体育', NULL, '体育');
+INSERT INTO `ontology_schema` VALUES ('0ae1818b-eddd-dc6b-d887-b938b7563048', '摩托车骑手', NULL, NULL, NULL, '13734311-dc07-293d-615f-fdd34e425cff', '0ae1818b-eddd-dc6b-d887-b938b7563048', '摩托车骑手', NULL, '摩托车骑手');
+INSERT INTO `ontology_schema` VALUES ('0f55fb97-0974-d62d-4250-cac47dc087ac', '贩卖', NULL, NULL, NULL, 'e541152a-e57d-4794-f1af-711c306237a3', '074b3183-c078-1760-71c5-becb2c10d02e.0f55fb97-0974-d62d-4250-cac47dc087ac', '贩卖', NULL, '贩卖');
 INSERT INTO `ontology_schema` VALUES ('1263954c-39b2-2d49-1fd6-3b657c0f6880', '事件', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('13734311-dc07-293d-615f-fdd34e425cff', '赛车选手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.13734311-dc07-293d-615f-fdd34e425cff', '赛车选手', NULL, '赛车选手');
+INSERT INTO `ontology_schema` VALUES ('17ed4b12-d147-7b92-d661-c5abfbe7174e', '花样滑冰运动员', NULL, NULL, NULL, '6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '754fb204-bb75-1fe7-9140-30233d383a06.17ed4b12-d147-7b92-d661-c5abfbe7174e', '花样滑冰运动员', NULL, '花样滑冰运动员');
+INSERT INTO `ontology_schema` VALUES ('18ed1513-d980-e4c5-2841-38d93975593b', '赛马骑师', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b', '赛马骑师', NULL, '赛马骑师');
+INSERT INTO `ontology_schema` VALUES ('191309f2-ec37-1eb8-bccf-6b2b7a3b9709', '冰壶运动员', NULL, NULL, NULL, '6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '754fb204-bb75-1fe7-9140-30233d383a06.17ed4b12-d147-7b92-d661-c5abfbe7174e.191309f2-ec37-1eb8-bccf-6b2b7a3b9709', '冰壶运动员', NULL, '冰壶运动员');
+INSERT INTO `ontology_schema` VALUES ('1c940838-edf6-ce9c-ac53-3a624e5a96a8', '古典音乐艺术家', NULL, NULL, NULL, '327e4989-3fa4-146a-19b0-4aa9ebc4681c', '46067855-07a3-e2d1-4ddd-a2df0396df2c.1c940838-edf6-ce9c-ac53-3a624e5a96a8', '古典音乐艺术家', NULL, '古典音乐艺术家');
+INSERT INTO `ontology_schema` VALUES ('1d4db7ea-faa1-1d17-7739-ca53428786f2', '新闻工作者', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.1d4db7ea-faa1-1d17-7739-ca53428786f2', '新闻工作者', NULL, '新闻工作者');
+INSERT INTO `ontology_schema` VALUES ('1d7f6374-4ec8-0256-2871-bfb119d5f4d4', '业余拳击手', NULL, NULL, NULL, 'dd979162-f405-d834-9bcb-4554aa0dd342', '1d7f6374-4ec8-0256-2871-bfb119d5f4d4', '业余拳击手', NULL, '业余拳击手');
+INSERT INTO `ontology_schema` VALUES ('1d8fe402-e188-f494-4eb8-9ae57ea63fa9', '澳式足球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.1d8fe402-e188-f494-4eb8-9ae57ea63fa9', '澳式足球运动员', NULL, '澳式足球运动员');
+INSERT INTO `ontology_schema` VALUES ('1e841801-3779-6bb6-1cd6-b1bc136495a5', '橄榄球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.1e841801-3779-6bb6-1cd6-b1bc136495a5', '橄榄球运动员', NULL, '橄榄球运动员');
+INSERT INTO `ontology_schema` VALUES ('201709de-f774-81f1-e3a2-0df5b631b69c', '武术运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.201709de-f774-81f1-e3a2-0df5b631b69c', '武术运动员', NULL, '武术运动员');
+INSERT INTO `ontology_schema` VALUES ('21b09cab-e67c-aee2-31d8-3e8524156d74', '壁球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.21b09cab-e67c-aee2-31d8-3e8524156d74', '壁球运动员', NULL, '壁球运动员');
+INSERT INTO `ontology_schema` VALUES ('22217481-4a1f-6f8a-deba-6ce05aa9b3f2', '红衣主教', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2', '红衣主教', NULL, '红衣主教');
+INSERT INTO `ontology_schema` VALUES ('257aa816-2a6e-1acc-4a01-46e7c671bf2b', '篮球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.257aa816-2a6e-1acc-4a01-46e7c671bf2b', '篮球运动员', NULL, '篮球运动员');
+INSERT INTO `ontology_schema` VALUES ('27a6fbb3-0ca6-c984-0d23-10b4316fdfd5', '美式足球运动员', NULL, NULL, NULL, '2f4719d7-57c7-0738-967c-82fb3517e8ea', '27a6fbb3-0ca6-c984-0d23-10b4316fdfd5', '美式足球运动员', NULL, '美式足球运动员');
+INSERT INTO `ontology_schema` VALUES ('29ff9895-2ec4-8058-c809-122246dc025b', '众议员', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.29ff9895-2ec4-8058-c809-122246dc025b', '众议员', NULL, '众议员');
+INSERT INTO `ontology_schema` VALUES ('2bd4644f-445e-8cdd-454c-13a206a6d414', '准男爵', NULL, NULL, NULL, 'b36ee04b-c02e-0597-3959-454dbd4d4c15', '2bd4644f-445e-8cdd-454c-13a206a6d414', '准男爵', NULL, '准男爵');
+INSERT INTO `ontology_schema` VALUES ('2f4719d7-57c7-0738-967c-82fb3517e8ea', '欧式橄榄球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.2f4719d7-57c7-0738-967c-82fb3517e8ea', '欧式橄榄球运动员', NULL, '欧式橄榄球运动员');
+INSERT INTO `ontology_schema` VALUES ('2f76cd02-d0b4-6da7-c591-29a0b295c7ea', '经济学家', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.2f76cd02-d0b4-6da7-c591-29a0b295c7ea', '经济学家', NULL, '经济学家');
+INSERT INTO `ontology_schema` VALUES ('3022a539-dab7-f199-48d7-426f5fb59bfc', '排球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.3022a539-dab7-f199-48d7-426f5fb59bfc', '排球运动员', NULL, '排球运动员');
+INSERT INTO `ontology_schema` VALUES ('304075db-b020-4169-c39f-33e547f447fc', '作家', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc', '作家', NULL, '作家');
+INSERT INTO `ontology_schema` VALUES ('327e4989-3fa4-146a-19b0-4aa9ebc4681c', '音乐家', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27.327e4989-3fa4-146a-19b0-4aa9ebc4681c', '音乐家', NULL, '音乐家');
+INSERT INTO `ontology_schema` VALUES ('337fbc49-d54b-32d9-0a4f-61bfbba891f9', '时装设计师', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27.327e4989-3fa4-146a-19b0-4aa9ebc4681c.337fbc49-d54b-32d9-0a4f-61bfbba891f9', '时装设计师', NULL, '时装设计师');
+INSERT INTO `ontology_schema` VALUES ('3485ad5b-7f43-06e5-fd1d-138713c3cc5a', '编剧', NULL, NULL, NULL, '304075db-b020-4169-c39f-33e547f447fc', '3485ad5b-7f43-06e5-fd1d-138713c3cc5a', '编剧', NULL, '编剧');
 INSERT INTO `ontology_schema` VALUES ('35b7855a-0b3a-fba8-2771-daa305523feb', '音频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb', '音频', 'ffc3ad15-cfbe-2b28-09dc-d8a4ac0ac655', 'audio');
+INSERT INTO `ontology_schema` VALUES ('36e2201d-3b9e-3c0c-0643-41f231aa69b2', '羽毛球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.36e2201d-3b9e-3c0c-0643-41f231aa69b2', '羽毛球运动员', NULL, '羽毛球运动员');
+INSERT INTO `ontology_schema` VALUES ('37ec208a-57a3-7903-c265-d3363d3c1f27', '漫画家', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27', '漫画家', NULL, '漫画家');
+INSERT INTO `ontology_schema` VALUES ('3dda890b-7d40-4a71-a7c7-5c8bcdf44a52', '一级方程式赛车手', NULL, NULL, NULL, 'f9354c8f-139d-af37-512e-fabbc17de198', '3dda890b-7d40-4a71-a7c7-5c8bcdf44a52', '一级方程式赛车手', NULL, '一级方程式赛车手');
 INSERT INTO `ontology_schema` VALUES ('3f188f95-90ff-cddf-c858-3bc760193242', '医药和健康', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.3f188f95-90ff-cddf-c858-3bc760193242', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('46067855-07a3-e2d1-4ddd-a2df0396df2c', '乐器演奏者', NULL, NULL, NULL, '327e4989-3fa4-146a-19b0-4aa9ebc4681c', '46067855-07a3-e2d1-4ddd-a2df0396df2c', '乐器演奏者', NULL, '乐器演奏者');
+INSERT INTO `ontology_schema` VALUES ('4fdb4710-fdba-bf1f-4a81-17b06559e19d', '电视主持', NULL, NULL, NULL, '72163c51-4cd1-b475-a519-c1e2ae9f790d', '4fdb4710-fdba-bf1f-4a81-17b06559e19d', '电视主持', NULL, '电视主持');
+INSERT INTO `ontology_schema` VALUES ('4ff92b6d-7368-d3b2-921f-938a47a9e495', '实业家', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495', '实业家', NULL, '实业家');
+INSERT INTO `ontology_schema` VALUES ('51eda17d-2477-df18-15f9-7d35bcf546f2', '斯诺克冠军', NULL, NULL, NULL, 'ed84b475-5740-171e-42e1-8db5e66ac9e5', '51eda17d-2477-df18-15f9-7d35bcf546f2', '斯诺克冠军', NULL, '斯诺克冠军');
+INSERT INTO `ontology_schema` VALUES ('5542257c-a376-148d-260a-cf66028d4194', '游戏', NULL, NULL, NULL, 'e541152a-e57d-4794-f1af-711c306237a3', '074b3183-c078-1760-71c5-becb2c10d02e.5542257c-a376-148d-260a-cf66028d4194', '游戏', NULL, '游戏');
+INSERT INTO `ontology_schema` VALUES ('561f401e-b1b9-d958-45c5-816692d436c3', '总统', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3', '总统', NULL, '总统');
+INSERT INTO `ontology_schema` VALUES ('56ad423f-dc9a-53bd-b41c-2cfbf264d9e5', '军人', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5', '军人', NULL, '军人');
+INSERT INTO `ontology_schema` VALUES ('56fd527c-577a-f63f-192b-09fc034db522', '独木舟运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.56fd527c-577a-f63f-192b-09fc034db522', '独木舟运动员', NULL, '独木舟运动员');
+INSERT INTO `ontology_schema` VALUES ('5862ef0b-157f-8f21-1339-8a08b12b4606', '画家', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606', '画家', NULL, '画家');
+INSERT INTO `ontology_schema` VALUES ('5a8fdcd8-61c1-d088-dea3-f8b7477152f8', '牧师', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2.5a8fdcd8-61c1-d088-dea3-f8b7477152f8', '牧师', NULL, '牧师');
+INSERT INTO `ontology_schema` VALUES ('5dd9860d-7931-aa68-8f73-7b52891a5e33', '摔跤手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.5dd9860d-7931-aa68-8f73-7b52891a5e33', '摔跤手', NULL, '摔跤手');
+INSERT INTO `ontology_schema` VALUES ('5fa4a4d7-d2e9-28fc-baa8-1af6baa7db28', '滑冰运动员', NULL, NULL, NULL, '6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '754fb204-bb75-1fe7-9140-30233d383a06.17ed4b12-d147-7b92-d661-c5abfbe7174e.5fa4a4d7-d2e9-28fc-baa8-1af6baa7db28', '滑冰运动员', NULL, '滑冰运动员');
+INSERT INTO `ontology_schema` VALUES ('618849bb-6ce0-8472-288c-8fbef0cf9107', '大使', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.618849bb-6ce0-8472-288c-8fbef0cf9107', '大使', NULL, '大使');
+INSERT INTO `ontology_schema` VALUES ('6214ba0b-4aa6-fa82-00f0-b00550c39d71', '大主教', NULL, NULL, NULL, '8d680d71-9319-45e5-9fbe-9f1e2750fd59', '6214ba0b-4aa6-fa82-00f0-b00550c39d71', '大主教', NULL, '大主教');
+INSERT INTO `ontology_schema` VALUES ('62b835ae-915d-4e4f-b431-dee5974284ef', '骑手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.62b835ae-915d-4e4f-b431-dee5974284ef', '骑手', NULL, '骑手');
+INSERT INTO `ontology_schema` VALUES ('6324407c-14b0-4e0c-5766-6d94e3f83447', '体操运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.6324407c-14b0-4e0c-5766-6d94e3f83447', '体操运动员', NULL, '体操运动员');
+INSERT INTO `ontology_schema` VALUES ('63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '艺术家', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '艺术家', NULL, '艺术家');
+INSERT INTO `ontology_schema` VALUES ('652166aa-6b02-df37-cd4a-98120506cb51', '配音员', NULL, NULL, NULL, 'a89ef245-81f5-1504-f2f0-f821822c4da4', 'eb80da1d-b364-a732-ab5c-ce17bd016229.652166aa-6b02-df37-cd4a-98120506cb51', '配音员', NULL, '配音员');
+INSERT INTO `ontology_schema` VALUES ('6523f7c5-6bee-d0b0-f7ea-00a6c68f8ada', '模特儿', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.6523f7c5-6bee-d0b0-f7ea-00a6c68f8ada', '模特儿', NULL, '模特儿');
+INSERT INTO `ontology_schema` VALUES ('6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '冬季运动选手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '冬季运动选手', NULL, '冬季运动选手');
+INSERT INTO `ontology_schema` VALUES ('6ba3712b-7260-636c-eced-29effe4bc9a7', '扑克玩家', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.6ba3712b-7260-636c-eced-29effe4bc9a7', '扑克玩家', NULL, '扑克玩家');
+INSERT INTO `ontology_schema` VALUES ('6e347ac1-3611-67ad-33c7-ca4d6133b690', '手球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690', '手球运动员', NULL, '手球运动员');
+INSERT INTO `ontology_schema` VALUES ('72163c51-4cd1-b475-a519-c1e2ae9f790d', '主持人', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.72163c51-4cd1-b475-a519-c1e2ae9f790d', '主持人', NULL, '主持人');
+INSERT INTO `ontology_schema` VALUES ('7513e56f-681c-9e5f-19e8-c83d94d690d3', '滑雪运动员', NULL, NULL, NULL, '6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '754fb204-bb75-1fe7-9140-30233d383a06.17ed4b12-d147-7b92-d661-c5abfbe7174e.7513e56f-681c-9e5f-19e8-c83d94d690d3', '滑雪运动员', NULL, '滑雪运动员');
+INSERT INTO `ontology_schema` VALUES ('754fb204-bb75-1fe7-9140-30233d383a06', '冰球运动员', NULL, NULL, NULL, '6ad3a1f0-a43a-5fdd-03a9-da28c08e48fd', '754fb204-bb75-1fe7-9140-30233d383a06', '冰球运动员', NULL, '冰球运动员');
 INSERT INTO `ontology_schema` VALUES ('76706ce5-298f-5144-802a-7c0306be49f9', '视频', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9', '视频', '2d3a3ff2-b5ec-41df-6c85-3fc880b866d3', 'video');
+INSERT INTO `ontology_schema` VALUES ('76ae8c04-e942-340e-c8c1-e39dd94dd82f', '诗人', NULL, NULL, NULL, '304075db-b020-4169-c39f-33e547f447fc', '3485ad5b-7f43-06e5-fd1d-138713c3cc5a.76ae8c04-e942-340e-c8c1-e39dd94dd82f', '诗人', NULL, '诗人');
+INSERT INTO `ontology_schema` VALUES ('784870ab-8218-53b3-bb6b-1dde334cec6f', '历史学家', NULL, NULL, NULL, '304075db-b020-4169-c39f-33e547f447fc', '3485ad5b-7f43-06e5-fd1d-138713c3cc5a.784870ab-8218-53b3-bb6b-1dde334cec6f', '历史学家', NULL, '历史学家');
 INSERT INTO `ontology_schema` VALUES ('79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44', '组织', 'cb9497b1-281d-4a1d-664d-f66934b3efea', 'organization');
+INSERT INTO `ontology_schema` VALUES ('7a20eb41-1230-d9dd-1fa4-ef8fefeb3be5', '落网球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.7a20eb41-1230-d9dd-1fa4-ef8fefeb3be5', '落网球运动员', NULL, '落网球运动员');
+INSERT INTO `ontology_schema` VALUES ('7badc317-42fd-4d54-7637-f8f10a81e630', '省长', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.7badc317-42fd-4d54-7637-f8f10a81e630', '省长', NULL, '省长');
+INSERT INTO `ontology_schema` VALUES ('7be22ba1-86f7-78b4-a32c-b33915466741', '教练', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.7be22ba1-86f7-78b4-a32c-b33915466741', '教练', NULL, '教练');
 INSERT INTO `ontology_schema` VALUES ('7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.7e60636c-c3ce-9308-543f-3e77e2c85862', '图像', '1a1c3603-bc88-dc4d-f385-b4c25bf0514f', 'image');
+INSERT INTO `ontology_schema` VALUES ('7e6d38e3-2823-a006-eabd-70cb32f55f8e', '美国纳斯卡赛车选手', NULL, NULL, NULL, 'f9354c8f-139d-af37-512e-fabbc17de198', '3dda890b-7d40-4a71-a7c7-5c8bcdf44a52.7e6d38e3-2823-a006-eabd-70cb32f55f8e', '美国纳斯卡赛车选手', NULL, '美国纳斯卡赛车选手');
+INSERT INTO `ontology_schema` VALUES ('807e1b06-33be-a645-d95a-4b23db2ecca0', '桨手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.807e1b06-33be-a645-d95a-4b23db2ecca0', '桨手', NULL, '桨手');
+INSERT INTO `ontology_schema` VALUES ('81fe8c1a-74fc-a441-9804-06cbc01cf8b9', '自行车运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.81fe8c1a-74fc-a441-9804-06cbc01cf8b9', '自行车运动员', NULL, '自行车运动员');
+INSERT INTO `ontology_schema` VALUES ('837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '神职人员', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '神职人员', NULL, '神职人员');
+INSERT INTO `ontology_schema` VALUES ('84a22adc-1e7a-7f5e-d814-8c49cba3e5f6', '国际象棋棋手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.84a22adc-1e7a-7f5e-d814-8c49cba3e5f6', '国际象棋棋手', NULL, '国际象棋棋手');
+INSERT INTO `ontology_schema` VALUES ('88349630-a9e0-4254-53bb-2c355009b4a5', '板球者', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.88349630-a9e0-4254-53bb-2c355009b4a5', '板球者', NULL, '板球者');
 INSERT INTO `ontology_schema` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.8a924fb2-1438-8539-7e48-0b0fc02f44db', '评论', 'b6b8b913-cd11-2cf0-e10d-09896bd9a94e', 'comment');
+INSERT INTO `ontology_schema` VALUES ('8d680d71-9319-45e5-9fbe-9f1e2750fd59', '宗主教', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2.8d680d71-9319-45e5-9fbe-9f1e2750fd59', '宗主教', NULL, '宗主教');
+INSERT INTO `ontology_schema` VALUES ('8ecd8fcb-ab3a-aaf3-05de-a8162e2d2258', '教宗', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2.8ecd8fcb-ab3a-aaf3-05de-a8162e2d2258', '教宗', NULL, '教宗');
+INSERT INTO `ontology_schema` VALUES ('8f4489e6-9f42-37a5-9f1d-122d712df8a2', '国会议员', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.8f4489e6-9f42-37a5-9f1d-122d712df8a2', '国会议员', NULL, '国会议员');
+INSERT INTO `ontology_schema` VALUES ('8f812376-c1e6-c078-45fa-c5800fdc3107', '基督教的主教', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2.8f812376-c1e6-c078-45fa-c5800fdc3107', '基督教的主教', NULL, '基督教的主教');
+INSERT INTO `ontology_schema` VALUES ('942d2141-8be6-db7f-1105-ab5c4e897ea3', '摄影师', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27.327e4989-3fa4-146a-19b0-4aa9ebc4681c.942d2141-8be6-db7f-1105-ab5c4e897ea3', '摄影师', NULL, '摄影师');
+INSERT INTO `ontology_schema` VALUES ('959409b7-0079-1243-0eb0-e9d3d8d33044', '高速公路骑手', NULL, NULL, NULL, '0ae1818b-eddd-dc6b-d887-b938b7563048', '959409b7-0079-1243-0eb0-e9d3d8d33044', '高速公路骑手', NULL, '高速公路骑手');
+INSERT INTO `ontology_schema` VALUES ('96769bad-9009-ed82-6070-389c59afd922', '足球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.96769bad-9009-ed82-6070-389c59afd922', '足球运动员', NULL, '足球运动员');
 INSERT INTO `ontology_schema` VALUES ('977867fe-d710-efdf-c3e9-bd9251ae0d77', '地点', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.977867fe-d710-efdf-c3e9-bd9251ae0d77', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('9809c9e9-b7c5-8b12-5804-712d9ae30a32', '厨师', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.9809c9e9-b7c5-8b12-5804-712d9ae30a32', '厨师', NULL, '厨师');
+INSERT INTO `ontology_schema` VALUES ('9b4339f0-9c5d-721e-d72f-40deafb735d0', '运动员', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.9b4339f0-9c5d-721e-d72f-40deafb735d0', '运动员', NULL, '运动员');
+INSERT INTO `ontology_schema` VALUES ('9ccf4654-6e3d-5bde-0c2a-c0aa4233afaf', '健美运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.9ccf4654-6e3d-5bde-0c2a-c0aa4233afaf', '健美运动员', NULL, '健美运动员');
+INSERT INTO `ontology_schema` VALUES ('a89ef245-81f5-1504-f2f0-f821822c4da4', '演员', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27.327e4989-3fa4-146a-19b0-4aa9ebc4681c.a89ef245-81f5-1504-f2f0-f821822c4da4', '演员', NULL, '演员');
 INSERT INTO `ontology_schema` VALUES ('abbbcdf2-2296-b13b-3f3b-1724ce566401', '嵌入式非文本对象', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.abbbcdf2-2296-b13b-3f3b-1724ce566401', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('b36ee04b-c02e-0597-3959-454dbd4d4c15', '英国皇室成员', NULL, NULL, NULL, 'cb729f69-2d2b-2a51-3c86-c37a413ec861', 'b36ee04b-c02e-0597-3959-454dbd4d4c15', '英国皇室成员', NULL, '英国皇室成员');
 INSERT INTO `ontology_schema` VALUES ('ba140a9f-8888-cb0f-fff9-d073057a43e8', '产品', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.ba140a9f-8888-cb0f-fff9-d073057a43e8', '', NULL, '');
+INSERT INTO `ontology_schema` VALUES ('bc4518fb-b220-503c-0ee2-b27cb5a9ad3e', '首相', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.bc4518fb-b220-503c-0ee2-b27cb5a9ad3e', '首相', NULL, '首相');
+INSERT INTO `ontology_schema` VALUES ('bd4569d4-2e06-e6e8-f1e0-97c475b6eca9', '高尔夫球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.bd4569d4-2e06-e6e8-f1e0-97c475b6eca9', '高尔夫球运动员', NULL, '高尔夫球运动员');
+INSERT INTO `ontology_schema` VALUES ('bd4993c5-4c8b-b5a6-b8c4-97b141b0950f', '法官', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.bd4993c5-4c8b-b5a6-b8c4-97b141b0950f', '法官', NULL, '法官');
+INSERT INTO `ontology_schema` VALUES ('cb729f69-2d2b-2a51-3c86-c37a413ec861', '皇室', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.cb729f69-2d2b-2a51-3c86-c37a413ec861', '皇室', NULL, '皇室');
+INSERT INTO `ontology_schema` VALUES ('cd245ea4-c33e-79bc-dad5-93f6fc9583d7', '宗教人士', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.cd245ea4-c33e-79bc-dad5-93f6fc9583d7', '宗教人士', NULL, '宗教人士');
+INSERT INTO `ontology_schema` VALUES ('ce6e03a2-098d-f3d0-b15d-5a9ca3cd564c', '飞镖运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.ce6e03a2-098d-f3d0-b15d-5a9ca3cd564c', '飞镖运动员', NULL, '飞镖运动员');
+INSERT INTO `ontology_schema` VALUES ('cf01656b-d5ca-b408-d1a1-dff9f341cb20', '美式足球教练', NULL, NULL, NULL, '7be22ba1-86f7-78b4-a32c-b33915466741', 'f63d132e-6947-2ab6-cb02-f23c27c22a0a.cf01656b-d5ca-b408-d1a1-dff9f341cb20', '美式足球教练', NULL, '美式足球教练');
+INSERT INTO `ontology_schema` VALUES ('d0bbc5bc-60c0-8706-fa2e-af3aa4d21ca8', '沙滩排球运动员', NULL, NULL, NULL, '3022a539-dab7-f199-48d7-426f5fb59bfc', 'd0bbc5bc-60c0-8706-fa2e-af3aa4d21ca8', '沙滩排球运动员', NULL, '沙滩排球运动员');
+INSERT INTO `ontology_schema` VALUES ('d8ef58fd-2d56-fce4-5967-973847f0b0b7', '哲学家', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.d8ef58fd-2d56-fce4-5967-973847f0b0b7', '哲学家', NULL, '哲学家');
+INSERT INTO `ontology_schema` VALUES ('da635969-ade5-23b5-d645-35ad9aadc1f7', '兵乒球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.da635969-ade5-23b5-d645-35ad9aadc1f7', '兵乒球运动员', NULL, '兵乒球运动员');
+INSERT INTO `ontology_schema` VALUES ('da9d8bd1-77a7-14e7-e149-0e89bd21950f', '棒球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.da9d8bd1-77a7-14e7-e149-0e89bd21950f', '棒球运动员', NULL, '棒球运动员');
+INSERT INTO `ontology_schema` VALUES ('dd421a3e-08e7-ec39-a396-ff737eb82b9f', '工程师', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.dd421a3e-08e7-ec39-a396-ff737eb82b9f', '工程师', NULL, '工程师');
+INSERT INTO `ontology_schema` VALUES ('dd979162-f405-d834-9bcb-4554aa0dd342', '拳击手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.dd979162-f405-d834-9bcb-4554aa0dd342', '拳击手', NULL, '拳击手');
+INSERT INTO `ontology_schema` VALUES ('dd998543-9762-3d27-11ed-e734ab8c933e', '圣人', NULL, NULL, NULL, '837d2c6f-59f3-2c64-a2f8-d08d66dd0899', '22217481-4a1f-6f8a-deba-6ce05aa9b3f2.dd998543-9762-3d27-11ed-e734ab8c933e', '圣人', NULL, '圣人');
+INSERT INTO `ontology_schema` VALUES ('e0a3d96d-9e95-6cc9-d2d4-791847cf56cd', '花花公子玩伴女郎', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.e0a3d96d-9e95-6cc9-d2d4-791847cf56cd', '花花公子玩伴女郎', NULL, '花花公子玩伴女郎');
+INSERT INTO `ontology_schema` VALUES ('e541152a-e57d-4794-f1af-711c306237a3', '活动', NULL, NULL, NULL, NULL, 'e541152a-e57d-4794-f1af-711c306237a3', '活动', NULL, '活动');
+INSERT INTO `ontology_schema` VALUES ('e65c6f82-8478-a7aa-c68d-b0e15b478a95', '盖尔式足球选手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.e65c6f82-8478-a7aa-c68d-b0e15b478a95', '盖尔式足球选手', NULL, '盖尔式足球选手');
 INSERT INTO `ontology_schema` VALUES ('e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '创造性工作', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.1263954c-39b2-2d49-1fd6-3b657c0f6880.e8b409b1-ecd0-50bd-38d6-4d2b4238b931', '', NULL, '');
-INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人物', '2aea9958-e418-6a6e-ecdd-4e96380ea773', 'person');
+INSERT INTO `ontology_schema` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人类', NULL, NULL, NULL, NULL, '79aa8b48-2353-df14-e130-7ed24a35ad44.e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '人类', '2aea9958-e418-6a6e-ecdd-4e96380ea773', 'person');
+INSERT INTO `ontology_schema` VALUES ('ea4bc9ad-78ef-5238-ea68-ba7582903b02', '吉他手', NULL, NULL, NULL, '46067855-07a3-e2d1-4ddd-a2df0396df2c', 'ea4bc9ad-78ef-5238-ea68-ba7582903b02', '吉他手', NULL, '吉他手');
+INSERT INTO `ontology_schema` VALUES ('eb80da1d-b364-a732-ab5c-ce17bd016229', '成人电影演员', NULL, NULL, NULL, 'a89ef245-81f5-1504-f2f0-f821822c4da4', 'eb80da1d-b364-a732-ab5c-ce17bd016229', '成人电影演员', NULL, '成人电影演员');
+INSERT INTO `ontology_schema` VALUES ('ed16af57-707d-0ab6-e627-9f4f8ff9280b', '市长', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.ed16af57-707d-0ab6-e627-9f4f8ff9280b', '市长', NULL, '市长');
+INSERT INTO `ontology_schema` VALUES ('ed84b475-5740-171e-42e1-8db5e66ac9e5', '斯诺克选手', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.ed84b475-5740-171e-42e1-8db5e66ac9e5', '斯诺克选手', NULL, '斯诺克选手');
+INSERT INTO `ontology_schema` VALUES ('f11a14aa-74e9-1d58-f814-e41b4913b930', '美国全国大学生体育协会运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.00f8541c-1874-d94a-7669-8b35fb94ce1b.f11a14aa-74e9-1d58-f814-e41b4913b930', '美国全国大学生体育协会运动员', NULL, '美国全国大学生体育协会运动员');
+INSERT INTO `ontology_schema` VALUES ('f1823cea-c56f-348f-0874-c885409192f1', '电台主持', NULL, NULL, NULL, '72163c51-4cd1-b475-a519-c1e2ae9f790d', '4fdb4710-fdba-bf1f-4a81-17b06559e19d.f1823cea-c56f-348f-0874-c885409192f1', '电台主持', NULL, '电台主持');
+INSERT INTO `ontology_schema` VALUES ('f275a752-c142-39df-d419-b9bc482fc780', '喜剧演员', NULL, NULL, NULL, '63a69e3c-35ec-5043-bcd7-a8094ea96f6b', '5862ef0b-157f-8f21-1339-8a08b12b4606.37ec208a-57a3-7903-c265-d3363d3c1f27.327e4989-3fa4-146a-19b0-4aa9ebc4681c.f275a752-c142-39df-d419-b9bc482fc780', '喜剧演员', NULL, '喜剧演员');
+INSERT INTO `ontology_schema` VALUES ('f5630c3b-c70d-9047-facd-bb9ed83fb242', '网球运动员', NULL, NULL, NULL, '9b4339f0-9c5d-721e-d72f-40deafb735d0', '6e347ac1-3611-67ad-33c7-ca4d6133b690.18ed1513-d980-e4c5-2841-38d93975593b.037eb47f-666f-7835-38e7-b08e21e2af72.f5630c3b-c70d-9047-facd-bb9ed83fb242', '网球运动员', NULL, '网球运动员');
+INSERT INTO `ontology_schema` VALUES ('f622da0f-8559-8de6-ace5-d6d3e271c542', '总理', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.f622da0f-8559-8de6-ace5-d6d3e271c542', '总理', NULL, '总理');
+INSERT INTO `ontology_schema` VALUES ('f6269fff-c690-716c-ca83-486a28be11a3', '参议员', NULL, NULL, NULL, '04ef6197-746a-51bf-e1f6-59eb5205d259', '561f401e-b1b9-d958-45c5-816692d436c3.f6269fff-c690-716c-ca83-486a28be11a3', '参议员', NULL, '参议员');
+INSERT INTO `ontology_schema` VALUES ('f63d132e-6947-2ab6-cb02-f23c27c22a0a', '排球教练', NULL, NULL, NULL, '7be22ba1-86f7-78b4-a32c-b33915466741', 'f63d132e-6947-2ab6-cb02-f23c27c22a0a', '排球教练', NULL, '排球教练');
 INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', NULL, NULL, NULL, 'abbbcdf2-2296-b13b-3f3b-1724ce566401', '76706ce5-298f-5144-802a-7c0306be49f9.35b7855a-0b3a-fba8-2771-daa305523feb.f676cf19-4778-ec03-27b0-c70b12d5ace7', 'PDF', 'cc8c342f-45ad-2899-938a-ac56fa193d58', 'PDF');
+INSERT INTO `ontology_schema` VALUES ('f758f2f1-7ac9-31a1-b3f7-a2141c2f953f', '大学教练', NULL, NULL, NULL, '7be22ba1-86f7-78b4-a32c-b33915466741', 'f63d132e-6947-2ab6-cb02-f23c27c22a0a.cf01656b-d5ca-b408-d1a1-dff9f341cb20.f758f2f1-7ac9-31a1-b3f7-a2141c2f953f', '大学教练', NULL, '大学教练');
+INSERT INTO `ontology_schema` VALUES ('f9354c8f-139d-af37-512e-fabbc17de198', '赛车手', NULL, NULL, NULL, '13734311-dc07-293d-615f-fdd34e425cff', '0ae1818b-eddd-dc6b-d887-b938b7563048.f9354c8f-139d-af37-512e-fabbc17de198', '赛车手', NULL, '赛车手');
+INSERT INTO `ontology_schema` VALUES ('fc41329b-5273-0139-cfab-80ff05ea3225', '力士', NULL, NULL, NULL, '5dd9860d-7931-aa68-8f73-7b52891a5e33', 'fc41329b-5273-0139-cfab-80ff05ea3225', '力士', NULL, '力士');
+INSERT INTO `ontology_schema` VALUES ('fed55f99-900d-edfa-eb84-be85f0595ade', '建筑师', NULL, NULL, NULL, 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf', '56ad423f-dc9a-53bd-b41c-2cfbf264d9e5.4ff92b6d-7368-d3b2-921f-938a47a9e495.304075db-b020-4169-c39f-33e547f447fc.04ef6197-746a-51bf-e1f6-59eb5205d259.fed55f99-900d-edfa-eb84-be85f0595ade', '建筑师', NULL, '建筑师');
 
 -- ----------------------------
 -- Table structure for ontology_schema_property
@@ -8769,17 +8839,18 @@ INSERT INTO `ontology_schema` VALUES ('f676cf19-4778-ec03-27b0-c70b12d5ace7', 'P
 DROP TABLE IF EXISTS `ontology_schema_property`;
 CREATE TABLE `ontology_schema_property`  (
   `schemaId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `propertyId` int NOT NULL,
+  `propertyId` int(0) NOT NULL,
   PRIMARY KEY (`schemaId`, `propertyId`) USING BTREE,
-  INDEX `IDX_561afe7a3d5bac2c675d2aaa71`(`schemaId` ASC) USING BTREE,
-  INDEX `IDX_0f06870cfdc06bbdb73550ae18`(`propertyId` ASC) USING BTREE,
+  INDEX `IDX_561afe7a3d5bac2c675d2aaa71`(`schemaId`) USING BTREE,
+  INDEX `IDX_0f06870cfdc06bbdb73550ae18`(`propertyId`) USING BTREE,
   CONSTRAINT `FK_0f06870cfdc06bbdb73550ae180` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_561afe7a3d5bac2c675d2aaa716` FOREIGN KEY (`schemaId`) REFERENCES `ontology_schema` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_schema_property
 -- ----------------------------
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 10);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 18);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 19);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 20);
@@ -8788,7 +8859,9 @@ INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff1
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 25);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 26);
 INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 27);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 51);
 INSERT INTO `ontology_schema_property` VALUES ('8a924fb2-1438-8539-7e48-0b0fc02f44db', 823);
+INSERT INTO `ontology_schema_property` VALUES ('e9b82957-7fe3-e2ae-bc02-dd003ff13adf', 996);
 
 -- ----------------------------
 -- Table structure for ontology_type
@@ -8804,9 +8877,9 @@ CREATE TABLE `ontology_type`  (
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_1195b0fab025f689375d994d950`(`parentId` ASC) USING BTREE,
+  INDEX `FK_1195b0fab025f689375d994d950`(`parentId`) USING BTREE,
   CONSTRAINT `FK_1195b0fab025f689375d994d950` FOREIGN KEY (`parentId`) REFERENCES `ontology_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_type
@@ -8827,17 +8900,18 @@ INSERT INTO `ontology_type` VALUES ('feb4c3fd-ad97-b112-e4c0-55741b08a488', 'wik
 DROP TABLE IF EXISTS `ontology_type_value`;
 CREATE TABLE `ontology_type_value`  (
   `typeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `propertyId` int NOT NULL,
+  `propertyId` int(0) NOT NULL,
   PRIMARY KEY (`typeId`, `propertyId`) USING BTREE,
-  INDEX `IDX_568b9b5d75bd3865d279766916`(`propertyId` ASC) USING BTREE,
-  INDEX `IDX_1670cbd28db91600d952242a1a`(`typeId` ASC) USING BTREE,
+  INDEX `IDX_568b9b5d75bd3865d279766916`(`propertyId`) USING BTREE,
+  INDEX `IDX_1670cbd28db91600d952242a1a`(`typeId`) USING BTREE,
   CONSTRAINT `FK_1670cbd28db91600d952242a1ac` FOREIGN KEY (`typeId`) REFERENCES `ontology_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_568b9b5d75bd3865d279766916f` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_type_value
 -- ----------------------------
+INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 10);
 INSERT INTO `ontology_type_value` VALUES ('9a4ab10c-4ee9-f337-d46c-e53a7c441261', 18);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 19);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 20);
@@ -8846,7 +8920,9 @@ INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9'
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 25);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 26);
 INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 27);
+INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 51);
 INSERT INTO `ontology_type_value` VALUES ('6a24ed4a-487a-f730-8eae-2559238ac2a9', 823);
+INSERT INTO `ontology_type_value` VALUES ('e6cbe090-b601-8b30-4b03-4298c0e1cb50', 996);
 
 -- ----------------------------
 -- Table structure for system_action
@@ -8858,26 +8934,29 @@ CREATE TABLE `system_action`  (
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `menuId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort` int NOT NULL,
+  `sort` int(0) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_3ed34464adf967339c44f99ff80`(`menuId` ASC) USING BTREE,
+  INDEX `FK_3ed34464adf967339c44f99ff80`(`menuId`) USING BTREE,
   CONSTRAINT `FK_3ed34464adf967339c44f99ff80` FOREIGN KEY (`menuId`) REFERENCES `system_menu` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_action
 -- ----------------------------
 INSERT INTO `system_action` VALUES ('0710dbf3-65dd-db57-faa1-120a1098d3db', '查看', 'info', '', '43aff638-1ebe-ec01-5427-7578308cc7b7', 1);
+INSERT INTO `system_action` VALUES ('086d5194-4be1-8efa-a7b2-337f071be636', '查看', 'info', '', '5eeb724e-ef61-cf8a-7ba2-9291552ae700', 1);
 INSERT INTO `system_action` VALUES ('113ed106-2cdd-a596-de50-4b80de1fb83e', '删除', 'delete', 'fto-trash-2', '32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 4);
 INSERT INTO `system_action` VALUES ('19d1fde7-f3f4-4ce9-e6cc-6b77a5fe1ac4', '修改', 'edit', 'fto-edit', '32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 3);
 INSERT INTO `system_action` VALUES ('2711f0e9-5f7c-54dc-cf78-f96ef2fcaf19', '新增根节点', 'add-root', 'fto-plus', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 5);
 INSERT INTO `system_action` VALUES ('28ce1bf4-830a-76ab-c73c-10a7207f92ed', '修改', 'edit', 'fto-edit', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 3);
 INSERT INTO `system_action` VALUES ('2afc1b90-0c7f-ae5b-589b-5da8dc78f49a', '查看', 'info', 'fto-eye', '32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 1);
+INSERT INTO `system_action` VALUES ('3252a252-37da-33ab-d33b-a1505775964a', '查看', 'info', '', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711', 1);
 INSERT INTO `system_action` VALUES ('346594b7-0db7-8790-8869-be827d50a104', '删除', 'delete', 'fto-trash-2', '10f15681-0d11-78db-bc92-76d43298a5f8', 5);
 INSERT INTO `system_action` VALUES ('4ea3022d-b867-afd6-b4bc-5f91bb1e77e0', '查看', 'info', '', '47c99575-24ac-d6d5-5353-f000e29e3115', 1);
 INSERT INTO `system_action` VALUES ('54ccd3ee-0f78-e4aa-8643-a92dc2849000', '查看', 'info', 'fto-eye', '90d5153c-3241-0ef6-27a8-6d00012d1838', 1);
 INSERT INTO `system_action` VALUES ('590ac302-cdca-72c7-60c5-0444b4585899', '查看', 'info', 'fto-eye', '10f15681-0d11-78db-bc92-76d43298a5f8', 1);
 INSERT INTO `system_action` VALUES ('59809ff1-86dd-5785-c269-de59396e1db3', '查看', 'info', 'fto-database', '5b09ed61-ae30-e236-d8bb-d73d3f7a4703', 1);
+INSERT INTO `system_action` VALUES ('5abd680b-f530-8466-b885-e955328f61fe', '查看', 'info', '', '38c8784e-9fde-ec75-7101-22a793480a09', 1);
 INSERT INTO `system_action` VALUES ('629d4d09-73b6-2aa0-4e58-7108f4660a50', '新增', 'add', 'fto-plus', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 2);
 INSERT INTO `system_action` VALUES ('6dd07b1d-d431-9bf4-62d5-5db3dc99bddb', '查看', 'info', 'fto-eye', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 1);
 INSERT INTO `system_action` VALUES ('75056496-6ca6-1346-7a60-be72cab7d72b', '删除', 'delete', 'fto-trash-2', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 4);
@@ -8893,8 +8972,10 @@ INSERT INTO `system_action` VALUES ('ad39e8cf-2816-9176-ce7f-83fcb84c3cd1', '权
 INSERT INTO `system_action` VALUES ('bf9ba14b-b7db-3adb-662a-a88e417e70e8', '修改', 'edit', 'fto-edit', '10f15681-0d11-78db-bc92-76d43298a5f8', 3);
 INSERT INTO `system_action` VALUES ('c3ee3f62-3a8a-b8a6-0fb7-4f25138253d2', '查看', 'info', '', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', 1);
 INSERT INTO `system_action` VALUES ('c5360ad6-d2ec-392d-c610-98188e81da02', '查看', 'info', 'fto-database', 'c0232814-4938-a378-17b8-5a4eae56618b', 1);
+INSERT INTO `system_action` VALUES ('c8363f14-e9c6-925e-888b-c0747200d1c5', '查看', 'info', '', 'c2afa995-0aba-04a8-e0f9-db05e55ab235', 1);
 INSERT INTO `system_action` VALUES ('cac38734-fa4c-0775-96f2-c4146a4dcbe0', '新增', 'add', 'fto-plus', '10f15681-0d11-78db-bc92-76d43298a5f8', 2);
 INSERT INTO `system_action` VALUES ('e1497f04-16fa-9bee-c77e-fd4afab4ef86', '删除', 'delete', 'fto-trash-2', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 4);
+INSERT INTO `system_action` VALUES ('e8b5dacd-289f-b0b2-2b0c-74d4db258677', '查看', 'info', '', 'ba2a56c9-023d-b521-20b3-0e3ef9fa4282', 1);
 INSERT INTO `system_action` VALUES ('f50bd17d-2436-47f3-2f9a-d914ff2ad834', '查看', 'info', 'fto-eye', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 1);
 INSERT INTO `system_action` VALUES ('fb5680c4-47cb-78f9-c107-656f42886e3c', '新增', 'add', 'fto-plus', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 2);
 
@@ -8909,29 +8990,34 @@ CREATE TABLE `system_menu`  (
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `sort` int NOT NULL,
+  `sort` int(0) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_d7fcb6cbe5c416b793101e32a3f`(`parentId` ASC) USING BTREE,
+  INDEX `FK_d7fcb6cbe5c416b793101e32a3f`(`parentId`) USING BTREE,
   CONSTRAINT `FK_d7fcb6cbe5c416b793101e32a3f` FOREIGN KEY (`parentId`) REFERENCES `system_menu` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_menu
 -- ----------------------------
 INSERT INTO `system_menu` VALUES ('0009d7da-3efc-2ea1-3be1-2542c7b6c070', '系统管理', '', 'ado-setting', NULL, '0009d7da-3efc-2ea1-3be1-2542c7b6c070', 10);
-INSERT INTO `system_menu` VALUES ('06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '知识库', 'knowledge', 'fto-database', NULL, '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', 9);
+INSERT INTO `system_menu` VALUES ('06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '知识库', '', 'fto-database', NULL, '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', 9);
 INSERT INTO `system_menu` VALUES ('10f15681-0d11-78db-bc92-76d43298a5f8', '菜单管理', 'menus', 'fto-menu', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.10f15681-0d11-78db-bc92-76d43298a5f8', 4);
 INSERT INTO `system_menu` VALUES ('29ecd267-2707-8c74-d508-730526ddd7ee', '抽取', 'extraction', 'fto-filter', NULL, '29ecd267-2707-8c74-d508-730526ddd7ee', 6);
+INSERT INTO `system_menu` VALUES ('2c55795c-0bea-1cd2-b7e8-4a8563ac0711', '图库', 'image', 'fto-database', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711', 3);
 INSERT INTO `system_menu` VALUES ('32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', '用户管理', 'users', 'ado-team', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 1);
+INSERT INTO `system_menu` VALUES ('38c8784e-9fde-ec75-7101-22a793480a09', '目标库', 'entity', 'fto-database', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711.38c8784e-9fde-ec75-7101-22a793480a09', 1);
 INSERT INTO `system_menu` VALUES ('42e99937-ed68-ea0e-5d61-987e12a66732', '属性', 'properties', 'ado-setting', NULL, '42e99937-ed68-ea0e-5d61-987e12a66732', 5);
 INSERT INTO `system_menu` VALUES ('43aff638-1ebe-ec01-5427-7578308cc7b7', '节点', 'node', 'fto-command', NULL, '43aff638-1ebe-ec01-5427-7578308cc7b7', 7);
 INSERT INTO `system_menu` VALUES ('47c99575-24ac-d6d5-5353-f000e29e3115', '本体', 'ontology', 'ado-setting', NULL, '47c99575-24ac-d6d5-5353-f000e29e3115', 4);
 INSERT INTO `system_menu` VALUES ('4a305e03-c1b9-1ab7-b9ac-3408dced0194', '组织管理', 'organization', 'ado-apartment', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.4a305e03-c1b9-1ab7-b9ac-3408dced0194', 3);
 INSERT INTO `system_menu` VALUES ('5b09ed61-ae30-e236-d8bb-d73d3f7a4703', '搜索', 'search', 'fto-database', NULL, '5b09ed61-ae30-e236-d8bb-d73d3f7a4703', 9);
+INSERT INTO `system_menu` VALUES ('5eeb724e-ef61-cf8a-7ba2-9291552ae700', '音频库', 'audio', 'fto-database', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711.5eeb724e-ef61-cf8a-7ba2-9291552ae700', 4);
 INSERT INTO `system_menu` VALUES ('90d5153c-3241-0ef6-27a8-6d00012d1838', '首页', 'home', 'ado-home', NULL, '90d5153c-3241-0ef6-27a8-6d00012d1838', 1);
 INSERT INTO `system_menu` VALUES ('a2036646-7b02-7f9a-8a4b-18a1679c90a3', '关系', 'edge', 'fto-command', NULL, 'a2036646-7b02-7f9a-8a4b-18a1679c90a3', 7);
+INSERT INTO `system_menu` VALUES ('ba2a56c9-023d-b521-20b3-0e3ef9fa4282', '视频库', 'video', 'fto-database', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711.ba2a56c9-023d-b521-20b3-0e3ef9fa4282', 5);
 INSERT INTO `system_menu` VALUES ('c0232814-4938-a378-17b8-5a4eae56618b', '媒体库', 'media', 'fto-database', NULL, 'c0232814-4938-a378-17b8-5a4eae56618b', 8);
-INSERT INTO `system_menu` VALUES ('e2203f49-23da-5372-a260-ba8f71dc9e08', '仪表盘', 'dashboard', 'ado-radar-chart', NULL, 'e2203f49-23da-5372-a260-ba8f71dc9e08', 2);
+INSERT INTO `system_menu` VALUES ('c2afa995-0aba-04a8-e0f9-db05e55ab235', '文库', 'pdf', 'fto-database', '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '2c55795c-0bea-1cd2-b7e8-4a8563ac0711.c2afa995-0aba-04a8-e0f9-db05e55ab235', 2);
+INSERT INTO `system_menu` VALUES ('e2203f49-23da-5372-a260-ba8f71dc9e08', '工作台', 'dashboard', 'ado-radar-chart', NULL, 'e2203f49-23da-5372-a260-ba8f71dc9e08', 2);
 INSERT INTO `system_menu` VALUES ('f3bef769-af62-779f-800d-a49533766d01', '类型', 'type', 'ado-setting', NULL, 'f3bef769-af62-779f-800d-a49533766d01', 4);
 INSERT INTO `system_menu` VALUES ('f97d223d-b777-3dfa-c76a-d24244eba25e', '角色管理', 'roles', 'ado-user', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.f97d223d-b777-3dfa-c76a-d24244eba25e', 2);
 
@@ -8946,11 +9032,11 @@ CREATE TABLE `system_organization`  (
   `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `sort` int NOT NULL,
+  `sort` int(0) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_86110f24fd2d3afdba313c5060d`(`parentId` ASC) USING BTREE,
+  INDEX `FK_86110f24fd2d3afdba313c5060d`(`parentId`) USING BTREE,
   CONSTRAINT `FK_86110f24fd2d3afdba313c5060d` FOREIGN KEY (`parentId`) REFERENCES `system_organization` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_organization
@@ -8967,9 +9053,9 @@ CREATE TABLE `system_role`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `organizationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_af72a2809e8b6fdf8da0955bf03`(`organizationId` ASC) USING BTREE,
+  INDEX `FK_af72a2809e8b6fdf8da0955bf03`(`organizationId`) USING BTREE,
   CONSTRAINT `FK_af72a2809e8b6fdf8da0955bf03` FOREIGN KEY (`organizationId`) REFERENCES `system_organization` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_role
@@ -8985,23 +9071,25 @@ CREATE TABLE `system_role_action`  (
   `roleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `actionId` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`roleId`, `actionId`) USING BTREE,
-  INDEX `FK_a0ec504b9c427ffcc85e212594c`(`actionId` ASC) USING BTREE,
-  INDEX `IDX_25439811e232662e2dc087330d`(`roleId` ASC) USING BTREE,
-  INDEX `IDX_a0ec504b9c427ffcc85e212594`(`actionId` ASC) USING BTREE,
+  INDEX `FK_a0ec504b9c427ffcc85e212594c`(`actionId`) USING BTREE,
+  INDEX `IDX_25439811e232662e2dc087330d`(`roleId`) USING BTREE,
+  INDEX `IDX_a0ec504b9c427ffcc85e212594`(`actionId`) USING BTREE,
   CONSTRAINT `FK_25439811e232662e2dc087330d9` FOREIGN KEY (`roleId`) REFERENCES `system_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_a0ec504b9c427ffcc85e212594c` FOREIGN KEY (`actionId`) REFERENCES `system_action` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_role_action
 -- ----------------------------
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '0710dbf3-65dd-db57-faa1-120a1098d3db');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '086d5194-4be1-8efa-a7b2-337f071be636');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '113ed106-2cdd-a596-de50-4b80de1fb83e');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '19d1fde7-f3f4-4ce9-e6cc-6b77a5fe1ac4');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '2711f0e9-5f7c-54dc-cf78-f96ef2fcaf19');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '28ce1bf4-830a-76ab-c73c-10a7207f92ed');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '2afc1b90-0c7f-ae5b-589b-5da8dc78f49a');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '2afc1b90-0c7f-ae5b-589b-5da8dc78f49a');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '3252a252-37da-33ab-d33b-a1505775964a');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '346594b7-0db7-8790-8869-be827d50a104');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '4ea3022d-b867-afd6-b4bc-5f91bb1e77e0');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '54ccd3ee-0f78-e4aa-8643-a92dc2849000');
@@ -9009,6 +9097,7 @@ INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c',
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '590ac302-cdca-72c7-60c5-0444b4585899');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '590ac302-cdca-72c7-60c5-0444b4585899');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '59809ff1-86dd-5785-c269-de59396e1db3');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '5abd680b-f530-8466-b885-e955328f61fe');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '629d4d09-73b6-2aa0-4e58-7108f4660a50');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', '629d4d09-73b6-2aa0-4e58-7108f4660a50');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', '6dd07b1d-d431-9bf4-62d5-5db3dc99bddb');
@@ -9027,9 +9116,11 @@ INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01',
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'ad39e8cf-2816-9176-ce7f-83fcb84c3cd1');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'bf9ba14b-b7db-3adb-662a-a88e417e70e8');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'c3ee3f62-3a8a-b8a6-0fb7-4f25138253d2');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'c8363f14-e9c6-925e-888b-c0747200d1c5');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'cac38734-fa4c-0775-96f2-c4146a4dcbe0');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', 'cac38734-fa4c-0775-96f2-c4146a4dcbe0');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'e1497f04-16fa-9bee-c77e-fd4afab4ef86');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'e8b5dacd-289f-b0b2-2b0c-74d4db258677');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'f50bd17d-2436-47f3-2f9a-d914ff2ad834');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', 'f50bd17d-2436-47f3-2f9a-d914ff2ad834');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'fb5680c4-47cb-78f9-c107-656f42886e3c');
@@ -9047,7 +9138,7 @@ CREATE TABLE `system_user`  (
   `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_user
@@ -9062,12 +9153,12 @@ CREATE TABLE `system_user_organization`  (
   `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `organizationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`userId`, `organizationId`) USING BTREE,
-  INDEX `FK_68941b8e6cc24f7f5cc3898edb4`(`organizationId` ASC) USING BTREE,
-  INDEX `IDX_9a2b15d16e0199fd81dec2407b`(`userId` ASC) USING BTREE,
-  INDEX `IDX_68941b8e6cc24f7f5cc3898edb`(`organizationId` ASC) USING BTREE,
+  INDEX `FK_68941b8e6cc24f7f5cc3898edb4`(`organizationId`) USING BTREE,
+  INDEX `IDX_9a2b15d16e0199fd81dec2407b`(`userId`) USING BTREE,
+  INDEX `IDX_68941b8e6cc24f7f5cc3898edb`(`organizationId`) USING BTREE,
   CONSTRAINT `FK_68941b8e6cc24f7f5cc3898edb4` FOREIGN KEY (`organizationId`) REFERENCES `system_organization` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_9a2b15d16e0199fd81dec2407b2` FOREIGN KEY (`userId`) REFERENCES `system_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_user_organization
@@ -9082,12 +9173,12 @@ CREATE TABLE `system_user_role`  (
   `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `roleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`userId`, `roleId`) USING BTREE,
-  INDEX `FK_4c2ae6cf44ed3a1e1040122db4b`(`roleId` ASC) USING BTREE,
-  INDEX `IDX_4c2ae6cf44ed3a1e1040122db4`(`roleId` ASC) USING BTREE,
-  INDEX `IDX_8b51fc7bf87d9a9aada9c50454`(`userId` ASC) USING BTREE,
+  INDEX `FK_4c2ae6cf44ed3a1e1040122db4b`(`roleId`) USING BTREE,
+  INDEX `IDX_4c2ae6cf44ed3a1e1040122db4`(`roleId`) USING BTREE,
+  INDEX `IDX_8b51fc7bf87d9a9aada9c50454`(`userId`) USING BTREE,
   CONSTRAINT `FK_4c2ae6cf44ed3a1e1040122db4b` FOREIGN KEY (`roleId`) REFERENCES `system_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_8b51fc7bf87d9a9aada9c504544` FOREIGN KEY (`userId`) REFERENCES `system_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_user_role
