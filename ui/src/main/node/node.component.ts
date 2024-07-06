@@ -24,12 +24,8 @@ export class NodeComponent extends PageBase {
   keyword = '';
   size = 20;
   index = 1;
-
   value: XPosition = 'right';
-
   visible!: boolean;
-
-
 
   detail(row: XTableRow, column: XTableColumn) {
     console.log(row.id[0].split('/')[1]);

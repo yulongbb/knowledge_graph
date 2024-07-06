@@ -6,10 +6,12 @@ import { tap, map, Observable } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
+  XData,
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
   XPosition,
+  XRadioNode,
 } from '@ng-nest/ui';
 import { FusionService } from '../fusion/fusion.service';
 import { AudioService } from './audio.service';
@@ -41,6 +43,8 @@ export class AudioComponent extends PageBase {
   }
 
   data: any;
+  data$!: Observable<any>;
+
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -54,7 +58,12 @@ export class AudioComponent extends PageBase {
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
-  model1: any;
+
+  layout: XData<XRadioNode> = [
+    { label: '列表', icon: 'fto-list' },
+    { label: '卡片', icon: 'fto-grid' },
+  ];
+  model = '列表';
 
   constructor(
     private service: AudioService,
@@ -67,9 +76,14 @@ export class AudioComponent extends PageBase {
 
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-
+      this.data$ = this.service
+        .getList(this.index, this.size, { collection: 'entity', type: '音频', keyword: `%${this.keyword}%` })
+        .pipe(
+          tap((x: any) => console.log(x)),
+          map((x: any) => x)
+        );
       this.data = (index: number, size: number, query: Query) => this.service
-        .getList(index, this.size, { collection: 'audio_entity', type: '音频', keyword: `%${this.keyword}%` })
+        .getList(index, this.size, { collection: 'entity', type: '音频', keyword: `%${this.keyword}%` })
         .pipe(
           tap((x: any) => console.log(x)),
           map((x: any) => x)
@@ -104,8 +118,14 @@ export class AudioComponent extends PageBase {
 
 
   search(keyword: any) {
+    this.data$ = this.service
+      .getList(this.index, this.size, { collection: 'entity', type: '音频', keyword: `%${this.keyword}%` })
+      .pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'audio', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'entity', type: '音频', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

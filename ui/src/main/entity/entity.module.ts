@@ -13,6 +13,7 @@ import { XUploadModule } from '@ng-nest/ui/upload';
 import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XRadioModule } from '@ng-nest/ui/radio';
+import { XPaginationModule } from '@ng-nest/ui/pagination';
 
 
 
@@ -37,6 +38,7 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XStatisticModule,
     XImageModule,
     XRadioModule,
+    XPaginationModule,
     EntityRoutesModule
   ],
   declarations: [EntityComponent, EntityDetailComponent]

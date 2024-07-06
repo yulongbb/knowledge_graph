@@ -69,7 +69,7 @@ export class VideoComponent extends PageBase {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
 
       this.data = (index: number, size: number, query: Query) => this.service
-        .getList(index, this.size, { collection: 'video_entity', type: '视频', keyword: `%${this.keyword}%` })
+        .getList(index, this.size, { collection: 'entity', type: '视频', keyword: `%${this.keyword}%` })
         .pipe(
           tap((x: any) => console.log(x)),
           map((x: any) => x)
@@ -105,7 +105,7 @@ export class VideoComponent extends PageBase {
 
   search(keyword: any) {
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'video_entity', type: '视频', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'entity', type: '视频', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

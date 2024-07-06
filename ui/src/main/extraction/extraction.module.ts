@@ -8,6 +8,8 @@ import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { ExtractionDetailComponent } from "./extraction-detail/extraction-detail.component";
+import { XTextareaModule } from '@ng-nest/ui/textarea';
+
 
 
 @NgModule({
@@ -18,6 +20,7 @@ import { ExtractionDetailComponent } from "./extraction-detail/extraction-detail
     AuToolModule,
     AuAdaptionModule,
     XTreeModule,
+    XTextareaModule,
     ExtractionRoutesModule
   ],
   declarations: [ExtractionComponent,ExtractionDetailComponent]

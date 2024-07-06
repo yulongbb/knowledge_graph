@@ -8,16 +8,11 @@ import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { XInputModule } from '@ng-nest/ui/input';
-import { XDrawerModule, XPageHeaderModule } from "@ng-nest/ui";
+import { XDrawerModule, XPageHeaderModule, XRadioModule } from "@ng-nest/ui";
 import { XUploadModule } from '@ng-nest/ui/upload';
-import { XDescriptionModule } from '@ng-nest/ui/description';
 import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
-
-
-
-
-
+import { XPaginationModule } from '@ng-nest/ui/pagination';
 import { PdfDetailComponent } from "./pdf-detail/pdf-detail.component";
 
 
@@ -36,6 +31,8 @@ import { PdfDetailComponent } from "./pdf-detail/pdf-detail.component";
     XPageHeaderModule,
     XStatisticModule,
     XImageModule,
+    XPaginationModule,
+    XRadioModule,
     PdfRoutesModule
   ],
   declarations: [PdfComponent, PdfDetailComponent]

@@ -57,7 +57,6 @@ export class ImageComponent extends PageBase {
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
-  model1: any;
 
 
   layout: XData<XRadioNode> = [
@@ -79,14 +78,14 @@ export class ImageComponent extends PageBase {
     super(indexService);
 
     this.data$ = this.service
-      .getList(this.index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
+      .getList(this.index, this.size, { collection: 'entity', type: '图像', keyword: `%${this.keyword}%` })
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
 
     this.data = (index: number, size: number, query: Query) => this.service
-      .getList(index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
+      .getList(index, this.size, { collection: 'entity', type: '图像', keyword: `%${this.keyword}%` })
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
@@ -121,13 +120,13 @@ export class ImageComponent extends PageBase {
 
   search(keyword: any) {
     this.data$ = this.service
-    .getList(this.index, this.size, { collection: 'image_entity', type: '图像', keyword: `%${this.keyword}%` })
-    .pipe(
-      tap((x: any) => console.log(x)),
-      map((x: any) => x)
-    );
+      .getList(this.index, this.size, { collection: 'entity', type: '图像', keyword: `%${this.keyword}%` })
+      .pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'image', keyword: `%${keyword}%` }).pipe(
+      this.service.getList(index, this.size, { collection: 'entity', type: '图像', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

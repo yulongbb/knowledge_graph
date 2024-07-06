@@ -7,16 +7,3 @@
     </x-input-group>
 </div>
 
-<div style="width: 100%; display: flex; align-items: center; justify-content: center">
-    <x-slider [data]="data"> </x-slider>
-</div>
-
-<x-row space="1">
-    <x-col *ngFor="let row of (data$ | async)['list'] " [md]="getMd(row)">
-        <div>
-            <x-card shadow="always">
-                {{row?.label[0]}}
-            </x-card>
-        </div>
-    </x-col>
-</x-row>

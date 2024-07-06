@@ -233,6 +233,16 @@ export const layoutRoutes: Routes = [
     }
   },
 
+  {
+    path: "search",
+    loadChildren: () =>
+      import("../main/search/search.module").then(x => x.SearchModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
 
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },

@@ -112,7 +112,8 @@ export class NodeDetailComponent implements OnInit {
           console.log(x)
           let item: any = {};
           item['id'] = x._id;
-          item['type'] = x?.type;
+          // item['type'] = x?.type;
+          //创建边
           item['label'] = x?.labels?.zh?.value;
           item['description'] = x?.descriptions?.zh?.value;
           this.form.formGroup.patchValue(item);

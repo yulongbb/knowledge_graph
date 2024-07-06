@@ -152,12 +152,7 @@ export class NodeService {
       // 执行查询
       const start = size * (index - 1);
       let cursor = null;
-      console.log(start);
-      console.log(size);
       const collection = this.db.collection(query.collection);
-      console.log(collection);
-      console.log(query.keyword);
-      console.log(query.type);
       if (query.keyword == '%%') {
         if (query.type) {
           cursor = await this.db.query(aql`
@@ -184,25 +179,19 @@ export class NodeService {
 
       } else {
         cursor = await this.db.query(aql`
-
-
-        let langulage = 'zh'
-
-        LET total = COUNT(FOR doc IN ${query.collection}_view
-        SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
-        OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
-        OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword}) RETURN doc)
-
-
-        LET list = (FOR doc IN ${query.collection}_view
-        SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
-        OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
-        OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword})
-        LIMIT ${start}, ${size}
-        RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
-
-        RETURN {total: total, list: list}
-    `);
+          let langulage = 'zh'
+          LET total = COUNT(FOR doc IN ${query.collection}_view
+          SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
+          OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
+          OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword}) RETURN doc)
+          LET list = (FOR doc IN ${query.collection}_view
+          SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
+          OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
+          OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword})
+          LIMIT ${start}, ${size}
+          RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
+          RETURN {total: total, list: list}
+      `);
       }
 
       // 获取查询结果
