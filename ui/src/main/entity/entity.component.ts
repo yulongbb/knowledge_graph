@@ -79,13 +79,13 @@ export class EntityComponent extends PageBase {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.data$ = this.service
-      .getList(this.index, this.size, { collection: 'entity', type: '人类', keyword: `%${this.keyword}%` })
+      .getList(this.index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
       this.data = (index: number, size: number, query: Query) => this.service
-        .getList(index, this.size, { collection: 'entity', type: '人类', keyword: `%${this.keyword}%` })
+        .getList(index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
         .pipe(
           tap((x: any) => console.log(x)),
           map((x: any) => x)
@@ -121,7 +121,7 @@ export class EntityComponent extends PageBase {
 
   search(keyword: any) {
     this.data$ = this.service
-    .getList(this.index, this.size, { collection: 'person_entity', type: '人类', keyword: `%${this.keyword}%` })
+    .getList(this.index, this.size, { collection: 'person_entity', type: 'item', keyword: `%${this.keyword}%` })
     .pipe(
       tap((x: any) => console.log(x)),
       map((x: any) => x)
@@ -145,7 +145,7 @@ export class EntityComponent extends PageBase {
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id}`],
           {
             relativeTo: this.activatedRoute,
           }
@@ -154,7 +154,7 @@ export class EntityComponent extends PageBase {
         break;
       case 'edit':
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id}`],
           {
             relativeTo: this.activatedRoute,
           }

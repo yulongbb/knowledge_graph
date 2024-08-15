@@ -1,4 +1,18 @@
 :host {
+    x-input-group {
+        display: block;
+        width: 100%;
+    }
+
+    x-input-group:not(:first-child) {
+        margin-top: 1rem;
+    }
+    .row:not(:first-child) {
+        margin-top: 1rem;
+      }
+      .row x-card:not(:first-child) {
+        margin-left: 2rem;
+      }
     x-row {
         margin: 1rem 0;
 
@@ -23,3 +37,4 @@
         }
     }
 }
+

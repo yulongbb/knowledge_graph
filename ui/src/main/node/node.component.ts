@@ -49,11 +49,10 @@ export class NodeComponent extends PageBase {
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
-    { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'label', label: '标签', flex: 1.5, sort: true },
-    { id: 'type', label: '类型', flex: 1.5, sort: true },
-    { id: 'description', label: '描述', flex: 0.5, sort: true },
-    { id: 'aliases', label: '别名', flex: 1 },
+    { id: 'id', label: '序号', width: 150,  left: 0, },
+    { id: 'type', label: '类型',width: 150,  sort: true },
+    { id: 'label', label: '标签', flex: 1, sort: true },
+    { id: 'description', label: '描述', flex: 2, sort: true },
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
@@ -114,7 +113,7 @@ export class NodeComponent extends PageBase {
   }
 
   action(type: string, item?: any) {
-    console.log(type);
+    console.log(item);
     switch (type) {
       case 'add':
         let param = {};
@@ -125,7 +124,7 @@ export class NodeComponent extends PageBase {
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id}`],
           {
             relativeTo: this.activatedRoute,
           }
@@ -133,7 +132,7 @@ export class NodeComponent extends PageBase {
         break;
       case 'edit':
         this.router.navigate(
-          [`./${type}/${item.id.toString().split('/')[1]}`],
+          [`./${type}/${item.id}`],
           {
             relativeTo: this.activatedRoute,
           }

@@ -23,7 +23,7 @@ export class EntityDetailComponent implements OnInit {
   schema: string = '';
   item: any;
   statements: any;
-  data!: Observable<Array<any>>;
+  climas!: Observable<Array<any>>;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -99,7 +99,7 @@ export class EntityDetailComponent implements OnInit {
         this.title = '修改实体';
       }
 
-      this.data = this.nodeService.getLinks(1, 20, this.id, { schema: 'e9b82957-7fe3-e2ae-bc02-dd003ff13adf' }).pipe(
+      this.climas = this.nodeService.getLinks(1, 20, this.id, {}).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

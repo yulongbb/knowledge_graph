@@ -12,11 +12,13 @@ import { Knowledge } from 'src/knowledge/knowledge.entity';
 
 @Entity('ontology_schema')
 export class Schema {
-  @PrimaryColumn('uuid', { length: 36 })
+  @PrimaryColumn('uuid',  { length: 36 })
   id: string;
 
-  @Column() label: string;
+  @Column({name: 'name'}) name: string;
 
+  @Column({default: 1}) value: number;
+  @Column() label: string;
   @Column() description: string;
   @Column() collection: string;
 

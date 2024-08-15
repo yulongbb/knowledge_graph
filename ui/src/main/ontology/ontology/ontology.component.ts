@@ -86,9 +86,20 @@ export class OntologyComponent extends PageBase {
       controls: [
         {
           control: 'input',
-          id: 'label',
+          id: 'id',
+          label: 'id',
+          required: true,
+        },
+        {
+          control: 'input',
+          id: 'name',
           label: '名称',
           required: true,
+        },
+        {
+          control: 'input',
+          id: 'label',
+          label: '标签',
         },
         { control: 'input', id: 'description', label: '描述' },
         { control: 'input', id: 'collection', label: '表' },
@@ -97,10 +108,10 @@ export class OntologyComponent extends PageBase {
     {
       hidden: true,
       controls: [
-        {
-          control: 'input',
-          id: 'id',
-        },
+        // {
+        //   control: 'input',
+        //   id: 'id',
+        // },
         {
           control: 'input',
           id: 'pid',
@@ -129,7 +140,7 @@ export class OntologyComponent extends PageBase {
         this.type = type;
         this.formGroup.reset();
         this.formGroup.patchValue({
-          id: XGuid(),
+          // id: XGuid(),
           pid: null,
         });
         break;
@@ -139,7 +150,7 @@ export class OntologyComponent extends PageBase {
         this.formGroup.reset();
         console.log(schema);
         this.formGroup.patchValue({
-          id: XGuid(),
+          // id: XGuid(),
           pid: schema.id,
         });
         break;

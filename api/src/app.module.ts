@@ -12,6 +12,9 @@ import { MinioClientModule } from './minio/minio-client.module';
 import { FusionModule } from './fusion/fusion.module';
 import { EdgeModule } from './edge/edge.module';
 import { PredicateModule } from './predicate/predicate.module';
+import { RedisModule } from './redis/redis.module';
+import { EsModule } from './es/es.module';
+
 
 @Module({
   imports: [
@@ -26,6 +29,7 @@ import { PredicateModule } from './predicate/predicate.module';
       synchronize: true,
       logging: ['query', 'error'],
     }),
+   
     SystemModule,
     DesignModule,
     OntologynModule,
@@ -36,7 +40,9 @@ import { PredicateModule } from './predicate/predicate.module';
     KnowledgeModule,
     MinioClientModule,
     AuthModule,
-    EdgeModule
+    EdgeModule,
+    RedisModule,
+    EsModule
   ],
   controllers: [],
   providers: [],

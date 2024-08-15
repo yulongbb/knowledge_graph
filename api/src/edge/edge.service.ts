@@ -8,7 +8,6 @@ export class EdgeService {
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
       const start = size * (index - 1);
-      const end = start + size;
       console.log(query.toString());
 
       // 执行查询
@@ -18,7 +17,7 @@ export class EdgeService {
         RETURN doc)
         
   LET list = (FOR edge IN link
-    LIMIT ${start}, ${end} 
+    LIMIT ${start}, ${size} 
            RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property']), value:edge['mainsnak']['datavalue']['value'] })
         
   RETURN {total: total, list: list}

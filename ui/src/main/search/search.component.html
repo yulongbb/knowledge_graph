@@ -1,9 +1,24 @@
 <!-- 搜索栏 -->
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
     <x-input-group compact>
-        <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword"
-            (keyup.enter)="search(keyword)"></x-input>
+      <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword"
+      (keyup.enter)="search(keyword)"></x-input>
         <x-button icon="fto-search" (click)="search(keyword)"></x-button>
     </x-input-group>
 </div>
 
+
+<div class="row" *ngFor="let entity of entities">
+    <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+      <ng-template #header>
+        <span>{{entity._id}}</span>
+      </ng-template>
+      <div class="bottom">
+        <h1>{{entity['_source'].labels}}</h1>
+        <p>{{entity['_source'].descriptions}}</p>
+        <div class="time">
+          <span>{{entity['_source'].modified}}</span>
+        </div>
+      </div>
+    </x-card>
+  </div>

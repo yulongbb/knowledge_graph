@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
 import { Observable, map, tap } from 'rxjs';
-import { ImageService } from '../image/image.service';
+import { EsService } from './es.service';
 
 @Component({
   selector: 'app-search',
@@ -9,30 +9,37 @@ import { ImageService } from '../image/image.service';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
-
+  entities: any;
+  query = {};
   keyword = '';
   data: XData<XSliderNode> = ['目标库', '文库', '图库', '音频库', '视频库',];
   size = 20;
   index = 1;
-  data$!: Observable<any>;
 
   constructor(
-    private service: ImageService,
-
+    private service: EsService,
   ) {
-    this.data$ = this.service
-      .getList(this.index, this.size, { collection: 'entity', keyword: `%${this.keyword}%` })
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
+
   }
 
   ngOnInit(): void {
+    this.service.getEntity({}).subscribe((data: any) => {
+      console.log(data);
+      this.entities = data.hits.hits;
+    })
   }
 
   search(keyword: any) {
+    if(keyword!=''){
+      this.query = { "must": [{ "match": { "labels": keyword } }] }
 
+    }else{
+      this.query = {}
+    }
+    this.service.getEntity(this.query).subscribe((data: any) => {
+      console.log(data);
+      this.entities = data.hits.hits;
+    })
   }
 
   getMd(row: any) {

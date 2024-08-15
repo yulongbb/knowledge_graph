@@ -8,10 +8,7 @@ import { ShareModule } from 'src/share/share.module';
 import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
-
-
-
-
+import { EsService } from './es.service';
 
 @NgModule({
   declarations: [SearchComponent],
@@ -33,6 +30,7 @@ import { XCardModule } from '@ng-nest/ui/card';
     ]),
   ],
   exports: [RouterModule],
+  providers: [EsService]
 
 })
 export class SearchModule {}

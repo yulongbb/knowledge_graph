@@ -19,6 +19,8 @@
     "@angular/platform-browser-dynamic": "^16.0.0",
     "@angular/router": "^16.0.0",
     "@ng-nest/ui": "^16.0.7",
+    "echarts": "^5.5.1",
+    "ngx-echarts": "^18.0.0",
     "rxjs": "~7.8.0",
     "sass": "^1.67.0",
     "style-loader": "^3.3.3",

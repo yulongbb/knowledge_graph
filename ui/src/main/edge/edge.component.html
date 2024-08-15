@@ -18,23 +18,26 @@
 
 <ng-template #fromTpl let-column="$column" let-row="$row">
   <div>
-    {{row.from.labels.zh.value}}
+    {{row.from?.labels?.zh?.value}}
   </div>
 </ng-template>
 
 
 <ng-template #toTpl let-column="$column" let-row="$row">
   <div  *ngIf="row.from['_key']!=row.to['_key']">
-    {{row.to.labels.zh.value}}
+    {{row.to['_key']}}
   </div>
   <div  *ngIf="row.from['_key']==row.to['_key']">
-    {{row.value}}
+    {{row?.value |json }}
   </div>
 </ng-template>
 
 <ng-template #propertyTpl let-column="$column" let-row="$row">
-  <div>
-    {{row.property.name}}
+  <div *ngIf="row.property">
+    {{row?.property?.name ?? row?.property?.enName}}
+  </div>
+  <div *ngIf="!row.property">
+    暂无
   </div>
 </ng-template>
 

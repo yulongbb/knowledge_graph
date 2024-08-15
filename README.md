@@ -19,6 +19,13 @@ ng build --configuration production
 
 ng serve --proxy-config proxy.conf.json
 
+"entity": {
+  
+      "includeAllFields": true,
+
+    }
+
+.\arangoimp.exe --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.database kgms --file D:\download\wikidata\entity.jsonl --type jsonl --create-collection true --create-collection-type document --overwrite true --collection "entity"
 
 wikidata数据dump到arangodb的方法
 

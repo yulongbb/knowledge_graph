@@ -52,8 +52,8 @@ export class EdgeComponent extends PageBase {
     { id: 'actions', label: '操作', width: 150, right: 0 },
 
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'from', label: '起始节点', flex: 1.5, sort: true },
-    { id: 'property', label: '关系', flex: 0.5, sort: true },
+    { id: 'from', label: '起始节点', flex: 0.5, sort: true },
+    { id: 'property', label: '关系', flex: 1.5, sort: true },
     { id: 'to', label: '目标节点', flex: 1 },
   ];
 

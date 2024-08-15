@@ -58,7 +58,7 @@
 
 <ng-template #labelTpl let-column="$column" let-row="$row">
   <x-link (click)="action('info', row)">
-    {{row.label}}
+    {{row.label?.zh?.value??row.label?.en?.value}}
   </x-link>
 </ng-template>
 
