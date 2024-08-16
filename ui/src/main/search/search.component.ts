@@ -31,7 +31,7 @@ export class SearchComponent implements OnInit {
 
   search(keyword: any) {
     if(keyword!=''){
-      this.query = { "must": [{ "match": { "labels": keyword } }] }
+      this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
 
     }else{
       this.query = {}
