@@ -1,12 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
+import { EsService } from 'src/es/es.service';
 import { Extraction } from 'src/extraction/extraction.entity';
 import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
 export class NodeService {
-  constructor(@Inject('ARANGODB') private db: Database) { }
+  constructor(@Inject('ARANGODB') private db: Database, private elasticsearchService: EsService) { }
 
   async fusion(extraction: Extraction): Promise<any> {
     // 获取集合（Collection）
@@ -60,15 +61,30 @@ export class NodeService {
 
     // 插入数据
     const document = {
-
       type: entity.type,
       labels: { zh: { language: 'zh', value: entity.label } },
       descriptions: { zh: { language: 'zh', value: entity.description } },
       modified: new Date().toISOString(),
     };
 
+
+
     return myCollection.save(document).then(
-      (doc) => console.log('Document saved:', doc),
+      (doc) => {
+        document['items'] = [doc['_id']];
+        
+        doc['id']=doc['_key'];
+        this.updateEntity(doc);
+        return this.elasticsearchService.bulk({
+          body: [
+            // 指定的数据库为news, 指定的Id = 1
+            { index: { _index: 'entity', _id: doc['_key'] } },
+            document
+          ]
+        });
+
+
+      },
       (err) => console.error('Failed to save document:', err),
     );
   }
@@ -114,6 +130,7 @@ export class NodeService {
       .document(entity.id)
       .then((existingDocument) => {
         // Update the document fields
+        existingDocument.id = entity.id;
         existingDocument.type = entity.type;
         existingDocument.labels = {
           zh: { language: 'zh', value: entity.label },

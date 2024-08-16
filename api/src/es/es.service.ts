@@ -12,5 +12,9 @@ export class EsService {
   async search(params: any) {
     return await this.elasticsearchService.search(params);
   }
+
+  async bulk(params: any) {
+    return await this.elasticsearchService.bulk(params);
+  }
 }
 

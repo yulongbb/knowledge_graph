@@ -19,5 +19,17 @@ export class EsController {
       }
     });
   }
+
+  @Post('add')
+  async add(@Body() doc: any,) {
+    return await this.elasticsearchService.bulk({
+      body: [
+        // 指定的数据库为news, 指定的Id = 1
+        { index: { _index: 'entity', _type: 'doc', _id: '1' } }, 
+        { content: doc }
+      ]
+    });
+  }
 }
+
 

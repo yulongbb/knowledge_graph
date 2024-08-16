@@ -35,21 +35,30 @@ export class EntityDetailComponent implements OnInit {
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
+    // {
+    //   control: 'find',
+    //   id: 'type',
+    //   label: '类型',
+    //   treeData: () =>
+    //     this.ontologyService
+    //       .getList(1, Number.MAX_SAFE_INTEGER, {
+
+    //         sort: [
+    //           { field: 'pid', value: 'asc' },
+    //           { field: 'sort', value: 'asc' },
+    //         ],
+    //       })
+    //       .pipe(map((x) => x.list)),
+
+    // },
     {
-      control: 'find',
+      control: 'input',
       id: 'type',
       label: '类型',
-      treeData: () =>
-        this.ontologyService
-          .getList(1, Number.MAX_SAFE_INTEGER, {
-
-            sort: [
-              { field: 'pid', value: 'asc' },
-              { field: 'sort', value: 'asc' },
-            ],
-          })
-          .pipe(map((x) => x.list)),
-
+      required: true,
+      value: 'item',
+      // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
+      // message: '手机号格式不正确，+8615212345678'
     },
     {
       control: 'input',
@@ -98,12 +107,10 @@ export class EntityDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-
       this.climas = this.nodeService.getLinks(1, 20, this.id, {}).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
-      
     });
   }
 

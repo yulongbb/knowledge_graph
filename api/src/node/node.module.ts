@@ -9,10 +9,15 @@ import { PropertiesService } from 'src/ontology/services/properties.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { Property } from 'src/ontology/entities/property.entity';
+import { EsModule } from 'src/es/es.module';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
+import { EsService } from 'src/es/es.service';
 
-@Module({
-  imports: [ArangoDbModule,TypeOrmModule.forFeature([Schema, Property])],
+@Module({  
+  imports: [ArangoDbModule, EsModule, TypeOrmModule.forFeature([Schema, Property]), ElasticsearchModule.register({
+    node: 'http://localhost:9200',
+  })],
   controllers: [NodeController],
-  providers: [NodeService, FusionService,PropertiesService], 
+  providers: [NodeService, FusionService,PropertiesService, EsService], 
 })
 export class NodeModule {}
