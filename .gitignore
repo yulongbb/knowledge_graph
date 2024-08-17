@@ -8,4 +8,5 @@ ui/.angular/cache
 db/MySQL/db
 db/arangodb/data
 db/minio/data
+db/elasticsearch/data
 db/nginx/html/gis
