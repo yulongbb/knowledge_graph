@@ -17,6 +17,10 @@ export class FusionService extends RepositoryService<Item> {
     return this.http.post(`${this.option.controller?.name}`, extractions);
   }
 
+  restore(extractions: any): Observable<any> {
+    return this.http.post(`${this.option.controller?.name}/restore`, extractions);
+  }
+
   knowledge(nodes: any, collection: any) {
     return this.http.post(`${this.option.controller?.name}/${collection}`, nodes);
   }

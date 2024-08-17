@@ -1,95 +1,174 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
+import { EsService } from 'src/es/es.service';
 import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database) {}
+  constructor(@Inject('ARANGODB') private db: Database, private elasticsearchService: EsService) { }
 
   async fusion({
-    extractions,
+    entity,
   }: {
-    extractions: Array<Extraction>;
+    entity: any;
   }): Promise<any> {
-    console.log(extractions);
-    for (const extraction of extractions) {
-      let s = await this.getEntityBylabel(extraction.subject);
-      if (!s) {
-        s = {
-          label: extraction.subject,
-          description: extraction.subject,
-        };
-        s = await this.addOrUpdateEntity(s);
-      }
+    console.log(entity);
+    // 获取集合（Collection）
+    entity.ids.forEach((id: any) => {
+      this.elasticsearchService.delete(id.toString());
+    });
 
-      const p = await this.getPropertyByName(extraction.property);
-      console.log(p);
+    // 插入数据
+    const document = {
+      type: entity.type,
+      labels: entity.labels,
+      aliases: entity.aliases,
+      descriptions: entity.descriptions,
+      items: entity.items,
+      modified: new Date().toISOString(),
+    };
 
-      if (p['tail'] == 'wikibase-item') {
-        let o = await this.getEntityBylabel(extraction.object);
-        if (!o) {
-          o = {
-            label: extraction.object,
-            description: extraction.object,
-          };
-          o = await this.addOrUpdateEntity(o);
-        }
-        const link = {
-          from: s['_id'],
-          to: o['_id'],
-          mainsnak: {
-            snaktype: 'value',
-            property: p['_key'],
-            hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-            datavalue: {
-              value: {
-                'entity-type': 'item',
-                'numeric-id': Number.parseInt(o['_id'].split('/')[1]),
-                id: o['_id'],
-              },
-              type: 'wikibase-entityid',
-            },
-            datatype: p['tail'],
-          },
-        };
+    return this.elasticsearchService.bulk({
+      body: [
+        // 指定的数据库为news, 指定的Id = 1
+        { index: { _index: 'entity', } },
+        document
+      ]
+    }).then((doc: any) => {
+      const myCollection = this.db.collection('entity');
+    
+      entity.items.forEach((item: any) => {
+        myCollection
+          .document(item.split('/')[1])
+          .then((existingDocument) => {
+            // Update the document fields
+            existingDocument.id = doc['items'][0]['index']['_id'];
+            return myCollection.update(existingDocument._key, existingDocument);
+          })
+          .then(
+            (updatedDocument) => console.log('Document updated:', updatedDocument),
+            (err) => console.error('Failed to update document:', err),
+          );
+      })
+      return doc['items'][0]['index']
+    })
+    // for (const extraction of extractions) {
+    //   let s = await this.getEntityBylabel(extraction.subject);
+    //   if (!s) {
+    //     s = {
+    //       label: extraction.subject,
+    //       description: extraction.subject,
+    //     };
+    //     s = await this.addOrUpdateEntity(s);
+    //   }
 
-        await this.addOrUpdateLink(link);
-      } else {
-        const link = {
-          from: s['_id'],
-          to: s['_id'],
-          value: extraction.object,
-          mainsnak: {
-            snaktype: 'value',
-            property: p['_key'],
-            hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-            datavalue: { value: extraction.object, type: 'string' },
-            datatype: p['tail'],
-          },
-        };
-        console.log(link);
+    //   const p = await this.getPropertyByName(extraction.property);
+    //   console.log(p);
 
-        await this.addOrUpdateLink(link);
-      }
+    //   if (p['tail'] == 'wikibase-item') {
+    //     let o = await this.getEntityBylabel(extraction.object);
+    //     if (!o) {
+    //       o = {
+    //         label: extraction.object,
+    //         description: extraction.object,
+    //       };
+    //       o = await this.addOrUpdateEntity(o);
+    //     }
+    //     const link = {
+    //       from: s['_id'],
+    //       to: o['_id'],
+    //       mainsnak: {
+    //         snaktype: 'value',
+    //         property: p['_key'],
+    //         hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+    //         datavalue: {
+    //           value: {
+    //             'entity-type': 'item',
+    //             'numeric-id': Number.parseInt(o['_id'].split('/')[1]),
+    //             id: o['_id'],
+    //           },
+    //           type: 'wikibase-entityid',
+    //         },
+    //         datatype: p['tail'],
+    //       },
+    //     };
 
-      // if (p) {
+    //     await this.addOrUpdateLink(link);
+    //   } else {
+    //     const link = {
+    //       from: s['_id'],
+    //       to: s['_id'],
+    //       value: extraction.object,
+    //       mainsnak: {
+    //         snaktype: 'value',
+    //         property: p['_key'],
+    //         hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+    //         datavalue: { value: extraction.object, type: 'string' },
+    //         datatype: p['tail'],
+    //       },
+    //     };
+    //     console.log(link);
 
-      // } else {
-      //   const property = {
-      //     name: extraction.property,
-      //     description: extraction.property,
-      //   };
-      //   const newProperty = await this.addProperty(property);
-      //   const link = {
-      //     from: s['_id'],
-      //     to: o['_id'],
-      //     property: newProperty['_key'],
-      //   };
-      //   await this.addOrUpdateLink(link);
-      // }
-    }
+    //     await this.addOrUpdateLink(link);
+    //   }
+
+    //   // if (p) {
+
+    //   // } else {
+    //   //   const property = {
+    //   //     name: extraction.property,
+    //   //     description: extraction.property,
+    //   //   };
+    //   //   const newProperty = await this.addProperty(property);
+    //   //   const link = {
+    //   //     from: s['_id'],
+    //   //     to: o['_id'],
+    //   //     property: newProperty['_key'],
+    //   //   };
+    //   //   await this.addOrUpdateLink(link);
+    //   // }
+    // }
   }
+
+  async restore({
+    entity,
+  }: {
+    entity: any;
+  }): Promise<any> {
+    console.log(entity);
+    this.elasticsearchService.delete(entity['_id']);
+
+    const myCollection = this.db.collection('entity');
+    entity['_source'].items.forEach((item: any) => {
+      myCollection
+        .document(item.split('/')[1])
+        .then((existingDocument) => {
+          const document = {
+            type: existingDocument.type,
+            labels: existingDocument.labels,
+            descriptions: existingDocument.descriptions,
+            aliases: existingDocument.aliases,
+            modified: new Date().toISOString(),
+            items: [item]
+          };
+
+          this.elasticsearchService.bulk({
+            body: [
+              // 指定的数据库为news, 指定的Id = 1
+              { index: { _index: 'entity', _id: existingDocument['_key'] } },
+              document
+            ]
+          });
+          existingDocument.id = existingDocument['_key'];
+          return myCollection.update(existingDocument._key, existingDocument);
+        })
+        .then(
+          (updatedDocument) => console.log('Document updated:', updatedDocument),
+          (err) => console.error('Failed to update document:', err),
+        );
+    });
+  };
 
   async addOrUpdateEntity(entity) {
     const existingEntity = await this.getEntityBylabel(entity.label);
@@ -120,16 +199,13 @@ export class FusionService {
     for (const node of nodes) {
       try {
         // 执行查询
-        const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-          node.id[0]
-        } GRAPH 'graph'
+        const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${node.id[0]
+          } GRAPH 'graph'
           INSERT  v INTO ${collection} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
           FOR edge IN p['edges']
-            LET link = MERGE(edge, {'_from': CONCAT(${
-              knowledge + '_entity/'
-            }, SPLIT(edge['_from'], "/")[1]),'_to': CONCAT(${
-              knowledge + '_entity/'
-            }, SPLIT(edge['_to'], "/")[1]),})
+            LET link = MERGE(edge, {'_from': CONCAT(${knowledge + '_entity/'
+          }, SPLIT(edge['_from'], "/")[1]),'_to': CONCAT(${knowledge + '_entity/'
+          }, SPLIT(edge['_to'], "/")[1]),})
             INSERT   link INTO ${edge} OPTIONS { overwriteMode: "update", keepNull: true, mergeObjects: false }
           RETURN { "v": v, "e": e, "p":p }`);
 
@@ -356,9 +432,8 @@ export class FusionService {
       const end = start + size;
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}

@@ -25,20 +25,19 @@ export class SearchComponent implements OnInit {
   ngOnInit(): void {
     this.service.getEntity({}).subscribe((data: any) => {
       console.log(data);
-      this.entities = data.hits.hits;
+      this.entities = data.list;
     })
   }
 
   search(keyword: any) {
-    if(keyword!=''){
+    if (keyword != '') {
       this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
-
-    }else{
+    } else {
       this.query = {}
     }
     this.service.getEntity(this.query).subscribe((data: any) => {
       console.log(data);
-      this.entities = data.hits.hits;
+      this.entities = data.list;
     })
   }
 

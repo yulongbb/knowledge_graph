@@ -34,7 +34,7 @@
         
 
             <x-table #tableCom  [columns]="columns" [data]="items" [size]="size" [bodyHeight]="750" 
-              [bodyColumnTpl]="{ label: labelTpl ,    description:descriptionTpl }"   [virtualScroll]="true"
+              [bodyColumnTpl]="{ label: labelTpl ,    description:descriptionTpl,  }"   [virtualScroll]="true"
               loading [allowSelectRow]="true">
             </x-table>
             <ng-template #labelTpl let-column="$column" let-row="$row">

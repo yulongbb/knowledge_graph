@@ -10,11 +10,16 @@ export class EsService {
   constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
   async search(params: any) {
-    return await this.elasticsearchService.search(params);
+    let data = await this.elasticsearchService.search(params)
+    return {total: data['hits']['total']['value'], list: data['hits']['hits']};
   }
 
   async bulk(params: any) {
     return await this.elasticsearchService.bulk(params);
+  }
+
+  async delete(id: any) {
+    return await this.elasticsearchService.delete({index:'entity', id: id});
   }
 }
 

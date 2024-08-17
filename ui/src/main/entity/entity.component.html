@@ -10,6 +10,8 @@
   </div>
   <div>
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+    <x-button type="success" icon="fto-plus" (click)="action('fusion')">融合</x-button>
+    <x-button type="warning" icon="fto-plus" (click)="action('restore')">还原</x-button>
     <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
   </div>
 </au-tool>
@@ -44,21 +46,36 @@
 </x-container>
 
 
+
+
 <!-- 表格栏 -->
 <x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll
-  [scroll]="{ x: 1500, y: 600 }" [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl     }"
+  [scroll]="{ x: 1500, y: 600 }"
+  [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl  ,    description:descriptionTpl ,    aliase:aliaseTpl  }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>
 <ng-template #typeTpl let-column="$column" let-row="$row">
   <div>
-    {{row?.type?.label }}
+    {{row['_source'].type }}
   </div>
 </ng-template>
 
 <ng-template #labelTpl let-column="$column" let-row="$row">
   <x-link (click)="action('info', row)">
-    {{row.labels?.zh?.value??row.label?.en?.value}}
+    {{row['_source'].labels?.zh?.value??row['_source'].labels?.en?.value}}
+  </x-link>
+</ng-template>
+
+<ng-template #descriptionTpl let-column="$column" let-row="$row">
+  <x-link (click)="action('info', row)">
+    {{row['_source'].descriptions?.zh?.value??row['_source'].descriptions?.en?.value}}
+  </x-link>
+</ng-template>
+
+<ng-template #aliaseTpl let-column="$column" let-row="$row">
+  <x-link (click)="action('info', row)">
+    <span *ngFor="let aliase of (row['_source'].aliases?.zh??row['_source'].descriptions?.en)">{{aliase.value}}，</span>
   </x-link>
 </ng-template>
 
@@ -70,3 +87,33 @@
     <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除"></x-link>
   </div>
 </ng-template>
+
+
+
+<x-dialog
+  title="标题"
+  [(visible)]="visible"
+  [placement]="placement()"
+  (close)="evt('close')"
+  (cancel)="evt('cancel')"
+  (confirm)="evt('confirm')"
+>
+<div class="row">
+  <x-card *ngIf="mergedEntity" width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+    <ng-template #header>
+      <h1>{{mergedEntity?.labels?.zh?.value}} (<small *ngFor="let aliase of mergedEntity?.aliases?.zh">{{aliase.value}},</small>)
+      </h1>
+     
+    </ng-template>
+    <div class="bottom">
+      <p>{{mergedEntity?.descriptions?.zh?.value}}</p>
+
+      <!-- <div class="time">
+        <x-tag *ngFor="let item of mergedEntity?.items">{{item}}</x-tag>
+        
+      </div> -->
+    </div>
+  </x-card>
+</div>
+  
+</x-dialog>

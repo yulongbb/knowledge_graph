@@ -1,24 +1,30 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, signal } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
 import { tap, map, Observable } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
+  XButtonModule,
   XData,
+  XDialogAction,
+  XDialogComponent,
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
+  XPlace,
   XPosition,
   XRadioNode,
 } from '@ng-nest/ui';
 import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
+import { EsService } from '../search/es.service';
 
 @Component({
   selector: 'app-entity',
+
   templateUrl: 'entity.component.html',
   styleUrls: ['./entity.component.scss'],
 })
@@ -31,15 +37,9 @@ export class EntityComponent extends PageBase {
 
   value: XPosition = 'right';
 
-  visible!: boolean;
 
   detail(row: XTableRow, column: XTableColumn) {
     this.id = row.id[0].split('/')[1];
-  }
-
-  close() {
-    this.id = null;
-    this.visible = false;
   }
 
   data: any;
@@ -50,11 +50,11 @@ export class EntityComponent extends PageBase {
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
-    { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'labels.zh.value', label: '标签', flex: 1.5, sort: true },
-    { id: 'type', label: '类型', flex: 1.5, sort: true },
-    { id: 'description', label: '描述', flex: 0.5, sort: true },
-    { id: 'aliases', label: '别名', flex: 1 },
+    { id: '_id', label: '序号',  width: 200, left: 0,  },
+    { id: 'type', label: '类型', width: 100, sort: true },
+    { id: 'label', label: '标签', flex: 0.5, sort: true },
+    { id: 'description', label: '描述', flex: 1.5, sort: true },
+    { id: 'aliase', label: '别名', flex: 2 },
   ];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
@@ -66,9 +66,13 @@ export class EntityComponent extends PageBase {
   ];
   model = '列表'
 
+  mergedEntity: any;
+
 
   constructor(
     private service: EntityService,
+    private esService: EsService,
+    private fusionService: FusionService,
     public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -79,13 +83,13 @@ export class EntityComponent extends PageBase {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.data$ = this.service
-      .getList(this.index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
-      this.data = (index: number, size: number, query: Query) => this.service
-        .getList(index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
+        .getList(this.index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
+        .pipe(
+          tap((x: any) => console.log(x)),
+          map((x: any) => x)
+        );
+      this.data = (index: number, size: number, query: Query) => this.esService
+        .getEntity({})
         .pipe(
           tap((x: any) => console.log(x)),
           map((x: any) => x)
@@ -121,11 +125,11 @@ export class EntityComponent extends PageBase {
 
   search(keyword: any) {
     this.data$ = this.service
-    .getList(this.index, this.size, { collection: 'person_entity', type: 'item', keyword: `%${this.keyword}%` })
-    .pipe(
-      tap((x: any) => console.log(x)),
-      map((x: any) => x)
-    );
+      .getList(this.index, this.size, { collection: 'person_entity', type: 'item', keyword: `%${this.keyword}%` })
+      .pipe(
+        tap((x: any) => console.log(x)),
+        map((x: any) => x)
+      );
     this.data = (index: number, size: number, query: Query) =>
       this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
         tap((x: any) => console.log(x)),
@@ -191,7 +195,162 @@ export class EntityComponent extends PageBase {
           });
         }
         break;
+      case 'fusion':
+        this.placement.set('center');
+        this.visible = true;
+        console.log(this.checkedRows)
+        let checkedRows: EntitySource[] = [];
+        this.checkedRows.forEach((row: any) => {
+          checkedRows.push(row['_source'])
+        })
 
+        this.mergedEntity = this.fusion(checkedRows);
+        break;
+      case 'restore':
+        this.fusionService.restore(this.checkedRows[0]).subscribe((data:any)=>{console.log(data)});
+        break;
     }
   }
+
+
+
+  visible = false;
+  placement = signal<XPlace>('center');
+
+
+
+  close() {
+    this.visible = false;
+  }
+
+  evt(type: string) {
+    console.log('output', type);
+    if(type=='confirm'){
+      this.fusionService.fusion(this.mergedEntity).subscribe((data:any)=>{console.log(data)});
+    }
+  }
+
+  fusion(checkedRows: EntitySource[]): EntitySource {
+    // 初始化标签、描述和别名
+    let mainLabel: Label | null = null;
+    let mergedDescription: string = "";
+    let mergedAliases: Alias[] = [];
+    let mergedItems: string[] = [];
+    let latestModified: string = "";
+
+    // 遍历每个实体进行融合
+    for (let row of checkedRows) {
+      const { labels, descriptions, aliases, modified, items }: any = row;
+
+      // 如果 mainLabel 还没有设置，选择第一个标签作为主要标签
+      if (!mainLabel) {
+        mainLabel = labels.zh;
+      } else {
+        // 如果已经有了主要标签，当前标签进入别名
+        mergedAliases.push({
+          language: labels.zh.language,
+          value: labels.zh.value
+        });
+      }
+
+      // 合并描述
+      if (descriptions.zh) {
+        if (mergedDescription) {
+          mergedDescription += `，${descriptions.zh.value}`;
+        } else {
+          mergedDescription = descriptions.zh.value;
+        }
+      }
+
+      // 合并别名
+      if (aliases && aliases.zh) {
+        for (let alias of aliases.zh) {
+          if (!mergedAliases.some(a => a.value === alias.value)) {
+            mergedAliases.push(alias);
+          }
+        }
+      }
+
+      // 合并items
+      mergedItems = [...new Set([...mergedItems, ...items])];
+
+      // 保留最新的modified时间
+      if (modified > latestModified) {
+        latestModified = modified;
+      }
+    }
+
+    // 创建最终的合并实体
+    const mergedEntity: EntitySource = {
+      ids: this.checkedRows.map((row:any)=>row['_id']),
+      type: "item",
+      labels: {
+        zh: mainLabel!
+      },
+      descriptions: {
+        zh: {
+          language: "zh",
+          value: mergedDescription
+        }
+      },
+      aliases: {
+        zh: mergedAliases
+      },
+      modified: latestModified,
+      items: mergedItems
+    };
+
+    console.log(mergedEntity);
+    return mergedEntity;
+  }
+
+
+
+
+  // beforeClose = (action: XDialogAction) => {
+  //   console.log('beforeClose', action);
+  //   this.msgBox.confirm({
+  //     title: '提示',
+  //     content: '有未保存的数据，确认关闭吗？',
+  //     type: 'warning',
+  //     callback: (action: XMessageBoxAction) => {
+  //       action === 'confirm' && this.close();
+  //     }
+  //   });
+  // };
+}
+
+
+
+
+
+interface Label {
+  language: string;
+  value: string;
+}
+
+interface Description {
+  language: string;
+  value: string;
+}
+
+interface Alias {
+  language: string;
+  value: string;
+}
+
+interface EntitySource {
+  ids: string[];
+  type: string;
+  labels: {
+    [key: string]: Label;
+  };
+  descriptions: {
+    [key: string]: Description;
+  };
+  aliases?: {
+    [key: string]: Alias[];
+  };
+  modified: string;
+  items: string[];
 }
