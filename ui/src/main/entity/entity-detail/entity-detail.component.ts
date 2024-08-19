@@ -143,15 +143,25 @@ export class EntityDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
-        console.log(this.form.formGroup.value)
+        let item:any = {
+          labels: {
+            zh: this.form.formGroup.value.label
+          },
+          descriptions: {
+            zh: this.form.formGroup.value.description
+          },
+          type: this.form.formGroup.value.type
+        }
+        console.log(item)
 
         if (this.type === 'add') {
-          this.nodeService.post(this.form.formGroup.value).subscribe((x) => {
+          
+          this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
-          this.nodeService.put(this.form.formGroup.value).subscribe((x) => {
+          this.nodeService.put(item).subscribe((x) => {
             this.message.success('修改成功！');
             this.router.navigate(['/index/entity']);
           });

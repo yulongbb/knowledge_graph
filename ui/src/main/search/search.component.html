@@ -11,14 +11,14 @@
 <div class="row" *ngFor="let entity of entities">
     <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
       <ng-template #header>
-        <h1>{{entity['_source'].labels.zh.value}}<span>{{entity._id}}</span>
+        <h1>{{entity['_source']?.labels?.zh?.value}}<span>{{entity?._id}}</span>
         </h1>
       </ng-template>
       <div class="bottom">
-        <p>{{entity['_source'].descriptions.zh.value}}</p>
+        <p>{{entity['_source']?.descriptions?.zh?.value}}</p>
         <div class="time">
-          <span>{{entity['_source'].modified}}</span>
-          <span>{{entity['_source'].items}}</span>
+          <span>{{entity['_source']?.modified}}</span>
+          <span>{{entity['_source']?.items}}</span>
         </div>
       </div>
     </x-card>

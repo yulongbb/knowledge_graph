@@ -37,7 +37,6 @@ export class FusionService {
       ]
     }).then((doc: any) => {
       const myCollection = this.db.collection('entity');
-    
       entity.items.forEach((item: any) => {
         myCollection
           .document(item.split('/')[1])
@@ -145,7 +144,7 @@ export class FusionService {
         .document(item.split('/')[1])
         .then((existingDocument) => {
           const document = {
-            type: existingDocument.type,
+            type: entity['_source'].type,
             labels: existingDocument.labels,
             descriptions: existingDocument.descriptions,
             aliases: existingDocument.aliases,

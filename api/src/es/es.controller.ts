@@ -30,6 +30,22 @@ export class EsController {
       ]
     });
   }
+
+
+  @Get('aggs')
+  async aggs() {
+    return await this.elasticsearchService.aggs({
+      index: 'entity', body: {
+        "aggs": {
+          "types": {
+            "terms": {
+              "field": "type.keyword"
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
 

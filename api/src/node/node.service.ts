@@ -62,9 +62,11 @@ export class NodeService {
     // 插入数据
 
     const item = {
+      _key: entity['_key'],
       type: 'item',
-      labels: { zh: { language: 'zh', value: entity.label } },
-      descriptions: { zh: { language: 'zh', value: entity.description } },
+      labels: entity?.labels,
+      descriptions: entity?.descriptions,
+      aliases: entity?.aliases,
       modified: new Date().toISOString(),
     };
 
@@ -79,8 +81,9 @@ export class NodeService {
         const type = {
           _key: entity.type.id,
           type: 'item',
-          labels: { zh: { language: 'zh', value: entity.type.label } },
-          descriptions: { zh: { language: 'zh', value: entity.type.description } },
+          // labels: entity?.labels, 
+          // descriptions: entity?.descriptions,
+          // aliases: entity?.aliases,
           modified: new Date().toISOString(),
         };
         console.log(type);
@@ -112,7 +115,6 @@ export class NodeService {
               (err) => console.error('Failed to save document:', err),
             );
           }, (err) => {
-            console.log(err);
             document.save(type).then((type: any) => {
               edge.save({
                 _from: doc['_id'],
@@ -139,19 +141,19 @@ export class NodeService {
                 (err) => console.error('Failed to save document:', err),
               );
             });
-          }),
+          });
+        item['id'] = item['_key'];
+        this.updateEntity(item);
 
-
-          doc['id'] = doc['_key'];
-        this.updateEntity(doc);
         return this.elasticsearchService.bulk({
           body: [
             // 指定的数据库为news, 指定的Id = 1
-            { index: { _index: 'entity', _id: doc['_key'] } },
+            { index: { _index: 'entity', _id: entity['_key'] } },
             {
               type: entity.type.id,
-              labels: { zh: { language: 'zh', value: entity.label } },
-              descriptions: { zh: { language: 'zh', value: entity.description } },
+              labels: entity?.labels,
+              descriptions: entity?.descriptions,
+              aliases: entity?.aliases,
               modified: new Date().toISOString(),
               items: [doc['_id']]
             }
@@ -161,7 +163,23 @@ export class NodeService {
       (err) => console.error('Failed to save document:', err),
     );
   }
+  async updateEntity(entity: any): Promise<any> {
+    // Fetch the existing document
+    const myCollection = this.db.collection('entity');
 
+    return myCollection
+      .document(entity['_key'])
+      .then((existingDocument) => {
+        // Update the document fields
+        existingDocument.id = entity.id;
+        existingDocument.type = entity.type;
+        existingDocument.labels = entity?.labels;
+        existingDocument.descriptions = entity?.descriptions;
+        existingDocument.modified = new Date().toISOString();
+        return myCollection.update(entity['_key'], existingDocument);
+      })
+
+  }
   async addLink(entity: any): Promise<any> {
     // 获取集合（Collection）
     const myCollection = this.db.collection('link');
@@ -195,27 +213,7 @@ export class NodeService {
     );
   }
 
-  async updateEntity(entity: any): Promise<any> {
-    // Fetch the existing document
-    const myCollection = this.db.collection('entity');
 
-    return myCollection
-      .document(entity.id)
-      .then((existingDocument) => {
-        // Update the document fields
-        existingDocument.id = entity.id;
-        existingDocument.type = entity.type;
-        existingDocument.labels = {
-          zh: { language: 'zh', value: entity.label },
-        };
-        existingDocument.descriptions = {
-          zh: { language: 'zh', value: entity.description },
-        };
-        existingDocument.modified = new Date().toISOString();
-        return myCollection.update(existingDocument._key, existingDocument);
-      })
-
-  }
 
   async deleteEntity(id: any): Promise<any> {
 
@@ -229,14 +227,26 @@ export class NodeService {
 
 
     return this.elasticsearchService.get(id).then((data: any) => {
-      data['_source']['items'].forEach((item: any) => {
-        const myCollection = this.db.collection('entity');
+      data['_source']['items'].forEach(async (item: any) => {
         console.log(item);
+        const removeEdgesQuery = `
+          FOR edge IN link
+          FILTER edge._from == @item OR edge._to == @item
+          REMOVE edge IN link
+        `;
 
-        myCollection.remove(item.split('/')[1]).then(
-          () => console.log('Document removed successfully'),
-          (err) => console.error('Failed to remove document:', err),
-        );
+        // 删除节点本身
+        const removeNodeQuery = `
+          REMOVE { _key: @item } IN entity
+        `;
+
+
+        // 执行删除边的查询
+        await this.db.query(removeEdgesQuery, { item });
+
+
+        // 执行删除节点的查询
+        await this.db.query(removeNodeQuery, { item: item.split('/')[1] });
       })
       this.elasticsearchService.delete(id).then((data: any) => {
         console.log(data);
