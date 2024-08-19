@@ -6,10 +6,7 @@ import { tap, map, Observable } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
-  XButtonModule,
   XData,
-  XDialogAction,
-  XDialogComponent,
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
@@ -50,7 +47,7 @@ export class EntityComponent extends PageBase {
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
-    { id: '_id', label: '序号',  width: 200, left: 0,  },
+    { id: '_id', label: '序号', width: 200, left: 0, },
     { id: 'type', label: '类型', width: 100, sort: true },
     { id: 'label', label: '标签', flex: 0.5, sort: true },
     { id: 'description', label: '描述', flex: 1.5, sort: true },
@@ -138,7 +135,8 @@ export class EntityComponent extends PageBase {
   }
 
   action(type: string, item?: any) {
-    console.log(type);
+    console.log(item);
+
     switch (type) {
       case 'add':
         let param = {};
@@ -172,7 +170,7 @@ export class EntityComponent extends PageBase {
             type: 'warning',
             callback: (action: XMessageBoxAction) => {
               action === 'confirm' && this.checkedRows.forEach((item) => {
-                this.service.delete(item.id[0].split('/')[1]).subscribe(() => {
+                this.service.delete(item['_id']).subscribe(() => {
                   this.tableCom.change(this.index);
                   this.message.success('删除成功！');
                 });
@@ -187,7 +185,8 @@ export class EntityComponent extends PageBase {
             type: 'warning',
             callback: (action: XMessageBoxAction) => {
               action === 'confirm' &&
-                this.service.delete(item.id[0].split('/')[1]).subscribe(() => {
+                this.service.delete(item['_id']).subscribe((data) => {
+                  console.log(data);
                   this.tableCom.change(this.index);
                   this.message.success('删除成功！');
                 });
@@ -207,7 +206,7 @@ export class EntityComponent extends PageBase {
         this.mergedEntity = this.fusion(checkedRows);
         break;
       case 'restore':
-        this.fusionService.restore(this.checkedRows[0]).subscribe((data:any)=>{console.log(data)});
+        this.fusionService.restore(this.checkedRows[0]).subscribe((data: any) => { console.log(data) });
         break;
     }
   }
@@ -225,13 +224,14 @@ export class EntityComponent extends PageBase {
 
   evt(type: string) {
     console.log('output', type);
-    if(type=='confirm'){
-      this.fusionService.fusion(this.mergedEntity).subscribe((data:any)=>{console.log(data)});
+    if (type == 'confirm') {
+      this.fusionService.fusion(this.mergedEntity).subscribe((data: any) => { console.log(data) });
     }
   }
 
   fusion(checkedRows: EntitySource[]): EntitySource {
     // 初始化标签、描述和别名
+    let mergedType: string = "";
     let mainLabel: Label | null = null;
     let mergedDescription: string = "";
     let mergedAliases: Alias[] = [];
@@ -240,7 +240,11 @@ export class EntityComponent extends PageBase {
 
     // 遍历每个实体进行融合
     for (let row of checkedRows) {
-      const { labels, descriptions, aliases, modified, items }: any = row;
+      const { type, labels, descriptions, aliases, modified, items }: any = row;
+      // 合并描述
+      if (type) {
+        mergedType = type;
+      }
 
       // 如果 mainLabel 还没有设置，选择第一个标签作为主要标签
       if (!mainLabel) {
@@ -282,8 +286,8 @@ export class EntityComponent extends PageBase {
 
     // 创建最终的合并实体
     const mergedEntity: EntitySource = {
-      ids: this.checkedRows.map((row:any)=>row['_id']),
-      type: "item",
+      ids: this.checkedRows.map((row: any) => row['_id']),
+      type: mergedType,
       labels: {
         zh: mainLabel!
       },

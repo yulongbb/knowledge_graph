@@ -18,6 +18,10 @@ export class EsService {
     return await this.elasticsearchService.bulk(params);
   }
 
+  async get(id: any) {
+    return await this.elasticsearchService.get({index:'entity', id: id});
+  }
+
   async delete(id: any) {
     return await this.elasticsearchService.delete({index:'entity', id: id});
   }

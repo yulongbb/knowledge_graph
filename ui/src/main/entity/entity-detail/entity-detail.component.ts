@@ -35,31 +35,31 @@ export class EntityDetailComponent implements OnInit {
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
-    // {
-    //   control: 'find',
-    //   id: 'type',
-    //   label: '类型',
-    //   treeData: () =>
-    //     this.ontologyService
-    //       .getList(1, Number.MAX_SAFE_INTEGER, {
-
-    //         sort: [
-    //           { field: 'pid', value: 'asc' },
-    //           { field: 'sort', value: 'asc' },
-    //         ],
-    //       })
-    //       .pipe(map((x) => x.list)),
-
-    // },
     {
-      control: 'input',
+      control: 'find',
       id: 'type',
       label: '类型',
-      required: true,
-      value: 'item',
-      // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
-      // message: '手机号格式不正确，+8615212345678'
+      treeData: () =>
+        this.ontologyService
+          .getList(1, Number.MAX_SAFE_INTEGER, {
+
+            sort: [
+              { field: 'pid', value: 'asc' },
+              { field: 'sort', value: 'asc' },
+            ],
+          })
+          .pipe(map((x) => x.list)),
+
     },
+    // {
+    //   control: 'input',
+    //   id: 'type',
+    //   label: '类型',
+    //   required: true,
+    //   value: 'item',
+    //   // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
+    //   // message: '手机号格式不正确，+8615212345678'
+    // },
     {
       control: 'input',
       id: 'description',
@@ -143,21 +143,22 @@ export class EntityDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
+        console.log(this.form.formGroup.value)
+
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value)
           this.nodeService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
-            this.router.navigate(['/index/node']);
+            this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
           this.nodeService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
-            this.router.navigate(['/index/node']);
+            this.router.navigate(['/index/entity']);
           });
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/node']);
+        this.router.navigate(['/index/entity']);
         break;
     }
   }
