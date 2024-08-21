@@ -18,6 +18,7 @@ import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { EsService } from '../search/es.service';
+import { PropertyService } from '../ontology/property/property.service';
 
 @Component({
   selector: 'app-entity',
@@ -70,6 +71,7 @@ export class EntityComponent extends PageBase {
     private service: EntityService,
     private esService: EsService,
     private fusionService: FusionService,
+
     public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -86,7 +88,7 @@ export class EntityComponent extends PageBase {
           map((x: any) => x)
         );
       this.data = (index: number, size: number, query: Query) => this.esService
-        .getEntity({})
+        .searchEntity(index, size, {})
         .pipe(
           tap((x: any) => console.log(x)),
           map((x: any) => x)
@@ -147,7 +149,7 @@ export class EntityComponent extends PageBase {
       case 'info':
         console.log(item);
         this.router.navigate(
-          [`./${type}/${item.id}`],
+          [`./${type}/${item._id}`],
           {
             relativeTo: this.activatedRoute,
           }
@@ -156,7 +158,7 @@ export class EntityComponent extends PageBase {
         break;
       case 'edit':
         this.router.navigate(
-          [`./${type}/${item.id}`],
+          [`./${type}/${item._id}`],
           {
             relativeTo: this.activatedRoute,
           }

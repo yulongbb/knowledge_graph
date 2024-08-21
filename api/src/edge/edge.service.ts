@@ -3,7 +3,30 @@ import { Database, aql } from 'arangojs';
 
 @Injectable()
 export class EdgeService {
+
+
   constructor(@Inject('ARANGODB') private db: Database) { }
+
+
+  async addEdge(edge: any): Promise<any> {
+    const myCollection = this.db.collection('link');
+    return myCollection.save(edge).then(
+      () => console.log('Document removed successfully'),
+      (err) => console.error('Failed to remove document:', err),
+    );
+  }
+
+  updateEdge(edge: any): Promise<any> {
+  // Fetch the existing document
+  const myCollection = this.db.collection('link');
+
+  return myCollection
+    .document(edge['_key'])
+    .then((existingDocument) => {
+      // Update the document fields
+      existingDocument.mainsnak = edge.mainsnak;
+      return myCollection.update(edge['_key'], existingDocument);
+    })  }
 
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {

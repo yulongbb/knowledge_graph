@@ -43,6 +43,30 @@
     color: var(--x-text-400);
   }
 
+  .row .card dl {
+    display: block;
+    font-size: 22px;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
+  }
+
+  .row .card  dt {
+    display: inline-block;
+    margin-right: 20px;
+    width: 35%;
+    text-align: end;
+    color: #5f37ab !important;
+  }
+
+  .row .card dd {
+    display: inline-grid;
+    text-align: left;
+    word-break: break-all;
+  }
+
   .row.scroll {
     height: 12rem;
     width: 100%;

@@ -36,6 +36,7 @@ import { EsModule } from './es/es.module';
     PredicateModule,
     ExtractionModule,
     NodeModule,
+    EdgeModule,
     FusionModule,
     KnowledgeModule,
     MinioClientModule,

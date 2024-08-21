@@ -6,11 +6,18 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class EsService extends RepositoryService<any> {
   constructor(public override http: HttpService) {
-    super(http, { controller: { name: 'api/redis' } });
+    super(http, { controller: { name: 'api/es' } });
   }
 
-  getValue(key: any): Observable<any> {
-    return this.http.get(`${this.option.controller?.name}/get/${key}`);
+
+  searchEntity( index?: number,
+    size?: number, query?: any): Observable<any> {
+    return this.http.post(`${this.option.controller?.name}/search/${size}/${index}`,query);
+  }
+
+
+  getEntity(id: any): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/get/${id}`);
   }
 
 
@@ -19,9 +26,5 @@ export class EsService extends RepositoryService<any> {
     return this.http.post(`${this.option.controller?.name}/number`, ids);
   }
 
-
-  getEntity(query: any): Observable<any> {
-    return this.http.post(`api/es/search`, query);
-  }
 
 }

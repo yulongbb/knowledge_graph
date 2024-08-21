@@ -9,9 +9,10 @@ import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
 import { EsService } from './es.service';
+import { SearchDetailComponent } from './search-detail/search-detail.component';
 
 @NgModule({
-  declarations: [SearchComponent],
+  declarations: [SearchComponent, SearchDetailComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -27,6 +28,8 @@ import { EsService } from './es.service';
         path: '',
         component: SearchComponent,
       },
+      { path: ':type', component: SearchDetailComponent },
+      { path: ':type/:id', component: SearchDetailComponent }
     ]),
   ],
   exports: [RouterModule],

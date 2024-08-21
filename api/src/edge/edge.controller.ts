@@ -5,6 +5,7 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Put,
   Delete,
 } from '@nestjs/common';
 import { EdgeService } from './edge.service';
@@ -14,9 +15,21 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('edge')
 @ApiTags('知识融合') // 分组
 export class EdgeController {
-  constructor(private readonly nodeService: EdgeService) {}
+  constructor(private readonly edgeService: EdgeService) {}
 
-  @Post(':size/:index')
+  @Post('')
+  async addEdge(@Body() edge: any): Promise<any> {
+    return await this.edgeService.addEdge(edge);
+  }
+
+  @Put('')
+  async updateEdge(@Body() edge: any): Promise<any> {
+    return await this.edgeService.updateEdge(edge);
+  }
+
+ 
+
+  @Post('search/:size/:index')
   getLinks(
     @Param('index', new ParseIntPipe())
     index: number = 1,
@@ -24,7 +37,7 @@ export class EdgeController {
     size: number = 10,
     @Body() query: any,
   ): any {
-    return this.nodeService.getLinks(index, size, query);
+    return this.edgeService.getLinks(index, size, query);
   }
 
   @Get('property/:size/:index')
@@ -34,11 +47,11 @@ export class EdgeController {
     @Param('size', new ParseIntPipe())
     size: number = 10,
   ): any {
-    return this.nodeService.getProperties(index, size);
+    return this.edgeService.getProperties(index, size);
   }
 
   @Delete(':id')
   deleteEdge(@Param('id') id: XIdType): any {
-    return this.nodeService.deleteEdge(id);
+    return this.edgeService.deleteEdge(id);
   }
 }

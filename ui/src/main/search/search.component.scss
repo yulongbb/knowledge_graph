@@ -38,8 +38,14 @@
     }
 }
 
+   #header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+   }
 
-.row:not(:first-child) {
+  
+  .row:not(:first-child) {
     margin-top: 1rem;
   }
   .row x-card:not(:first-child) {

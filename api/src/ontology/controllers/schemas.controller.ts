@@ -1,5 +1,5 @@
-import { Controller } from '@nestjs/common';
-import { XControllerService, XQuery } from '@ng-nest/api/core';
+import { Controller, Get, Param } from '@nestjs/common';
+import { XControllerService, XIdType, XQuery } from '@ng-nest/api/core';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { SchemasService } from 'src/ontology/services/schemas.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -9,5 +9,10 @@ import { ApiTags } from '@nestjs/swagger';
 export class SchemasController extends XControllerService<Schema, XQuery> {
   constructor(public readonly schemasService: SchemasService) {
     super(schemasService);
+  }
+
+  @Get('parent/:id')
+  getAllParentIds(@Param('id') id: XIdType): any {
+    return this.schemasService.getAllParentIds(id);
   }
 }

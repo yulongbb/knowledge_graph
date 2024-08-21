@@ -9,7 +9,9 @@ export class OntologyService extends RepositoryService<Schema> {
   constructor(public override http: HttpService) {
     super(http, { controller: { name: 'api/schemas' } });
   }
-
+  getAllParentIds(id:  string): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/parent/${id}`);
+  }
 }
 
 

@@ -7,6 +7,7 @@ import { IndexService } from 'src/layout/index/index.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntypedFormGroup } from '@angular/forms';
 import { NodeService } from '../node/node.service';
+import { EsService } from '../search/es.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,8 +44,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ];
 
   items = (index: number, size: number, query: Query) =>
-    this.nodeService
-      .getList(index, this.size, { collection: 'entity', keyword: `%${this.keyword}%` })
+    this.esService
+      .searchEntity(index, size, {})
       .pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
@@ -99,6 +100,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   entities: any = signal([]);
 
   constructor(
+    private esService: EsService,
+
     private service: OntologyService, private dashboardService: DashboardService,
     private message: XMessageService,
     private router: Router,

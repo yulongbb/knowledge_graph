@@ -11,8 +11,8 @@
 <div class="row" *ngFor="let entity of entities">
     <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
       <ng-template #header>
-        <h1>{{entity['_source']?.labels?.zh?.value}}<span>{{entity?._id}}</span>
-        </h1>
+        <strong (click)="action('info', entity)" >{{entity['_source']?.labels?.zh?.value}} </strong><span>{{entity['_source']?.type}}</span>
+       
       </ng-template>
       <div class="bottom">
         <p>{{entity['_source']?.descriptions?.zh?.value}}</p>

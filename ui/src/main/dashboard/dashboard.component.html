@@ -39,13 +39,13 @@
             </x-table>
             <ng-template #labelTpl let-column="$column" let-row="$row">
               <x-link (click)="action('info', row)">
-                {{row?.labels?.zh?.value??row?.labels?.en?.value}}
+                {{row['_source']?.labels?.zh?.value??row?.labels?.en?.value}}
               </x-link>
             </ng-template>
             
             <ng-template #descriptionTpl let-column="$column" let-row="$row">
               <x-link (click)="action('info', row)">
-                {{row?.descriptions?.zh?.value??row?.descriptions?.en?.value}}
+                {{row['_source']?.descriptions?.zh?.value??row?.descriptions?.en?.value}}
               </x-link>
             </ng-template>
           </x-card>

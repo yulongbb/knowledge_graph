@@ -56,6 +56,51 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
       x(result);
     });
   }
+  private setFilter(rep: SelectQueryBuilder<Entity>, filter: XFilter[]) {
+    if (filter && filter.length > 0) {
+      const param = {};
+      filter.forEach((x, index) => {
+        param[`param${index}`] = x.value;
+        if (x.relation) {
+          rep = rep.leftJoin(`entity.${x.relation}`, x.relation);
+          switch (x.operation) {
+            case '=':
+              rep.andWhere(`${x.relation}.${x.field} = :param${index}`);
+              break;
+            case 'IN':
+              rep.andWhere(`${x.relation}.${x.field} IN (:...param${index})`);
+              break;
+          }
+        } else {
+          switch (x.operation) {
+            case '=':
+              rep.andWhere(`entity.${x.field} = :param${index}`);
+              break;
+            case '>':
+              rep.andWhere(`entity.${x.field} > :param${index}`);
+              break;
+            case '>=':
+              rep.andWhere(`entity.${x.field} >= :param${index}`);
+              break;
+            case '<':
+              rep.andWhere(`entity.${x.field} < :param${index}`);
+              break;
+            case '<=':
+              rep.andWhere(`entity.${x.field} <= :param${index}`);
+              break;
+            case 'IN':
+              rep.andWhere(`entity.${x.field} IN (:...param${index})`);
+              break;
+            default:
+              // '%'
+              rep.andWhere(`entity.${x.field} LIKE concat('%', :param${index}, '%')`);
+              break;
+          }
+        }
+      });
+      rep.setParameters(param);
+    }
+  }
 
   async get(id: XIdType): Promise<Entity> {
     return await this.repository.findOneBy({ id });
@@ -84,47 +129,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     return await this.repository.remove(entity);
   }
 
-  private setFilter(rep: SelectQueryBuilder<Entity>, filter: XFilter[]) {
-    if (filter && filter.length > 0) {
-      const param = {};
-      filter.forEach((x, index) => {
-        param[`param${index}`] = x.value;
-        if (x.relation) {
-          rep = rep.leftJoin(`entity.${x.relation}`, x.relation);
-          switch (x.operation) {
-            case '=':
-              rep.andWhere(`${x.relation}.${x.field} = :param${index}`);
-              break;
-          }
-        } else {
-          switch (x.operation) {
-            case '=':
-              rep.andWhere(`entity.${x.field} = :param${index}`);
-              break;
-            case '>':
-              rep.andWhere(`entity.${x.field} > :param${index}`);
-              break;
-            case '>=':
-              rep.andWhere(`entity.${x.field} >= :param${index}`);
-              break;
-            case '<':
-              rep.andWhere(`entity.${x.field} < :param${index}`);
-              break;
-            case '<=':
-              rep.andWhere(`entity.${x.field} < :param${index}`);
-              break;
-            default:
-              // '%'
-              rep.andWhere(
-                `entity.${x.field} like concat('%',:param${index},'%')`,
-              );
-              break;
-          }
-        }
-      });
-      rep.setParameters(param);
-    }
-  }
+  
 
   private async setGroup(rep: SelectQueryBuilder<Entity>, group: string) {
     let result = [];
@@ -155,7 +160,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     const condition: { [prop: string]: 'ASC' | 'DESC' } = {};
     if (sort && sort.length > 0) {
       sort.forEach((x) => {
-        const order: 'ASC' | 'DESC' = x.value.toUpperCase() as 'ASC' | 'DESC';
+        const order: 'ASC' | 'DESC' = x.value.toString().toUpperCase() as 'ASC' | 'DESC';
         const field = x.field;
         if (entity !== '') {
           condition[`${entity}.${field}`] = order;

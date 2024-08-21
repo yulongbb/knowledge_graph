@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
@@ -8,6 +8,8 @@ import { map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NodeService } from 'src/main/node/node.service';
+import { EsService } from '../es.service';
+import { PropertyService } from 'src/main/ontology/property/property.service';
 
 @Component({
   selector: 'app-search-detail',
@@ -20,9 +22,10 @@ export class SearchDetailComponent implements OnInit {
   knowledge: string = '';
   type: string = '';
   schema: string = '';
-  item: any;
+  entity: any;
   statements: any;
-  climas!: Observable<Array<any>>;
+  properties: any;
+  claims: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
     {
@@ -79,6 +82,8 @@ export class SearchDetailComponent implements OnInit {
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
+    private service: EsService,
+    public propertyService: PropertyService,
 
     private nodeService: NodeService,
     private router: Router,
@@ -98,16 +103,10 @@ export class SearchDetailComponent implements OnInit {
         this.title = '修改实体';
       }
 
-      this.climas = this.nodeService.getLinks(1, 20, this.id, {}).pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
-      
     });
   }
 
   ngOnInit(): void {
-    console.log(this.type);
     this.action(this.type);
 
 
@@ -127,8 +126,26 @@ export class SearchDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.nodeService.getItem(this.id).subscribe((x) => {
-          this.item = x;
+        this.service.getEntity(this.id).subscribe((x) => {
+          this.entity = signal(x['_source']);
+          console.log(this.entity)
+          this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
+            console.log(parents)
+            parents.push(x['_source'].type)
+            this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
+              console.log(x.list)
+              this.properties = signal(p.list);
+              this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).subscribe((c: any) => {
+                console.log(c.list)
+                this.claims = c.list;
+              })
+            });
+          });
+
+          // this.climas = this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).pipe(
+          //   tap((x: any) => console.log(x)),
+          //   map((x: any) => x)
+          // );
         });
         break;
       case 'edit':
@@ -156,6 +173,12 @@ export class SearchDetailComponent implements OnInit {
 
   backClick() {
     this.router.navigate([`/index/search/${this.knowledge}`], { replaceUrl: true });
+
+  }
+
+  getStatement(property: any): any {
+    console.log(property);
+    return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
 
   }
 }

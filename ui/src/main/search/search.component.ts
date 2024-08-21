@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
 import { Observable, map, tap } from 'rxjs';
 import { EsService } from './es.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -18,12 +19,14 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private service: EsService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
   ) {
 
   }
 
   ngOnInit(): void {
-    this.service.getEntity({}).subscribe((data: any) => {
+    this.service.searchEntity(1, 10, {}).subscribe((data: any) => {
       console.log(data);
       this.entities = data.list;
     })
@@ -35,7 +38,7 @@ export class SearchComponent implements OnInit {
     } else {
       this.query = {}
     }
-    this.service.getEntity(this.query).subscribe((data: any) => {
+    this.service.searchEntity(1, 10, this.query).subscribe((data: any) => {
       console.log(data);
       this.entities = data.list;
     })
@@ -58,5 +61,23 @@ export class SearchComponent implements OnInit {
     return 4;
   }
 
+
+  action(type: string, item?: any) {
+    console.log(item);
+
+    switch (type) {
+      case 'info':
+        console.log(item);
+        this.router.navigate(
+          [`./${type}/${item._id}`],
+          {
+            relativeTo: this.activatedRoute,
+          }
+        ).then(() => {
+        });
+        break;
+
+    }
+  }
 
 }

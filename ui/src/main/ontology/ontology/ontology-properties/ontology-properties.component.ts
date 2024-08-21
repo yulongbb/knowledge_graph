@@ -6,6 +6,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { NavService } from 'src/services/nav.service';
 import { PropertyService } from '../../property/property.service';
+import { OntologyService } from '../ontology.service';
 
 @Component({
     selector: 'app-ontology-properties',
@@ -19,10 +20,7 @@ export class OntologyPropertiesComponent implements OnInit {
     query: XQuery = { filter: [] };
 
     schemaId!: string;
-    data = (index: number, size: number, query: any) =>
-        this.service.getList(index, size, query).pipe((x: any) => {
-            return x;
-        });
+    data :any;
 
     columns: XTableColumn[] = [
         { id: 'id', label: '序号', flex: 0.1, left: 0, },
@@ -35,6 +33,8 @@ export class OntologyPropertiesComponent implements OnInit {
     @ViewChild('tableCom') tableCom!: XTableComponent;
 
     constructor(
+        private ontologyService: OntologyService,
+
         public service: PropertyService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -43,8 +43,19 @@ export class OntologyPropertiesComponent implements OnInit {
         private nav: NavService
     ) {
         this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+            console.log(x)
             this.schemaId = x.get('schemaId') as string;
-            this.query.filter = [{ field: 'id', value: this.schemaId as string, relation: 'schemas', operation: '=' }];
+            this.ontologyService.getAllParentIds(this.schemaId).subscribe((parents:any)=>{
+                console.log(parents)
+                parents.push(this.schemaId)
+                this.query.filter = [{ field: 'id', value: parents, relation: 'schemas', operation: 'IN' }];
+
+                this.data = (index: number, size: number, query: any) =>
+                    this.service.getList(index, size, query).pipe((x: any) => {
+                        return x;
+                    });
+            })
+            
         });
     }
 

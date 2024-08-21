@@ -81,12 +81,12 @@ export class NodeService {
         const type = {
           _key: entity.type.id,
           type: 'item',
-          // labels: entity?.labels, 
-          // descriptions: entity?.descriptions,
-          // aliases: entity?.aliases,
+          labels: { 'zh': { language: 'zh', value: entity.type.label } },
+          descriptions: { 'zh': { language: 'zh', value: entity.type.description } },
+          aliases: { 'zh': [{ language: 'zh', value: entity.type.label }] },
           modified: new Date().toISOString(),
+          id: entity.type.id,
         };
-        console.log(type);
 
         document.document(entity.type.id).then(
           (updatedDocument) => {
@@ -115,10 +115,10 @@ export class NodeService {
               (err) => console.error('Failed to save document:', err),
             );
           }, (err) => {
-            document.save(type).then((type: any) => {
+            document.save(type).then((t: any) => {
               edge.save({
                 _from: doc['_id'],
-                _to: type['_id'],
+                _to: t['_id'],
                 id: entity.id,
                 mainsnak: {
                   snaktype: 'value',
@@ -127,8 +127,8 @@ export class NodeService {
                   datavalue: {
                     value: {
                       'entity-type': 'item',
-                      'numeric-id': Number.parseInt(type['_key'].replace('Q', '')),
-                      id: type['_key'],
+                      'numeric-id': Number.parseInt(t['_key'].replace('Q', '')),
+                      id: t['_key'],
                     },
                     type: 'wikibase-entityid',
                   },
@@ -142,13 +142,13 @@ export class NodeService {
               );
             });
           });
+        item['_key'] = doc['_key'];
         item['id'] = item['_key'];
         this.updateEntity(item);
-
         return this.elasticsearchService.bulk({
           body: [
             // 指定的数据库为news, 指定的Id = 1
-            { index: { _index: 'entity', _id: entity['_key'] } },
+            { index: { _index: 'entity', _id: doc['_key'] } },
             {
               type: entity.type.id,
               labels: entity?.labels,

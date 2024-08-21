@@ -35,12 +35,12 @@ export interface Sort extends Filter {}
 
 export interface Filter {
   field: string;
-  value: string;
+  value: string | string[];
   operation?: Operation;
   relation?: string;
 }
 
-export type Operation = '%' | '=' | '>' | '>=' | '<' | '<=' | '';
+export type Operation = '%' | '=' | '>' | '>=' | '<' | '<=' | 'IN' | '';
 
 export class RepositoryService<Entity extends Id> {
   constructor(public http: HttpService, public option: RepositoryOption) {}

@@ -1,33 +1,27 @@
-<x-card width="100%" >
-            
-  <h3>{{ title }}</h3>
-  <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-    width="30rem" labelAlign="end" span="20" space="2"></x-form>
-  
 
-  <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload>
-  
-  <div class="app-footer">
-    <x-buttons space="0.5">
-      <x-button (click)="action('cancel')">取消</x-button>
-      <x-button type="primary" (click)="!formInvalid && action('save')" [disabled]="formInvalid || disabled">保存</x-button>
-    </x-buttons>
-  </div>
 
+<div class="row">
+  <x-card width="100%">
+
+    <h3>{{ title }}</h3>
+    <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+    width="100%" labelAlign="end" span="24" space="2"></x-form>
   
-  <div *ngFor="let claim of climas  | async | keyvalue">
-    <p *ngFor="let statement of claim.value">
-      <i>{{statement.mainsnak.property}}</i>:
-      <i>{{statement.mainsnak.datatype}}</i>:
-      <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a [href]="'http://localhost:4200/index/node/info/'+statement.mainsnak.datavalue.id">{{statement.mainsnak.datavalue.label}}</a>
-        </strong>
-      <strong *ngIf="statement.mainsnak.datatype=='string'">{{statement.mainsnak.datavalue.value |json}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='url'"><a [href]="statement.mainsnak.datavalue.value">{{statement.mainsnak.datavalue.value}}</a></strong>
-      <strong *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text }}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong></p>
-  </div>
+      <br>
   
-</x-card>
+    <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%" labelWidth="5rem" labelAlign="end" 
+    direction="row" span="8" space="1.5"></x-form>
+  
+    <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
+  
+    <div class="app-footer">
+      <x-buttons space="0.5">
+        <x-button (click)="action('cancel')">取消</x-button>
+        <x-button type="primary" (click)="!formInvalid && action('save')"
+          [disabled]="formInvalid || disabled">保存</x-button>
+      </x-buttons>
+    </div>
+  
+  
+  </x-card>
+</div>

@@ -1,19 +1,57 @@
-<x-card width="100%" >
-            
 
-  <div *ngFor="let claim of climas  | async | keyvalue">
-    <p *ngFor="let statement of claim.value">
-      <i>{{statement.mainsnak.property}}</i>:
-      <i>{{statement.mainsnak.datatype}}</i>:
-      <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a [href]="'http://localhost:4200/index/node/info/'+statement.mainsnak.datavalue.id">{{statement.mainsnak.datavalue.label}}</a>
-        </strong>
-      <strong *ngIf="statement.mainsnak.datatype=='string'">{{statement.mainsnak.datavalue.value |json}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='url'"><a [href]="statement.mainsnak.datavalue.value">{{statement.mainsnak.datavalue.value}}</a></strong>
-      <strong *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text }}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-      <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong></p>
-  </div>
+
+<div class="row">
+  <x-card  width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+    <ng-template #header>
+      <strong >{{entity()?.labels?.zh?.value}}</strong><span>{{entity()?.type}}</span>
   
-</x-card>
+    </ng-template>
+    <div class="bottom">
+      <p>{{entity()?.descriptions?.zh?.value}}</p>
+      <div class="time">
+        <span>{{entity()?.modified}}</span>
+        <span>{{entity()?.items}}</span>
+      </div>
+    </div>
+    <dl *ngFor="let property of properties()">
+      <dl *ngIf="getStatement(property).length>0">
+        <dt>
+          {{property.name}}
+        </dt>
+        <dd>
+          <i *ngFor="let statement of getStatement(property)">
+            <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
+                [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.id}}</a>
+            </strong>
+            <strong *ngIf="statement.mainsnak.datatype=='string'">
+              <!-- 判断是否包含多值 -->
+              <ng-container *ngIf="statement.mainsnak.datavalue.value.includes('|'); else singleValue">
+                <!-- 多值处理 -->
+                <div *ngFor="let item of statement.mainsnak.datavalue.value.split('|')">
+                  <strong>{{item.split('(')[0].trim()}}</strong>
+               
+                </div>
+              </ng-container>
+              
+              <!-- 单值处理 -->
+              <ng-template #singleValue>
+                <strong>{{statement.mainsnak.datavalue.value.split('(')[0].trim()}}</strong>
+              
+              </ng-template>
+            </strong>
+            <strong *ngIf="statement.mainsnak.datatype=='url'"><a
+                [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
+            <strong *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
+              }}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
+            <strong
+              *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
+          </i>
+        </dd>
+      </dl>
+    </dl>
+  
+  </x-card>
+</div>

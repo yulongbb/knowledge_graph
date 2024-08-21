@@ -25,7 +25,7 @@ export interface XQuery {
  */
 export interface XFilter {
   field: string;
-  value: string;
+  value: string | string[];
   operation?: XOperation;
   relation?: string;
 }
@@ -33,7 +33,7 @@ export interface XFilter {
 /**
  * 属性匹配规则
  */
-export type XOperation = '%' | '=' | '>' | '>=' | '<' | '<=' | '';
+export type XOperation = '%' | '=' | '>' | '>=' | '<' | '<=' | 'IN'| '';
 
 /**
  * 排序规则

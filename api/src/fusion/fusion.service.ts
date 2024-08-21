@@ -430,13 +430,13 @@ export class FusionService {
       const start = size * (index - 1);
       const end = start + size;
 
-      // 执行查询
+      // 执行查询 RETURN  MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'value': {id: Document(e['_to']).id}}}  })
       const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
         } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
-      RETURN  MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'label': Document(e['_to']).labels.zh.value}}  })`);
+      RETURN e`);
       // 获取查询结果
       const result = await cursor.all();
       console.log(result);

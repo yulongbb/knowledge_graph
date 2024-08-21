@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { EntityService } from '../entity.service';
 import { XTableColumn } from '@ng-nest/ui';
-import { map, Observable, tap } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NodeService } from 'src/main/node/node.service';
+import { EsService } from 'src/main/search/es.service';
+import { PropertyService } from 'src/main/ontology/property/property.service';
+import { EdgeService } from 'src/main/edge/edge.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -25,6 +28,7 @@ export class EntityDetailComponent implements OnInit {
   statements: any;
   climas!: Observable<Array<any>>;
   @ViewChild('form') form!: XFormComponent;
+  @ViewChild('form2') form2!: XFormComponent;
   controls: XControl[] = [
     {
       control: 'input',
@@ -61,7 +65,7 @@ export class EntityDetailComponent implements OnInit {
     //   // message: '手机号格式不正确，+8615212345678'
     // },
     {
-      control: 'input',
+      control: 'textarea',
       id: 'description',
       label: '描述',
       required: true,
@@ -70,6 +74,8 @@ export class EntityDetailComponent implements OnInit {
     },
     { control: 'input', id: 'id', hidden: true, value: XGuid() }
   ];
+
+  controls2: any;
 
 
   query: any;
@@ -86,9 +92,15 @@ export class EntityDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
+
+
+  
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
+    private esService: EsService,
+    public propertyService: PropertyService,
+    private edgeService: EdgeService,
 
     private nodeService: NodeService,
     private router: Router,
@@ -108,7 +120,7 @@ export class EntityDetailComponent implements OnInit {
         this.title = '修改实体';
       }
       this.climas = this.nodeService.getLinks(1, 20, this.id, {}).pipe(
-        tap((x: any) => console.log(x)),
+        tap((x: any) => console.log(x.list)),
         map((x: any) => x)
       );
     });
@@ -135,35 +147,168 @@ export class EntityDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.nodeService.getItem(this.id).subscribe((x) => {
-          this.item = x;
+        this.esService.getEntity(this.id).subscribe((x) => {
+          this.item = x._source;
+          console.log(this.item)
+          this.form.formGroup.patchValue({ id: x._id, label: this.item.labels.zh.value, type: { id: 'Q5', label: '人物' }, description: this.item.descriptions.zh.value });
+          this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
+            console.log(parents)
+            parents.push(this.item.type)
+            this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
+              this.nodeService.getLinks(1, 20, this.id, {}).subscribe((data: any) => {
+                console.log(data.list)
+
+                let control: any = []
+                x.list.forEach((property: any) => {
+                  control.push(
+                    {
+                      _key: '123',
+                      control: 'input',
+                      id: `P${property.id}`,
+                      label: property.name,
+                      value: (data.list.filter((statement: any) => statement.mainsnak.property == `P${property.id}`))[0]?.mainsnak?.datavalue?.value
+                    },
+                  )
+                });
+                this.controls2 = signal<XControl[]>(control);
+              })
+            });
+          });
         });
         break;
       case 'edit':
         this.action('info');
         break;
       case 'save':
-        let item:any = {
+        let item: any = {
           labels: {
-            zh: this.form.formGroup.value.label
+            zh: {
+              language: 'zh',
+              value: this.form.formGroup.value.label
+            }
           },
           descriptions: {
-            zh: this.form.formGroup.value.description
+            zh: {
+              language: 'zh',
+              value: this.form.formGroup.value.description
+            }
           },
           type: this.form.formGroup.value.type
         }
-        console.log(item)
 
         if (this.type === 'add') {
-          
+
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
-          this.nodeService.put(item).subscribe((x) => {
-            this.message.success('修改成功！');
-            this.router.navigate(['/index/entity']);
+
+          // {P19: '广州市', P21: '男', P27: undefined}
+          console.log(this.form2.formGroup.value)
+
+          this.nodeService.getLinks(1, 20, this.id, {}).subscribe((data: any) => {
+            console.log(data.list)
+            let existingEdges = data.list;
+            const updatedEdges: any = [];
+            const deletedEdges: any = [];
+            const newEdges: any = [];
+
+            Object.keys(this.form2.formGroup.value).forEach((key) => {
+              const value = this.form2.formGroup.value[key];
+              const existingEdge = existingEdges.find((edge: any) => edge.mainsnak.property === key && this.form2.formGroup.value[edge.mainsnak.property] != '');
+
+              if (existingEdge) {
+                if (existingEdge.mainsnak.datavalue.value !== value) {
+                  // 值发生变化，进行更新
+                  existingEdge.mainsnak.datavalue.value = value;
+                  updatedEdges.push(existingEdge);
+                }
+              } else if (value !== undefined && value !== '') {
+                // 新增的边
+                let newEdge = {
+                  "_from": this.item.items[0],
+                  "_to": this.item.items[0],
+                  "mainsnak": {
+                    "snaktype": "value",
+                    "property": key,
+                    "hash": "8f7599319c8f07055134a500cf67fc22d1b3142d", // 哈希值部分可以根据需要生成
+                    "datavalue": {
+                      "value": value,
+                      "type": typeof value === 'string' ? 'string' : 'wikibase-entityid'
+                    },
+                    "datatype": typeof value === 'string' ? 'string' : 'wikibase-item'
+                  },
+                  "type": "statement",
+                  "rank": "normal"
+                };
+                newEdges.push(newEdge);
+              }
+            });
+
+            // 查找需要删除的边
+            existingEdges.forEach((edge: any) => {
+              if (!this.form2.formGroup.value.hasOwnProperty(edge.mainsnak.property) || this.form2.formGroup.value[edge.mainsnak.property] == '') {
+                if (edge.mainsnak.property != 'P31') {
+                  deletedEdges.push(edge);
+                }
+              }
+            });
+
+            console.log(updatedEdges)
+            console.log(deletedEdges)
+            console.log(newEdges)
+
+            const requests: any = [];
+
+            // 执行更新操作
+            updatedEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.updateEdge(edge));
+            });
+
+            // 执行删除操作
+            deletedEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.deleteEdge(edge._key));
+            });
+
+            // 执行新增操作
+            newEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.addEdge(edge));
+            });
+
+            // 并行执行所有请求
+            forkJoin(requests).subscribe(() => {
+              this.message.success('编辑成功！');
+              this.router.navigate(['/index/entity']);
+            });
+
+
+            //   let arr: any = []
+
+            //   Object.keys(this.form2.formGroup.value).map((key) => {
+            //     let edge = {
+            //       "_from": "entity/" + this.id,
+            //       "_to": "entity/" + this.id,
+            //       "mainsnak": {
+            //         "snaktype": "value",
+            //         "property": key,
+            //         "hash": "8f7599319c8f07055134a500cf67fc22d1b3142d",
+            //         "datavalue": {
+            //           "value": this.form2.formGroup.value[key],
+            //           "type": "string"
+            //         },
+            //         "datatype": "string"
+            //       },
+            //       "type": "statement",
+            //       "rank": "normal"
+            //     };
+            //     arr.push(this.edgeService.addEdge(edge))
+            //   })
+            // })
+            // // forkJoin(arr).subscribe(() => { });
+            // // this.nodeService.put(item).subscribe((x) => {
+            // //   this.message.success('修改成功！');
+            // //   this.router.navigate(['/index/entity']);
           });
         }
         break;
