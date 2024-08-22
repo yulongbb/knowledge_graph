@@ -1,7 +1,6 @@
 import { Component, OnInit, Query } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
-import { Observable, map, tap } from 'rxjs';
-import { ImageService } from '../image/image.service';
+import { map, tap } from 'rxjs';
 import { EsService } from '../search/es.service';
 
 @Component({
