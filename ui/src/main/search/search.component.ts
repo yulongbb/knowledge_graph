@@ -3,6 +3,7 @@ import { XData, XSliderNode } from '@ng-nest/ui';
 import { Observable, map, tap } from 'rxjs';
 import { EsService } from './es.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-search',
@@ -20,6 +21,7 @@ export class SearchComponent implements OnInit {
   constructor(
     private service: EsService,
     private router: Router,
+    private ontologyService: OntologyService,
     private activatedRoute: ActivatedRoute,
   ) {
 
@@ -27,7 +29,12 @@ export class SearchComponent implements OnInit {
 
   ngOnInit(): void {
     this.service.searchEntity(1, 10, {}).subscribe((data: any) => {
-      console.log(data);
+      data.list.forEach((item:any) => {
+        this.ontologyService.get(item._source.type).subscribe((t:any)=>{
+          console.log(t)
+          item._type = t.label
+        })
+      });
       this.entities = data.list;
     })
   }
@@ -44,30 +51,12 @@ export class SearchComponent implements OnInit {
     })
   }
 
-  getMd(row: any) {
-    console.log(row);
-    if (row.type.label == 'PDF') {
-      return 6;
-    }
-    if (row.type.label == '图像') {
-      return 8;
-    }
-    if (row.type.label == '音频') {
-      return 10;
-    }
-    if (row.type.label == '视频') {
-      return 12;
-    }
-    return 4;
-  }
-
 
   action(type: string, item?: any) {
     console.log(item);
 
     switch (type) {
       case 'info':
-        console.log(item);
         this.router.navigate(
           [`./${type}/${item._id}`],
           {

@@ -12,6 +12,7 @@
     <x-textarea></x-textarea>
   </x-col>
 </x-row>
+<div #container style="width: 100%"></div>
 
 <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index" [query]="query"
   [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" loading [allowSelectRow]="true"

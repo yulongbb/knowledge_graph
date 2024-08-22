@@ -1,4 +1,4 @@
-import { Component, OnInit, Query } from '@angular/core';
+import { Component, OnInit,  } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
 import { map, tap } from 'rxjs';
 import { EsService } from '../search/es.service';

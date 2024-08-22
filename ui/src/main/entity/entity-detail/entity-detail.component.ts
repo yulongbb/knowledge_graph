@@ -72,7 +72,8 @@ export class EntityDetailComponent implements OnInit {
       // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
       // message: '手机号格式不正确，+8615212345678'
     },
-    { control: 'input', id: 'id', hidden: true, value: XGuid() }
+    { control: 'input', id: '_key',  label: 'ID',
+      required: false,  }
   ];
 
   controls2: any;
@@ -94,7 +95,7 @@ export class EntityDetailComponent implements OnInit {
   disabled = false;
 
 
-  
+
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
@@ -181,6 +182,7 @@ export class EntityDetailComponent implements OnInit {
         break;
       case 'save':
         let item: any = {
+          _key:  this.form.formGroup.value._key,
           labels: {
             zh: {
               language: 'zh',
@@ -204,14 +206,15 @@ export class EntityDetailComponent implements OnInit {
           });
         } else if (this.type === 'edit') {
 
-          // {P19: '广州市', P21: '男', P27: undefined}
-          console.log(this.form2.formGroup.value)
 
           this.nodeService.getLinks(1, 20, this.id, {}).subscribe((data: any) => {
             console.log(data.list)
             let existingEdges = data.list;
+            //更新边
             const updatedEdges: any = [];
+            //删除边
             const deletedEdges: any = [];
+            //新增边
             const newEdges: any = [];
 
             Object.keys(this.form2.formGroup.value).forEach((key) => {
@@ -283,32 +286,9 @@ export class EntityDetailComponent implements OnInit {
             });
 
 
-            //   let arr: any = []
 
-            //   Object.keys(this.form2.formGroup.value).map((key) => {
-            //     let edge = {
-            //       "_from": "entity/" + this.id,
-            //       "_to": "entity/" + this.id,
-            //       "mainsnak": {
-            //         "snaktype": "value",
-            //         "property": key,
-            //         "hash": "8f7599319c8f07055134a500cf67fc22d1b3142d",
-            //         "datavalue": {
-            //           "value": this.form2.formGroup.value[key],
-            //           "type": "string"
-            //         },
-            //         "datatype": "string"
-            //       },
-            //       "type": "statement",
-            //       "rank": "normal"
-            //     };
-            //     arr.push(this.edgeService.addEdge(edge))
-            //   })
-            // })
-            // // forkJoin(arr).subscribe(() => { });
-            // // this.nodeService.put(item).subscribe((x) => {
-            // //   this.message.success('修改成功！');
-            // //   this.router.navigate(['/index/entity']);
+            this.message.success('修改成功！');
+            this.router.navigate(['/index/entity']);
           });
         }
         break;

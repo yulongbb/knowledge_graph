@@ -127,20 +127,34 @@ export class SearchDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.service.getEntity(this.id).subscribe((x) => {
-          this.entity = signal(x['_source']);
-          console.log(this.entity)
-          this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
-            console.log(parents)
-            parents.push(x['_source'].type)
-            this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
-              console.log(x.list)
-              this.properties = signal(p.list);
-              this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).subscribe((c: any) => {
-                console.log(c.list)
-                this.claims = c.list;
-              })
+          this.ontologyService.get(x._source.type).subscribe((t: any) => {
+            x._type = t.label
+            this.entity = signal(x);
+            this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
+              parents.push(x['_source'].type)
+              this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
+                this.properties = signal(p.list);
+
+                this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).subscribe((c: any) => {
+                  let statements:any = [];
+                  c.list.forEach((p: any) => {
+                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
+                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+
+                    }
+
+                    statements.push(p.edges[0])
+
+                  })
+                  console.log(statements)
+
+                  this.claims = statements;
+                })
+              });
             });
-          });
+
+          })
 
           // this.climas = this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).pipe(
           //   tap((x: any) => console.log(x)),

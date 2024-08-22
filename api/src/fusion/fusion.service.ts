@@ -436,7 +436,7 @@ export class FusionService {
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${end}
-      RETURN e`);
+      RETURN p`);
       // 获取查询结果
       const result = await cursor.all();
       console.log(result);

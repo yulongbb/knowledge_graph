@@ -1,13 +1,12 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, Query, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
-import { XFormRow, XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
-import { Extraction, ExtractionService } from './extraction.service';
-import { map, tap } from 'rxjs';
-import { UntypedFormGroup } from '@angular/forms';
+import { XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
+import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FusionService } from '../fusion/fusion.service';
+
 
 @Component({
   selector: 'app-extraction',
@@ -15,48 +14,7 @@ import { FusionService } from '../fusion/fusion.service';
   styleUrls: ['./extraction.component.scss'],
 })
 export class ExtractionComponent extends PageBase {
-  // formGroup = new UntypedFormGroup({});
 
-  // selected!: Extraction;
-  // type = 'add';
-  // loading = true;
-
-  // controls: XFormRow[] = [
-  //   {
-  //     controls: [
-  //       {
-  //         control: 'input',
-  //         id: 'subject',
-  //         label: '主体',
-  //         required: true,
-  //       },
-
-  //       {
-  //         control: 'input',
-  //         id: 'property',
-  //         label: '属性',
-  //         required: true,
-  //       },
-
-  //       {
-  //         control: 'input',
-  //         id: 'object',
-  //         label: '对象',
-  //         required: true,
-  //       },
-  //     ],
-  //   }
-  // ];
-
-  // get disabled() {
-  //   return !['edit', 'add',].includes(this.type);
-  // }
-
-  // data = (index: number, size: number, query: Query) =>
-  //   this.service.getList(index, size).pipe(
-  //     tap((x: any) => console.log(x)),
-  //     map((x: any) => x)
-  //   );
   index = 1;
 
   query: XQuery = { filter: [] };
@@ -69,7 +27,6 @@ export class ExtractionComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'actions', label: '操作', width: 100 },
     { id: 'subject', label: '实体', flex: 1.5, sort: true },
@@ -82,12 +39,10 @@ export class ExtractionComponent extends PageBase {
     public override indexService: IndexService,
     private service: ExtractionService,
     private fusionService: FusionService,
-
     private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private msgBox: XMessageBoxService
-
   ) {
     super(indexService);
   }
@@ -148,13 +103,11 @@ export class ExtractionComponent extends PageBase {
           content: `此操作将：${this.checkedRows.length}条数据推送融合，是否继续？`,
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
-            var arr = [];
             action === 'confirm' &&
               this.fusionService.fusion(this.checkedRows).subscribe(() => {
                 this.tableCom.change(this.index);
                 this.message.success('融合成功！');
               });
-
           },
         });
         break;
