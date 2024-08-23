@@ -10,8 +10,6 @@ import { ExtractionModule } from 'src/extraction/extraction.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { FusionModule } from './fusion/fusion.module';
-import { EdgeModule } from './edge/edge.module';
-import { PredicateModule } from './predicate/predicate.module';
 import { RedisModule } from './redis/redis.module';
 import { EsModule } from './es/es.module';
 
@@ -33,15 +31,12 @@ import { EsModule } from './es/es.module';
     SystemModule,
     DesignModule,
     OntologynModule,
-    PredicateModule,
     ExtractionModule,
     NodeModule,
-    EdgeModule,
     FusionModule,
     KnowledgeModule,
     MinioClientModule,
     AuthModule,
-    EdgeModule,
     RedisModule,
     EsModule
   ],

@@ -28,7 +28,7 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.service.searchEntity(1, 10, {}).subscribe((data: any) => {
+    this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
       data.list.forEach((item:any) => {
         this.ontologyService.get(item._source.type).subscribe((t:any)=>{
           console.log(t)
@@ -45,7 +45,7 @@ export class SearchComponent implements OnInit {
     } else {
       this.query = {}
     }
-    this.service.searchEntity(1, 10, this.query).subscribe((data: any) => {
+    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
       console.log(data);
       this.entities = data.list;
     })

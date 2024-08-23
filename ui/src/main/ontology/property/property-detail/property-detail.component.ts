@@ -10,8 +10,6 @@ import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
-import { TypeService } from '../../type/type.service';
-import { PredicateService } from '../predicate.service';
 import { PropertyService } from '../property.service';
 
 @Component({
@@ -60,20 +58,22 @@ export class PropertyDetailComponent implements OnInit {
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
     {
-      control: 'find',
-      id: 'types',
-      label: '尾部实体',
+      control: 'select',
+      id: 'type',
+      label: '值类型',
       required: true,
-      multiple: true,
-      treeData: () =>
-        this.typeService
-          .getList(1, Number.MAX_SAFE_INTEGER, {
-            sort: [
-              { field: 'pid', value: 'asc' },
-              { field: 'sort', value: 'asc' },
-            ],
-          })
-          .pipe(map((x) => x.list)),
+      data: [
+        'time',
+        'external-id',
+        'monolingualtext',
+        'url',
+        'wikibase-item',
+        'quantity',
+        'commonsMedia',
+        'string',
+        'wikibase-property',
+      ]
+
     },
 
     { control: 'input', id: 'id', hidden: true, value: XGuid() },
@@ -88,8 +88,6 @@ export class PropertyDetailComponent implements OnInit {
 
   constructor(
     private ontologyService: OntologyService,
-    private typeService: TypeService,
-    private predicateService: PredicateService,
     private propertyService: PropertyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -119,13 +117,8 @@ export class PropertyDetailComponent implements OnInit {
       case 'info':
         console.log(this.id);
 
-        this.predicateService.get(`P${this.id}`).subscribe((predicate) => {
-          console.log(predicate);
-          this.predicate = predicate;
-        })
 
         this.propertyService.get(this.id as string).subscribe((x: any) => {
-          console.log(x);
           this.query.filter = [
             {
               field: 'id',
@@ -139,21 +132,8 @@ export class PropertyDetailComponent implements OnInit {
             .getList(1, 10, this.query)
             .subscribe((y: any) => {
               x['schemas'] = y.list;
-              this.typeService
-                .getList(1, 10, {
-                  filter: [
-                    {
-                      field: 'id',
-                      value: x.id as string,
-                      relation: 'properties',
-                      operation: '=',
-                    },
-                  ]
-                })
-                .subscribe((t: any) => {
-                  x['types'] = t.list;
-                  this.form.formGroup.patchValue(x);
-                });
+              this.form.formGroup.patchValue(x);
+
             });
         });
         break;
@@ -170,17 +150,12 @@ export class PropertyDetailComponent implements OnInit {
               this.router.navigate(['/index/properties']);
             });
         } else if (this.type === 'edit') {
-          console.log(this.form.formGroup.value);
-          this.predicate['head'] = this.form.formGroup.value['schemas'][0]['label'];
-          this.predicate['tail'] = this.form.formGroup.value['types'][0]['label'];
 
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
-            this.predicateService.put(this.predicate).subscribe((p) => {
-              console.log(p);
-              this.message.success('修改成功！');
-              this.router.navigate(['/index/properties']);
-            })
+
+            this.message.success('修改成功！');
+            this.router.navigate(['/index/properties']);
 
           });
         }

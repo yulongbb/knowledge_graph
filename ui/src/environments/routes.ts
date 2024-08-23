@@ -115,16 +115,7 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-  // 类型
-  {
-    path: "type",
-    loadChildren: () =>
-      import("../main/ontology/type/type.module").then(x => x.TypeModule),
-    canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
+
   // 本体
   {
     path: "ontology",

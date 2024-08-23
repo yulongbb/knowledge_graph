@@ -22,9 +22,7 @@ export class SearchDetailComponent implements OnInit {
   knowledge: string = '';
   type: string = '';
   schema: string = '';
-  entity: any;
-  statements: any;
-  properties: any;
+
   claims: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
@@ -79,12 +77,14 @@ export class SearchDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
+
+  entity: any;
+  properties: any;
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private service: EsService,
     public propertyService: PropertyService,
-
     private nodeService: NodeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -102,26 +102,12 @@ export class SearchDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-
     });
   }
-
   ngOnInit(): void {
     this.action(this.type);
-
-
   }
-  uploadSuccess($event: any) {
-    let item: any = {};
-    item['label'] = $event.body.name;
-    this.form.formGroup.patchValue(item);
-    console.log('uploadSuccess', $event);
-  }
-  trustUrl(url: string) {
 
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-  }
 
   action(type: string) {
     switch (type) {
@@ -136,30 +122,20 @@ export class SearchDetailComponent implements OnInit {
                 this.properties = signal(p.list);
 
                 this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).subscribe((c: any) => {
-                  let statements:any = [];
+                  let statements: any = [];
                   c.list.forEach((p: any) => {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                       p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
                       p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
-
                     }
-
                     statements.push(p.edges[0])
-
                   })
                   console.log(statements)
-
                   this.claims = statements;
                 })
               });
             });
-
           })
-
-          // this.climas = this.nodeService.getLinks(1, 20, x['_source']['items'][0].split('/')[1], {}).pipe(
-          //   tap((x: any) => console.log(x)),
-          //   map((x: any) => x)
-          // );
         });
         break;
       case 'edit':
@@ -167,7 +143,6 @@ export class SearchDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value)
           this.nodeService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/node']);
@@ -185,13 +160,26 @@ export class SearchDetailComponent implements OnInit {
     }
   }
 
+
+  uploadSuccess($event: any) {
+    let item: any = {};
+    item['label'] = $event.body.name;
+    this.form.formGroup.patchValue(item);
+    console.log('uploadSuccess', $event);
+  }
+  trustUrl(url: string) {
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+  }
+
+
   backClick() {
     this.router.navigate([`/index/search/${this.knowledge}`], { replaceUrl: true });
 
   }
 
   getStatement(property: any): any {
-    console.log(property);
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
 
   }

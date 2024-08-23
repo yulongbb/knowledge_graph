@@ -1,32 +1,48 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
+import { NodeService } from 'src/node/node.service';
 
 @Injectable()
 export class EdgeService {
 
 
-  constructor(@Inject('ARANGODB') private db: Database) { }
+  constructor(@Inject('ARANGODB') private db: Database, private readonly nodeService: NodeService,) { }
 
 
   async addEdge(edge: any): Promise<any> {
     const myCollection = this.db.collection('link');
-    return myCollection.save(edge).then(
-      () => console.log('Document removed successfully'),
-      (err) => console.error('Failed to remove document:', err),
-    );
+    let result = null;
+    if (!edge['_to']) {
+      // 新增知识
+      this.nodeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.value } } }).then((entity:any)=>{
+        console.log(entity)
+        console.log(entity.items[0].index._id)
+        edge.mainsnak.datavalue.value.value = entity.items[0].index._id;
+        edge['_to'] = 'entity/'+entity.items[0].index._id;
+        console.log(edge)
+        result = myCollection.save(edge).then(
+          () => console.log('Document removed successfully'),
+          (err) => console.error('Failed to remove document:', err),
+        )
+      })
+  
+    }
+    console.log(edge)
+    return result;
   }
 
   updateEdge(edge: any): Promise<any> {
-  // Fetch the existing document
-  const myCollection = this.db.collection('link');
+    // Fetch the existing document
+    const myCollection = this.db.collection('link');
 
-  return myCollection
-    .document(edge['_key'])
-    .then((existingDocument) => {
-      // Update the document fields
-      existingDocument.mainsnak = edge.mainsnak;
-      return myCollection.update(edge['_key'], existingDocument);
-    })  }
+    return myCollection
+      .document(edge['_key'])
+      .then((existingDocument) => {
+        // Update the document fields
+        existingDocument.mainsnak = edge.mainsnak;
+        return myCollection.update(edge['_key'], existingDocument);
+      })
+  }
 
   async getLinks(index: number, size: number, query: any): Promise<any> {
     try {
