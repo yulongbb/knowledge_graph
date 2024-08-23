@@ -156,7 +156,7 @@ export class EntityDetailComponent implements OnInit {
           this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
             parents.push(this.item.type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-              this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+              this.nodeService.getLinks(1, 50, this.item.items[0].split('/')[1], {}).subscribe((c: any) => {
                 let statements: any = [];
                 x.list.forEach((property: any) => {
                   statements.push({

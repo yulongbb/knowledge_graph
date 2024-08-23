@@ -16,9 +16,9 @@ export class EdgeService {
       // 新增知识
       this.nodeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.value } } }).then((entity:any)=>{
         console.log(entity)
-        console.log(entity.items[0].index._id)
+        console.log(entity.items[0].index._source)
         edge.mainsnak.datavalue.value.value = entity.items[0].index._id;
-        edge['_to'] = 'entity/'+entity.items[0].index._id;
+        edge['_to'] = entity?.items[0].index._source?.items[0];
         console.log(edge)
         result = myCollection.save(edge).then(
           () => console.log('Document removed successfully'),
