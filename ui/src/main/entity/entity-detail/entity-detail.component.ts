@@ -155,8 +155,8 @@ export class EntityDetailComponent implements OnInit {
           this.form.formGroup.patchValue({ id: x._id, label: this.item.labels.zh.value, type: { id: 'Q5', label: '人物' }, description: this.item.descriptions.zh.value });
           this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
             parents.push(this.item.type)
-            this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-              this.nodeService.getLinks(1, 20, this.item.items[0].split('/')[1], {}).subscribe((c: any) => {
+            this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
+              this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                 let statements: any = [];
                 x.list.forEach((property: any) => {
                   statements.push({
@@ -179,6 +179,7 @@ export class EntityDetailComponent implements OnInit {
                 })
                 c.list.forEach((p: any) => {
                   if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                    console.log(p.edges[0].mainsnak.property)
                     p.edges[0].mainsnak.label = x.list.filter((l: any) => l.id == p.edges[0].mainsnak.property.replace('P', ''))[0]?.name;
                     p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
                     p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
@@ -341,10 +342,10 @@ export class EntityDetailComponent implements OnInit {
             //   requests.push(this.edgeService.updateEdge(edge));
             // });
 
-            // // 执行删除操作
-            // deletedEdges.forEach((edge: any) => {
-            //   requests.push(this.edgeService.deleteEdge(edge._key));
-            // });
+            // 执行删除操作
+            deletedEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.deleteEdge(edge._key));
+            });
 
             // 执行新增操作
             newEdges.forEach((edge: any) => {
