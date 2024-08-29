@@ -24,16 +24,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       "name": "其他",
       "path": "其他"
     }];
-
   chartOptions: any;
-
   value: any;
-
   query = { keyword: '' }
-
   data1: any;
-
-
   index = 1;
   size = 20;
   total1 = 0;
@@ -287,9 +281,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-
-
-
     this.service.getList(1, Number.MAX_SAFE_INTEGER, {
       sort: [
         { field: 'pid', value: 'asc' },
@@ -477,9 +468,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // console.log(this.buildTree(data.list));
 
     })
-
-
-
   }
 
 
@@ -503,7 +491,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       } else {
         // 否则，作为根节点放入树结构中
         map[item.id]['number'] = map[item.id].value;
-
         map[item.id].value = 1
         tree.push(map[item.id]);
       }

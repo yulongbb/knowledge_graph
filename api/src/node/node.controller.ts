@@ -59,6 +59,7 @@ export class NodeController {
     size: number = 10,
     @Body() query: any,
   ): Promise<any> {
+    console.log(id);
     return  this.fusionService.getLinks(id, index, size, query);;
   }
 

@@ -20,7 +20,7 @@ import { XTagModule } from '@ng-nest/ui/tag';
 
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [DashboardComponent, ],
   imports: [
     CommonModule,
     ShareModule,

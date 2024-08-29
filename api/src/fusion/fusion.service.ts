@@ -427,24 +427,35 @@ export class FusionService {
     query: any,
   ): Promise<any> {
     try {
-      const start = size * (index - 1);
-      const end = start + size;
+    const start = size * (index - 1);
+    const end = start + size;
+   
+    return this.elasticsearchService.get(id).then(async (entity: any) => {
+      console.log(entity['_source']['items']) // [ 'entity/bdi20191862', 'entity/Q6166482' ]
+      const items = entity['_source']['items'];
+     
+        // 使用AQL查询多个items的关系，并合并结果
+        const cursor = await this.db.query(aql`
+            FOR item IN ${items}
+              FOR v, e, p IN 0..1 OUTBOUND DOCUMENT(item)['_id'] GRAPH "graph"
+              FILTER e != null
+              SORT e.mainsnak.property
+              LIMIT ${start}, ${end}
+              RETURN p
+          `);
 
-      // 执行查询 RETURN  MERGE_RECURSIVE( e,{ 'mainsnak': { 'datavalue': {'value': {id: Document(e['_to']).id}}}  })
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1 OUTBOUND ${'entity/' + id
-        } GRAPH "graph"
-      FILTER e!=null
-      SORT e.mainsnak.property
-      LIMIT ${start}, ${end}
-      RETURN p`);
-      // 获取查询结果
-      const result = await cursor.all();
-      console.log(result);
-      // 处理查询结果
-      return { total: 100, list: result };
-    } catch (error) {
-      console.error('Query Error:', error);
-    }
+        // 获取查询结果
+        const result = await cursor.all();
+        console.log(result);
+        // 处理查询结果
+        return { total: 100, list: result };
+      
+
+    })
+
+  } catch (error) {
+    console.error('Query Error:', error);
+  }
   }
 
   async getProperties(index: number, size: number): Promise<any> {
