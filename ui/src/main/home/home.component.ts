@@ -15,6 +15,7 @@ export class HomeComponent implements OnInit {
   size = 20;
   index = 1;
   data$!: any;
+  query:any;
 
   constructor(
     private service: EsService,
@@ -32,7 +33,17 @@ export class HomeComponent implements OnInit {
   }
 
   search(keyword: any) {
-
+    if (keyword != '') {
+      this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
+    } else {
+      this.query = {}
+    }
+    this.data$ = this.service
+    .searchEntity(1, 20, this.query)
+    .pipe(
+      tap((x: any) => console.log(x)),
+      map((x: any) => x.list)
+    );
   }
 
 

@@ -8,12 +8,28 @@
 </div>
 
 
-<x-row >
-    <x-col *ngFor="let row of (data$ | async) " [md]="4">
-            <x-card shadow="always">
-                {{row?._source?.labels?.zh?.value}}
-                <p> {{row?._source?.descriptions?.zh?.value}}
-                </p>
-            </x-card>
-    </x-col>
-</x-row>
+
+<x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+    <ng-template #header>
+        <!-- <strong class="title">{{entity['_source']?.labels?.zh?.value}} </strong><span>{{entity['_type']}}</span> -->
+
+    </ng-template>
+    <div class="bottom">
+
+
+        <x-row>
+            <x-col *ngFor="let entity of (data$ | async) " [sm]="8">
+                <x-card class="card" [bodyStyle]="{ padding: 10, }">
+                    <img src="https://ngnest.com/img/logo/logo-144x144.png" />
+
+                    <div class="bottom">
+                        <strong class="title">{{entity['_source']?.labels?.zh?.value}}
+                        </strong><span>{{entity['_type']}}</span>
+
+                    </div>
+                </x-card>
+            </x-col>
+        </x-row>
+
+    </div>
+</x-card>
