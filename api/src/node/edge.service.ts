@@ -34,7 +34,7 @@ export class EdgeService {
           let query: any = {
             filter: [{
               field: 'id',
-              value: 26,
+              value: Number.parseInt(edge.mainsnak.property.replace('P', '')),
               relation: 'values',
               operation: '=',
             }]
