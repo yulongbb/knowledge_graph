@@ -2,7 +2,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
 import { EsService } from 'src/es/es.service';
-import { Extraction } from 'src/extraction/extraction.entity';
 
 @Injectable()
 export class FusionService {
@@ -151,7 +150,6 @@ export class FusionService {
             modified: new Date().toISOString(),
             items: [item]
           };
-
           this.elasticsearchService.bulk({
             body: [
               // 指定的数据库为news, 指定的Id = 1
@@ -359,27 +357,21 @@ export class FusionService {
     `);
       } else {
         cursor = await this.db.query(aql`
-
-
         let langulage = 'zh'
 
         LET total = COUNT(FOR doc IN entity_view
         SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
         OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
         OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword}) RETURN doc)
-
-
         LET list = (FOR doc IN entity_view
         SEARCH LIKE(doc['labels'][langulage]['value'], ${query.keyword} )
         OR LIKE(doc['descriptions'][langulage]['value'], ${query.keyword})
         OR LIKE(doc['aliases'][langulage]['value'],  ${query.keyword})
         LIMIT ${start}, ${size}
         RETURN {id:TO_ARRAY(doc['_id']), label: TO_ARRAY(doc['labels'][langulage]['value']), description: TO_ARRAY(doc['descriptions'][langulage]['value']), aliases: TO_ARRAY(doc['aliases'][langulage][*]['value'])})
-
         RETURN {total: total, list: list}
     `);
       }
-
       // 获取查询结果
       const result = await cursor.all();
       // 处理查询结果
@@ -427,13 +419,14 @@ export class FusionService {
     query: any,
   ): Promise<any> {
     try {
-    const start = size * (index - 1);
-    const end = start + size;
-   
-    return this.elasticsearchService.get(id).then(async (entity: any) => {
-      console.log(entity['_source']['items']) // [ 'entity/bdi20191862', 'entity/Q6166482' ]
-      const items = entity['_source']['items'];
-     
+      const start = size * (index - 1);
+      const end = start + size;
+      console.log(id);
+
+      return this.elasticsearchService.get(id).then(async (entity: any) => {
+        console.log(entity['_source']['items']) // [ 'entity/bdi20191862', 'entity/Q6166482' ]
+        const items = entity['_source']['items'];
+
         // 使用AQL查询多个items的关系，并合并结果
         const cursor = await this.db.query(aql`
             FOR item IN ${items}
@@ -446,16 +439,17 @@ export class FusionService {
 
         // 获取查询结果
         const result = await cursor.all();
+        console.log(111);
         console.log(result);
         // 处理查询结果
         return { total: 100, list: result };
-      
 
-    })
 
-  } catch (error) {
-    console.error('Query Error:', error);
-  }
+      })
+
+    } catch (error) {
+      console.error('Query Error:', error);
+    }
   }
 
   async getProperties(index: number, size: number): Promise<any> {

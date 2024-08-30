@@ -19,7 +19,14 @@ export class EsController {
         from: (index-1) * size,
         query: {
           bool: bool
-        }
+        },
+        sort: [
+          {
+            modified: {
+              order: "desc"
+            }
+          }
+        ]
       }
     });
   }

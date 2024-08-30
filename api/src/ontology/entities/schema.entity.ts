@@ -54,6 +54,13 @@ export class Schema {
     inverseJoinColumn: { name: 'propertyId' },
   })
   properties: Property[];
-
+  
+  @ManyToMany(() => Property, (property) => property.types)
+  @JoinTable({
+    name: 'ontology_type_value',
+    joinColumn: { name: 'schemaId' },
+    inverseJoinColumn: { name: 'propertyId' },
+  })
+  values: Property[];
 
 }

@@ -4,12 +4,9 @@
     <h3>{{ title }}</h3>
     <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
       width="100%" labelAlign="end" span="24" space="2"></x-form>
-
     <br>
-
     <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
       labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
-
     <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
 
     <div class="app-footer">
@@ -19,7 +16,5 @@
           [disabled]="formInvalid || disabled">保存</x-button>
       </x-buttons>
     </div>
-
-
   </x-card>
 </div>

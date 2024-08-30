@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { EntityService } from '../entity.service';
 import { XTableColumn } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
@@ -12,7 +10,6 @@ import { NodeService } from 'src/main/node/node.service';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EdgeService } from 'src/main/edge/edge.service';
-import { property } from 'lodash';
 
 @Component({
   selector: 'app-entity-detail',
@@ -104,7 +101,6 @@ export class EntityDetailComponent implements OnInit {
     private esService: EsService,
     public propertyService: PropertyService,
     private edgeService: EdgeService,
-
     private nodeService: NodeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -232,16 +228,16 @@ export class EntityDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x) => {
+          console.log(x);
           this.item = x._source;
           // 填充基本信息表单
-          this.form.formGroup.patchValue({ id: x._id, label: this.item.labels.zh.value, type: { id: 'Q5', label: '人物' }, description: this.item.descriptions.zh.value });
+          this.form.formGroup.patchValue({ _key: x._id, label: this.item?.labels?.zh?.value, type: { id: 'Q5', label: '人物' }, description: this.item.descriptions?.zh?.value });
           this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
             parents.push(this.item.type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
               console.log(x);
               this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                 console.log(c);
-
                 this.statements = [];
                 x.list.forEach((property: any) => {
                   this.statements.push({
@@ -293,181 +289,184 @@ export class EntityDetailComponent implements OnInit {
                             value: statement.mainsnak.datavalue.value.label
                           },
                         )
+                      }
+                    } else {
+                      control.push(
+                        {
+                          control: 'input',
+                          id: statement.mainsnak.property,
+                          label: statement.mainsnak.label,
+                          value: statement.mainsnak.datavalue.value.label
+                        },
+                      )
                     }
-
-                  } else {
-                    control.push(
-                      {
-                        control: 'input',
-                        id: statement.mainsnak.property,
-                        label: statement.mainsnak.label,
-                        value: statement.mainsnak.datavalue.value.label
-                      },
-                    )
                   }
-
-                }
-
                 })
-              // x.list.forEach((property: any) => {
-              //   let statement = statements.filter((statement: any) => statement.mainsnak.property == `P${property.id}`)[0]
-              //   console.log(statement)
-              //   control.push(
-              //     {
-              //       control: 'input',
-              //       id: `P${property.id}`,
-              //       label: property.name,
-              //       value: statement?.mainsnak?.datavalue?.value
-              //     },
-              //   )
-              // });
-              this.controls2 = signal<XControl[]>(control);
-            })
+                // x.list.forEach((property: any) => {
+                //   let statement = statements.filter((statement: any) => statement.mainsnak.property == `P${property.id}`)[0]
+                //   console.log(statement)
+                //   control.push(
+                //     {
+                //       control: 'input',
+                //       id: `P${property.id}`,
+                //       label: property.name,
+                //       value: statement?.mainsnak?.datavalue?.value
+                //     },
+                //   )
+                // });
+                this.controls2 = signal<XControl[]>(control);
+              })
+            });
           });
         });
-    });
-    break;
+        break;
       case 'edit':
-    this.action('info');
-    break;
+        this.action('info');
+        break;
       case 'save':
-    let item: any = {
-      _key: this.form.formGroup.value._key,
-      labels: {
-        zh: {
-          language: 'zh',
-          value: this.form.formGroup.value.label
+        let item: any = {
+          _key: this.form.formGroup.value._key,
+          labels: {
+            zh: {
+              language: 'zh',
+              value: this.form.formGroup.value.label
+            }
+          },
+          descriptions: {
+            zh: {
+              language: 'zh',
+              value: this.form.formGroup.value.description
+            }
+          },
+          type: this.form.formGroup.value.type,
         }
-      },
-      descriptions: {
-        zh: {
-          language: 'zh',
-          value: this.form.formGroup.value.description
+        if (this.type === 'add') {
+          this.nodeService.post(item).subscribe((x) => {
+            console.log(x)
+            this.message.success('新增成功！');
+            this.router.navigate(['/index/entity']);
+          });
+        } else if (this.type === 'edit') {
+          this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
+            let statements: any = [];
+
+            c.list.forEach((p: any) => {
+              if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
+                p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+              }
+              statements.push(p.edges[0])
+            })
+            console.log(statements)
+
+            let existingEdges = statements;
+            //更新边
+            const updatedEdges: any = [];
+            //删除边
+            const deletedEdges: any = [];
+            //新增边
+            const newEdges: any = [];
+            console.log(this.form2.formGroup.value)
+            console.log(existingEdges)
+
+            Object.keys(this.form2.formGroup.value).forEach((key) => {
+              const value = this.form2.formGroup.value[key];
+              const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
+              if (existingEdge) {
+                if (existingEdge.mainsnak.datavalue.type == 'string') {
+                  if (existingEdge.mainsnak.datavalue.value !== value) {
+                    // 值发生变化，进行更新
+                    existingEdge.mainsnak.datavalue.value = value;
+                    updatedEdges.push(existingEdge);
+                  }
+                } else {
+                  if (existingEdge.mainsnak.datavalue.value.label !== value) {
+                    // 值发生变化，进行更新
+                    existingEdge.mainsnak.datavalue.value.label = value;
+                    updatedEdges.push(existingEdge);
+                  }
+                }
+              } else if (value !== undefined && value !== '') {
+                // 新增的边
+                console.log(this.statements)
+                let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
+                statement['_from'] = this.item.items[0];
+                statement['_to'] = this.item.items[0];
+                if (statement.mainsnak.datatype == 'string') {
+                  statement.mainsnak.datavalue.value = value;
+                } else if (statement.mainsnak.datatype == 'wikibase-item') {
+                  statement.mainsnak.datavalue.value.label = value;
+                }
+                newEdges.push(statement);
+              }
+            });
+
+            // 查找需要删除的边
+            existingEdges.forEach((edge: any) => {
+              if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
+                if (edge.mainsnak.property != 'P31') {
+                  deletedEdges.push(edge);
+                }
+              }
+            });
+            console.log('更新')
+
+            console.log(updatedEdges)
+            console.log('删除')
+
+            console.log(deletedEdges)
+            console.log('新增')
+
+            console.log(newEdges)
+
+            const requests: any = [];
+
+            // 执行更新操作
+            updatedEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.updateEdge(edge));
+            });
+
+            // 执行删除操作
+            deletedEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.deleteEdge(edge._key));
+            });
+
+            // 执行新增操作
+            newEdges.forEach((edge: any) => {
+              requests.push(this.edgeService.addEdge(edge));
+            });
+
+            // 并行执行所有请求
+            forkJoin(requests).subscribe(() => {
+              this.message.success('编辑成功！');
+              this.router.navigate(['/index/entity']);
+            });
+
+            item.id = this.id;
+            item['_key'] = this.id;
+            item['items'] = this.item.items;
+            console.log(item)
+
+            this.nodeService.put(item).subscribe((x) => {
+              console.log(x)
+              this.message.success('编辑成功！');
+              // this.router.navigate(['/index/entity']);
+            });
+
+            // this.message.success('修改成功！');
+            // this.router.navigate(['/index/entity']);
+          });
         }
-      },
-      type: this.form.formGroup.value.type
-    }
-    if (this.type === 'add') {
-      this.nodeService.post(item).subscribe((x) => {
-        console.log(x)
-        this.message.success('新增成功！');
-        this.router.navigate(['/index/entity']);
-      });
-    } else if (this.type === 'edit') {
-      this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
-        let statements: any = [];
-
-        c.list.forEach((p: any) => {
-          if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-            p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-            p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
-          }
-          statements.push(p.edges[0])
-        })
-        console.log(statements)
-
-        let existingEdges = statements;
-        //更新边
-        const updatedEdges: any = [];
-        //删除边
-        const deletedEdges: any = [];
-        //新增边
-        const newEdges: any = [];
-        console.log(this.form2.formGroup.value)
-        console.log(existingEdges)
-
-        Object.keys(this.form2.formGroup.value).forEach((key) => {
-          const value = this.form2.formGroup.value[key];
-          const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
-
-
-          if (existingEdge) {
-            if(existingEdge.mainsnak.datavalue.type=='string'){
-              if (existingEdge.mainsnak.datavalue.value !== value) {
-                // 值发生变化，进行更新
-                existingEdge.mainsnak.datavalue.value = value;
-                updatedEdges.push(existingEdge);
-              }
-
-            }else{
-              if (existingEdge.mainsnak.datavalue.value.label !== value) {
-                // 值发生变化，进行更新
-                existingEdge.mainsnak.datavalue.value.label = value;
-                updatedEdges.push(existingEdge);
-              }
-            }
-            
-          } else if (value !== undefined && value !== '') {
-            // 新增的边
-            console.log(this.statements)
-            let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
-            statement['_from'] = this.item.items[0];
-            statement['_to'] = this.item.items[0];
-            if (statement.mainsnak.datatype == 'string') {
-              statement.mainsnak.datavalue.value = value;
-            }
-            newEdges.push(statement);
-          }
-        });
-
-        // 查找需要删除的边
-        existingEdges.forEach((edge: any) => {
-          if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
-            if (edge.mainsnak.property != 'P31') {
-              deletedEdges.push(edge);
-            }
-          }
-        });
-        console.log('更新')
-
-        console.log(updatedEdges)
-        console.log('删除')
-
-        console.log(deletedEdges)
-        console.log('新增')
-
-        console.log(newEdges)
-
-        const requests: any = [];
-
-        // // 执行更新操作
-        // updatedEdges.forEach((edge: any) => {
-        //   requests.push(this.edgeService.updateEdge(edge));
-        // });
-
-        // // 执行删除操作
-        // deletedEdges.forEach((edge: any) => {
-        //   requests.push(this.edgeService.deleteEdge(edge._key));
-        // });
-
-        // // 执行新增操作
-        // newEdges.forEach((edge: any) => {
-        //   requests.push(this.edgeService.addEdge(edge));
-        // });
-
-        // // 并行执行所有请求
-        // forkJoin(requests).subscribe(() => {
-        //   this.message.success('编辑成功！');
-        //   this.router.navigate(['/index/entity']);
-        // });
-
-
-
-        // this.message.success('修改成功！');
-        // this.router.navigate(['/index/entity']);
-      });
-    }
-    break;
+        break;
       case 'cancel':
-    this.router.navigate(['/index/entity']);
-    break;
+        this.router.navigate(['/index/entity']);
+        break;
+    }
   }
-}
 
-backClick() {
-  this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
-
-}
+  backClick() {
+    this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
+  }
 }
 
 

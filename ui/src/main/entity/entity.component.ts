@@ -16,9 +16,7 @@ import {
 } from '@ng-nest/ui';
 import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
-import { OntologyService } from '../ontology/ontology/ontology.service';
 import { EsService } from '../search/es.service';
-import { PropertyService } from '../ontology/property/property.service';
 
 @Component({
   selector: 'app-entity',
@@ -65,7 +63,6 @@ export class EntityComponent extends PageBase {
   model = '列表'
 
   mergedEntity: any;
-
 
   constructor(
     private service: EntityService,
@@ -250,21 +247,21 @@ export class EntityComponent extends PageBase {
 
       // 如果 mainLabel 还没有设置，选择第一个标签作为主要标签
       if (!mainLabel) {
-        mainLabel = labels.zh;
+        mainLabel = labels?.zh;
       } else {
         // 如果已经有了主要标签，当前标签进入别名
         mergedAliases.push({
-          language: labels.zh.language,
-          value: labels.zh.value
+          language: labels?.zh?.language,
+          value: labels?.zh?.value
         });
       }
 
       // 合并描述
-      if (descriptions.zh) {
+      if (descriptions?.zh) {
         if (mergedDescription) {
-          mergedDescription += `，${descriptions.zh.value}`;
+          mergedDescription += `，${descriptions?.zh?.value}`;
         } else {
-          mergedDescription = descriptions.zh.value;
+          mergedDescription = descriptions?.zh?.value;
         }
       }
 
@@ -310,20 +307,6 @@ export class EntityComponent extends PageBase {
     return mergedEntity;
   }
 
-
-
-
-  // beforeClose = (action: XDialogAction) => {
-  //   console.log('beforeClose', action);
-  //   this.msgBox.confirm({
-  //     title: '提示',
-  //     content: '有未保存的数据，确认关闭吗？',
-  //     type: 'warning',
-  //     callback: (action: XMessageBoxAction) => {
-  //       action === 'confirm' && this.close();
-  //     }
-  //   });
-  // };
 }
 
 

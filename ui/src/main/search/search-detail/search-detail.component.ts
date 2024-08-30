@@ -4,7 +4,7 @@ import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XTableColumn } from '@ng-nest/ui';
-import { map, Observable, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NodeService } from 'src/main/node/node.service';
@@ -61,11 +61,7 @@ export class SearchDetailComponent implements OnInit {
     },
     { control: 'input', id: 'id', hidden: true, value: XGuid() }
   ];
-
-
   query: any;
-
-
   columns: XTableColumn[] = [
     { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
     { id: 'property', label: '属性名', width: 200 },
@@ -119,9 +115,8 @@ export class SearchDetailComponent implements OnInit {
             this.entity = signal(x);
             this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
               parents.push(x['_source'].type)
-              this.propertyService.getList(1, 20, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
+              this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
                 this.properties = signal(p.list);
-
                 this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
                   let statements: any = [];
                   c.list.forEach((p: any) => {
@@ -131,8 +126,9 @@ export class SearchDetailComponent implements OnInit {
                     }
                     statements.push(p.edges[0])
                   })
-                  console.log(statements)
                   this.claims = statements;
+                  console.log( this.claims)
+
                 })
               });
             });
@@ -168,19 +164,18 @@ export class SearchDetailComponent implements OnInit {
     this.form.formGroup.patchValue(item);
     console.log('uploadSuccess', $event);
   }
+
   trustUrl(url: string) {
-
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
   }
 
 
   backClick() {
     this.router.navigate([`/index/search/${this.knowledge}`], { replaceUrl: true });
-
   }
 
   getStatement(property: any): any {
+
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
 
   }

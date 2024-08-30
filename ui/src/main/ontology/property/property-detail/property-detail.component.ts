@@ -73,7 +73,22 @@ export class PropertyDetailComponent implements OnInit {
         'string',
         'wikibase-property',
       ]
-
+    },
+    {
+      control: 'find',
+      id: 'types',
+      label: '尾部实体',
+      required: true,
+      multiple: true,
+      treeData: () =>
+        this.ontologyService
+          .getList(1, Number.MAX_SAFE_INTEGER, {
+            sort: [
+              { field: 'pid', value: 'asc' },
+              { field: 'sort', value: 'asc' },
+            ],
+          })
+          .pipe(map((x) => x.list)),
     },
 
     { control: 'input', id: 'id', hidden: true, value: XGuid() },
@@ -83,7 +98,6 @@ export class PropertyDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
-
   query: XQuery = { filter: [] };
 
   constructor(
@@ -116,8 +130,6 @@ export class PropertyDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         console.log(this.id);
-
-
         this.propertyService.get(this.id as string).subscribe((x: any) => {
           this.query.filter = [
             {
@@ -127,13 +139,24 @@ export class PropertyDetailComponent implements OnInit {
               operation: '=',
             },
           ];
-
           this.ontologyService
             .getList(1, 10, this.query)
             .subscribe((y: any) => {
               x['schemas'] = y.list;
-              this.form.formGroup.patchValue(x);
-
+              this.query.filter = [
+                {
+                  field: 'id',
+                  value: x.id as string,
+                  relation: 'values',
+                  operation: '=',
+                },
+              ];
+              this.ontologyService
+                .getList(1, 10, this.query)
+                .subscribe((t: any) => {
+                  x['types'] = t.list;
+                  this.form.formGroup.patchValue(x);
+                });
             });
         });
         break;
@@ -150,13 +173,10 @@ export class PropertyDetailComponent implements OnInit {
               this.router.navigate(['/index/properties']);
             });
         } else if (this.type === 'edit') {
-
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
-
             this.message.success('修改成功！');
             this.router.navigate(['/index/properties']);
-
           });
         }
         break;

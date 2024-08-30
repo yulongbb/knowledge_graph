@@ -1,18 +1,17 @@
 <div class="row">
-  <x-card  width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+  <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
       <strong class="label">{{entity()?._source?.labels?.zh?.value}}
         <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-         
         </x-buttons>
-
       </strong><span>{{entity()?._type}}</span>
     </ng-template>
     <div class="bottom">
       <h2>简介</h2>
       <p>{{entity()?._source?.descriptions?.zh?.value}}</p>
       <dl *ngFor="let property of properties()">
+   
         <dl *ngIf="getStatement(property).length>0">
           <dt>
             {{property.name}}
@@ -23,7 +22,7 @@
                   [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.label}}</a>
               </strong>
               <strong *ngIf="statement.mainsnak.datatype=='string'">
-              {{statement.mainsnak.datavalue.value}}
+                {{statement.mainsnak.datavalue.value}}
               </strong>
               <strong *ngIf="statement.mainsnak.datatype=='url'"><a
                   [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
@@ -39,12 +38,10 @@
           </dd>
         </dl>
       </dl>
-  
       <div class="time">
         <span>{{entity()?._source?.modified}}</span>
         <span>{{entity()?._id}}</span>
       </div>
     </div>
-   
   </x-card>
 </div>

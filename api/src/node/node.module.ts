@@ -14,12 +14,13 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { EsService } from 'src/es/es.service';
 import { EdgeService } from './edge.service';
 import { EdgeController } from './edge.controller';
+import { SchemasService } from 'src/ontology/services/schemas.service';
 
 @Module({  
   imports: [ArangoDbModule, EsModule, TypeOrmModule.forFeature([Schema, Property]), ElasticsearchModule.register({
     node: 'http://localhost:9200',
   })],
   controllers: [NodeController,EdgeController],
-  providers: [NodeService,EdgeService, FusionService,PropertiesService, EsService], 
+  providers: [NodeService,EdgeService, FusionService,PropertiesService, EsService, SchemasService], 
 })
 export class NodeModule {}

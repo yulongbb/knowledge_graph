@@ -144,6 +144,7 @@ export class NodeService {
           });
         item['_key'] = doc['_key'];
         item['id'] = item['_key'];
+        item['items'] = ['entity/' + item['_key']];
         this.updateEntity(item);
         return this.elasticsearchService.bulk({
           body: [
@@ -165,19 +166,37 @@ export class NodeService {
   }
   async updateEntity(entity: any): Promise<any> {
     // Fetch the existing document
-    const myCollection = this.db.collection('entity');
+    this.elasticsearchService.bulk({
+      body: [
+        // 指定的数据库为news, 指定的Id = 1
+        { index: { _index: 'entity', _id: entity['_key'] } },
+        {
+          type: entity.type.id,
+          labels: entity?.labels,
+          descriptions: entity?.descriptions,
+          aliases: entity?.aliases,
+          modified: new Date().toISOString(),
+          items: entity.items
+        }
+      ]
+    }).then(() => {
+      const myCollection = this.db.collection('entity');
 
-    return myCollection
-      .document(entity['_key'])
-      .then((existingDocument) => {
-        // Update the document fields
-        existingDocument.id = entity.id;
-        existingDocument.type = entity.type;
-        existingDocument.labels = entity?.labels;
-        existingDocument.descriptions = entity?.descriptions;
-        existingDocument.modified = new Date().toISOString();
-        return myCollection.update(entity['_key'], existingDocument);
-      })
+      return myCollection
+        .document(entity['_key'])
+        .then((existingDocument) => {
+          // Update the document fields
+          existingDocument.id = entity.id;
+          existingDocument.type = entity.type;
+          existingDocument.labels = entity?.labels;
+          existingDocument.descriptions = entity?.descriptions;
+          existingDocument.modified = new Date().toISOString();
+          return myCollection.update(entity['_key'], existingDocument);
+        })
+
+    });
+
+    (err) => console.error('Failed to save document:', err)
 
   }
   async addLink(entity: any): Promise<any> {
