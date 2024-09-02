@@ -9,6 +9,8 @@ import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
 
+import { XMenuModule } from '@ng-nest/ui/menu';
+
 
 
 
@@ -26,6 +28,7 @@ import { XCardModule } from '@ng-nest/ui/card';
     XSliderModule,
     XCardModule,
     XTagModule,
+    XMenuModule,
     RouterModule.forChild([
       {
         path: '',

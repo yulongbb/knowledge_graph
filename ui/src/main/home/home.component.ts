@@ -1,8 +1,9 @@
-import { Component, OnInit,  } from '@angular/core';
-import { XData, XSliderNode } from '@ng-nest/ui';
+import { Component, OnInit, signal, } from '@angular/core';
 import { EsService } from '../search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { property } from 'lodash';
 
 @Component({
   selector: 'app-home',
@@ -12,11 +13,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class HomeComponent implements OnInit {
 
   keyword = '';
-  data: XData<XSliderNode> = ['目标库', '文库', '图库', '音频库', '视频库',];
   size = 20;
   index = 1;
   entities!: any;
-  query:any;
+  query: any;
+  menu: any;
 
   constructor(
     private service: EsService,
@@ -26,13 +27,27 @@ export class HomeComponent implements OnInit {
 
   ) {
     this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
-      data.list.forEach((item:any) => {
-        this.ontologyService.get(item._source.type).subscribe((t:any)=>{
+      data.list.forEach((item: any) => {
+        this.ontologyService.get(item._source.type).subscribe((t: any) => {
           console.log(t)
           item._type = t.label
         })
       });
       this.entities = data.list;
+      let menu:any = []
+      let arr:any = [];
+      data.aggregations.forEach((m: any) => {
+        arr.push( this.ontologyService.get(m.key));
+      })
+      forkJoin(arr).subscribe((properties:any) => {
+        console.log(properties)
+        data.aggregations.forEach((m: any) => {
+          menu.push({ id: m.key, label: properties.filter((p:any)=> p.id==m.key)[0].name})
+        })
+        console.log(menu)
+        this.menu = signal(menu)
+
+       });
     })
   }
 
@@ -46,8 +61,8 @@ export class HomeComponent implements OnInit {
       this.query = {}
     }
     this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
-      data.list.forEach((item:any) => {
-        this.ontologyService.get(item._source.type).subscribe((t:any)=>{
+      data.list.forEach((item: any) => {
+        this.ontologyService.get(item._source.type).subscribe((t: any) => {
           item._type = t.label
         })
       });

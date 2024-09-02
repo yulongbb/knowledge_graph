@@ -60,7 +60,6 @@ export class EntityComponent extends PageBase {
     { label: '列表', icon: 'fto-list' },
     { label: '卡片', icon: 'fto-grid' },
   ];
-  model = '列表'
 
   mergedEntity: any;
 

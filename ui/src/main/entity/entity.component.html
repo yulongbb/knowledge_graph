@@ -5,9 +5,7 @@
 
 
 <au-tool>
-  <div>
-    <x-radio [data]="layout" [(ngModel)]="model" icon></x-radio>
-  </div>
+
   <div>
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     <x-button type="success" icon="fto-plus" (click)="action('fusion')">融合</x-button>
@@ -20,36 +18,10 @@
   <span class="select-item"> {{ node?.name }} </span>
 </ng-template>
 
-<x-container *ngIf="model=='卡片'">
-  <x-main><x-row class="row">
-      <x-col *ngFor="let row of (data$ | async)['list'] " span="6">
-        <x-card class="card" [bodyStyle]="{height:'250px',padding: 0}">
-          <div style="height: 180px; overflow: hidden; display:flex; justify-content:center; align-items: center">
-            <x-avatar [size]="{ xs: 20, sm: 60, md: 90, lg: 120, xl: 160 }" [label]="row['label'][0]"></x-avatar>
-          </div>
-          <div class="bottom">
-            <p>{{row['description'][0]}}</p>
-            <div class="time">
-              <x-button type="primary">查看</x-button>
-              <x-button type="info">编辑</x-button>
-              <x-button type="danger">删除</x-button>
-            </div>
-          </div>
-        </x-card>
-      </x-col>
-    </x-row></x-main>
-  <x-footer>
-    <div class="row">
-      <x-pagination [index]="index" [size]="size" [total]="(data$ | async)['total']"></x-pagination>
-    </div>
-  </x-footer>
-</x-container>
-
-
 
 
 <!-- 表格栏 -->
-<x-table *ngIf="model=='列表'" #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll
+<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size" virtualScroll
   [scroll]="{ x: 1500, y: 600 }"
   [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl  ,    description:descriptionTpl ,    aliase:aliaseTpl  }"
   (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
@@ -90,30 +62,25 @@
 
 
 
-<x-dialog
-  title="标题"
-  [(visible)]="visible"
-  [placement]="placement()"
-  (close)="evt('close')"
-  (cancel)="evt('cancel')"
-  (confirm)="evt('confirm')"
->
-<div class="row">
-  <x-card *ngIf="mergedEntity" width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
-    <ng-template #header>
-      <h1>{{mergedEntity?.labels?.zh?.value}} (<small *ngFor="let aliase of mergedEntity?.aliases?.zh">{{aliase.value}},</small>)
-      </h1>
-     
-    </ng-template>
-    <div class="bottom">
-      <p>{{mergedEntity?.descriptions?.zh?.value}}</p>
+<x-dialog title="标题" [(visible)]="visible" [placement]="placement()" (close)="evt('close')" (cancel)="evt('cancel')"
+  (confirm)="evt('confirm')">
+  <div class="row">
+    <x-card *ngIf="mergedEntity" width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+      <ng-template #header>
+        <h1>{{mergedEntity?.labels?.zh?.value}} (<small
+            *ngFor="let aliase of mergedEntity?.aliases?.zh">{{aliase.value}},</small>)
+        </h1>
 
-      <!-- <div class="time">
+      </ng-template>
+      <div class="bottom">
+        <p>{{mergedEntity?.descriptions?.zh?.value}}</p>
+
+        <!-- <div class="time">
         <x-tag *ngFor="let item of mergedEntity?.items">{{item}}</x-tag>
         
       </div> -->
-    </div>
-  </x-card>
-</div>
-  
+      </div>
+    </x-card>
+  </div>
+
 </x-dialog>

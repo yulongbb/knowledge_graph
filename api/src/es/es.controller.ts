@@ -27,6 +27,13 @@ export class EsController {
             }
           }
         ],
+        aggs: {
+          types: {
+            terms: {
+              field: "type.keyword"
+            }
+          }
+        },
         highlight: {
           fields: {
             "labels.zh.value": {

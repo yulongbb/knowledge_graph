@@ -6,6 +6,8 @@
         <x-button icon="fto-search" (click)="search(keyword)"></x-button>
     </x-input-group>
 </div>
+<x-menu  [data]="menu()"> </x-menu>
+
 
 
 
@@ -17,8 +19,8 @@
     <div class="bottom">
         <x-row>
             <x-col *ngFor="let entity of entities" [sm]="8">
-                <x-card class="card" [bodyStyle]="{ padding: 0, height:'200px' }">
-                    <img (click)="action('info', entity)" *ngIf="entity['_source']?.images" height='100px'
+                <x-card class="card" [bodyStyle]="{ padding: 0, height: '304px',  overflow: 'clip'}">
+                    <img style="height: 200px;" (click)="action('info', entity)" *ngIf="entity['_source']?.images"
                         [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
                     <div class="bottom">
                         <strong class="title">{{entity['_source']?.labels?.zh?.value}}

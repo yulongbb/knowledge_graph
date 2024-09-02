@@ -1,6 +1,6 @@
 :host {
 
-    
+
     x-row {
         margin: 1rem 0;
 
@@ -27,11 +27,11 @@
         .row:not(:first-child) {
             margin-top: 1rem;
         }
-        
+
         .row x-card:not(:first-child) {
             margin-left: 2rem;
         }
-        
+
         .title {
             color: inherit;
             display: -webkit-box;
@@ -41,31 +41,30 @@
             overflow: hidden;
             text-decoration: none;
         }
-        
-        .row .card img {
-            width: 100%;
-            display: block;
-        }
-        
+
+     
+       
+
         .row .card .bottom {
             padding: 0.625rem;
         }
-        
+
         .row .card .bottom>p {
             margin: 0;
             font-size: 1rem;
         }
-        
+
         .row .card .bottom>.time {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        
+
         .row .card .bottom>.time>span {
             color: var(--x-text-400);
         }
     }
+
     x-input-group {
         display: block;
         width: 100%;
@@ -75,16 +74,8 @@
         margin-top: 1rem;
     }
 
-  
+
 
 
 
 }
-
-#header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-
