@@ -17,10 +17,11 @@
     <div class="bottom">
         <x-row>
             <x-col *ngFor="let entity of entities" [sm]="8">
-                <x-card class="card" [bodyStyle]="{ padding: 10, }">
-                    <img *ngIf="entity['_source']?.images" width="100%" [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
+                <x-card class="card" [bodyStyle]="{ padding: 0, height:'200px' }">
+                    <img (click)="action('info', entity)" *ngIf="entity['_source']?.images" height='100px'
+                        [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
                     <div class="bottom">
-                        <strong class="title" (click)="action('info', entity)" >{{entity['_source']?.labels?.zh?.value}}
+                        <strong class="title">{{entity['_source']?.labels?.zh?.value}}
                         </strong>
                     </div>
                     <x-tag>{{entity?._type}}</x-tag>

@@ -5,8 +5,6 @@
     <x-button icon="fto-search" (click)="search(keyword)"></x-button>
   </x-input-group>
 </div>
-
-
 <div class="row" *ngFor="let entity of entities">
   <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
     <ng-template #header>
@@ -16,36 +14,32 @@
         [innerHTML]="entity['highlight']['labels.zh.value']"></span><span>{{entity['_type']}}</span>
     </ng-template>
     <div class="bottom">
-      <x-text-retract *ngIf="!entity['highlight']" max="100" [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-
-      <p  *ngIf="entity['highlight']"  [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
-      
-   
-        <dl>
-       
-          <dd>
-            <i *ngFor="let statement of entity.claims">
-              <span>{{statement.mainsnak.label}}:</span>
-
-              <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
-                  [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.label}}</a>
-              </strong>
-              <strong *ngIf="statement.mainsnak.datatype=='string'">
-                {{statement.mainsnak.datavalue.value}}
-              </strong>
-              <strong *ngIf="statement.mainsnak.datatype=='url'"><a
-                  [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
-              <strong
-                *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-              <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
-                }}</strong>
-              <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-              <strong
-                *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-              <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
-            </i>
-          </dd>
-        </dl>
+      <x-text-retract *ngIf="!entity['highlight']" max="100"
+        [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
+      <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
+      <dl>
+        <dd>
+          <i *ngFor="let statement of entity.claims">
+            <span>{{statement.mainsnak.label}}:</span>
+            <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
+                [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.label}}</a>
+            </strong>
+            <strong *ngIf="statement.mainsnak.datatype=='string'">
+              {{statement.mainsnak.datavalue.value}}
+            </strong>
+            <strong *ngIf="statement.mainsnak.datatype=='url'"><a
+                [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
+            <strong
+              *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
+              }}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
+            <strong
+              *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
+            <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
+          </i>
+        </dd>
+      </dl>
       <div class="time">
         <span>{{entity['_source']?.modified}}</span>
         <span>{{entity['_source']?.items}}</span>
