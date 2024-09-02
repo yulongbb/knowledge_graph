@@ -35,7 +35,7 @@ export interface Sort extends Filter {}
 
 export interface Filter {
   field: string;
-  value: string | string[];
+  value: string |boolean| string[];
   operation?: Operation;
   relation?: string;
 }

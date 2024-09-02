@@ -90,7 +90,11 @@ export class PropertyDetailComponent implements OnInit {
           })
           .pipe(map((x) => x.list)),
     },
-
+    {
+      control: 'switch',
+      id: 'isPrimary',
+      label: '是否为主属性',
+    },
     { control: 'input', id: 'id', hidden: true, value: XGuid() },
   ];
   title = '';

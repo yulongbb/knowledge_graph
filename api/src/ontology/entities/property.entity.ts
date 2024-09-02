@@ -23,7 +23,11 @@ export class Property {
 
   @Column()
   type: string;
+  
 
   @ManyToMany(() => Schema, (schema) => schema.values)
   types: Schema[];
+
+  @Column('boolean', { nullable: true })
+  isPrimary: string;
 }

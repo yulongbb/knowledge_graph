@@ -1,25 +1,55 @@
 <!-- 搜索栏 -->
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-    <x-input-group compact>
-      <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword"
-      (keyup.enter)="search(keyword)"></x-input>
-        <x-button icon="fto-search" (click)="search(keyword)"></x-button>
-    </x-input-group>
+  <x-input-group compact>
+    <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
+    <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+  </x-input-group>
 </div>
 
 
 <div class="row" *ngFor="let entity of entities">
-    <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
-      <ng-template #header>
-        <strong (click)="action('info', entity)" >{{entity['_source']?.labels?.zh?.value}} </strong><span>{{entity['_type']}}</span>
+  <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+    <ng-template #header>
+      <span *ngIf="!entity['highlight']" (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}
+      </span>
+      <span *ngIf="entity['highlight']" (click)="action('info', entity)"
+        [innerHTML]="entity['highlight']['labels.zh.value']"></span><span>{{entity['_type']}}</span>
+    </ng-template>
+    <div class="bottom">
+      <x-text-retract *ngIf="!entity['highlight']" max="100" [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
+
+      <p  *ngIf="entity['highlight']"  [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
+      
+   
+        <dl>
        
-      </ng-template>
-      <div class="bottom">
-        <p>{{entity['_source']?.descriptions?.zh?.value}}</p>
-        <div class="time">
-          <span>{{entity['_source']?.modified}}</span>
-          <span>{{entity['_source']?.items}}</span>
-        </div>
+          <dd>
+            <i *ngFor="let statement of entity.claims">
+              <span>{{statement.mainsnak.label}}:</span>
+
+              <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
+                  [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.label}}</a>
+              </strong>
+              <strong *ngIf="statement.mainsnak.datatype=='string'">
+                {{statement.mainsnak.datavalue.value}}
+              </strong>
+              <strong *ngIf="statement.mainsnak.datatype=='url'"><a
+                  [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
+              <strong
+                *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
+              <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
+                }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
+              <strong
+                *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
+              <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
+            </i>
+          </dd>
+        </dl>
+      <div class="time">
+        <span>{{entity['_source']?.modified}}</span>
+        <span>{{entity['_source']?.items}}</span>
       </div>
-    </x-card>
-  </div>
+    </div>
+  </x-card>
+</div>

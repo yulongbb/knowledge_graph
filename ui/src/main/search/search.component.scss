@@ -1,4 +1,5 @@
 :host {
+
     x-input-group {
         display: block;
         width: 100%;
@@ -36,13 +37,16 @@
             margin-bottom: 0;
         }
     }
+
+    
 }
 
-   #header{
+.row .card  #header{
     display: flex;
     align-items: center;
     justify-content: space-between;
    }
+
 
   
   .row:not(:first-child) {
@@ -55,6 +59,7 @@
     width: 100%;
     display: block;
   }
+
   .row .card .bottom {
     padding: 0.625rem;
   }
@@ -70,3 +75,6 @@
   .row .card .bottom > .time > span {
     color: var(--x-text-400);
   }
+  ::ng-deep strong{
+    color: brown;
+   }

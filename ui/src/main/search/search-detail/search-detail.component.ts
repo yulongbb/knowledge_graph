@@ -124,6 +124,7 @@ export class SearchDetailComponent implements OnInit {
                       p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
                       p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
                     }
+                    
                     statements.push(p.edges[0])
                   })
                   this.claims = statements;

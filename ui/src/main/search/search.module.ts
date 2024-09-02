@@ -10,6 +10,8 @@ import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
 import { EsService } from './es.service';
 import { SearchDetailComponent } from './search-detail/search-detail.component';
+import { XTextRetractModule } from '@ng-nest/ui/text-retract';
+
 
 @NgModule({
   declarations: [SearchComponent, SearchDetailComponent],
@@ -23,6 +25,7 @@ import { SearchDetailComponent } from './search-detail/search-detail.component';
     XInputModule,
     XSliderModule,
     XCardModule,
+    XTextRetractModule,
     RouterModule.forChild([
       {
         path: '',

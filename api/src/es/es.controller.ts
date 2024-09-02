@@ -16,7 +16,7 @@ export class EsController {
     return await this.elasticsearchService.search({
       index: 'entity', body: {
         size: size,
-        from: (index-1) * size,
+        from: (index - 1) * size,
         query: {
           bool: bool
         },
@@ -26,7 +26,28 @@ export class EsController {
               order: "desc"
             }
           }
-        ]
+        ],
+        highlight: {
+          fields: {
+            "labels.zh.value": {
+              pre_tags: [
+                "<strong>"
+              ],
+              post_tags: [
+                "</strong>"
+              ]
+            },
+            "descriptions.zh.value": {
+              pre_tags: [
+                "<strong>"
+              ],
+              post_tags: [
+                "</strong>"
+              ]
+            }
+          }
+        }
+
       }
     });
   }

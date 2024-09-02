@@ -1,11 +1,11 @@
 <div class="row">
   <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
-      <strong class="label">{{entity()?._source?.labels?.zh?.value}}
+      <span class="label">{{entity()?._source?.labels?.zh?.value}}
         <!-- <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
         </x-buttons> -->
-      </strong><span>{{entity()?._type}}</span>
+      </span><span>{{entity()?._type}}</span>
     </ng-template>
     <img *ngFor="let image of entity()['_source'].images" width="100%" [src]="'http://localhost:9000/kgms/'+image"/>
 
