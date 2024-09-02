@@ -1,8 +1,8 @@
 import { Component, OnInit,  } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
-import { map, tap } from 'rxjs';
 import { EsService } from '../search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -21,6 +21,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private service: EsService,
     private ontologyService: OntologyService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
 
   ) {
     this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
@@ -53,6 +55,22 @@ export class HomeComponent implements OnInit {
     })
   }
 
+  action(type: string, item?: any) {
+    console.log(item);
+
+    switch (type) {
+      case 'info':
+        this.router.navigate(
+          [`/index/search/${type}/${item._id}`],
+          {
+            relativeTo: this.activatedRoute,
+          }
+        ).then(() => {
+        });
+        break;
+
+    }
+  }
 
 
 }

@@ -234,7 +234,7 @@ export class EntityDetailComponent implements OnInit {
           console.log(x);
           this.item = x._source;
           this.imgs = [];
-          this.item.images.forEach((image: any) => {
+          this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` })
           })
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
@@ -347,7 +347,7 @@ export class EntityDetailComponent implements OnInit {
             }
           },
           type: this.form.formGroup.value.type,
-          images: this.imgs.map((i: any) => i.url.split('/')[i.url.split('/').length - 1])
+          images: this.imgs?.map((i: any) => i.url.split('/')[i.url.split('/').length - 1])
         }
         console.log(this.item)
         if (this.type === 'add') {
