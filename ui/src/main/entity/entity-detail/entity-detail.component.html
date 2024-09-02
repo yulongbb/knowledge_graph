@@ -1,14 +1,29 @@
 <div class="row">
+  {{imgs|json}}
   <x-card width="100%">
-
+    <div class="row">
+      <x-upload
+        action="http://localhost:3000/api/minio-client/uploadFile"
+        [text]="textTpl"
+        type="img"
+        multiple
+        [(ngModel)]="imgs"
+        (uploadSuccess)="uploadSuccess($event)"
+        multipleModel="add"
+      ></x-upload>
+      <ng-template #textTpl>
+        <x-icon class="upload-icon" type="fto-upload"></x-icon>
+        <span>选择图片</span>
+      </ng-template>
+    </div>
     <h3>{{ title }}</h3>
     <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
       width="100%" labelAlign="end" span="24" space="2"></x-form>
     <br>
     <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
       labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
-    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload>
-
+    <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
+   
     <div class="app-footer">
       <x-buttons space="0.5">
         <x-button (click)="action('cancel')">取消</x-button>

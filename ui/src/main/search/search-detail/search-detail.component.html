@@ -7,7 +7,7 @@
         </x-buttons> -->
       </strong><span>{{entity()?._type}}</span>
     </ng-template>
-    <img width="100%" [src]="'http://localhost:9000/kgms/'+entity()['_source'].images[0]"/>
+    <img *ngFor="let image of entity()['_source'].images" width="100%" [src]="'http://localhost:9000/kgms/'+image"/>
 
     <div class="bottom">
       <h2>简介</h2>

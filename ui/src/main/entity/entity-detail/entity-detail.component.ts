@@ -94,6 +94,7 @@ export class EntityDetailComponent implements OnInit {
   }
   disabled = false;
 
+  imgs: any;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -133,14 +134,16 @@ export class EntityDetailComponent implements OnInit {
 
   }
   uploadSuccess($event: any) {
-    let item: any = {};
-    item['label'] = $event.body.name;
-    this.form.formGroup.patchValue(item);
+    console.log(this.imgs)
+    this.imgs[this.imgs.length - 1] =
+      { "url": `http://localhost:9000/kgms/${$event.body.name}` }
+
+    // let item: any = {};
+    // item['label'] = $event.body.name;
+    // this.form.formGroup.patchValue(item);
   }
   trustUrl(url: string) {
-
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
   }
 
   getDatavalue(datatype: any) {
@@ -230,13 +233,16 @@ export class EntityDetailComponent implements OnInit {
         this.esService.getEntity(this.id).subscribe((x) => {
           console.log(x);
           this.item = x._source;
+          this.imgs = [];
+          this.item.images.forEach((image: any) => {
+            this.imgs.push({ url: `http://localhost:9000/kgms/${image}` })
+          })
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
             this.form.formGroup.patchValue({ _key: x._id, label: this.item?.labels?.zh?.value, type: { id: type.id, label: type.name }, description: this.item.descriptions?.zh?.value });
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
               parents.push(this.item.type)
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-                console.log(x);
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   console.log(c);
                   this.statements = [];
@@ -279,6 +285,15 @@ export class EntityDetailComponent implements OnInit {
                               id: statement._id,
                               label: statement.mainsnak.label,
                               value: statement.mainsnak.datavalue.value
+                            },
+                          )
+                        } else if (statement.mainsnak.datavalue.type == 'quantity') {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement._id,
+                              label: statement.mainsnak.label,
+                              value: statement.mainsnak.datavalue.value.amount
                             },
                           )
                         } else {
@@ -332,8 +347,9 @@ export class EntityDetailComponent implements OnInit {
             }
           },
           type: this.form.formGroup.value.type,
-          images: []
+          images: this.imgs.map((i: any) => i.url.split('/')[i.url.split('/').length - 1])
         }
+        console.log(this.item)
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
