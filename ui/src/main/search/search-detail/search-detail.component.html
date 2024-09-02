@@ -2,11 +2,13 @@
   <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
       <strong class="label">{{entity()?._source?.labels?.zh?.value}}
-        <x-buttons>
+        <!-- <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-        </x-buttons>
+        </x-buttons> -->
       </strong><span>{{entity()?._type}}</span>
     </ng-template>
+    <img width="100%" [src]="'http://localhost:9000/kgms/'+entity()['_source'].images[0]"/>
+
     <div class="bottom">
       <h2>简介</h2>
       <p>{{entity()?._source?.descriptions?.zh?.value}}</p>

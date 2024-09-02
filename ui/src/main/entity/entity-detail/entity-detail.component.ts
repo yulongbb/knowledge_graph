@@ -230,7 +230,7 @@ export class EntityDetailComponent implements OnInit {
         this.esService.getEntity(this.id).subscribe((x) => {
           console.log(x);
           this.item = x._source;
-          this.ontologyService.get(x._source.type).subscribe((type:any)=>{
+          this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
             this.form.formGroup.patchValue({ _key: x._id, label: this.item?.labels?.zh?.value, type: { id: type.id, label: type.name }, description: this.item.descriptions?.zh?.value });
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
@@ -268,7 +268,7 @@ export class EntityDetailComponent implements OnInit {
                     return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
                   });
                   console.log(this.statements)
-  
+
                   this.statements.forEach((statement: any) => {
                     if (statement.mainsnak.property != 'P31') {
                       if (statement._id) {
@@ -303,25 +303,14 @@ export class EntityDetailComponent implements OnInit {
                       }
                     }
                   })
-                  // x.list.forEach((property: any) => {
-                  //   let statement = statements.filter((statement: any) => statement.mainsnak.property == `P${property.id}`)[0]
-                  //   console.log(statement)
-                  //   control.push(
-                  //     {
-                  //       control: 'input',
-                  //       id: `P${property.id}`,
-                  //       label: property.name,
-                  //       value: statement?.mainsnak?.datavalue?.value
-                  //     },
-                  //   )
-                  // });
+
                   this.controls2 = signal<XControl[]>(control);
                 })
               });
             });
           })
           // 填充基本信息表单
-         
+
         });
         break;
       case 'edit':
@@ -343,17 +332,16 @@ export class EntityDetailComponent implements OnInit {
             }
           },
           type: this.form.formGroup.value.type,
+          images: []
         }
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
-            console.log(x)
             this.message.success('新增成功！');
             this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
           this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
             let statements: any = [];
-
             c.list.forEach((p: any) => {
               if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                 p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
@@ -361,8 +349,6 @@ export class EntityDetailComponent implements OnInit {
               }
               statements.push(p.edges[0])
             })
-            console.log(statements)
-
             let existingEdges = statements;
             //更新边
             const updatedEdges: any = [];
@@ -370,9 +356,6 @@ export class EntityDetailComponent implements OnInit {
             const deletedEdges: any = [];
             //新增边
             const newEdges: any = [];
-            console.log(this.form2.formGroup.value)
-            console.log(existingEdges)
-
             Object.keys(this.form2.formGroup.value).forEach((key) => {
               const value = this.form2.formGroup.value[key];
               const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
@@ -392,19 +375,19 @@ export class EntityDetailComponent implements OnInit {
                 }
               } else if (value !== undefined && value !== '') {
                 // 新增的边
-                console.log(this.statements)
                 let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
                 statement['_from'] = this.item.items[0];
                 statement['_to'] = this.item.items[0];
                 if (statement.mainsnak.datatype == 'string') {
                   statement.mainsnak.datavalue.value = value;
+                } else if (statement.mainsnak.datatype == 'quantity') {
+                  statement.mainsnak.datavalue.value.amount = value;
                 } else if (statement.mainsnak.datatype == 'wikibase-item') {
                   statement.mainsnak.datavalue.value.label = value;
                 }
                 newEdges.push(statement);
               }
             });
-
             // 查找需要删除的边
             existingEdges.forEach((edge: any) => {
               if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
@@ -414,13 +397,10 @@ export class EntityDetailComponent implements OnInit {
               }
             });
             console.log('更新')
-
             console.log(updatedEdges)
             console.log('删除')
-
             console.log(deletedEdges)
             console.log('新增')
-
             console.log(newEdges)
 
             const requests: any = [];
@@ -449,10 +429,8 @@ export class EntityDetailComponent implements OnInit {
             item.id = this.id;
             item['_key'] = this.id;
             item['items'] = this.item.items;
-            console.log(item)
 
             this.nodeService.put(item).subscribe((x) => {
-              console.log(x)
               this.message.success('编辑成功！');
               // this.router.navigate(['/index/entity']);
             });

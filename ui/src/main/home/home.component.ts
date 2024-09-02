@@ -2,6 +2,7 @@ import { Component, OnInit,  } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
 import { map, tap } from 'rxjs';
 import { EsService } from '../search/es.service';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-home',
@@ -14,19 +15,23 @@ export class HomeComponent implements OnInit {
   data: XData<XSliderNode> = ['目标库', '文库', '图库', '音频库', '视频库',];
   size = 20;
   index = 1;
-  data$!: any;
+  entities!: any;
   query:any;
 
   constructor(
     private service: EsService,
+    private ontologyService: OntologyService,
 
   ) {
-    this.data$ = this.service
-      .searchEntity(1, 20, {})
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x.list)
-      );
+    this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
+      data.list.forEach((item:any) => {
+        this.ontologyService.get(item._source.type).subscribe((t:any)=>{
+          console.log(t)
+          item._type = t.label
+        })
+      });
+      this.entities = data.list;
+    })
   }
 
   ngOnInit(): void {
@@ -38,12 +43,14 @@ export class HomeComponent implements OnInit {
     } else {
       this.query = {}
     }
-    this.data$ = this.service
-    .searchEntity(1, 20, this.query)
-    .pipe(
-      tap((x: any) => console.log(x)),
-      map((x: any) => x.list)
-    );
+    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
+      data.list.forEach((item:any) => {
+        this.ontologyService.get(item._source.type).subscribe((t:any)=>{
+          item._type = t.label
+        })
+      });
+      this.entities = data.list;
+    })
   }
 
 

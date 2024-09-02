@@ -24,13 +24,11 @@ export class EdgeService {
         if (data) {
           edge['_to'] = data['_id'];
           edge.mainsnak.datavalue.value.id = data['_key'];
-          console.log(edge)
           result = myCollection.save(edge).then(
             () => console.log('Document removed successfully'),
             (err) => console.error('Failed to remove document:', err),
           )
         } else {
-          console.log(edge);
           let query: any = {
             filter: [{
               field: 'id',
@@ -38,15 +36,12 @@ export class EdgeService {
               relation: 'values',
               operation: '=',
             }]
-
           };
           this.schemasService.getList(1, 10, query).then((schema: any) => {
             if (schema.list.length > 0) {
-              console.log(schema.list[0])
               // 新增知识并关联
               this.nodeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((entity: any) => {
                 edge['_to'] = 'entity/' + entity.items[0].index._id;
-                console.log(edge)
                 result = myCollection.save(edge).then(
                   () => console.log('Document removed successfully'),
                   (err) => console.error('Failed to remove document:', err),
@@ -66,17 +61,12 @@ export class EdgeService {
           })
         }
       })
-
-
     } else {
-      console.log(edge)
       result = myCollection.save(edge).then(
         () => console.log('Document removed successfully'),
         (err) => console.error('Failed to remove document:', err),
       )
-
     }
-
     return result;
   }
 

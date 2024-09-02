@@ -144,7 +144,8 @@ export class NodeService {
           });
         item['_key'] = doc['_key'];
         item['id'] = item['_key'];
-        item['items'] = ['entity/' + item['_key']];
+        item['items'] = [doc['_id']],
+        item['images'] = entity?.images,
         this.updateEntity(item);
         return this.elasticsearchService.bulk({
           body: [
@@ -156,7 +157,8 @@ export class NodeService {
               descriptions: entity?.descriptions,
               aliases: entity?.aliases,
               modified: new Date().toISOString(),
-              items: [doc['_id']]
+              items: [doc['_id']],
+              images: entity?.images,
             }
           ]
         });
@@ -176,12 +178,12 @@ export class NodeService {
           descriptions: entity?.descriptions,
           aliases: entity?.aliases,
           modified: new Date().toISOString(),
-          items: entity.items
+          items: entity?.items,
+          images: entity?.images,
         }
       ]
     }).then(() => {
       const myCollection = this.db.collection('entity');
-
       return myCollection
         .document(entity['_key'])
         .then((existingDocument) => {
@@ -195,9 +197,7 @@ export class NodeService {
         })
 
     });
-
     (err) => console.error('Failed to save document:', err)
-
   }
   async addLink(entity: any): Promise<any> {
     // 获取集合（Collection）

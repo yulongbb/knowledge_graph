@@ -7,7 +7,7 @@
     <br>
     <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
       labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
-    <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
+    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload>
 
     <div class="app-footer">
       <x-buttons space="0.5">
