@@ -1,11 +1,13 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
-import { XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
-import { ExtractionService } from './extraction.service';
+import { XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
+import { Extraction, ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FusionService } from '../fusion/fusion.service';
+import { forkJoin, map, tap } from 'rxjs';
+import { PropertyService } from '../ontology/property/property.service';
 
 
 @Component({
@@ -16,20 +18,44 @@ import { FusionService } from '../fusion/fusion.service';
 export class ExtractionComponent extends PageBase {
 
   index = 1;
-
+  keyword: any = '{ "名称" : "歼-16战机", "产国" : "中国", "图片" : "http://images.huanqiu.com/sarons/2014/05/78c43ad2aad6411d2cda1328555a0bef.jpg", "简介" : "歼16沈阳飞机公司为海军航空兵所研发的一款新型多用途战机，是歼-11BS战斗机的攻击机版本（歼-11BS又是苏-27的双座版本），由于此前的歼-11BS双座战斗机的外挂架数量和挂载能力偏低，主要用于对空作战，因而对地、对海攻击能力有限。  结合了俄制苏-30MKK战斗机的机身和空中格斗能力，以及西安产歼轰-7A歼击轰炸机的通用弹药，在载弹种类、数量上将超越中国现役的同类机型，推测其可以挂载除战略武器以外的所有空基发射武器，将具备远距离超视距攻击能力和强大的对地、对海打击能力。   2013年，网上也曝出一组关于歼-16携霹雳-13惊艳亮相的图片，引发外界强烈关注。分析称，该新型导弹搭档中国歼-16，战力大增，一旦上战场作战，击沉美军航母也不是不可能。", "首飞时间" : "2011年10月17日", "研发单位" : "中国沈阳飞机公司", "气动布局" : "后掠翼", "发动机数量" : "双发", "飞行速度" : "超音速", "关注度" : "(5分)", "乘员" : "2人", "机长" : "21.19米", "翼展" : "14.7米", "机高" : "5.9米", "发动机" : "AL-31F涡扇发动机", "最大飞行速度" : "1438千米每小时", "最大航程" : "4288千米", "大类" : "飞行器", "类型" : "战斗机" }';
   query: XQuery = { filter: [] };
+  properties: any;
 
   data = (index: number, size: number, query: any) =>
-    this.service.getList(index, size, query).pipe((x: any) => {
-      return x;
-    });
+    this.service.getList(index, size, query).pipe(
+      tap((x) => {
+        let result: any = []
+        let properties = new Set();
+        x.list?.forEach((e: any) => {
+          properties.add(e.property);
+        })
+        let arr: any = [];
+        properties.forEach((p: any) => {
+          arr.push(this.propertyService.getPropertyByName(p))
+        })
+        forkJoin(arr).subscribe((data: any) => {
+          data.forEach((ds: any) => {
+            ds.forEach((d: any) => {
+              result.push(d);
+            })
+          })
+
+          this.properties = result;
+
+        })
+
+      }),
+      map((x) => x)
+
+    );
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
     { id: 'actions', label: '操作', width: 100 },
-    { id: 'subject', label: '实体', flex: 1.5, sort: true },
+    { id: 'subject', label: '实体', flex: 1, sort: true },
     { id: 'property', label: '属性', flex: 0.5, sort: true },
     { id: 'object', label: '值', flex: 1 },
   ];
@@ -38,7 +64,7 @@ export class ExtractionComponent extends PageBase {
   constructor(
     public override indexService: IndexService,
     private service: ExtractionService,
-    private fusionService: FusionService,
+    private propertyService: PropertyService,
     private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -96,18 +122,53 @@ export class ExtractionComponent extends PageBase {
           relativeTo: this.activatedRoute,
         });
         break;
+      case 'parse':
+        console.log(JSON.parse(this.keyword));
+        let row = JSON.parse(this.keyword);
+        let subject = row['名称'];
+        let arr: any = [];
+        Object.keys(row).map((property) => {
+          arr.push(this.service.post({ id: XGuid(), subject: subject, property: property, object: row[property] }))
+        })
+
+        forkJoin(arr).subscribe((x) => {
+          console.log(x)
+          this.message.success('解析成功！');
+        });
+
+        break;
       case 'upload':
-        console.log(this.checkedRows);
         this.msgBox.confirm({
           title: '提示',
           content: `此操作将：${this.checkedRows.length}条数据推送融合，是否继续？`,
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
-            action === 'confirm' &&
-              this.fusionService.fusion(this.checkedRows).subscribe(() => {
-                this.tableCom.change(this.index);
-                this.message.success('融合成功！');
-              });
+            if (action === 'confirm') {
+              console.log(this.checkedRows)
+              console.log(this.properties)
+              let edge = {
+                mainsnak: {
+                  snaktype: "value",
+                  property: "P102",
+                  datavalue: {
+                    value: null,
+                    type: "unknown"
+                  },
+                  datatype: null,
+                  label: "所属政党"
+                },
+                rank: "normal",
+                type: "statement",
+
+              }
+              console.log(edge)
+
+            }
+
+            // this.fusionService.fusion(this.checkedRows).subscribe(() => {
+            //   this.tableCom.change(this.index);
+            //   this.message.success('融合成功！');
+            // });
           },
         });
         break;

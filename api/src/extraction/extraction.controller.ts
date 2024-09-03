@@ -1,10 +1,6 @@
 import {
   Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Body,
+
 } from '@nestjs/common';
 import { ExtractionService } from './extraction.service';
 import { XControllerService, XQuery } from '@ng-nest/api/core';

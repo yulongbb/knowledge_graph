@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { XControllerService, XQuery } from '@ng-nest/api/core';
 import { Property } from 'src/ontology/entities/property.entity';
 import { PropertiesService } from 'src/ontology/services/properties.service';
@@ -10,4 +10,10 @@ export class PropertiesController extends XControllerService<Property, XQuery> {
   constructor(public readonly propertiesService: PropertiesService) {
     super(propertiesService);
   }
+
+  @Get('name/:name')
+  async getPropertyByName(@Param('name') name: string,): Promise<Property[]> {
+    return await this.propertiesService.getPropertyByName(name);
+  }
+
 }

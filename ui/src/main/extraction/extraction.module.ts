@@ -9,6 +9,8 @@ import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { ExtractionDetailComponent } from "./extraction-detail/extraction-detail.component";
 import { XTextareaModule } from '@ng-nest/ui/textarea';
+import { XInputModule } from "@ng-nest/ui";
+import { PropertyDetailComponent } from "./property-detail/property-detail.component";
 
 
 
@@ -21,8 +23,9 @@ import { XTextareaModule } from '@ng-nest/ui/textarea';
     AuAdaptionModule,
     XTreeModule,
     XTextareaModule,
+    XInputModule,
     ExtractionRoutesModule
   ],
-  declarations: [ExtractionComponent,ExtractionDetailComponent]
+  declarations: [ExtractionComponent,ExtractionDetailComponent,PropertyDetailComponent]
 })
 export class ExtractionModule {}

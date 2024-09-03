@@ -61,16 +61,26 @@ export class NodeService {
 
     // 插入数据
 
-    const item = {
-      _key: entity['_key'],
-      type: 'item',
-      labels: entity?.labels,
-      descriptions: entity?.descriptions,
-      aliases: entity?.aliases,
-      modified: new Date().toISOString(),
-    };
+    let item = {};
 
-
+    if (entity['_key']) {
+      item = {
+        _key: entity['_key'],
+        type: 'item',
+        labels: entity?.labels,
+        descriptions: entity?.descriptions,
+        aliases: entity?.aliases,
+        modified: new Date().toISOString(),
+      };
+    } else {
+      item = {
+        type: 'item',
+        labels: entity?.labels,
+        descriptions: entity?.descriptions,
+        aliases: entity?.aliases,
+        modified: new Date().toISOString(),
+      };
+    }
 
     return document.save(item).then(
       (doc) => {
@@ -143,10 +153,8 @@ export class NodeService {
             });
           });
         item['_key'] = doc['_key'];
-        item['id'] = item['_key'];
-        item['items'] = [doc['_id']],
-        item['images'] = entity?.images,
         this.updateEntity(item);
+        console.log(entity)
         return this.elasticsearchService.bulk({
           body: [
             // 指定的数据库为news, 指定的Id = 1
@@ -173,7 +181,7 @@ export class NodeService {
         // 指定的数据库为news, 指定的Id = 1
         { index: { _index: 'entity', _id: entity['_key'] } },
         {
-          type: entity.type.id,
+          type: entity?.type?.id,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
           aliases: entity?.aliases,
@@ -188,8 +196,8 @@ export class NodeService {
         .document(entity['_key'])
         .then((existingDocument) => {
           // Update the document fields
-          existingDocument.id = entity.id;
-          existingDocument.type = entity.type;
+          existingDocument.id = entity['_key'];
+          existingDocument.type = 'item',
           existingDocument.labels = entity?.labels;
           existingDocument.descriptions = entity?.descriptions;
           existingDocument.modified = new Date().toISOString();

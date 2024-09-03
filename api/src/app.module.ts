@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { OntologynModule } from 'src/ontology/ontology.module';
 import { NodeModule } from 'src/node/node.module';
 import { ExtractionModule } from 'src/extraction/extraction.module';
-import { KnowledgeModule } from './knowledge/knowledge.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { FusionModule } from './fusion/fusion.module';
 import { RedisModule } from './redis/redis.module';
@@ -34,7 +33,6 @@ import { EsModule } from './es/es.module';
     ExtractionModule,
     NodeModule,
     FusionModule,
-    KnowledgeModule,
     MinioClientModule,
     AuthModule,
     RedisModule,

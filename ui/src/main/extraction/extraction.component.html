@@ -3,16 +3,20 @@
     <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
   </div>
+  <div>
 
-  <x-button type="success" icon="fto-upload" (click)="action('upload')">推送</x-button>
+    <x-button type="success" icon="fto-upload" (click)="action('parse')">解析</x-button>
+    <x-button type="success" icon="fto-upload" (click)="action('upload')">上传</x-button>
+  </div>
 </au-tool>
 
-<x-row>
-  <x-col span="16">
-    <x-textarea></x-textarea>
-  </x-col>
-</x-row>
-<div #container style="width: 100%"></div>
+
+<div style="width: 100%; display: flex; align-items: center; justify-content: center">
+  <x-input-group compact>
+    <x-textarea height="200px" [style.width.%]="100" placeholder="数据解析" [(ngModel)]="keyword"></x-textarea>
+  </x-input-group>
+</div>
+
 
 <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index" [query]="query"
   [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" loading [allowSelectRow]="true"
@@ -29,3 +33,4 @@
 <ng-template #iconTpl let-column="$column" let-row="$row">
   <x-icon *ngIf="row.icon" [type]="row.icon"></x-icon>
 </ng-template>
+<!-- <app-property-detail *ngFor="let p of properties()" [name]="p"></app-property-detail> -->

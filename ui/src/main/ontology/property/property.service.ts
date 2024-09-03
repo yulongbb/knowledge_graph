@@ -12,7 +12,7 @@ export class PropertyService extends RepositoryService<Property> {
   }
 
   getPropertyByName(name: number | string): Observable<any> {
-    return this.http.get(`${this.option.controller?.name}/${name}`);
+    return this.http.get(`${this.option.controller?.name}/name/${name}`);
   }
 
 }

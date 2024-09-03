@@ -12,7 +12,7 @@ export class Property {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column()
+  @Column('text', { nullable: true })
   enName: string;
 
   @Column('text', { nullable: true })
@@ -21,7 +21,7 @@ export class Property {
   @ManyToMany(() => Schema, (schema) => schema.properties)
   schemas: Schema[];
 
-  @Column()
+  @Column('text', { nullable: true })
   type: string;
   
 

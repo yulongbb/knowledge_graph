@@ -8,7 +8,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Property } from 'src/ontology/entities/property.entity';
-import { Knowledge } from 'src/knowledge/knowledge.entity';
 
 @Entity('ontology_schema')
 export class Schema {
@@ -43,9 +42,6 @@ export class Schema {
   @OneToMany(() => Schema, (schema) => schema.parent)
   children: Schema[];
 
-
-  @ManyToOne(() => Knowledge, (knowledge) => knowledge.schemas)
-  knowledge: Knowledge;
 
   @ManyToMany(() => Property, (property) => property.schemas)
   @JoinTable({

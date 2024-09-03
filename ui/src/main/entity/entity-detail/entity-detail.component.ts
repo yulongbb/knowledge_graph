@@ -239,7 +239,7 @@ export class EntityDetailComponent implements OnInit {
           })
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
-            this.form.formGroup.patchValue({ _key: x._id, label: this.item?.labels?.zh?.value, type: { id: type.id, label: type.name }, description: this.item.descriptions?.zh?.value });
+            this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
               parents.push(this.item.type)
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
@@ -282,27 +282,27 @@ export class EntityDetailComponent implements OnInit {
                           control.push(
                             {
                               control: 'input',
-                              id: statement._id,
-                              label: statement.mainsnak.label,
-                              value: statement.mainsnak.datavalue.value
+                              id: statement?._id,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value
                             },
                           )
                         } else if (statement.mainsnak.datavalue.type == 'quantity') {
                           control.push(
                             {
                               control: 'input',
-                              id: statement._id,
-                              label: statement.mainsnak.label,
-                              value: statement.mainsnak.datavalue.value.amount
+                              id: statement?._id,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.amount
                             },
                           )
                         } else {
                           control.push(
                             {
                               control: 'input',
-                              id: statement._id,
-                              label: statement.mainsnak.label,
-                              value: statement.mainsnak.datavalue.value.label
+                              id: statement?._id,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.label
                             },
                           )
                         }
@@ -310,9 +310,9 @@ export class EntityDetailComponent implements OnInit {
                         control.push(
                           {
                             control: 'input',
-                            id: statement.mainsnak.property,
-                            label: statement.mainsnak.label,
-                            value: statement.mainsnak.datavalue.value.label
+                            id: statement?.mainsnak?.property,
+                            label: statement?.mainsnak?.label,
+                            value: statement?.mainsnak?.datavalue?.value?.label
                           },
                         )
                       }
@@ -446,13 +446,13 @@ export class EntityDetailComponent implements OnInit {
             item['_key'] = this.id;
             item['items'] = this.item.items;
 
+            console.log(item)
+
             this.nodeService.put(item).subscribe((x) => {
               this.message.success('编辑成功！');
-              // this.router.navigate(['/index/entity']);
+              this.router.navigate(['/index/entity']);
             });
 
-            // this.message.success('修改成功！');
-            // this.router.navigate(['/index/entity']);
           });
         }
         break;
