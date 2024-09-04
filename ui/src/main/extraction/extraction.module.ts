@@ -11,6 +11,10 @@ import { ExtractionDetailComponent } from "./extraction-detail/extraction-detail
 import { XTextareaModule } from '@ng-nest/ui/textarea';
 import { XInputModule } from "@ng-nest/ui";
 import { PropertyDetailComponent } from "./property-detail/property-detail.component";
+import { XStepsModule } from '@ng-nest/ui/steps';
+import { XTabsModule } from '@ng-nest/ui/tabs';
+
+
 
 
 
@@ -24,6 +28,8 @@ import { PropertyDetailComponent } from "./property-detail/property-detail.compo
     XTreeModule,
     XTextareaModule,
     XInputModule,
+    XStepsModule,
+    XTabsModule,
     ExtractionRoutesModule
   ],
   declarations: [ExtractionComponent,ExtractionDetailComponent,PropertyDetailComponent]

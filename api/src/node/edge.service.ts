@@ -62,6 +62,8 @@ export class EdgeService {
         }
       })
     } else {
+      console.log(edge)
+      edge['_to']=edge['_from'];
       result = myCollection.save(edge).then(
         () => console.log('Document removed successfully'),
         (err) => console.error('Failed to remove document:', err),

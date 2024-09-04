@@ -5,12 +5,12 @@ export class Extraction {
   @PrimaryColumn('uuid', { length: 36 })
   id: string;
 
-  @Column()
+  @Column({ length: 500 })
   subject: string;
 
-  @Column()
+  @Column({ length: 500 })
   property: string;
 
-  @Column()
+  @Column({ length: 500 })
   object: string;
 }

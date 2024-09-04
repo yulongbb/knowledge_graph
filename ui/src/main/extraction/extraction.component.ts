@@ -8,6 +8,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FusionService } from '../fusion/fusion.service';
 import { forkJoin, map, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
+import { NodeService } from '../node/node.service';
+import { EdgeService } from '../edge/edge.service';
 
 
 @Component({
@@ -21,6 +23,20 @@ export class ExtractionComponent extends PageBase {
   keyword: any = '{ "名称" : "歼-16战机", "产国" : "中国", "图片" : "http://images.huanqiu.com/sarons/2014/05/78c43ad2aad6411d2cda1328555a0bef.jpg", "简介" : "歼16沈阳飞机公司为海军航空兵所研发的一款新型多用途战机，是歼-11BS战斗机的攻击机版本（歼-11BS又是苏-27的双座版本），由于此前的歼-11BS双座战斗机的外挂架数量和挂载能力偏低，主要用于对空作战，因而对地、对海攻击能力有限。  结合了俄制苏-30MKK战斗机的机身和空中格斗能力，以及西安产歼轰-7A歼击轰炸机的通用弹药，在载弹种类、数量上将超越中国现役的同类机型，推测其可以挂载除战略武器以外的所有空基发射武器，将具备远距离超视距攻击能力和强大的对地、对海打击能力。   2013年，网上也曝出一组关于歼-16携霹雳-13惊艳亮相的图片，引发外界强烈关注。分析称，该新型导弹搭档中国歼-16，战力大增，一旦上战场作战，击沉美军航母也不是不可能。", "首飞时间" : "2011年10月17日", "研发单位" : "中国沈阳飞机公司", "气动布局" : "后掠翼", "发动机数量" : "双发", "飞行速度" : "超音速", "关注度" : "(5分)", "乘员" : "2人", "机长" : "21.19米", "翼展" : "14.7米", "机高" : "5.9米", "发动机" : "AL-31F涡扇发动机", "最大飞行速度" : "1438千米每小时", "最大航程" : "4288千米", "大类" : "飞行器", "类型" : "战斗机" }';
   query: XQuery = { filter: [] };
   properties: any;
+  properties2:any = signal([]);
+
+  activated = signal(0);
+  steps = signal(['数据解析', '属性配置', '实体录入', '关系录入']);
+
+  pre() {
+    this.activated.update((x) => --x);
+  }
+
+  next() {
+    this.activated.update((x) => ++x);
+  }
+
+  done() { }
 
   data = (index: number, size: number, query: any) =>
     this.service.getList(index, size, query).pipe(
@@ -40,9 +56,9 @@ export class ExtractionComponent extends PageBase {
               result.push(d);
             })
           })
-
+          console.log(result)
           this.properties = result;
-
+          this.properties2 = signal(properties);
         })
 
       }),
@@ -65,6 +81,9 @@ export class ExtractionComponent extends PageBase {
     public override indexService: IndexService,
     private service: ExtractionService,
     private propertyService: PropertyService,
+    private nodeService: NodeService,
+    private edgeService: EdgeService,
+
     private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -144,24 +163,76 @@ export class ExtractionComponent extends PageBase {
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
             if (action === 'confirm') {
-              console.log(this.checkedRows)
-              console.log(this.properties)
-              let edge = {
-                mainsnak: {
-                  snaktype: "value",
-                  property: "P102",
-                  datavalue: {
-                    value: null,
-                    type: "unknown"
-                  },
-                  datatype: null,
-                  label: "所属政党"
+              let item: any = {
+                labels: {
+                  zh: {
+                    language: 'zh',
+                    value: this.checkedRows[0]['subject']
+                  }
                 },
-                rank: "normal",
-                type: "statement",
-
+                type: { 'id': 'E4' },
               }
-              console.log(edge)
+              let arr: any = [];
+              this.nodeService.post(item).subscribe((i: any) => {
+                console.log(i);
+                let edges: any = []
+                this.checkedRows.forEach((row: any) => {
+                  let property = this.properties.filter((p: any) => p.name == row.property)[0];
+                  let datavalue: any;
+                  if (property == 'string') {
+                    datavalue = {
+                      value: row.object,
+                      type: "string"
+                    }
+                  } else if (property.type == 'quantity') {
+                    datavalue = {
+                      value: {
+                        amount: row.object,
+                        unit: "1",
+                        upperBound: null,
+                        lowerBound: null
+                      },
+                      type: "quantity"
+                    }
+                  } else if (property.type == 'wikibase-item') {
+                    datavalue = {
+                      value: {
+                        label: row.object
+                      },
+                      type: "wikibase-entityid"
+                    }
+                  } else if (property.type == 'time') {
+                    datavalue = {
+                      value: {
+                        time: row.object,
+                      },
+                      type: "time"
+                    }
+                  }
+                  let edge = {
+                    _from: 'entity/' + i.items[0]['index']['_id'],
+                    mainsnak: {
+                      snaktype: "value",
+                      property: `P${property.id}`,
+                      datavalue: datavalue,
+                      datatype: property.type,
+                      label: property.name
+                    },
+                    rank: "normal",
+                    type: "statement",
+                  }
+                  edges.push(edge);
+                  arr.push(this.edgeService.addEdge(edge));
+
+                })
+                console.log(edges)
+                forkJoin(arr).subscribe((resulet: any) => {
+                  console.log(resulet)
+
+                })
+              })
+
+
 
             }
 
