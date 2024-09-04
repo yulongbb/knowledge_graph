@@ -246,20 +246,7 @@ export class EntityDetailComponent implements OnInit {
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   console.log(c);
                   this.statements = [];
-                  x.list.forEach((property: any) => {
-                    this.statements.push({
-                      "mainsnak": {
-                        "snaktype": "value",
-                        "property": `P${property.id}`,
-                        "datavalue": this.getDatavalue(property.type),
-                        "datatype": property.type,
-                        "label": property.name,
-                      },
-                      "type": "statement",
-                      "rank": "normal"
-                    }
-                    )
-                  })
+
                   c.list.forEach((p: any) => {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                       console.log(p.edges[0].mainsnak.property)
@@ -268,6 +255,23 @@ export class EntityDetailComponent implements OnInit {
                       p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
                     }
                     this.statements.push(p.edges[0])
+                  })
+                  x.list.forEach((property: any) => {
+                    if(c.list.filter((p:any)=>`P${property.id}`==p.edges[0].mainsnak.property ).length==0){
+                      this.statements.push({
+                        "mainsnak": {
+                          "snaktype": "value",
+                          "property": `P${property.id}`,
+                          "datavalue": this.getDatavalue(property.type),
+                          "datatype": property.type,
+                          "label": property.name,
+                        },
+                        "type": "statement",
+                        "rank": "normal"
+                      }
+                      )
+                    }
+                    
                   })
                   let control: any = []
                   this.statements = this.statements.sort((a: any, b: any) => {
@@ -294,6 +298,15 @@ export class EntityDetailComponent implements OnInit {
                               id: statement?._id,
                               label: statement?.mainsnak?.label,
                               value: statement?.mainsnak?.datavalue?.value?.amount
+                            },
+                          )
+                        } else if (statement.mainsnak.datavalue.type == 'time') {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement?._id,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.time
                             },
                           )
                         } else {
@@ -374,6 +387,7 @@ export class EntityDetailComponent implements OnInit {
             const newEdges: any = [];
             Object.keys(this.form2.formGroup.value).forEach((key) => {
               const value = this.form2.formGroup.value[key];
+
               const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
               if (existingEdge) {
                 if (existingEdge.mainsnak.datavalue.type == 'string') {
@@ -391,6 +405,7 @@ export class EntityDetailComponent implements OnInit {
                 }
               } else if (value !== undefined && value !== '') {
                 // 新增的边
+                console.log(value)
                 let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
                 statement['_from'] = this.item.items[0];
                 statement['_to'] = this.item.items[0];

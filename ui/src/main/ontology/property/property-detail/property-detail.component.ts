@@ -95,7 +95,6 @@ export class PropertyDetailComponent implements OnInit {
       id: 'isPrimary',
       label: '是否为主属性',
     },
-    { control: 'input', id: 'id', hidden: true, value: XGuid() },
   ];
   title = '';
   get formInvalid() {

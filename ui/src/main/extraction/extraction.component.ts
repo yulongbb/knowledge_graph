@@ -9,6 +9,7 @@ import { forkJoin, map, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
 import { NodeService } from '../node/node.service';
 import { EdgeService } from '../edge/edge.service';
+import { EsService } from '../search/es.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ import { EdgeService } from '../edge/edge.service';
 export class ExtractionComponent extends PageBase {
 
   index = 1;
-  keyword: any = '{ "名称" : "歼-16战机", "产国" : "中国", "图片" : "http://images.huanqiu.com/sarons/2014/05/78c43ad2aad6411d2cda1328555a0bef.jpg", "简介" : "歼16沈阳飞机公司为海军航空兵所研发的一款新型多用途战机，是歼-11BS战斗机的攻击机版本（歼-11BS又是苏-27的双座版本），由于此前的歼-11BS双座战斗机的外挂架数量和挂载能力偏低，主要用于对空作战，因而对地、对海攻击能力有限。  结合了俄制苏-30MKK战斗机的机身和空中格斗能力，以及西安产歼轰-7A歼击轰炸机的通用弹药，在载弹种类、数量上将超越中国现役的同类机型，推测其可以挂载除战略武器以外的所有空基发射武器，将具备远距离超视距攻击能力和强大的对地、对海打击能力。   2013年，网上也曝出一组关于歼-16携霹雳-13惊艳亮相的图片，引发外界强烈关注。分析称，该新型导弹搭档中国歼-16，战力大增，一旦上战场作战，击沉美军航母也不是不可能。", "首飞时间" : "2011年10月17日", "研发单位" : "中国沈阳飞机公司", "气动布局" : "后掠翼", "发动机数量" : "双发", "飞行速度" : "超音速", "关注度" : "(5分)", "乘员" : "2人", "机长" : "21.19米", "翼展" : "14.7米", "机高" : "5.9米", "发动机" : "AL-31F涡扇发动机", "最大飞行速度" : "1438千米每小时", "最大航程" : "4288千米", "大类" : "飞行器", "类型" : "战斗机" }';
+  keyword: any = '';
   query: XQuery = { filter: [] };
   properties: any;
   properties2: any = signal([]);
@@ -41,6 +42,8 @@ export class ExtractionComponent extends PageBase {
   data = (index: number, size: number, query: any) =>
     this.service.getList(index, size, query).pipe(
       tap((x) => {
+        console.log(x.list)
+
         let result: any = []
         let properties = new Set();
         let items = new Set();
@@ -58,7 +61,7 @@ export class ExtractionComponent extends PageBase {
               result.push(d);
             })
           })
-          console.log(result)
+          console.log(items)
           this.properties = result;
           this.properties2 = signal(properties);
           this.items = signal(items);
@@ -86,6 +89,7 @@ export class ExtractionComponent extends PageBase {
     private propertyService: PropertyService,
     private nodeService: NodeService,
     private edgeService: EdgeService,
+    private esService: EsService,
 
     private message: XMessageService,
     private router: Router,
@@ -166,23 +170,18 @@ export class ExtractionComponent extends PageBase {
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
             if (action === 'confirm') {
-              let item: any = {
-                labels: {
-                  zh: {
-                    language: 'zh',
-                    value: this.checkedRows[0]['subject']
-                  }
-                },
-                type: { 'id': 'E4' },
-              }
+
               let arr: any = [];
-              this.nodeService.post(item).subscribe((i: any) => {
-                console.log(i);
+              let query = { "must": [{ "term": { "labels.zh.value.keyword": this.checkedRows[0]['subject'] } },] }
+
+              console.log(query)
+              this.esService.searchEntity(1, 10, query).subscribe((e: any) => {
+                console.log(e.list[0]._source);
                 let edges: any = []
                 this.checkedRows.forEach((row: any) => {
                   let property = this.properties.filter((p: any) => p.name == row.property)[0];
                   let datavalue: any;
-                  if (property == 'string') {
+                  if (property.type == 'string') {
                     datavalue = {
                       value: row.object,
                       type: "string"
@@ -213,7 +212,7 @@ export class ExtractionComponent extends PageBase {
                     }
                   }
                   let edge = {
-                    _from: 'entity/' + i.items[0]['index']['_id'],
+                    _from: 'entity/' + e.list[0]['_id'],
                     mainsnak: {
                       snaktype: "value",
                       property: `P${property.id}`,

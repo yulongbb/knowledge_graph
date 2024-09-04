@@ -19,7 +19,7 @@
       <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
       <dl>
         <dd>
-          <i *ngFor="let statement of entity.claims">
+          <p *ngFor="let statement of entity.claims">
             <span>{{statement.mainsnak.label}}:</span>
             <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
                 [href]="'http://localhost:4200/index/search/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.value.label}}</a>
@@ -37,7 +37,7 @@
             <strong
               *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
             <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
-          </i>
+            </p>
         </dd>
       </dl>
       <div class="time">

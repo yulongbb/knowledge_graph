@@ -99,7 +99,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let query = { "must": [{ "match": { "labels.zh.value": this.name } },] }
+    let query = { "must": [{ "term": { "labels.zh.value.keyword": this.name} },] }
 
     this.esService.searchEntity(1,10,query).subscribe((data: any) => {
       console.log(data);
@@ -112,7 +112,8 @@ export class EntityDetailComponent implements OnInit {
          
         })
       }else{
-        this.type = "add"
+        this.type = "add";
+        this.form.formGroup.patchValue({  label:this.name, description: this.name });
       }
 
     })
@@ -169,7 +170,7 @@ export class EntityDetailComponent implements OnInit {
           type: this.form.formGroup.value.type,
           images: this.imgs?.map((i: any) => i.url.split('/')[i.url.split('/').length - 1])
         }
-        console.log(this.item)
+        console.log(item)
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');

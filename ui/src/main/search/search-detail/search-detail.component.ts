@@ -117,7 +117,7 @@ export class SearchDetailComponent implements OnInit {
               parents.push(x['_source'].type)
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
                 this.properties = signal(p.list);
-                this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
+                this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   let statements: any = [];
                   c.list.forEach((p: any) => {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {

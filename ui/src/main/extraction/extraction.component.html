@@ -22,7 +22,7 @@
           </x-input-group>
         </div>
 
-        <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index"
+        <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="100" [(index)]="index"
           [query]="query" [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" loading [allowSelectRow]="true"
           (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)"></x-table>
 
