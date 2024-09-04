@@ -11,7 +11,7 @@ export class EsService {
 
   async search(params: any) {
     let data = await this.elasticsearchService.search(params)
-    return { total: data['hits']['total']['value'], list: data['hits']['hits'] , aggregations: data['aggregations']['types']['buckets'] };
+    return { total: data['hits']['total']['value'], list: data['hits']['hits'], aggregations: data['aggregations']['types']['buckets'] };
   }
 
   async bulk(params: any) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { XData, XSliderNode } from '@ng-nest/ui';
 import { EsService } from './es.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +18,7 @@ export class SearchComponent implements OnInit {
   data: XData<XSliderNode> = ['目标库', '文库', '图库', '音频库', '视频库',];
   size = 20;
   index = 1;
-
+  menu = signal([]);
   constructor(
     private service: EsService,
     private router: Router,
@@ -32,6 +32,30 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ontologyService
+      .getList(1, Number.MAX_SAFE_INTEGER, {
+        sort: [
+          { field: 'pid', value: 'asc' },
+          { field: 'sort', value: 'asc' },
+        ],
+      }).subscribe((data: any) => {
+        console.log(data);
+        let menu: any = [];
+        data.list.forEach((d: any) => {
+          if (d.id != 'E1') {
+            if (d.pid == 'E1') {
+              menu.push({ id: d.id, label: d.name, })
+
+            } else {
+
+              menu.push({ id: d.id, label: d.name, pid: d?.pid })
+
+            }
+          }
+
+        })
+        this.menu = signal(menu)
+      })
     this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -48,15 +72,15 @@ export class SearchComponent implements OnInit {
                     path.edges[0].mainsnak.datavalue.value.id = path.vertices[1].id;
                     path.edges[0].mainsnak.datavalue.value.label = path.vertices[1].labels.zh.value;
                   }
-                  if(p.list?.filter((property:any)=>path.edges[0].mainsnak.property ==  `P${property.id}`).length>0){
+                  if (p.list?.filter((property: any) => path.edges[0].mainsnak.property == `P${property.id}`).length > 0) {
                     statements.push(path.edges[0])
-                  } 
+                  }
                 })
                 item.claims = statements;
                 console.log(item)
 
               })
-          
+
             });
           });
         })
@@ -77,6 +101,13 @@ export class SearchComponent implements OnInit {
     })
   }
 
+  selectType(type: any) {
+    this.query = { "must": [{"term": {"type.keyword": type.id}}] }
+
+    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
+      console.log(data);
+      this.entities = data.list;
+    })  }
 
   action(type: string, item?: any) {
     console.log(item);

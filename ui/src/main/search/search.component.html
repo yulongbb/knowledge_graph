@@ -5,6 +5,9 @@
     <x-button icon="fto-search" (click)="search(keyword)"></x-button>
   </x-input-group>
 </div>
+<x-menu (nodeClick)="selectType($event)" [data]="menu()"> </x-menu>
+
+
 <div class="row" *ngFor="let entity of entities">
   <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
     <ng-template #header>
