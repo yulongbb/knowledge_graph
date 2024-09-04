@@ -22,7 +22,6 @@
           </x-input-group>
         </div>
 
-
         <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="20" [(index)]="index"
           [query]="query" [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" loading [allowSelectRow]="true"
           (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)"></x-table>
@@ -47,10 +46,9 @@
       </div>
     </x-tab>
     <x-tab>
-      <div class="custom-steps-content">Content 3</div>
-    </x-tab>
-    <x-tab>
-      <div class="custom-steps-content">Content 3</div>
+      <div class="custom-steps-content">
+        <app-entity-detail *ngFor="let i of items()" [name]="i"></app-entity-detail>
+      </div>
     </x-tab>
   </x-tabs>
 </div>

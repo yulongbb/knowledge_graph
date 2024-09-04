@@ -31,8 +31,6 @@
                 (keyup.enter)="search(keyword)"></x-input>
               <x-button icon="fto-search" (click)="search(keyword)"></x-button>
             </x-input-group>
-        
-
             <x-table #tableCom  [columns]="columns" [data]="items" [size]="size" [bodyHeight]="750" 
               [bodyColumnTpl]="{ label: labelTpl ,    description:descriptionTpl,  }"   [virtualScroll]="true"
               loading [allowSelectRow]="true">
@@ -42,15 +40,12 @@
                 {{row['_source']?.labels?.zh?.value??row?.labels?.en?.value}}
               </x-link>
             </ng-template>
-            
             <ng-template #descriptionTpl let-column="$column" let-row="$row">
               <x-link (click)="action('info', row)">
                 {{row['_source']?.descriptions?.zh?.value??row?.descriptions?.en?.value}}
               </x-link>
             </ng-template>
           </x-card>
-
-
         </x-col>
         <x-col span="12">
           <x-card width="100%">
@@ -93,85 +88,3 @@
     <x-footer>footer</x-footer>
   </x-container>
 </x-container>
-
-<!-- 
-<x-row>
-  <x-col span="6">
-    <x-tree #treeCom au-adaption [outerHeight]="100" [data]="data" expandedLevel="0" [nodeHeight]="1.875"
-      [actions]="treeActions" (activatedChange)="action('info', $event)"></x-tree> <au-tool>
-      <x-buttons [space]="0.5">
-        <x-button icon="fto-save" type="primary" (click)="!formGroup.invalid && !disabled && action('save', selected)"
-          [disabled]="formGroup.invalid || disabled">
-          保存
-        </x-button>
-      </x-buttons>
-    </au-tool>
-    <x-form class="au-panel au-overflow-auto" au-adaption [outerHeight]="128" [formGroup]="formGroup"
-      [controls]="controls" [disabled]="disabled" direction="row" labelSuffix=":" labelWidth="6rem" width="24rem"
-      labelAlign="end" span="20" space="2"></x-form>
-  </x-col>
-  <x-col span="18">
-
-    <div echarts [options]="chartOptions" class="echart" (chartClick)="treeNodeclick($event)"></div>
-
-
-    <x-row>
-      <x-col span="12">
-        <x-input-group compact>
-          <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword"
-            (keyup.enter)="search(keyword)"></x-input>
-          <x-button icon="fto-search" (click)="search(keyword)"></x-button>
-        </x-input-group>
-        <x-table #tableCom [columns]="columns" [data]="data2()" [index]="index" [size]="size" [total]="total1"
-          [rowHeight]="0" [scroll]="{ x: 1200, y: 300 }" [virtualScroll]="true" [adaptionHeight]="105"
-          [bodyColumnTpl]="{  label: labelTpl     }" [allowSelectRow]="true" (indexChange)="indexChange()"
-          (sizeChange)="sizeChange()">
-        </x-table>
-
-
-        <ng-template #labelTpl let-column="$column" let-row="$row">
-          <x-link (click)="selectRow( row)">
-            {{row?.labels}}
-          </x-link>
-        </ng-template>
-      </x-col>
-      <x-col span="12">
-        <div class="row">
-          <x-card width="100%">
-
-            <h1>{{selectedRow?.labels}}</h1>
-            <p>{{selectedRow?.descriptions}}</p>
-            <div *ngFor="let claim of climas  | async | keyvalue">
-              <p *ngFor="let statement of claim.value">
-                <i>{{statement.mainsnak.property}}</i>:
-                <i>{{statement.mainsnak.datatype}}</i>:
-                <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><x-link type="primary"
-                    [href]="'http://localhost:4200/index/entity/info/'+statement.mainsnak.datavalue.value.id">{{statement.mainsnak.datavalue.label}}</x-link>
-                </strong>
-                <strong *ngIf="statement.mainsnak.datatype=='string'">{{statement.mainsnak.datavalue.value
-                  |json}}</strong>
-                <strong *ngIf="statement.mainsnak.datatype=='url'"><a
-                    [href]="statement.mainsnak.datavalue.value">{{statement.mainsnak.datavalue.value}}</a></strong>
-                <strong
-                  *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-                <strong *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
-                  }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-                <strong
-                  *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-                <strong *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
-              </p>
-            </div>
-
-          </x-card>
-        </div>
-
-      </x-col>
-
-    </x-row>
-
-
-
-  </x-col>
-
-</x-row> -->

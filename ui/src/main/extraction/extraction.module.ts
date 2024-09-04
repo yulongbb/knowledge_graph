@@ -13,6 +13,7 @@ import { XInputModule } from "@ng-nest/ui";
 import { PropertyDetailComponent } from "./property-detail/property-detail.component";
 import { XStepsModule } from '@ng-nest/ui/steps';
 import { XTabsModule } from '@ng-nest/ui/tabs';
+import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
 
 
 
@@ -32,6 +33,6 @@ import { XTabsModule } from '@ng-nest/ui/tabs';
     XTabsModule,
     ExtractionRoutesModule
   ],
-  declarations: [ExtractionComponent,ExtractionDetailComponent,PropertyDetailComponent]
+  declarations: [ExtractionComponent,ExtractionDetailComponent,PropertyDetailComponent, EntityDetailComponent]
 })
 export class ExtractionModule {}
