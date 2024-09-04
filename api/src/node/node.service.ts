@@ -165,7 +165,7 @@ export class NodeService {
               descriptions: entity?.descriptions,
               aliases: entity?.aliases,
               modified: new Date().toISOString(),
-              items: [doc['_id']],
+              items: ['entity/' + doc['_key']],
               images: entity?.images,
             }
           ]
@@ -198,7 +198,7 @@ export class NodeService {
           // Update the document fields
           existingDocument.id = entity['_key'];
           existingDocument.type = 'item',
-          existingDocument.labels = entity?.labels;
+            existingDocument.labels = entity?.labels;
           existingDocument.descriptions = entity?.descriptions;
           existingDocument.modified = new Date().toISOString();
           return myCollection.update(entity['_key'], existingDocument);

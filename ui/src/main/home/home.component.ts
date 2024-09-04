@@ -34,20 +34,20 @@ export class HomeComponent implements OnInit {
         })
       });
       this.entities = data.list;
-      let menu:any = []
-      let arr:any = [];
+      let menu: any = []
+      let arr: any = [];
       data.aggregations.forEach((m: any) => {
-        arr.push( this.ontologyService.get(m.key));
+        arr.push(this.ontologyService.get(m.key));
       })
-      forkJoin(arr).subscribe((properties:any) => {
+      forkJoin(arr).subscribe((properties: any) => {
         console.log(properties)
         data.aggregations.forEach((m: any) => {
-          menu.push({ id: m.key, label: properties.filter((p:any)=> p.id==m.key)[0].name})
+          menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
         })
         console.log(menu)
         this.menu = signal(menu)
 
-       });
+      });
     })
   }
 
@@ -66,6 +66,15 @@ export class HomeComponent implements OnInit {
           item._type = t.label
         })
       });
+      this.entities = data.list;
+    })
+  }
+
+  selectType(type: any) {
+    this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
+
+    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
+      console.log(data);
       this.entities = data.list;
     })
   }
