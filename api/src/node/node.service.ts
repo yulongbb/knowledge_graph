@@ -172,7 +172,7 @@ export class NodeService {
           document.document(doc['_key'])
             .then((existingDocument) => {
               existingDocument.id = e['items'][0]['index']['_id'];
-              return document.update(doc['_key'], existingDocument);
+              document.update(doc['_key'], existingDocument);
             });
         });
       },
