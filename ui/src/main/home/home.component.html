@@ -22,8 +22,8 @@
             <div class="grid-item" *ngFor="let entity of entities" >
                 <img *ngIf="entity['_source']?.images&&entity['_source']?.images.length>0" style="height: 200px;" (click)="action('info', entity)"
                 [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-                <strong >{{entity['_source']?.labels?.zh?.value | slice:0:10}}
-                </strong>
+                <b >{{entity['_source']?.labels?.zh?.value | slice:0:10}}
+                </b>
             </div>
         </div>
     </div>

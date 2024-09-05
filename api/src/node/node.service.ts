@@ -152,9 +152,6 @@ export class NodeService {
               );
             });
           });
-        item['_key'] = doc['_key'];
-        this.updateEntity(item);
-        console.log(entity)
         return this.elasticsearchService.bulk({
           body: [
             // 指定的数据库为news, 指定的Id = 1
@@ -169,11 +166,21 @@ export class NodeService {
               images: entity?.images,
             }
           ]
+        }).then((e: any) => {
+          console.log(e['items'][0]['index']);
+          console.log(doc);
+          document.document(doc['_key'])
+            .then((existingDocument) => {
+              existingDocument.id = e['items'][0]['index']['_id'];
+              return document.update(doc['_key'], existingDocument);
+            });
         });
       },
       (err) => console.error('Failed to save document:', err),
     );
   }
+
+
   async updateEntity(entity: any): Promise<any> {
     // Fetch the existing document
     this.elasticsearchService.bulk({
