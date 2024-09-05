@@ -11,10 +11,10 @@
 <div class="row" *ngFor="let entity of entities">
   <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
     <ng-template #header>
-      <span *ngIf="!entity['highlight']" (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}
-      </span>
-      <span *ngIf="entity['highlight']" (click)="action('info', entity)"
-        [innerHTML]="entity['highlight']['labels.zh.value']"></span><span>{{entity['_type']}}</span>
+      <b *ngIf="!entity['highlight']" (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}
+      </b>
+      <b *ngIf="entity['highlight']" (click)="action('info', entity)"
+        [innerHTML]="entity['highlight']['labels.zh.value']"></b><span>{{entity['_type']}}</span>
     </ng-template>
     <div class="bottom">
       <x-text-retract *ngIf="!entity['highlight']" max="100"
@@ -30,6 +30,18 @@
             <strong *ngIf="statement.mainsnak.datatype=='string'">
               {{statement.mainsnak.datavalue.value}}
             </strong>
+            <strong *ngIf="statement.mainsnak.datatype=='commonsMedia'">
+              <img
+                *ngIf="statement?.mainsnak?.datavalue?.value?.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] != 'mp4'"
+                width="100px" [src]="'http://localhost:9000/kgms/'+statement?.mainsnak?.datavalue.value" />
+              <video
+                *ngIf="statement?.mainsnak.datavalue.value.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] == 'mp4'"
+                width="100px" controls>
+                <source [src]="'http://localhost:9000/kgms/'+statement?.mainsnak.datavalue.value" type="video/mp4" />
+                <p>
+                  你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                </p>
+              </video> </strong>
             <strong *ngIf="statement.mainsnak.datatype=='url'"><a
                 [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
             <strong

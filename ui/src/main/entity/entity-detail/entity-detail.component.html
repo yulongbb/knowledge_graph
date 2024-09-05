@@ -1,18 +1,17 @@
 <div class="row">
   <x-card width="100%">
     <div class="row">
-      <x-upload
-        action="http://localhost:3000/api/minio-client/uploadFile"
-        [text]="textTpl"
-        type="img"
-        multiple
-        [(ngModel)]="imgs"
-        (uploadSuccess)="uploadSuccess($event)"
-        multipleModel="add"
-      ></x-upload>
+      <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl"   [filesTpl]="filesTpl" multiple
+        [(ngModel)]="imgs" 
+        (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
       <ng-template #textTpl>
         <x-icon class="upload-icon" type="fto-upload"></x-icon>
         <span>选择图片</span>
+      </ng-template>
+      <ng-template #filesTpl let-files="$files">
+        <ul>
+            <li *ngFor="let file of files">{{ file|json }} - {{ file.state }}</li>
+        </ul>
       </ng-template>
     </div>
     <h3>{{ title }}</h3>
@@ -22,7 +21,7 @@
     <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
       labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
     <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
-   
+
     <div class="app-footer">
       <x-buttons space="0.5">
         <x-button (click)="action('cancel')">取消</x-button>
@@ -32,3 +31,4 @@
     </div>
   </x-card>
 </div>
+

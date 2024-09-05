@@ -53,7 +53,7 @@ export class PropertyDetailComponent implements OnInit {
       control: 'input',
       id: 'description',
       label: '描述',
-      required: true,
+      required: false,
       // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
@@ -78,7 +78,7 @@ export class PropertyDetailComponent implements OnInit {
       control: 'find',
       id: 'types',
       label: '尾部实体',
-      required: true,
+      required: false,
       multiple: true,
       treeData: () =>
         this.ontologyService
@@ -176,6 +176,9 @@ export class PropertyDetailComponent implements OnInit {
               this.router.navigate(['/index/properties']);
             });
         } else if (this.type === 'edit') {
+          this.form.formGroup.value['id']=Number.parseInt(this.id);
+          console.log(this.form.formGroup.value);
+
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');

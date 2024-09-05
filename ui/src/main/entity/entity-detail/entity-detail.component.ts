@@ -257,7 +257,7 @@ export class EntityDetailComponent implements OnInit {
                     this.statements.push(p.edges[0])
                   })
                   x.list.forEach((property: any) => {
-                    if(c.list.filter((p:any)=>`P${property.id}`==p.edges[0].mainsnak.property ).length==0){
+                    if (c.list.filter((p: any) => `P${property.id}` == p.edges[0].mainsnak.property).length == 0) {
                       this.statements.push({
                         "mainsnak": {
                           "snaktype": "value",
@@ -271,7 +271,7 @@ export class EntityDetailComponent implements OnInit {
                       }
                       )
                     }
-                    
+
                   })
                   let control: any = []
                   this.statements = this.statements.sort((a: any, b: any) => {
@@ -309,6 +309,17 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value?.time
                             },
                           )
+                        } else if (statement.mainsnak.datavalue.type == 'commonsMedia') {
+                          control.push(
+                            {
+                              control: 'select',
+                              id: 'selectRequired',
+                              label: 'required',
+                              span: 8,
+                              data: this.imgs,
+                              required: true
+                            },
+                          )
                         } else {
                           control.push(
                             {
@@ -320,14 +331,45 @@ export class EntityDetailComponent implements OnInit {
                           )
                         }
                       } else {
-                        control.push(
-                          {
-                            control: 'input',
-                            id: statement?.mainsnak?.property,
-                            label: statement?.mainsnak?.label,
-                            value: statement?.mainsnak?.datavalue?.value?.label
-                          },
-                        )
+                        console.log(statement);
+                        if (statement.mainsnak.datatype == 'string') {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement?.mainsnak?.property,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value
+                            },
+                          )
+                        } else if (statement.mainsnak.datatype == 'quantity') {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement?.mainsnak?.property,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.amount
+                            },
+                          )
+                        } else if (statement.mainsnak.datatype == 'time') {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement?.mainsnak?.property,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.time
+                            },
+                          )
+                        } else {
+                          control.push(
+                            {
+                              control: 'input',
+                              id: statement?.mainsnak?.property,
+                              label: statement?.mainsnak?.label,
+                              value: statement?.mainsnak?.datavalue?.value?.label
+                            },
+                          )
+                        }
+
                       }
                     }
                   })
@@ -409,7 +451,7 @@ export class EntityDetailComponent implements OnInit {
                 let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
                 statement['_from'] = this.item.items[0];
                 statement['_to'] = this.item.items[0];
-                if (statement.mainsnak.datatype == 'string') {
+                if (statement.mainsnak.datavalue.type == 'string') {
                   statement.mainsnak.datavalue.value = value;
                 } else if (statement.mainsnak.datatype == 'quantity') {
                   statement.mainsnak.datavalue.value.amount = value;
