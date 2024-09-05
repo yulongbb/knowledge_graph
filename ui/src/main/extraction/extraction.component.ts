@@ -27,7 +27,7 @@ export class ExtractionComponent extends PageBase {
   items: any = signal([]);
 
   activated = signal(0);
-  steps = signal(['数据解析', '属性配置', '知识录入']);
+  steps = signal(['数据解析', '知识录入', '属性配置']);
 
   pre() {
     this.activated.update((x) => --x);

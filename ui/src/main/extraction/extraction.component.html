@@ -42,14 +42,15 @@
     </x-tab>
     <x-tab>
       <div class="custom-steps-content">
-        <app-property-detail *ngFor="let p of properties2()" [name]="p"></app-property-detail>
+        <app-entity-detail *ngFor="let i of items()" [name]="i"></app-entity-detail>
       </div>
     </x-tab>
     <x-tab>
       <div class="custom-steps-content">
-        <app-entity-detail *ngFor="let i of items()" [name]="i"></app-entity-detail>
+        <app-property-detail *ngFor="let p of properties2()" [name]="p"></app-property-detail>
       </div>
     </x-tab>
+    
   </x-tabs>
 </div>
 <div class="row">

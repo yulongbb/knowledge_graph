@@ -64,13 +64,13 @@ export class SearchComponent implements OnInit {
           this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
             parents.push(item['_source'].type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
-              console.log(p.list)
               this.nodeService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
                 let statements: any = [];
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                    path.edges[0].mainsnak.datavalue.value.id = path.vertices[1]['_key'];
-                    path.edges[0].mainsnak.datavalue.value.label = path.vertices[1].labels.zh.value;
+                    console.log(path)
+                    path.edges[0].mainsnak.datavalue.value.id = path?.vertices[1]['_key'];
+                    path.edges[0].mainsnak.datavalue.value.label = path?.vertices[1].labels.zh.value;
                   }
                   if (p.list?.filter((property: any) => path.edges[0].mainsnak.property == `P${property.id}`).length > 0) {
                     statements.push(path.edges[0])
