@@ -11,6 +11,7 @@ import { XCardModule } from '@ng-nest/ui/card';
 import { EsService } from './es.service';
 import { SearchDetailComponent } from './search-detail/search-detail.component';
 import { XTextRetractModule } from '@ng-nest/ui/text-retract';
+import { NgxMasonryModule } from 'ngx-masonry';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { XTextRetractModule } from '@ng-nest/ui/text-retract';
     XSliderModule,
     XCardModule,
     XTextRetractModule,
+    NgxMasonryModule,
     RouterModule.forChild([
       {
         path: '',

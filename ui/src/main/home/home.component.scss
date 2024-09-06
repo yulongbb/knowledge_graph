@@ -35,7 +35,7 @@
 
 
 
- 
+
     }
 
     x-input-group {
@@ -47,53 +47,21 @@
         margin-top: 1rem;
     }
 
-    .card {
-        position: relative;
-        overflow: hidden;
 
 
-
-        // .bottom {
-        //     display: block;
-        //     width: 100%;
-        //     position: absolute;
-        //     padding: 0.625rem;
-        //     z-index: 100;
-        // }
-
-        // .bottom>p {
-        //     margin: 0;
-        //     font-size: 1rem;
-        // }
-
-
-        // .bottom>.time {
-        //     display: flex;
-        //     align-items: center;
-        //     justify-content: space-between;
-        // }
-
-        // .bottom>.time>span {
-        //     color: var(--x-text-400);
-        // }
-    }
-
-
-    .grid-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 10px;
-    }
-    .grid-item {
-        background-color: #ccc;
+    .masonry-item {
+        transition: top 0.4s ease-in-out, left 0.4s ease-in-out;
+ 
+        padding: 10px;
+        width: 25%;
         padding: 10px;
         border-radius: 5px;
     }
-    .grid-item img {
+
+    .masonry-item img {
         width: 100%;
         height: auto;
         border-radius: 5px;
     }
 
-  
 }

@@ -11,6 +11,7 @@ import { XCardModule } from '@ng-nest/ui/card';
 
 import { XMenuModule } from '@ng-nest/ui/menu';
 
+import { NgxMasonryModule } from 'ngx-masonry';
 
 
 
@@ -29,6 +30,7 @@ import { XMenuModule } from '@ng-nest/ui/menu';
     XCardModule,
     XTagModule,
     XMenuModule,
+    NgxMasonryModule,
     RouterModule.forChild([
       {
         path: '',

@@ -55,9 +55,11 @@
         <span>{{entity()?._source?.modified}}</span>
         <span>{{entity()?._id}}</span>
       </div>
-      <div class="grid-container">
-        <div class="grid-item" *ngFor="let image of entity()['_source'].images">
-          <img *ngIf="image.split('.')[image.split('.').length-1] != 'mp4'" width="100%"
+
+      <ngx-masonry>
+        <div ngxMasonryItem class="masonry-item"   *ngFor="let image of  entity()['_source'].images">
+        
+            <img masonryLazy loading="lazy"   *ngIf="image.split('.')[image.split('.').length-1] != 'mp4'" width="100%"
             [src]="'http://localhost:9000/kgms/'+image" />
           <video *ngIf="image.split('.')[image.split('.').length-1] == 'mp4'" width="100%" controls>
             <source [src]="'http://localhost:9000/kgms/'+image" type="video/mp4" />
@@ -65,10 +67,11 @@
               你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
             </p>
           </video>
-        </div>
-      </div>
-
+            <b>{{entity['_source']?.labels?.zh?.value | slice:0:10}}
+        </b>           </div>
+      </ngx-masonry>
     </div>
   </x-card>
+
 
 </div>
