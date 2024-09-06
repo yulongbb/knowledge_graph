@@ -251,8 +251,8 @@ export class EntityDetailComponent implements OnInit {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                       console.log(p.edges[0].mainsnak.property)
                       p.edges[0].mainsnak.label = x.list.filter((l: any) => l.id == p.edges[0].mainsnak.property.replace('P', ''))[0]?.name;
-                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
                     }
                     this.statements.push(p.edges[0])
                   })

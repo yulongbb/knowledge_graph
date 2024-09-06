@@ -2,10 +2,11 @@
 
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { EsService } from './es.service';
+import { NLPService } from './nlp.service';
 
 @Controller('es')
 export class EsController {
-  constructor(private readonly elasticsearchService: EsService) { }
+  constructor(private readonly elasticsearchService: EsService, private readonly nlpSevice: NLPService) { }
 
 
   @Post('search/:size/:index')
@@ -72,10 +73,22 @@ export class EsController {
 
   @Get('get/:id')
   async get(@Param('id') id: any,) {
-    return await this.elasticsearchService.get(id);
+    
+    return await this.elasticsearchService.get(id).then((data:any)=>{
+      if(data._source.descriptions){
+        let entities = this.nlpSevice.extractEntities(data._source?.descriptions?.zh?.value);
+        data._source['entities'] = entities;
+      }
+
+      return data;
+    })
   }
 
-
+  @Get('sync')
+  async syncDataToTxt() {
+    
+    return await this.elasticsearchService.syncDataToTxt();
+  }
   @Get('aggs')
   async aggs() {
     return await this.elasticsearchService.aggs({

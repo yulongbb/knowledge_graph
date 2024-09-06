@@ -10,7 +10,7 @@
 
     <div class="bottom">
       <h2>简介</h2>
-      <p>{{entity()?._source?.descriptions?.zh?.value}}</p>
+      <p *ngIf="entity()._source.descriptions" [innerHTML]="linkifyText(entity()?._source?.descriptions?.zh?.value, entity()?._source?.entities)"></p>
       <dl *ngFor="let property of properties()">
 
         <dl *ngIf="getStatement(property).length>0">

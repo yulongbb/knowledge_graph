@@ -76,6 +76,8 @@ export class SearchDetailComponent implements OnInit {
 
   entity: any;
   properties: any;
+
+
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
@@ -105,6 +107,23 @@ export class SearchDetailComponent implements OnInit {
     this.action(this.type);
   }
 
+  linkifyText(text: string, entities: any): string {
+    const wikidataBaseUrl = 'http://localhost:4200/index/search/info/';
+    // 简单示例，将“爱因斯坦”替换为指向Wikidata的链接
+    console.log(entities)
+    let entityMap:any = new Map();
+    entities.forEach((entity:any)=>{
+      entityMap[entity.word] = entity.id;
+    })
+   
+    Object.keys(entityMap).forEach(key => {
+      const link = `<a href="${wikidataBaseUrl}${entityMap[key]}" >${key}</a>`;
+      text = text.replace(new RegExp(key, 'g'), link);
+    });
+  
+    return text;
+  }
+
 
   action(type: string) {
     switch (type) {
@@ -121,8 +140,8 @@ export class SearchDetailComponent implements OnInit {
                   let statements: any = [];
                   c.list.forEach((p: any) => {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]['_key'];
-                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
                     }
                     statements.push(p.edges[0])
                   })

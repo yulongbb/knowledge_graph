@@ -69,8 +69,8 @@ export class SearchComponent implements OnInit {
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {
                     console.log(path)
-                    path.edges[0].mainsnak.datavalue.value.id = path?.vertices[1]['_key'];
-                    path.edges[0].mainsnak.datavalue.value.label = path?.vertices[1].labels.zh.value;
+                    path.edges[0].mainsnak.datavalue.value.id = path?.vertices[1]?.id;
+                    path.edges[0].mainsnak.datavalue.value.label = path?.vertices[1]?.labels?.zh?.value;
                   }
                   if (p.list?.filter((property: any) => path.edges[0].mainsnak.property == `P${property.id}`).length > 0) {
                     statements.push(path.edges[0])

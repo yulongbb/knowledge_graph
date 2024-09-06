@@ -1,82 +1,86 @@
 :host {
 
-    x-input-group {
-        display: block;
-        width: 100%;
-    }
+  x-input-group {
+    display: block;
+    width: 100%;
+  }
 
-    x-input-group:not(:first-child) {
-        margin-top: 1rem;
-    }
-    .row:not(:first-child) {
-        margin-top: 1rem;
-      }
-      .row x-card:not(:first-child) {
-        margin-left: 2rem;
-      }
-    x-row {
-        margin: 1rem 0;
+  x-input-group:not(:first-child) {
+    margin-top: 1rem;
+  }
 
-        >x-col {
-            margin: 0.5rem 0;
+  .row:not(:first-child) {
+    margin-top: 1rem;
+  }
 
-            >div {
-                height: 300px;
-                padding: 1rem;
-                text-align: center;
-                border-radius: 0.125rem;
-                background-color: var(--x-info-400);
-            }
-        }
+  .row x-card:not(:first-child) {
+    margin-left: 2rem;
+  }
 
-        &:first-child {
-            margin-top: 0;
-        }
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    
-}
-
-.row .card  #header{
+  .row .card #header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-   }
-
-
+  }
+  
+  
   
   .row:not(:first-child) {
     margin-top: 1rem;
   }
+  
   .row x-card:not(:first-child) {
     margin-left: 2rem;
   }
-  .row .card img {
-    display: block;
-  }
 
+  
   .row .card .bottom {
     padding: 0.625rem;
   }
-  .row .card .bottom > p {
+  
+  .row .card .bottom>p {
     margin: 0;
     font-size: 1rem;
   }
-  .row .card .bottom > .time {
+  
+  .row .card .bottom>.time {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  .row .card .bottom > .time > span {
+  
+  .row .card .bottom>.time>span {
     color: var(--x-text-400);
   }
-  ::ng-deep strong{
+  
+  ::ng-deep strong {
     color: brown;
-   }
+  }
+
+  x-row {
+    margin: 1rem 0;
+
+    >x-col {
+      margin: 0.5rem 0;
+
+      >div {
+        height: 300px;
+        padding: 1rem;
+        text-align: center;
+        border-radius: 0.125rem;
+        background-color: var(--x-info-400);
+      }
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 
 
-   
+}
+

@@ -25,10 +25,6 @@
     margin-right: 5px;
   }
 
-  .row .card img {
-    width: 100%;
-    display: block;
-  }
 
   .row .card .bottom {
     padding: 0.625rem;
@@ -74,7 +70,6 @@
   }
 
   .row.scroll {
-    height: 12rem;
     width: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -82,11 +77,7 @@
     border: 0.0625rem solid var(--x-border);
   }
 
-  .row .box {
-    height: 25rem;
-    width: 100%;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
-  }
+  
 
   .row x-affix:not(:first-child) {
     margin-left: 1rem;
@@ -100,48 +91,56 @@
     width: 25%;
     padding: 10px;
     border-radius: 5px;
-}
+  }
 
-.masonry-item img {
+  .masonry-item img {
     width: 100%;
     height: auto;
     border-radius: 5px;
-}
+  }
 
   //全屏按钮
   video::-webkit-media-controls-fullscreen-button {
     display: none;
-}
-//播放按钮
-video::-webkit-media-controls-play-button {
+  }
+
+  //播放按钮
+  video::-webkit-media-controls-play-button {
     display: none;
-}
-//进度条
-video::-webkit-media-controls-timeline {
+  }
+
+  //进度条
+  video::-webkit-media-controls-timeline {
     display: none;
-}
-//观看的当前时间
-video::-webkit-media-controls-current-time-display{
-    display: none;            
-}
-//剩余时间
-video::-webkit-media-controls-time-remaining-display {
-    display: none;            
-}
-//音量按钮
-video::-webkit-media-controls-mute-button {
-    display: none;            
-}
-video::-webkit-media-controls-toggle-closed-captions-button {
-    display: none;            
-}
-//音量的控制条
-video::-webkit-media-controls-volume-slider {
-    display: none;            
-}
-//所有控件
-video::-webkit-media-controls-enclosure{ 
+  }
+
+  //观看的当前时间
+  video::-webkit-media-controls-current-time-display {
     display: none;
-}
+  }
+
+  //剩余时间
+  video::-webkit-media-controls-time-remaining-display {
+    display: none;
+  }
+
+  //音量按钮
+  video::-webkit-media-controls-mute-button {
+    display: none;
+  }
+
+  video::-webkit-media-controls-toggle-closed-captions-button {
+    display: none;
+  }
+
+  //音量的控制条
+  video::-webkit-media-controls-volume-slider {
+    display: none;
+  }
+
+  //所有控件
+  video::-webkit-media-controls-enclosure {
+    display: none;
+  }
 
 }
