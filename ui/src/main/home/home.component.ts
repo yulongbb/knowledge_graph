@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
 
   ) {
-    this.service.searchEntity(1, 50, {}).subscribe((data: any) => {
+    this.service.searchEntity(1, 50, { "must": [ {"exists":{'field': 'images'}}]}).subscribe((data: any) => {
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
           console.log(t)

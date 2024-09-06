@@ -10,6 +10,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NodeService } from 'src/main/node/node.service';
 import { EsService } from '../es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
+import { NgxMasonryOptions } from 'ngx-masonry';
 
 @Component({
   selector: 'app-search-detail',
@@ -77,6 +78,16 @@ export class SearchDetailComponent implements OnInit {
   entity: any;
   properties: any;
 
+  images:any;
+
+  public myOptions: NgxMasonryOptions = {
+    gutter: 0,
+    fitWidth: false,
+    resize:false
+
+  };
+
+  
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -129,8 +140,10 @@ export class SearchDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.service.getEntity(this.id).subscribe((x) => {
+          this.images = x?._source?.images;
           this.ontologyService.get(x._source.type).subscribe((t: any) => {
             x._type = t.label
+
             this.entity = signal(x);
             this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
               parents.push(x['_source'].type)

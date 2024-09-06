@@ -9,14 +9,26 @@
 <x-menu [data]="menu()" (nodeClick)="selectType($event)"> </x-menu>
 
 
+<div class="gallery">
+    <div>
+      <span  *ngFor="let entity of entities"  (click)="action('info', entity)" 
+        class="thumbnail"
+        style="background-image: url('http://localhost:9000/kgms/{{entity['_source']?.images[0]}}')"
+      >
+      <b>{{entity['_source']?.labels?.zh?.value | slice:0:10}}
+    </b>  
+    </span>
+    </div>
+  </div>
+
+  
 
 
-
-<ngx-masonry>
+<!-- <ngx-masonry>
     <div ngxMasonryItem class="masonry-item"  (click)="action('info', entity)" *ngFor="let entity of entities">
         <img  masonryLazy loading="lazy"  *ngIf="entity['_source']?.images&&entity['_source']?.images.length>0"
         [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
     <b>{{entity['_source']?.labels?.zh?.value | slice:0:10}}
     </b>           </div>
-  </ngx-masonry>
+  </ngx-masonry> -->
 

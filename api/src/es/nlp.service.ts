@@ -13,7 +13,7 @@ export class NLPService {
 
     // 加载自定义词汇
     private loadCustomDict() {
-        const dictPath = path.join('D:\\workspace\\knowledge_graph\\api\\src\\es\\output.txt');
+        const dictPath = path.join('//Users//sunyulong//Desktop//knowledge_graph//api//output.txt');
    
         const data = fs.readFileSync(dictPath, 'utf-8');
         console.log(data);

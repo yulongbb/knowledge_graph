@@ -49,19 +49,34 @@
 
 
 
-    .masonry-item {
-        transition: top 0.4s ease-in-out, left 0.4s ease-in-out;
- 
-        padding: 10px;
-        width: 25%;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .masonry-item img {
+      .gallery {
         width: 100%;
-        height: auto;
-        border-radius: 5px;
-    }
+        display: flex;
+      }
+      .gallery div {
+        width: 100%;
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        grid-gap: 20px;
+        padding: 10px;
+        flex: none;
+      }
+      .gallery .thumbnail {
+        border: 1px solid #CCC;
+        width: 100%;
+        height: 250px;
+        background-repeat: no-repeat;
+        /*background-size: contain;*/
+        background-size: cover;
+        background-position: center center;
+      }
+
+      .gallery .thumbnail b{
+        display: block;
+        width: 100%;
+        background-color: gray;
+        color: #fff;
+        font-size: 18px;
+      }
 
 }

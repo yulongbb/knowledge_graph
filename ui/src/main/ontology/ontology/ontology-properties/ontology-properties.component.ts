@@ -48,12 +48,12 @@ export class OntologyPropertiesComponent implements OnInit {
             this.ontologyService.getAllParentIds(this.schemaId).subscribe((parents:any)=>{
                 console.log(parents)
                 parents.push(this.schemaId)
-                this.query.filter = [{ field: 'id', value: parents, relation: 'schemas', operation: 'IN' }];
+                // this.query.filter = [{ field: 'id', value: parents, relation: 'schemas', operation: 'IN' }];
 
-                this.data = (index: number, size: number, query: any) =>
-                    this.service.getList(index, size, query).pipe((x: any) => {
-                        return x;
-                    });
+                // this.data = (index: number, size: number, query: any) =>
+                //     this.service.getList(index, size, query).pipe((x: any) => {
+                //         return x;
+                //     });
             })
             
         });

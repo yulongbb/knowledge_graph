@@ -10,6 +10,7 @@
   >h3 {
     margin: 0;
   }
+ 
 
   .row:not(:first-child) {
     margin-top: 1rem;
@@ -141,6 +142,29 @@
   //所有控件
   video::-webkit-media-controls-enclosure {
     display: none;
+  }
+
+
+  .gallery {
+    width: 100%;
+    display: flex;
+  }
+  .gallery div {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    grid-gap: 20px;
+    padding: 10px;
+    flex: none;
+  }
+  .gallery .thumbnail {
+    border: 1px solid #CCC;
+    width: 100%;
+    height: 250px;
+    background-repeat: no-repeat;
+    /*background-size: contain;*/
+    background-size: cover;
+    background-position: center center;
   }
 
 }
