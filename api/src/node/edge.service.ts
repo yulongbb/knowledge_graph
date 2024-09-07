@@ -40,7 +40,8 @@ export class EdgeService {
           this.schemasService.getList(1, 10, query).then((schema: any) => {
             if (schema.list.length > 0) {
               // 新增知识并关联
-              this.nodeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
+              this.nodeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } },'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }  }).then((e: any) => {
+                console.log(123)
                 console.log(e)
                 edge['_to'] = 'entity/' + e?.items[0]?.index?._id;
                 result = myCollection.save(edge).then(
@@ -50,9 +51,10 @@ export class EdgeService {
               })
             } else {
               // 新增知识并关联
-              this.nodeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((entity: any) => {
-                edge['_to'] = 'entity/' + entity.items[0].index._id;
-                console.log(edge)
+              this.nodeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } ,'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }  }).then((e: any) => {
+                console.log(123)
+                console.log(e)
+                edge['_to'] = 'entity/' + e.items[0].index._id;
                 result = myCollection.save(edge).then(
                   () => console.log('Document removed successfully'),
                   (err) => console.error('Failed to remove document:', err),

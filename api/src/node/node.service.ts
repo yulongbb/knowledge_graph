@@ -7,7 +7,10 @@ import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
 export class NodeService {
-  constructor(@Inject('ARANGODB') private db: Database, private elasticsearchService: EsService) { }
+  constructor(
+    @Inject('ARANGODB') private db: Database,
+    private elasticsearchService: EsService,
+  ) {}
 
   async fusion(extraction: Extraction): Promise<any> {
     // 获取集合（Collection）
@@ -83,7 +86,7 @@ export class NodeService {
     }
 
     return document.save(item).then(
-      (doc) => {
+      async (doc) => {
         // 插入关系
         const edge = this.db.collection('link');
 
@@ -91,44 +94,21 @@ export class NodeService {
         const type = {
           _key: entity.type.id,
           type: 'item',
-          labels: { 'zh': { language: 'zh', value: entity.type.label } },
-          descriptions: { 'zh': { language: 'zh', value: entity.type.description } },
-          aliases: { 'zh': [{ language: 'zh', value: entity.type.label }] },
+          labels: { zh: { language: 'zh', value: entity.type.label } },
+          descriptions: {
+            zh: { language: 'zh', value: entity.type.description },
+          },
+          aliases: { zh: [{ language: 'zh', value: entity.type.label }] },
           modified: new Date().toISOString(),
           id: entity.type.id,
         };
 
         document.document(entity.type.id).then(
           (updatedDocument) => {
-            edge.save({
-              _from: doc['_id'],
-              _to: updatedDocument['_id'],
-              id: entity.id,
-              mainsnak: {
-                snaktype: 'value',
-                property: 'P31',
-                hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-                datavalue: {
-                  value: {
-                    'entity-type': 'item',
-                    'numeric-id': Number.parseInt(updatedDocument['_key'].replace('Q', '')),
-                    id: type['_key'],
-                  },
-                  type: 'wikibase-entityid',
-                },
-                datatype: 'wikibase-item',
-              },
-              type: 'statement',
-              rank: 'normal',
-            }).then(
-              (doc) => console.log('Document saved:', doc),
-              (err) => console.error('Failed to save document:', err),
-            );
-          }, (err) => {
-            document.save(type).then((t: any) => {
-              edge.save({
+            edge
+              .save({
                 _from: doc['_id'],
-                _to: t['_id'],
+                _to: updatedDocument['_id'],
                 id: entity.id,
                 mainsnak: {
                   snaktype: 'value',
@@ -137,8 +117,10 @@ export class NodeService {
                   datavalue: {
                     value: {
                       'entity-type': 'item',
-                      'numeric-id': Number.parseInt(t['_key'].replace('Q', '')),
-                      id: t['_key'],
+                      'numeric-id': Number.parseInt(
+                        updatedDocument['_key'].replace('Q', ''),
+                      ),
+                      id: type['_key'],
                     },
                     type: 'wikibase-entityid',
                   },
@@ -146,13 +128,47 @@ export class NodeService {
                 },
                 type: 'statement',
                 rank: 'normal',
-              }).then(
+              })
+              .then(
                 (doc) => console.log('Document saved:', doc),
                 (err) => console.error('Failed to save document:', err),
               );
+          },
+          (err) => {
+            document.save(type).then((t: any) => {
+              edge
+                .save({
+                  _from: doc['_id'],
+                  _to: t['_id'],
+                  id: entity.id,
+                  mainsnak: {
+                    snaktype: 'value',
+                    property: 'P31',
+                    hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+                    datavalue: {
+                      value: {
+                        'entity-type': 'item',
+                        'numeric-id': Number.parseInt(
+                          t['_key'].replace('Q', ''),
+                        ),
+                        id: t['_key'],
+                      },
+                      type: 'wikibase-entityid',
+                    },
+                    datatype: 'wikibase-item',
+                  },
+                  type: 'statement',
+                  rank: 'normal',
+                })
+                .then(
+                  (doc) => console.log('Document saved:', doc),
+                  (err) => console.error('Failed to save document:', err),
+                );
             });
-          });
-        return this.elasticsearchService.bulk({
+          },
+        );
+
+        let data = await this.elasticsearchService.bulk({
           body: [
             // 指定的数据库为news, 指定的Id = 1
             { index: { _index: 'entity', _id: doc['_key'] } },
@@ -164,55 +180,54 @@ export class NodeService {
               modified: new Date().toISOString(),
               items: ['entity/' + doc['_key']],
               images: entity?.images,
-            }
-          ]
-        }).then((e: any) => {
-          console.log(e['items'][0]['index']);
-          console.log(doc);
-          document.document(doc['_key'])
-            .then((existingDocument) => {
-              existingDocument.id = e['items'][0]['index']['_id'];
-              document.update(doc['_key'], existingDocument);
-            });
+            },
+          ],
         });
+        console.log(555)
+        console.log(data)
+        document.document(doc['_key']).then((existingDocument) => {
+          existingDocument.id = data['items'][0]['index']['_id'];
+          document.update(doc['_key'], existingDocument);
+        });
+        return data;
       },
       (err) => console.error('Failed to save document:', err),
     );
   }
 
-
   async updateEntity(entity: any): Promise<any> {
     // Fetch the existing document
-    this.elasticsearchService.bulk({
-      body: [
-        // 指定的数据库为news, 指定的Id = 1
-        { index: { _index: 'entity', _id: entity['_key'] } },
-        {
-          type: entity?.type?.id,
-          labels: entity?.labels,
-          descriptions: entity?.descriptions,
-          aliases: entity?.aliases,
-          modified: new Date().toISOString(),
-          items: entity?.items,
-          images: entity?.images,
-        }
-      ]
-    }).then(() => {
-      const myCollection = this.db.collection('entity');
-      return myCollection
-        .document(entity['_key'])
-        .then((existingDocument) => {
-          // Update the document fields
-          existingDocument.id = entity['_key'];
-          existingDocument.type = 'item',
-            existingDocument.labels = entity?.labels;
-          existingDocument.descriptions = entity?.descriptions;
-          existingDocument.modified = new Date().toISOString();
-          return myCollection.update(entity['_key'], existingDocument);
-        })
-
-    });
-    (err) => console.error('Failed to save document:', err)
+    this.elasticsearchService
+      .bulk({
+        body: [
+          // 指定的数据库为news, 指定的Id = 1
+          { index: { _index: 'entity', _id: entity['_key'] } },
+          {
+            type: entity?.type?.id,
+            labels: entity?.labels,
+            descriptions: entity?.descriptions,
+            aliases: entity?.aliases,
+            modified: new Date().toISOString(),
+            items: entity?.items,
+            images: entity?.images,
+          },
+        ],
+      })
+      .then(() => {
+        const myCollection = this.db.collection('entity');
+        return myCollection
+          .document(entity['_key'])
+          .then((existingDocument) => {
+            // Update the document fields
+            existingDocument.id = entity['_key'];
+            (existingDocument.type = 'item'),
+              (existingDocument.labels = entity?.labels);
+            existingDocument.descriptions = entity?.descriptions;
+            existingDocument.modified = new Date().toISOString();
+            return myCollection.update(entity['_key'], existingDocument);
+          });
+      });
+    (err) => console.error('Failed to save document:', err);
   }
   async addLink(entity: any): Promise<any> {
     // 获取集合（Collection）
@@ -247,10 +262,7 @@ export class NodeService {
     );
   }
 
-
-
   async deleteEntity(id: any): Promise<any> {
-
     console.log(id);
     // const myCollection = this.db.collection('entity');
 
@@ -258,7 +270,6 @@ export class NodeService {
     //   () => console.log('Document removed successfully'),
     //   (err) => console.error('Failed to remove document:', err),
     // );
-
 
     return this.elasticsearchService.get(id).then((data: any) => {
       data['_source']['items'].forEach(async (item: any) => {
@@ -274,26 +285,20 @@ export class NodeService {
           REMOVE { _key: @item } IN entity
         `;
 
-
         // 执行删除边的查询
         await this.db.query(removeEdgesQuery, { item });
 
-
         // 执行删除节点的查询
         await this.db.query(removeNodeQuery, { item: item.split('/')[1] });
-      })
+      });
       this.elasticsearchService.delete(id).then((data: any) => {
         console.log(data);
         return data;
       });
-    })
+    });
   }
 
-  async getEntityList(
-    index: number,
-    size: number,
-    query: any,
-  ): Promise<any> {
+  async getEntityList(index: number, size: number, query: any): Promise<any> {
     this.db = new Database({
       url: 'http://localhost:8529',
       databaseName: 'kgms',
@@ -312,7 +317,6 @@ export class NodeService {
           RETURN doc)
           RETURN {total: COUNT(${collection}), list: list}
       `);
-
       } else {
         cursor = await this.db.query(aql`
           let langulage = 'zh'
@@ -380,8 +384,9 @@ export class NodeService {
       const start = size * (index - 1);
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${'entity/' + id
-        } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${
+        'entity/' + id
+      } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${size}

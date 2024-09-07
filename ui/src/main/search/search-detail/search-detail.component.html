@@ -34,7 +34,6 @@
             <i *ngFor="let statement of getStatement(property)">
               <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"
                 ><a
-                  target="_blank"
                   [href]="
                     'http://localhost:4200/index/search/info/' +
                     statement.mainsnak.datavalue.value.id
