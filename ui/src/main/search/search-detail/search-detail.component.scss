@@ -149,10 +149,10 @@
     width: 100%;
     display: flex;
   }
-  .gallery div {
+  .gallery .warp {
     width: 100%;
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: 25% 25% 25% auto;
     grid-gap: 20px;
     padding: 10px;
     flex: none;

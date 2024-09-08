@@ -3,7 +3,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XTableColumn } from '@ng-nest/ui';
+import { XDialogService, XImagePreviewComponent, XTableColumn } from '@ng-nest/ui';
 import { map } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -97,7 +97,8 @@ export class SearchDetailComponent implements OnInit {
     private nodeService: NodeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private message: XMessageService
+    private message: XMessageService,
+    private dialogSewrvice: XDialogService
   ) {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
@@ -186,6 +187,19 @@ export class SearchDetailComponent implements OnInit {
         this.router.navigate(['/index/node']);
         break;
     }
+  }
+
+  preview(image:any) {
+    this.dialogSewrvice.create(XImagePreviewComponent, {
+      width: '100%',
+      height: '100%',
+      className: 'x-image-preview-portal',
+      data: [
+        {
+          src: 'http://localhost:9000/kgms/'+image
+        }
+      ]
+    });
   }
 
 

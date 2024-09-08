@@ -117,15 +117,35 @@
       </div>
 
       <div class="gallery" *ngIf="images">
-        <div >
-          <span *ngFor="let image of images"
-            class="thumbnail"
-            style="background-image: url('http://localhost:9000/kgms/{{image}}')"
-          ></span>
+        <div  class="warp">
+          <div *ngFor="let image of images">
+            <div (click)="preview(image)"
+              *ngIf="image?.split('.')[image.split('.').length - 1] != 'mp4'"
+              class="thumbnail"
+              style="background-image: url('http://localhost:9000/kgms/{{
+                image
+              }}')"
+            ></div>
+            <video  class="thumbnail"
+              *ngIf="image.split('.')[image.split('.').length - 1] == 'mp4'"
+              width="200px"
+              controls
+            >
+              <source
+                [src]="'http://localhost:9000/kgms/' + image"
+                type="video/mp4"
+              />
+              <p>
+                你的浏览器不支持 HTML5 视频。这里有一个<a
+                  href="myVideo.mp4"
+                  download="myVideo.mp4"
+                  >视频</a
+                >链接。
+              </p>
+            </video>
+          </div>
         </div>
       </div>
-
-      
     </div>
   </x-card>
 </div>
