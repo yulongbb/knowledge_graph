@@ -15,7 +15,7 @@ import { forkJoin } from 'rxjs';
 export class SearchComponent implements OnInit {
 
   keyword = '';
-  size = 20;
+  size = 10;
   index = 1;
   entities!: any;
   query: any = {};
@@ -31,7 +31,11 @@ export class SearchComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
 
-    this.service.searchEntity(1, 10, {}).subscribe((data: any) => {
+   
+  }
+
+  ngOnInit(): void {
+    this.service.searchEntity(this.index, this.size, {}).subscribe((data: any) => {
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
           item._type = t.label;
@@ -82,16 +86,15 @@ export class SearchComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-  }
-
   search(keyword: any) {
+    this.index = 1;
+
     if (keyword != '') {
       this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
     } else {
       this.query = {}
     }
-    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
+    this.service.searchEntity(this.index, this.size, this.query).subscribe((data: any) => {
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
           item._type = t.label
@@ -112,9 +115,7 @@ export class SearchComponent implements OnInit {
                 })
                 item.claims = statements;
                 console.log(item)
-
               })
-
             });
           });
         })
@@ -124,12 +125,13 @@ export class SearchComponent implements OnInit {
   }
 
   selectType(type: any) {
+    this.index = 1;
     if (type.id) {
       this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
     } else {
       this.query = {}
     }
-    this.service.searchEntity(1, 10, this.query).subscribe((data: any) => {
+    this.service.searchEntity(this.index, this.size, this.query).subscribe((data: any) => {
       console.log(data);
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -192,7 +194,43 @@ export class SearchComponent implements OnInit {
   }
 
   onScroll() {
-    console.log('scrolled!!');
+    this.index++;
+    console.log(this.index)
+    this.service.searchEntity(this.index, this.size, this.query).subscribe((data: any) => {
+      console.log(data);
+      data.list.forEach((item: any) => {
+        this.ontologyService.get(item._source.type).subscribe((t: any) => {
+          item._type = t.label
+          this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
+            parents.push(item['_source'].type)
+            this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
+              this.nodeService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
+                let statements: any = [];
+                c.list.forEach((path: any) => {
+                  if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                    console.log(path)
+                    path.edges[0].mainsnak.datavalue.value.id = path?.vertices[1]?.id;
+                    path.edges[0].mainsnak.datavalue.value.label = path?.vertices[1]?.labels?.zh?.value;
+                  }
+                  if (p.list?.filter((property: any) => path.edges[0].mainsnak.property == `P${property.id}`).length > 0) {
+                    statements.push(path.edges[0])
+                  }
+                })
+                item.claims = statements;
+                console.log(item)
+              })
+            });
+          });
+        })
+      });
+      if (data.list.length > 0) {
+        data.list.forEach((d: any) => {
+          this.entities.push(d);
+        })
+      }
+
+      console.log(this.entities);
+    })
   }
 
 }
