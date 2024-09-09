@@ -12,7 +12,8 @@
           <div class="warp">
             <div *ngFor="let file of files">
 
-              <div *ngIf="file?.url?.split('.')[file?.url.split('.').length - 1] != 'mp4'" class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
+              <div *ngIf="file?.url?.split('.')[file?.url.split('.').length - 1] != 'mp4'" class="thumbnail"
+                [style]="'background-image: url('+file?.url+')'"></div>
               <video class="thumbnail" *ngIf="file?.url.split('.')[file?.url.split('.').length - 1] == 'mp4'"
                 width="200px" controls>
                 <source [src]="file?.url" type="video/mp4" />
@@ -20,7 +21,6 @@
                   你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
                 </p>
               </video>
-
             </div>
           </div>
         </div>

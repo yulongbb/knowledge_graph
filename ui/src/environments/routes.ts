@@ -43,16 +43,7 @@ export const mainRoutes: Routes = [
 
 // 框架页中对应的路由，指向具体的页面，框架页面中的路由都会带上顶级路由 index 如：/index/workplace
 export const layoutRoutes: Routes = [
-  // 首页
-  {
-    path: "home",
-    loadChildren: () =>
-      import("../main/home/home.module").then(x => x.HomeModule),
-    canLoad: [AuthGuard],
-    data: {
-      title: "home"
-    }
-  },
+
   // 仪表盘
   {
     path: "dashboard",
