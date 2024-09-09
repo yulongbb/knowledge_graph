@@ -17,6 +17,7 @@
 <ng-template #nodeTpl let-node="$node">
   <span class="select-item"> {{ node?.name }} </span>
 </ng-template>
+<x-menu [data]="types()" (nodeClick)="selectType($event)"> </x-menu>
 
 
 

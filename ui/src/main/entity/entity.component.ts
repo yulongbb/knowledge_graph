@@ -2,7 +2,7 @@ import { PageBase } from 'src/share/base/base-page';
 import { Component, ViewChild, signal } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui/table';
-import { tap, map, Observable } from 'rxjs';
+import { tap, map, Observable, forkJoin } from 'rxjs';
 import { Query } from 'src/services/repository.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import {
@@ -17,6 +17,7 @@ import {
 import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
 import { EsService } from '../search/es.service';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-entity',
@@ -39,7 +40,6 @@ export class EntityComponent extends PageBase {
   }
 
   data: any;
-  data$!: Observable<any>;
 
   checkedRows: XTableRow[] = [];
 
@@ -62,11 +62,14 @@ export class EntityComponent extends PageBase {
   ];
 
   mergedEntity: any;
+  types: any = signal([]);
+  query: any;
 
   constructor(
     private service: EntityService,
     private esService: EsService,
     private fusionService: FusionService,
+    private ontologyService: OntologyService,
 
     public override indexService: IndexService,
     private router: Router,
@@ -77,16 +80,26 @@ export class EntityComponent extends PageBase {
 
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      this.data$ = this.service
-        .getList(this.index, this.size, { collection: 'entity', type: 'item', keyword: `%${this.keyword}%` })
-        .pipe(
-          tap((x: any) => console.log(x)),
-          map((x: any) => x)
-        );
+
       this.data = (index: number, size: number, query: Query) => this.esService
         .searchEntity(index, size, {})
         .pipe(
-          tap((x: any) => console.log(x)),
+          tap((data: any) => {
+            let menu: any = []
+            let arr: any = [];
+            data.aggregations.forEach((m: any) => {
+              arr.push(this.ontologyService.get(m.key));
+            })
+            forkJoin(arr).subscribe((properties: any) => {
+              console.log(properties)
+              data.aggregations.forEach((m: any) => {
+                menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
+              })
+              console.log(menu)
+              this.types = signal(menu)
+
+            });
+          }),
           map((x: any) => x)
         );
 
@@ -119,14 +132,23 @@ export class EntityComponent extends PageBase {
 
 
   search(keyword: any) {
-    this.data$ = this.service
-      .getList(this.index, this.size, { collection: 'person_entity', type: 'item', keyword: `%${this.keyword}%` })
-      .pipe(
+    if (keyword != '') {
+      this.query = { "must": [{ "match": { "labels.zh.value": keyword } }, { "match": { "descriptions.zh.value": keyword } }] }
+    } else {
+      this.query = {}
+    }
+    this.data = (index: number, size: number, query: Query) =>
+      this.esService.searchEntity(index, this.size, this.query).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
+  }
+
+  selectType(type: any) {
+    this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
+
     this.data = (index: number, size: number, query: Query) =>
-      this.service.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
+      this.esService.searchEntity(index, this.size, this.query).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
