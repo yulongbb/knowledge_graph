@@ -31,7 +31,7 @@ export class SearchComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
 
-    this.service.searchEntity(1, 100, {}).subscribe((data: any) => {
+    this.service.searchEntity(1, 10, {}).subscribe((data: any) => {
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
           item._type = t.label;
@@ -124,18 +124,12 @@ export class SearchComponent implements OnInit {
   }
 
   selectType(type: any) {
-    console.log(type)
-
     if (type.id) {
       this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
-
     } else {
       this.query = {}
-
     }
-    console.log(this.query)
-
-    this.service.searchEntity(1, 50, this.query).subscribe((data: any) => {
+    this.service.searchEntity(1, 10, this.query).subscribe((data: any) => {
       console.log(data);
       data.list.forEach((item: any) => {
         this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -157,10 +151,7 @@ export class SearchComponent implements OnInit {
                   }
                 })
                 item.claims = statements;
-                console.log(item)
-
               })
-
             });
           });
         })
@@ -200,6 +191,8 @@ export class SearchComponent implements OnInit {
     });
   }
 
-
+  onScroll() {
+    console.log('scrolled!!');
+  }
 
 }

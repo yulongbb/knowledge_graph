@@ -95,8 +95,17 @@ export class EntityComponent extends PageBase {
               data.aggregations.forEach((m: any) => {
                 menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
               })
-              console.log(menu)
-              this.types = signal(menu)
+              let menuMerge = [];
+              menuMerge = data.aggregations.map((m: any, index: any) => {
+                return { ...m, ...menu[index] }
+              })
+              menuMerge.forEach((m: any) => {
+                m.label = m.label + '(' + m.doc_count + ')';
+              })
+              menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+              this.menu = signal(menuMerge)
+              console.log(menuMerge)
+              this.types = signal(menuMerge)
 
             });
           }),
@@ -145,7 +154,16 @@ export class EntityComponent extends PageBase {
   }
 
   selectType(type: any) {
-    this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
+    console.log(type)
+
+    if (type.id) {
+      this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
+
+    } else {
+      this.query = {}
+
+    }
+    console.log(this.query)
 
     this.data = (index: number, size: number, query: Query) =>
       this.esService.searchEntity(index, this.size, this.query).pipe(

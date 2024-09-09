@@ -13,6 +13,10 @@ import { SearchDetailComponent } from './search-detail/search-detail.component';
 import { XTextRetractModule } from '@ng-nest/ui/text-retract';
 import { NgxMasonryModule } from 'ngx-masonry';
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { XStatisticModule } from '@ng-nest/ui/statistic';
+
+
 
 
 
@@ -34,6 +38,8 @@ import { XPageHeaderModule } from '@ng-nest/ui/page-header';
     XPageHeaderModule,
     XTimelineModule,
     XAvatarModule,
+    XStatisticModule,
+    InfiniteScrollDirective,
     RouterModule.forChild([
       {
         path: '',

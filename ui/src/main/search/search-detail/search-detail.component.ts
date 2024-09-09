@@ -79,16 +79,15 @@ export class SearchDetailComponent implements OnInit {
   entity: any;
   properties: any;
 
-  images:any;
+  images: any;
+  videos: any;
+  pdfs: any;
 
   public myOptions: NgxMasonryOptions = {
     gutter: 0,
     fitWidth: false,
-    resize:false
-
+    resize: false
   };
-
-  
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -125,16 +124,16 @@ export class SearchDetailComponent implements OnInit {
     const wikidataBaseUrl = 'http://localhost:4200/index/search/info/';
     // 简单示例，将“爱因斯坦”替换为指向Wikidata的链接
     console.log(entities)
-    let entityMap:any = new Map();
-    entities.forEach((entity:any)=>{
+    let entityMap: any = new Map();
+    entities.forEach((entity: any) => {
       entityMap[entity.word] = entity.id;
     })
-   
+
     Object.keys(entityMap).forEach(key => {
       const link = `<a href="${wikidataBaseUrl}${entityMap[key]}" >${key}</a>`;
       text = text.replace(new RegExp(key, 'g'), link);
     });
-  
+
     return text;
   }
 
@@ -143,7 +142,7 @@ export class SearchDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.service.getEntity(this.id).subscribe((x) => {
-          this.images = x?._source?.images;
+
           this.ontologyService.get(x._source.type).subscribe((t: any) => {
             x._type = t.label
 
@@ -167,6 +166,9 @@ export class SearchDetailComponent implements OnInit {
               });
             });
           })
+          this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
+          this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
+          this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
         });
         break;
       case 'edit':
@@ -191,14 +193,14 @@ export class SearchDetailComponent implements OnInit {
     }
   }
 
-  preview(image:any) {
+  preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
       data: [
         {
-          src: 'http://localhost:9000/kgms/'+image
+          src: 'http://localhost:9000/kgms/' + image
         }
       ]
     });
@@ -227,7 +229,7 @@ export class SearchDetailComponent implements OnInit {
 
   }
 
-  back(){
+  back() {
     this.nav.back();
 
   }

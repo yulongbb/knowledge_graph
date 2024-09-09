@@ -1,33 +1,21 @@
 <div class="row">
-  <x-page-header [title]="entity()._source.labels.zh.value" [subTitle]="entity()._id" (backClick)="back()"> </x-page-header>
-
-
-  <x-card
-    width="100%"
-    class="card"
-    [bodyStyle]="{ padding: 10, }"
-    [header]="header"
-  >
+  <x-page-header [title]="entity()?._source?.labels?.zh?.value" [subTitle]="entity()?._id" (backClick)="back()">
+  </x-page-header>
+  <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
-      <span class="label"
-        >{{ entity()?._source?.labels?.zh?.value }}
+      <span class="label">{{ entity()?._source?.labels?.zh?.value }}
         <!-- <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-        </x-buttons> --> </span
-      ><span>{{ entity()?._type }}</span>
+        </x-buttons> --> </span><span>{{ entity()?._type }}</span>
     </ng-template>
-
     <div class="bottom">
       <h2>简介</h2>
-      <p
-        *ngIf="entity()._source.descriptions"
-        [innerHTML]="
+      <p *ngIf="entity()._source.descriptions" [innerHTML]="
           linkifyText(
             entity()?._source?.descriptions?.zh?.value,
             entity()?._source?.entities
           )
-        "
-      ></p>
+        "></p>
       <dl *ngFor="let property of properties()">
         <dl *ngIf="getStatement(property).length > 0">
           <dt>
@@ -35,81 +23,54 @@
           </dt>
           <dd>
             <i *ngFor="let statement of getStatement(property)">
-              <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"
-                ><a
-                  [href]="
+              <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                     'http://localhost:4200/index/search/info/' +
                     statement.mainsnak.datavalue.value.id
-                  "
-                  >{{ statement.mainsnak.datavalue.value.label }}</a
-                >
+                  ">{{ statement.mainsnak.datavalue.value.label }}</a>
               </strong>
               <strong *ngIf="statement.mainsnak.datatype == 'string'">
                 {{ statement.mainsnak.datavalue.value }}
               </strong>
               <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-                <img
-                  *ngIf="
+                <img *ngIf="
                     statement?.mainsnak?.datavalue?.value?.split('.')[
                       statement?.mainsnak.datavalue.value.split('.').length - 1
                     ] != 'mp4'
-                  "
-                  width="200px"
-                  [src]="
+                  " width="200px" [src]="
                     'http://localhost:9000/kgms/' +
                     statement?.mainsnak?.datavalue.value
-                  "
-                />
-                <video
-                  *ngIf="
+                  " />
+                <video *ngIf="
                     statement?.mainsnak.datavalue.value.split('.')[
                       statement?.mainsnak.datavalue.value.split('.').length - 1
                     ] == 'mp4'
-                  "
-                  width="200px"
-                  controls
-                >
-                  <source
-                    [src]="
+                  " width="200px" controls>
+                  <source [src]="
                       'http://localhost:9000/kgms/' +
                       statement?.mainsnak.datavalue.value
-                    "
-                    type="video/mp4"
-                  />
+                    " type="video/mp4" />
                   <p>
-                    你的浏览器不支持 HTML5 视频。这里有一个<a
-                      href="myVideo.mp4"
-                      download="myVideo.mp4"
-                      >视频</a
-                    >链接。
+                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
                   </p>
                 </video>
               </strong>
-              <strong *ngIf="statement.mainsnak.datatype == 'url'"
-                ><a
-                  target="_blank"
-                  [href]="statement?.mainsnak.datavalue.value"
-                  >{{ statement?.mainsnak.datavalue.value }}</a
-                ></strong
-              >
+              <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+                  [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
               <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
                 statement.mainsnak.datavalue.value.amount
-              }}</strong>
-              <strong
-                *ngIf="statement.mainsnak.datatype == 'monolingualtext'"
-                >{{ statement.mainsnak.datavalue.value.text }}</strong
-              >
+                }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                statement.mainsnak.datavalue.value.text }}</strong>
               <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
                 statement.mainsnak.datavalue.value
-              }}</strong>
-              <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'"
-                >{{ statement.mainsnak.datavalue.value.latitude }},{{
-                  statement.mainsnak.datavalue.value.longitude
-                }}</strong
-              >
+                }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+                statement.mainsnak.datavalue.value.latitude }},{{
+                statement.mainsnak.datavalue.value.longitude
+                }}</strong>
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
                 statement.mainsnak.datavalue.value.time
-              }}</strong>
+                }}</strong>
             </i>
           </dd>
         </dl>
@@ -118,36 +79,31 @@
         <span>{{ entity()?._source?.modified }}</span>
         <span>{{ entity()?._id }}</span>
       </div>
-
       <div class="gallery" *ngIf="images">
-        <div  class="warp">
+        <div class="warp">
           <div *ngFor="let image of images">
-            <div (click)="preview(image)"
-              *ngIf="image?.split('.')[image.split('.').length - 1] != 'mp4'"
-              class="thumbnail"
-              style="background-image: url('http://localhost:9000/kgms/{{
+
+            <div (click)="preview(image)" class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{
                 image
-              }}')"
-            ></div>
-            <video  class="thumbnail"
-              *ngIf="image.split('.')[image.split('.').length - 1] == 'mp4'"
-              width="200px"
-              controls
-            >
-              <source
-                [src]="'http://localhost:9000/kgms/' + image"
-                type="video/mp4"
-              />
-              <p>
-                你的浏览器不支持 HTML5 视频。这里有一个<a
-                  href="myVideo.mp4"
-                  download="myVideo.mp4"
-                  >视频</a
-                >链接。
-              </p>
-            </video>
+              }}')"></div>
+
           </div>
         </div>
+      </div>
+
+      <div *ngFor="let video of videos">
+        <video width="100%" controls>
+          <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+          <p>
+            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+          </p>
+        </video>
+      </div>
+
+      <div *ngFor="let pdf of pdfs">
+        <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
+          [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
+        </iframe>
       </div>
     </div>
   </x-card>

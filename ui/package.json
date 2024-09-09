@@ -22,6 +22,7 @@
     "canvas-datagrid": "^0.4.7",
     "echarts": "^5.5.1",
     "ngx-echarts": "^18.0.0",
+    "ngx-infinite-scroll": "^18.0.0",
     "ngx-masonry": "^14.0.1",
     "rxjs": "~7.8.0",
     "sass": "^1.67.0",
