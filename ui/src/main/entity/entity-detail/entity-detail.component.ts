@@ -176,7 +176,7 @@ export class EntityDetailComponent implements OnInit {
 
       case 'quantity':
         emptyDatavalue.value = {
-          amount: "+0",
+          amount: "",
           unit: "1",
           upperBound: null,
           lowerBound: null
@@ -186,7 +186,7 @@ export class EntityDetailComponent implements OnInit {
 
       case 'time':
         emptyDatavalue.value = {
-          time: "+0000-00-00T00:00:00Z",
+          time: "",
           timezone: 0,
           before: 0,
           after: 0,
@@ -453,6 +453,8 @@ export class EntityDetailComponent implements OnInit {
                 statement['_to'] = this.item.items[0];
                 if (statement.mainsnak.datavalue.type == 'string') {
                   statement.mainsnak.datavalue.value = value;
+                } else if (statement.mainsnak.datavalue.type == 'time') {
+                  statement.mainsnak.datavalue.value.time = value;
                 } else if (statement.mainsnak.datatype == 'quantity') {
                   statement.mainsnak.datavalue.value.amount = value;
                 } else if (statement.mainsnak.datatype == 'wikibase-item') {

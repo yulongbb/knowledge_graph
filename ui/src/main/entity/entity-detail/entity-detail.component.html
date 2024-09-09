@@ -1,17 +1,29 @@
 <div class="row">
   <x-card width="100%">
     <div class="row">
-      <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl"   [filesTpl]="filesTpl" multiple
-        [(ngModel)]="imgs" 
-        (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+      <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+        multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
       <ng-template #textTpl>
         <x-icon class="upload-icon" type="fto-upload"></x-icon>
         <span>选择图片</span>
       </ng-template>
       <ng-template #filesTpl let-files="$files">
-        <ul>
-            <li *ngFor="let file of files">{{ file|json }} - {{ file.state }}</li>
-        </ul>
+        <div class="gallery">
+          <div class="warp">
+            <div *ngFor="let file of files">
+
+              <div *ngIf="file?.url?.split('.')[file?.url.split('.').length - 1] != 'mp4'" class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
+              <video class="thumbnail" *ngIf="file?.url.split('.')[file?.url.split('.').length - 1] == 'mp4'"
+                width="200px" controls>
+                <source [src]="file?.url" type="video/mp4" />
+                <p>
+                  你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                </p>
+              </video>
+
+            </div>
+          </div>
+        </div>
       </ng-template>
     </div>
     <h3>{{ title }}</h3>
@@ -31,4 +43,3 @@
     </div>
   </x-card>
 </div>
-
