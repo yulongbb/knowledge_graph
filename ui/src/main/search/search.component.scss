@@ -22,37 +22,37 @@
     align-items: center;
     justify-content: space-between;
   }
-  
-  
-  
+
+
+
   .row:not(:first-child) {
     margin-top: 1rem;
   }
-  
+
   .row x-card:not(:first-child) {
     margin-left: 2rem;
   }
 
-  
+
   .row .card .bottom {
     padding: 0.625rem;
   }
-  
+
   .row .card .bottom>p {
     margin: 0;
     font-size: 1rem;
   }
-  
+
   .row .card .bottom>.time {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-  
+
   .row .card .bottom>.time>span {
     color: var(--x-text-400);
   }
-  
+
   ::ng-deep strong {
     color: brown;
   }
@@ -82,5 +82,28 @@
   }
 
 
-}
+  .gallery {
+    width: 100%;
+    display: flex;
+  }
 
+  .gallery .warp {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 25% 25% 25% auto;
+    grid-gap: 10px;
+    padding: 5px;
+    flex: none;
+  }
+
+  .gallery .thumbnail {
+    border: 1px solid #CCC;
+    width: 100%;
+    height: 120px;
+    background-repeat: no-repeat;
+    /*background-size: contain;*/
+    background-size: cover;
+    background-position: center center;
+  }
+
+}

@@ -31,7 +31,8 @@ export class EsController {
         aggs: {
           types: {
             terms: {
-              field: "type.keyword"
+              field: "type.keyword",
+              size: 20000
             }
           }
         },

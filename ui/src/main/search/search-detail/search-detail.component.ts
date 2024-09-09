@@ -100,7 +100,6 @@ export class SearchDetailComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
     public nav: NavService,
-
     private dialogSewrvice: XDialogService
   ) {
     // 获取路由参数
