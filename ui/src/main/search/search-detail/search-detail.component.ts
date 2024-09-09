@@ -11,6 +11,7 @@ import { NodeService } from 'src/main/node/node.service';
 import { EsService } from '../es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { NgxMasonryOptions } from 'ngx-masonry';
+import { NavService } from 'src/services/nav.service';
 
 @Component({
   selector: 'app-search-detail',
@@ -98,6 +99,8 @@ export class SearchDetailComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
+    public nav: NavService,
+
     private dialogSewrvice: XDialogService
   ) {
     // 获取路由参数
@@ -222,6 +225,11 @@ export class SearchDetailComponent implements OnInit {
   getStatement(property: any): any {
 
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
+
+  }
+
+  back(){
+    this.nav.back();
 
   }
 }

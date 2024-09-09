@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { RouterModule } from '@angular/router';
 import { XDrawerModule } from '@ng-nest/ui/drawer';
-import { XButtonModule, XInputModule, XRadioModule, XTagModule } from '@ng-nest/ui';
+import { XButtonModule, XInputModule, XRadioModule, XTagModule, XTextRetractModule } from '@ng-nest/ui';
 import { ShareModule } from 'src/share/share.module';
 import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
@@ -31,6 +31,7 @@ import { NgxMasonryModule } from 'ngx-masonry';
     XTagModule,
     XMenuModule,
     NgxMasonryModule,
+    XTextRetractModule,
     RouterModule.forChild([
       {
         path: '',
