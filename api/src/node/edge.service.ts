@@ -98,7 +98,7 @@ export class EdgeService {
         RETURN doc)
   LET list = (FOR edge IN link
     LIMIT ${start}, ${size} 
-           RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: Document('property',edge['mainsnak']['property']), value:edge['mainsnak']['datavalue']['value'] })
+           RETURN {id: edge['_key'], from: Document(edge['_from']), to: Document(edge['_to']), property: edge['mainsnak']['property'], value:edge['mainsnak']['datavalue']['value'] })
   RETURN {total: total, list: list}
       `);
       // 获取查询结果

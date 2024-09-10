@@ -1,5 +1,5 @@
 <div class="row">
-  <x-page-header [title]="entity()?._source?.labels?.zh?.value" [subTitle]="entity()?._id" (backClick)="back()">
+  <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id" (backClick)="back()">
   </x-page-header>
   <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>

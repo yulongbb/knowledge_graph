@@ -11,7 +11,7 @@
 </x-input-group>
 
 <x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
-  [bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl,  property: propertyTpl }"
+  [bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl }"
   (activatedChange)="action('info', $event)" loading  [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>
@@ -32,14 +32,7 @@
   </div>
 </ng-template>
 
-<ng-template #propertyTpl let-column="$column" let-row="$row">
-  <div *ngIf="row.property">
-    {{row?.property?.name ?? row?.property?.enName}}
-  </div>
-  <div *ngIf="!row.property">
-    暂无
-  </div>
-</ng-template>
+
 
 
 <ng-template #actionsTpl let-column="$column" let-row="$row">

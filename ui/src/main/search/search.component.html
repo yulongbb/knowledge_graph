@@ -1,8 +1,10 @@
 <!-- 搜索栏 -->
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-  <x-input-group compact>
+  <x-input-group compact size="big">
+    <x-select  [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="15"></x-select>
+
     <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
-    <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+    <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
   </x-input-group>
 </div>
 <x-menu [data]="menu()" (nodeClick)="selectType($event)"> </x-menu>

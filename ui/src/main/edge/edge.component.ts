@@ -51,7 +51,7 @@ export class EdgeComponent extends PageBase {
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
 
-    { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
+    { id: 'id', label: '序号', width: 150,  left: 0, },
     { id: 'from', label: '起始节点', flex: 0.5, sort: true },
     { id: 'property', label: '关系', flex: 1.5, sort: true },
     { id: 'to', label: '目标节点', flex: 1 },
