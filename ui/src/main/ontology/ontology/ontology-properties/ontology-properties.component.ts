@@ -23,7 +23,8 @@ export class OntologyPropertiesComponent implements OnInit {
     data :any;
 
     columns: XTableColumn[] = [
-        { id: 'id', label: '序号', flex: 0.1, left: 0, },
+        { id: 'id', label: '序号', flex: 0.4, left: 0 },
+
         { id: 'actions', label: '操作', width: 100 },
         { id: 'name', label: '名称', flex: 0.5, sort: true },
         { id: 'enName', label: '英文名称', flex: 0.5, sort: true },
@@ -48,12 +49,12 @@ export class OntologyPropertiesComponent implements OnInit {
             this.ontologyService.getAllParentIds(this.schemaId).subscribe((parents:any)=>{
                 console.log(parents)
                 parents.push(this.schemaId)
-                // this.query.filter = [{ field: 'id', value: parents, relation: 'schemas', operation: 'IN' }];
+                this.query.filter = [{ field: 'id', value: parents, relation: 'schemas', operation: 'IN' }];
 
-                // this.data = (index: number, size: number, query: any) =>
-                //     this.service.getList(index, size, query).pipe((x: any) => {
-                //         return x;
-                //     });
+                this.data = (index: number, size: number, query: any) =>
+                    this.service.getList(index, size, query).pipe((x: any) => {
+                        return x;
+                    });
             })
             
         });

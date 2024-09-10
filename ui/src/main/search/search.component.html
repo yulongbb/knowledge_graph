@@ -14,7 +14,7 @@
   <div class="row" *ngFor="let entity of entities">
     @switch (entity._source.type) {
     @case ('Q5') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+    <x-card  width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
         <b *ngIf="!entity['highlight']" (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}
         </b>
@@ -132,7 +132,7 @@
     </x-card>
     }
     @case ('bdi8885693') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+    <x-card  width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
         <span> <x-avatar *ngIf="entity['_source']?.images && entity['_source']?.images.length>0"
             [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]"></x-avatar>
