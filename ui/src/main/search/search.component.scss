@@ -57,29 +57,29 @@
     color: brown;
   }
 
-  x-row {
-    margin: 1rem 0;
+  // x-row {
+  //   margin: 1rem 0;
 
-    >x-col {
-      margin: 0.5rem 0;
+  //   >x-col {
+  //     margin: 0.5rem 0;
 
-      >div {
-        height: 300px;
-        padding: 1rem;
-        text-align: center;
-        border-radius: 0.125rem;
-        background-color: var(--x-info-400);
-      }
-    }
+  //     >div {
+  //       height: 300px;
+  //       padding: 1rem;
+  //       text-align: center;
+  //       border-radius: 0.125rem;
+  //       background-color: var(--x-info-400);
+  //     }
+  //   }
 
-    &:first-child {
-      margin-top: 0;
-    }
+  //   &:first-child {
+  //     margin-top: 0;
+  //   }
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+  //   &:last-child {
+  //     margin-bottom: 0;
+  //   }
+  // }
 
 
   .gallery {

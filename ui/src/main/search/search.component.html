@@ -6,7 +6,10 @@
   </x-input-group>
 </div>
 <x-menu [data]="menu()" (nodeClick)="selectType($event)"> </x-menu>
-<div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+
+<x-row>
+  <x-col span="18">
+    <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
   (scrolled)="onScroll()" [scrollWindow]="false">
 
   <div class="row" *ngFor="let entity of entities">
@@ -31,7 +34,7 @@
               <dd>
                 <p *ngFor="let statement of entity.claims">
                   <span>{{statement.mainsnak.label}}:</span>
-                  <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a
+                  <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a target="_blank"
                       [href]="'http://localhost:4200/index/search/info/'+statement?.mainsnak?.datavalue?.value?.id">{{statement.mainsnak.datavalue.value.label}}</a>
                   </strong>
                   <strong *ngIf="statement.mainsnak.datatype=='string'">
@@ -50,7 +53,7 @@
                         你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
                       </p>
                     </video> </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='url'"><a
+                  <strong *ngIf="statement.mainsnak.datatype=='url'"><a target="_blank"
                       [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
                   <strong
                     *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
@@ -149,7 +152,7 @@
         <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
         <div *ngFor="let image of entity['_source']?.images.slice(1,8)">
           
-          <video  *ngIf="image.split('.')[image.split('.').length - 1] == 'mp4'" width="100%"
+          <video  *ngIf="image.split('.')[image.split('.').length - 1] == 'mp4'" height="350px"
             controls>
             <source [src]="'http://localhost:9000/kgms/' + image" type="video/mp4" />
             <p>
@@ -233,3 +236,8 @@
     }
   </div>
 </div>
+
+  </x-col>
+  <x-col span="6">col-6</x-col>
+
+</x-row>
