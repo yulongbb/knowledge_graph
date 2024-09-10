@@ -46,7 +46,7 @@ export class EntityComponent extends PageBase {
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
-    { id: '_id', label: '序号', width: 200, left: 0, },
+    { id: '_id', label: '序号', width: 100, left: 0, },
     { id: 'type', label: '类型', width: 100, sort: true },
     { id: 'label', label: '标签', flex: 0.5, sort: true },
     { id: 'description', label: '描述', flex: 1.5, sort: true },
@@ -64,13 +64,12 @@ export class EntityComponent extends PageBase {
   mergedEntity: any;
   types: any = signal([]);
   query: any;
-
+  menus:any;
   constructor(
     private service: EntityService,
     private esService: EsService,
     private fusionService: FusionService,
     private ontologyService: OntologyService,
-
     public override indexService: IndexService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -80,7 +79,6 @@ export class EntityComponent extends PageBase {
 
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-
       this.data = (index: number, size: number, query: Query) => this.esService
         .searchEntity(index, size, {})
         .pipe(
@@ -91,7 +89,6 @@ export class EntityComponent extends PageBase {
               arr.push(this.ontologyService.get(m.key));
             })
             forkJoin(arr).subscribe((properties: any) => {
-              console.log(properties)
               data.aggregations.forEach((m: any) => {
                 menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
               })
@@ -103,10 +100,9 @@ export class EntityComponent extends PageBase {
                 m.label = m.label + '(' + m.doc_count + ')';
               })
               menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
-              this.menu = signal(menuMerge)
-              console.log(menuMerge)
+              this.menus = menuMerge
               this.types = signal(menuMerge)
-
+              console.log(menuMerge)
             });
           }),
           map((x: any) => x)
@@ -154,17 +150,11 @@ export class EntityComponent extends PageBase {
   }
 
   selectType(type: any) {
-    console.log(type)
-
     if (type.id) {
       this.query = { "must": [{ "term": { "type.keyword": type.id } }] }
-
     } else {
       this.query = {}
-
     }
-    console.log(this.query)
-
     this.data = (index: number, size: number, query: Query) =>
       this.esService.searchEntity(index, this.size, this.query).pipe(
         tap((x: any) => console.log(x)),
@@ -172,9 +162,11 @@ export class EntityComponent extends PageBase {
       );
   }
 
-  action(type: string, item?: any) {
-    console.log(item);
+  getType(type:any){
+    return this.menus.filter((m:any)=> m.key == type)[0].label.split('(')[0];
+  }
 
+  action(type: string, item?: any) {
     switch (type) {
       case 'add':
         let param = {};
@@ -213,7 +205,6 @@ export class EntityComponent extends PageBase {
                   this.message.success('删除成功！');
                 });
               })
-
             },
           });
         } else {
@@ -240,7 +231,6 @@ export class EntityComponent extends PageBase {
         this.checkedRows.forEach((row: any) => {
           checkedRows.push(row['_source'])
         })
-
         this.mergedEntity = this.fusion(checkedRows);
         break;
       case 'restore':

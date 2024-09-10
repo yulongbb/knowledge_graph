@@ -30,7 +30,7 @@
 </x-table>
 <ng-template #typeTpl let-column="$column" let-row="$row">
   <div>
-    {{row['_source'].type }}
+  {{getType(row['_source'].type)}}
   </div>
 </ng-template>
 

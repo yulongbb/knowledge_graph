@@ -1,8 +1,10 @@
 <!-- 搜索栏 -->
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-  <x-input-group compact>
+  <x-input-group compact size="big">
+    <x-select  [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="15"></x-select>
+
     <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
-    <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+    <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
   </x-input-group>
 </div>
 <x-menu [data]="menu()" (nodeClick)="selectType($event)"> </x-menu>
@@ -15,7 +17,7 @@
   <div class="row" *ngFor="let entity of entities">
     @switch (entity._source.type) {
     @case ('Q5') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+    <x-card  width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
         <b *ngIf="!entity['highlight']" (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}
         </b>
@@ -133,7 +135,7 @@
     </x-card>
     }
     @case ('bdi8885693') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+    <x-card  width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
         <span> <x-avatar *ngIf="entity['_source']?.images && entity['_source']?.images.length>0"
             [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]"></x-avatar>

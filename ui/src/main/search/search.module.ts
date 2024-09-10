@@ -15,6 +15,8 @@ import { NgxMasonryModule } from 'ngx-masonry';
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
+import { XSelectModule } from '@ng-nest/ui/select';
+
 
 
 
@@ -39,6 +41,7 @@ import { XStatisticModule } from '@ng-nest/ui/statistic';
     XTimelineModule,
     XAvatarModule,
     XStatisticModule,
+    XSelectModule,
     InfiniteScrollDirective,
     RouterModule.forChild([
       {

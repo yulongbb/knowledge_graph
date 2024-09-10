@@ -13,7 +13,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
-
+  way = '默认检索';
   keyword = '';
   size = 10;
   index = 1;
@@ -31,7 +31,7 @@ export class SearchComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
 
-   
+
   }
 
   ngOnInit(): void {
@@ -90,7 +90,25 @@ export class SearchComponent implements OnInit {
     this.index = 1;
 
     if (keyword != '') {
-      this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
+      if (this.way == '默认检索') {
+        this.query = {
+          "must": [{
+            "match": {
+              "labels.zh.value": {
+                "query": keyword,
+                "operator": "and"
+              }
+            }
+          }]
+        }
+
+      } else if (this.way == '精确检索') {
+        this.query = { "should": [{ "term": { "labels.zh.value.keyword": keyword } }] }
+
+      } else {
+        this.query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
+
+      }
     } else {
       this.query = {}
     }
