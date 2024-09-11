@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, Query, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
@@ -7,6 +7,7 @@ import { NodeService } from '../node.service';
 import { XTableColumn } from '@ng-nest/ui';
 import { map, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import cytoscape from 'cytoscape';
 
 @Component({
   selector: 'app-node-detail',
@@ -71,6 +72,10 @@ export class NodeDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
+
+  @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
+
+
   constructor(
     private nodeService: NodeService,
     private ontologyService: OntologyService,
@@ -94,7 +99,51 @@ export class NodeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initializeCytoscape();
+
     this.action(this.type);
+  }
+
+  initializeCytoscape(): void {
+    const cy = cytoscape({
+      container: this.cyContainer.nativeElement, // container to render in
+
+      elements: [ // list of graph elements to start with
+        { // node 1
+          data: { id: 'a' }
+        },
+        { // node 2
+          data: { id: 'b' }
+        },
+        { // edge between node 1 and 2
+          data: { id: 'ab', source: 'a', target: 'b' }
+        }
+      ],
+
+      style: [ // the stylesheet for the graph
+        {
+          selector: 'node',
+          style: {
+            'background-color': '#666',
+            'label': 'data(id)'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 3,
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc',
+            'target-arrow-shape': 'triangle'
+          }
+        }
+      ],
+
+      layout: {
+        name: 'grid',
+        rows: 1
+      }
+    });
   }
 
   uploadSuccess($event: any) {

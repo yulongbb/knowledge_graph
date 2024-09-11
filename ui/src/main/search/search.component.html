@@ -166,9 +166,7 @@
           <div class="warp">
             <div *ngFor="let image of entity['_source']?.images.slice(1,8)">
               <div (click)="preview(image)" *ngIf="image?.split('.')[image.split('.').length - 1] != 'mp4'"
-                class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{
-                image
-              }}')"></div>
+                class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
               
             </div>
           </div>

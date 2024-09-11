@@ -49,8 +49,8 @@ export class NodeComponent extends PageBase {
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
-    { id: '_key', label: '序号', width: 150,  left: 0, },
-    { id: 'type', label: '类型',width: 150,  sort: true },
+    { id: '_key', label: '序号', width: 150, left: 0, },
+    { id: 'type', label: '类型', width: 150, sort: true },
     { id: 'label', label: '标签', flex: 1, sort: true },
     { id: 'description', label: '描述', flex: 2, sort: true },
   ];
@@ -181,6 +181,15 @@ export class NodeComponent extends PageBase {
             });
           },
         });
+        break;
+      case 'graph':
+        console.log(item);
+        this.router.navigate(
+          [`./${type}/${item.id}`],
+          {
+            relativeTo: this.activatedRoute,
+          }
+        );
         break;
       case 'tree-info':
         // this.selected = item;
