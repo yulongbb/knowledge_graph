@@ -1,12 +1,15 @@
 // redis.controller.ts
 
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
 
 @Controller('es')
 export class EsController {
-  constructor(private readonly elasticsearchService: EsService, private readonly nlpSevice: NLPService) { }
+  constructor(
+    private readonly elasticsearchService: EsService,
+    private readonly nlpSevice: NLPService,
+  ) { }
 
 
   @Post('search/:size/:index')
@@ -14,8 +17,8 @@ export class EsController {
   index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10, @Body() bool: any,) {
-    return await this.elasticsearchService.search({
-      index: 'entity', body: {
+    return await this.elasticsearchService.search(
+      {
         size: size,
         from: (index - 1) * size,
         query: {
@@ -58,25 +61,19 @@ export class EsController {
         }
 
       }
-    });
+    );
   }
 
   @Post('add')
   async add(@Body() doc: any,) {
-    return await this.elasticsearchService.bulk({
-      body: [
-        // 指定的数据库为news, 指定的Id = 1
-        { index: { _index: 'entity', _type: 'doc', _id: '1' } },
-        { content: doc }
-      ]
-    });
+    return await this.elasticsearchService.bulk(doc);
   }
 
   @Get('get/:id')
   async get(@Param('id') id: any,) {
-    
-    return await this.elasticsearchService.get(id).then((data:any)=>{
-      if(data._source.descriptions){
+
+    return await this.elasticsearchService.get(id).then((data: any) => {
+      if (data._source.descriptions) {
         let entities = this.nlpSevice.extractEntities(data._source?.descriptions?.zh?.value);
         data._source['entities'] = entities;
       }
@@ -87,7 +84,7 @@ export class EsController {
 
   @Get('sync')
   async syncDataToTxt() {
-    
+
     return await this.elasticsearchService.syncDataToTxt();
   }
   @Get('aggs')

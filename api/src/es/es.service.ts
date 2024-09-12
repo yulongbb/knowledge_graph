@@ -1,6 +1,6 @@
 // redis.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import * as fs from 'fs';
 
@@ -8,23 +8,34 @@ import * as fs from 'fs';
 export class EsService {
 
 
-  constructor(private readonly elasticsearchService: ElasticsearchService) { }
+  constructor(
+    private readonly elasticsearchService: ElasticsearchService,
+    @Inject('DEFAULT_INDEX') private readonly defaultIndex: string,  // 注入默认索引
+
+  ) { }
 
   async search(params: any) {
-    let data = await this.elasticsearchService.search(params)
+    let data = await this.elasticsearchService.search({
+      index: this.defaultIndex, body: params})
     return { total: data['hits']['total']['value'], list: data['hits']['hits'], aggregations: data['aggregations']['types']['buckets'] };
   }
 
-  async bulk(params: any) {
-    return await this.elasticsearchService.bulk(params);
+  async bulk(doc: any) {
+    return await this.elasticsearchService.bulk({
+      body: [
+        // 指定的数据库为news, 指定的Id = 1
+        { index: { _index: this.defaultIndex, _id: '1' } },
+        doc
+      ]
+    });
   }
 
   async get(id: any) {
-    return await this.elasticsearchService.get({ index: 'entity', id: id });
+    return await this.elasticsearchService.get({ index: this.defaultIndex, id: id });
   }
 
   async delete(id: any) {
-    return await this.elasticsearchService.delete({ index: 'entity', id: id });
+    return await this.elasticsearchService.delete({ index: this.defaultIndex, id: id });
   }
 
   async aggs(params: any) {

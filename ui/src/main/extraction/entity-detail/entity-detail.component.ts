@@ -19,6 +19,7 @@ import { EdgeService } from 'src/main/edge/edge.service';
 })
 export class EntityDetailComponent implements OnInit {
   @Input() name: any;
+  es:string = 'entity';
 
   id: string = '';
   knowledge: string = '';

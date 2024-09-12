@@ -4,12 +4,34 @@ import { EsController } from './es.controller';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [ElasticsearchModule.register({
-    node: 'http://localhost:9200',
-  })],
-  providers: [EsService, NLPService], // 注册 ElasticsearchService 作为提供者
+  imports: [
+    ConfigModule.forRoot(),
+    ElasticsearchModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        node: configService.get('ELASTICSEARCH_NODE'),
+        // auth: {
+        //   username: configService.get('ELASTICSEARCH_USER'),
+        //   password: configService.get('ELASTICSEARCH_PASSWORD'),
+        // },
+      }),
+    }),
+  ],
+  providers: [
+    {
+      provide: 'DEFAULT_INDEX',
+      useFactory: (configService: ConfigService) => configService.get('ELASTICSEARCH_INDEX', 'entity'),
+      inject: [ConfigService],
+    },
+    EsService,
+    NLPService
+  ],
+  exports: [EsService],
+
   controllers: [EsController],
 })
 export class EsModule {}

@@ -7,10 +7,14 @@ import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 
 @Injectable()
 export class NodeService {
+
   constructor(
     @Inject('ARANGODB') private db: Database,
+
     private elasticsearchService: EsService,
-  ) {}
+  ) {
+  }
+
 
   async fusion(extraction: Extraction): Promise<any> {
     // 获取集合（Collection）
@@ -169,20 +173,14 @@ export class NodeService {
         );
 
         let data = await this.elasticsearchService.bulk({
-          body: [
-            // 指定的数据库为news, 指定的Id = 1
-            { index: { _index: 'entity', _id: doc['_key'] } },
-            {
-              type: entity.type.id,
-              labels: entity?.labels,
-              descriptions: entity?.descriptions,
-              aliases: entity?.aliases,
-              modified: new Date().toISOString(),
-              items: ['entity/' + doc['_key']],
-              images: entity?.images,
-            },
-          ],
-        });
+          type: entity.type.id,
+          labels: entity?.labels,
+          descriptions: entity?.descriptions,
+          aliases: entity?.aliases,
+          modified: new Date().toISOString(),
+          items: ['entity/' + doc['_key']],
+          images: entity?.images,
+        },);
         console.log(555)
         console.log(data)
         document.document(doc['_key']).then((existingDocument) => {
@@ -199,19 +197,13 @@ export class NodeService {
     // Fetch the existing document
     this.elasticsearchService
       .bulk({
-        body: [
-          // 指定的数据库为news, 指定的Id = 1
-          { index: { _index: 'entity', _id: entity['_key'] } },
-          {
-            type: entity?.type?.id,
-            labels: entity?.labels,
-            descriptions: entity?.descriptions,
-            aliases: entity?.aliases,
-            modified: new Date().toISOString(),
-            items: entity?.items,
-            images: entity?.images,
-          },
-        ],
+        type: entity?.type?.id,
+        labels: entity?.labels,
+        descriptions: entity?.descriptions,
+        aliases: entity?.aliases,
+        modified: new Date().toISOString(),
+        items: entity?.items,
+        images: entity?.images,
       })
       .then(() => {
         const myCollection = this.db.collection('entity');
@@ -299,11 +291,7 @@ export class NodeService {
   }
 
   async getEntityList(index: number, size: number, query: any): Promise<any> {
-    this.db = new Database({
-      url: 'http://localhost:8529',
-      databaseName: 'kgms',
-      auth: { username: 'root', password: 'root' },
-    });
+
     try {
       // 执行查询
       const start = size * (index - 1);
@@ -312,7 +300,7 @@ export class NodeService {
       if (query.keyword == '%%') {
         cursor = await this.db.query(aql`
           LET langulage = 'zh'
-          LET list = (FOR doc IN  entity_view
+          LET list = (FOR doc IN  entity
           LIMIT ${start}, ${size}
           RETURN doc)
           RETURN {total: COUNT(${collection}), list: list}
@@ -384,9 +372,8 @@ export class NodeService {
       const start = size * (index - 1);
 
       // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${
-        'entity/' + id
-      } GRAPH "graph"
+      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${'entity/' + id
+        } GRAPH "graph"
       FILTER e!=null
       SORT e.mainsnak.property
       LIMIT ${start}, ${size}

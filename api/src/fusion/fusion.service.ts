@@ -5,7 +5,10 @@ import { EsService } from 'src/es/es.service';
 
 @Injectable()
 export class FusionService {
-  constructor(@Inject('ARANGODB') private db: Database, private elasticsearchService: EsService) { }
+  constructor(
+    @Inject('ARANGODB') private db: Database, 
+
+    private elasticsearchService: EsService) { }
 
   async fusion({
     entity,
@@ -247,11 +250,6 @@ export class FusionService {
     query: any,
     db: string,
   ): Promise<any> {
-    this.db = new Database({
-      url: 'http://localhost:8529',
-      databaseName: db,
-      auth: { username: 'root', password: 'root' },
-    });
     try {
       // 执行查询
       const start = size * (index - 1);

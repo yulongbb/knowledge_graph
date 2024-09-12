@@ -6,9 +6,11 @@ import { ShareModule } from 'src/share/share.module';
 import { XInputModule } from '@ng-nest/ui/input';
 import { XButtonModule } from '@ng-nest/ui/button';
 import { XMessageModule } from '@ng-nest/ui/message';
+import { XSelectModule } from '@ng-nest/ui';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, ShareModule, XInputModule, XButtonModule, XMessageModule, LoginRoutesModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ShareModule, XInputModule, XSelectModule, XButtonModule, XMessageModule, LoginRoutesModule],
   declarations: [LoginComponent]
 })
 export class LoginModule {}
