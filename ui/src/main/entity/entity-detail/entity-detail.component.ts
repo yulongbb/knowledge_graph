@@ -10,6 +10,7 @@ import { NodeService } from 'src/main/node/node.service';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EdgeService } from 'src/main/edge/edge.service';
+import { EntityService } from '../entity.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -102,7 +103,7 @@ export class EntityDetailComponent implements OnInit {
     private esService: EsService,
     public propertyService: PropertyService,
     private edgeService: EdgeService,
-    private nodeService: NodeService,
+    private nodeService: EntityService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService

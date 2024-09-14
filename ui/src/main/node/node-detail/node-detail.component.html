@@ -1,11 +1,11 @@
 
-<div  #cy style="width: 600px; height: 400px;"></div>
+<div  #cy style="width: 100%; height: 800px;"></div>
 
 
 <div *ngIf="type!='graph'" >
   <h3>{{ title }}</h3>
   <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-    width="30rem" labelAlign="end" span="20" space="2"></x-form>
+    width="100%" labelAlign="end" span="20" space="2"></x-form>
     
     <x-upload  action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload>
 

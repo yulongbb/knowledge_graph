@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Query, RepositoryService } from 'src/services/repository.service';
 import { HttpService } from 'src/services/http.service';
-import { XTreeNode } from '@ng-nest/ui/tree';
 import { XId } from '@ng-nest/ui/core';
 import { Observable } from 'rxjs';
 
@@ -24,7 +23,6 @@ export class NodeService extends RepositoryService<Item> {
     return this.http.put(`${this.option.controller?.name}/entity`, item);
   }
 
-
   getItem(id: number | string): Observable<any> {
     return this.http.get(`${this.option.controller?.name}/${id}`);
   }
@@ -37,7 +35,6 @@ export class NodeService extends RepositoryService<Item> {
   ): Observable<Array<any>> {
     index = index ? index : 1;
     size = size ? size : 10;
-    console.log(`${this.option.controller?.name}/link/${id}/${size}/${index}`)
     return this.http.post(
       `${this.option.controller?.name}/link/${id}/${size}/${index}`,
       query

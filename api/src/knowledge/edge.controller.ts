@@ -27,8 +27,6 @@ export class EdgeController {
     return await this.edgeService.updateEdge(edge);
   }
 
- 
-
   @Post('search/:size/:index')
   getLinks(
     @Param('index', new ParseIntPipe())

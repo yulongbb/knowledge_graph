@@ -2,13 +2,14 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
 import { EsService } from './es.service';
+import { PropertiesService } from 'src/ontology/services/properties.service';
 
 @Injectable()
 export class NodeService {
 
   constructor(
     @Inject('ARANGODB') private db: Database,
-
+    private propertiesService: PropertiesService,
     private elasticsearchService: EsService,
   ) {
   }
@@ -251,6 +252,7 @@ export class NodeService {
   }
 
   async getNode(id: XIdType): Promise<any> {
+    console.log(id);
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR e IN entity
@@ -286,33 +288,69 @@ export class NodeService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: any,
   ): Promise<any> {
+    id = 'entity/' + id;
+    console.log(id);
     try {
       const start = size * (index - 1);
       const end = start + size;
-      console.log(id);
-      return this.elasticsearchService.get(id).then(async (entity: any) => {
-        console.log(entity['_source']['items']) // [ 'entity/bdi20191862', 'entity/Q6166482' ]
-        const items = entity['_source']['items'];
-        // 使用AQL查询多个items的关系，并合并结果
-        const cursor = await this.db.query(aql`
-            FOR item IN ${items}
-              FOR v, e, p IN 0..1 OUTBOUND DOCUMENT(item)['_id'] GRAPH "graph"
-              FILTER e != null
-              SORT e.mainsnak.property
-              LIMIT ${start}, ${end}
-              RETURN p
-          `);
-        // 获取查询结果
-        const result = await cursor.all();
-        console.log(111);
-        console.log(result);
-        // 处理查询结果
-        return { total: 100, list: result };
-      })
+      const cursor = await this.db.query(aql`
+       LET startNode = DOCUMENT(${id})
+       FOR v, e, p IN 0..1 ANY ${id} GRAPH "graph"
+          FILTER e != null
+          SORT e.mainsnak.property
+          LIMIT ${start}, ${end}
+          RETURN {vertex: v, edge: e, start: startNode}
+      `);
+      // 获取查询结果
+      const result = await cursor.all();
+      const cytoscapeData = { elements: { nodes: [], edges: [] } };
+
+      // 用于存储已添加的节点，防止重复
+      const addedNodes = new Set();
+
+      cytoscapeData.elements.nodes.push({
+        data: {
+          id: result[0].start._id,
+          label: result[0].start.labels.zh.value || '' // 根据你的字段结构选择合适的label
+        }
+      });
+      addedNodes.add(result[0].start._id);
+      await Promise.all(result.map(async ({ vertex, edge, start }) => {
+        // 添加节点
+        if (!addedNodes.has(vertex._id)) {
+          cytoscapeData.elements.nodes.push({
+            data: {
+              id: vertex._id,
+              label: vertex.labels?.zh?.value || '' // 确保数据结构的安全性
+            }
+          });
+          addedNodes.add(vertex._id);
+        }
+      
+        // 添加边
+        if (edge._from !== edge._to) {
+          const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
+          if (property?.name) {
+            cytoscapeData.elements.edges.push({
+              data: {
+                source: edge._from,
+                target: edge._to,
+                label: property.name || '' // 根据你的边数据结构选择合适的label
+              }
+            });
+          }
+        }
+      }));
+   
+      console.log(cytoscapeData);
+
+      // 现在你可以将 cytoscapeData 传递给 Cytoscape.js 进行渲染
+
+      return cytoscapeData;
     } catch (error) {
       console.error('Query Error:', error);
     }
   }
 
- 
+
 }

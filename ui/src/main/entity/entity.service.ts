@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class EntityService extends RepositoryService<Item> {
   constructor(public override http: HttpService) {
-    super(http, { controller: { name: 'api/node' } });
+    super(http, { controller: { name: 'api/knowledge' } });
   }
 
 
