@@ -5,12 +5,10 @@ import { DesignModule } from './design/design.module';
 
 import { AuthModule } from './auth/auth.module';
 import { OntologynModule } from 'src/ontology/ontology.module';
-import { NodeModule } from 'src/node/node.module';
 import { ExtractionModule } from 'src/extraction/extraction.module';
 import { MinioClientModule } from './minio/minio-client.module';
-import { FusionModule } from './fusion/fusion.module';
 import { RedisModule } from './redis/redis.module';
-import { EsModule } from './es/es.module';
+import { KnowledgeModule } from './knowledge/knowledge.module';
 
 
 @Module({
@@ -31,12 +29,10 @@ import { EsModule } from './es/es.module';
     DesignModule,
     OntologynModule,
     ExtractionModule,
-    NodeModule,
-    FusionModule,
+    KnowledgeModule,
     MinioClientModule,
     AuthModule,
     RedisModule,
-    EsModule
   ],
   controllers: [],
   providers: [],

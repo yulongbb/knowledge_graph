@@ -62,7 +62,6 @@ export class NodeComponent extends PageBase {
 
   constructor(
     private fusionService: FusionService,
-
     private service: NodeService,
     public override indexService: IndexService,
     private router: Router,
@@ -182,34 +181,7 @@ export class NodeComponent extends PageBase {
           },
         });
         break;
-      case 'graph':
-        console.log(item);
-        this.router.navigate(
-          [`./${type}/${item.id}`],
-          {
-            relativeTo: this.activatedRoute,
-          }
-        );
-        break;
-      case 'tree-info':
-        // this.selected = item;
-        // let filter = {
-        //   field: 'id',
-        //   value: item.id,
-        //   operation: '=',
-        //   relation: 'organizations',
-        // } as any;
-        // if (!this.query.filter || this.query.filter.length == 0) {
-        //   this.query.filter = [filter];
-        // } else {
-        //   let flt = this.query.filter.find(
-        //     (x) => x.field === 'id' && x.relation === 'organizations'
-        //   );
-        //   if (flt) flt.value = filter.value;
-        //   else this.query.filter = [...this.query.filter, filter];
-        // }
-        // this.tableCom.change(1);
-        break;
+
     }
   }
 }

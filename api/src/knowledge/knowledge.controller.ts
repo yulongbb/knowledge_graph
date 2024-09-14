@@ -1,19 +1,47 @@
-// redis.controller.ts
-
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { KnowledgeService } from './knowledge.service';
+import { XIdType } from 'src/core';
+import { ApiTags } from '@nestjs/swagger';
 import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
 
-@Controller('es')
-export class EsController {
+@Controller('knowledge')
+@ApiTags('知识融合') // 分组
+export class KnowledgeController {
+
   constructor(
+    private readonly knowledgeService: KnowledgeService,
     private readonly elasticsearchService: EsService,
     private readonly nlpSevice: NLPService,
+
   ) { }
 
+  @Post('')
+  async addEntity(@Body() entity: any): Promise<any> {
+    return await this.knowledgeService.addEntity(entity);
+  }
+
+  @Delete(':id')
+  deleteEntity(@Param('id') id: XIdType): any {
+    return this.knowledgeService.deleteEntity(id);
+  }
+
+  @Put('')
+  async updateEntity(@Body() entity: any): Promise<any> {
+    return await this.knowledgeService.updateEntity(entity);
+  }
 
   @Post('search/:size/:index')
-  async search(@Param('index', new ParseIntPipe())
+  async searchEntity(@Param('index', new ParseIntPipe())
   index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10, @Body() bool: any,) {
@@ -64,43 +92,43 @@ export class EsController {
     );
   }
 
-  @Post('add')
-  async add(@Body() doc: any,) {
-    return await this.elasticsearchService.bulk(doc);
-  }
-
   @Get('get/:id')
   async get(@Param('id') id: any,) {
-
     return await this.elasticsearchService.get(id).then((data: any) => {
       if (data._source.descriptions) {
         let entities = this.nlpSevice.extractEntities(data._source?.descriptions?.zh?.value);
         data._source['entities'] = entities;
       }
-
       return data;
     })
   }
 
+  @Post("fusion")
+  async fusion(@Body() entity: any): Promise<any> {
+    return await this.knowledgeService.fusion({ entity });
+  }
+
+  @Post('restore')
+  async restore(@Body() entity: any): Promise<any> {
+    return await this.knowledgeService.restore({ entity });
+  }
+
   @Get('sync')
   async syncDataToTxt() {
-
     return await this.elasticsearchService.syncDataToTxt();
   }
-  @Get('aggs')
-  async aggs() {
-    return await this.elasticsearchService.aggs({
-      index: 'entity', body: {
-        "aggs": {
-          "types": {
-            "terms": {
-              "field": "type.keyword"
-            }
-          }
-        }
-      }
-    });
+
+
+  @Post('link/:id/:size/:index')
+  async graph(
+    @Param('id') id: XIdType,
+    @Param('index', new ParseIntPipe())
+    index: number = 1,
+    @Param('size', new ParseIntPipe())
+    size: number = 10,
+    @Body() query: any,
+  ): Promise<any> {
+    console.log(id);
+    return this.knowledgeService.graph(id, index, size, query);;
   }
 }
-
-

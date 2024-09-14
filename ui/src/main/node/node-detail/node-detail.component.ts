@@ -36,7 +36,7 @@ export class NodeDetailComponent implements OnInit {
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
-      
+
             sort: [
               { field: 'pid', value: 'asc' },
               { field: 'sort', value: 'asc' },
@@ -95,6 +95,10 @@ export class NodeDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
+      this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+        console.log(c);
+      });
+
     });
   }
 

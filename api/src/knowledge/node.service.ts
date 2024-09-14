@@ -1,9 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
-import { EsService } from 'src/es/es.service';
-import { Extraction } from 'src/extraction/extraction.entity';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { EsService } from './es.service';
 
 @Injectable()
 export class NodeService {
@@ -16,53 +14,7 @@ export class NodeService {
   }
 
 
-  async fusion(extraction: Extraction): Promise<any> {
-    // 获取集合（Collection）
-
-    this.getEntityBylabel(extraction.subject).then((x) => {
-      let from;
-      let to;
-      if (x == null) {
-        from = UUID;
-      } else {
-        from = x['_key'];
-      }
-      x = {
-        id: from,
-        label: extraction.subject,
-        description: extraction.subject,
-      };
-
-      this.addEntity(x).then((s) => {
-        console.log(s);
-        this.getEntityBylabel(extraction.object).then((y) => {
-          if (y == null) {
-            to = UUID;
-          } else {
-            to = y['_key'];
-          }
-          y = {
-            id: to,
-            label: extraction.subject,
-            description: extraction.subject,
-          };
-
-          this.addEntity(y).then((o) => {
-            console.log(o);
-
-            const link = {
-              id: UUID,
-              from: from,
-              to: to,
-            };
-            this.addLink(link);
-          });
-        });
-      });
-    });
-  }
-
-  async addEntity(entity: any): Promise<any> {
+  async addNode(entity: any): Promise<any> {
     // 获取集合（Collection）
     const document = this.db.collection('entity');
 
@@ -193,68 +145,8 @@ export class NodeService {
     );
   }
 
-  async updateEntity(entity: any): Promise<any> {
-    // Fetch the existing document
-    this.elasticsearchService
-      .bulk({
-        type: entity?.type?.id,
-        labels: entity?.labels,
-        descriptions: entity?.descriptions,
-        aliases: entity?.aliases,
-        modified: new Date().toISOString(),
-        items: entity?.items,
-        images: entity?.images,
-      })
-      .then(() => {
-        const myCollection = this.db.collection('entity');
-        return myCollection
-          .document(entity['_key'])
-          .then((existingDocument) => {
-            // Update the document fields
-            existingDocument.id = entity['_key'];
-            (existingDocument.type = 'item'),
-              (existingDocument.labels = entity?.labels);
-            existingDocument.descriptions = entity?.descriptions;
-            existingDocument.modified = new Date().toISOString();
-            return myCollection.update(entity['_key'], existingDocument);
-          });
-      });
-    (err) => console.error('Failed to save document:', err);
-  }
-  async addLink(entity: any): Promise<any> {
-    // 获取集合（Collection）
-    const myCollection = this.db.collection('link');
 
-    // 插入数据
-    const document = {
-      _from: entity.from,
-      _to: entity.to,
-      id: entity.id,
-      mainsnak: {
-        snaktype: 'value',
-        property: 'P21',
-        hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-        datavalue: {
-          value: {
-            'entity-type': 'item',
-            'numeric-id': 40014,
-            id: 'Q40014',
-          },
-          type: 'wikibase-entityid',
-        },
-        datatype: 'wikibase-item',
-      },
-      type: 'statement',
-      rank: 'normal',
-    };
-
-    return myCollection.save(document).then(
-      (doc) => console.log('Document saved:', doc),
-      (err) => console.error('Failed to save document:', err),
-    );
-  }
-
-  async deleteEntity(id: any): Promise<any> {
+  async deleteNode(id: any): Promise<any> {
     console.log(id);
     // const myCollection = this.db.collection('entity');
 
@@ -289,8 +181,35 @@ export class NodeService {
       });
     });
   }
-
-  async getEntityList(index: number, size: number, query: any): Promise<any> {
+  async updateNode(entity: any): Promise<any> {
+    // Fetch the existing document
+    this.elasticsearchService
+      .bulk({
+        type: entity?.type?.id,
+        labels: entity?.labels,
+        descriptions: entity?.descriptions,
+        aliases: entity?.aliases,
+        modified: new Date().toISOString(),
+        items: entity?.items,
+        images: entity?.images,
+      })
+      .then(() => {
+        const myCollection = this.db.collection('entity');
+        return myCollection
+          .document(entity['_key'])
+          .then((existingDocument) => {
+            // Update the document fields
+            existingDocument.id = entity['_key'];
+            (existingDocument.type = 'item'),
+              (existingDocument.labels = entity?.labels);
+            existingDocument.descriptions = entity?.descriptions;
+            existingDocument.modified = new Date().toISOString();
+            return myCollection.update(entity['_key'], existingDocument);
+          });
+      });
+    (err) => console.error('Failed to save document:', err);
+  }
+  async getNodeList(index: number, size: number, query: any): Promise<any> {
 
     try {
       // 执行查询
@@ -331,7 +250,7 @@ export class NodeService {
     }
   }
 
-  async getEntity(id: XIdType): Promise<any> {
+  async getNode(id: XIdType): Promise<any> {
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR e IN entity
@@ -346,7 +265,7 @@ export class NodeService {
     }
   }
 
-  async getEntityBylabel(label: string): Promise<any> {
+  async getNodeBylabel(label: string): Promise<any> {
     try {
       // 执行查询
       const cursor = await this.db.query(aql`FOR e IN entity
@@ -360,8 +279,7 @@ export class NodeService {
       console.error('Query Error:', error);
     }
   }
-
-  async getLinks(
+  async graph(
     id: XIdType,
     index: number,
     size: number,
@@ -370,46 +288,31 @@ export class NodeService {
   ): Promise<any> {
     try {
       const start = size * (index - 1);
-
-      // 执行查询
-      const cursor = await this.db.query(aql`FOR v, e, p IN 0..1  ${'entity/' + id
-        } GRAPH "graph"
-      FILTER e!=null
-      SORT e.mainsnak.property
-      LIMIT ${start}, ${size}
-      RETURN e['mainsnak']['datavalue']['type']=='wikibase-entityid'?MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue:{value:{'entity-type':"item",'numeric-id':e['mainsnak']['datavalue']["value"]['numeric-id'],id:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["zh"]['value']:DOCUMENT(CONCAT('entity/',e['mainsnak']['datavalue']["value"]["id"]))["labels"]["en"]['value']},type:"wikibase-entityid"},datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-):MERGE(
-
- e, {mainsnak:{snaktype: e['mainsnak']['snaktype'],datavalue: e['mainsnak']['datavalue'],datatype: e['mainsnak']['datatype'], property: DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]?DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["zh"]["value"]:DOCUMENT(CONCAT('entity/',e.mainsnak.property))["labels"]["en"]["value"]}}
-)`);
-      // 获取查询结果
-      const result = await cursor.all();
-      // 处理查询结果
-      return { total: 100, list: result };
-    } catch (error) {
-      console.error('Query Error:', error);
-    }
-  }
-
-  async getProperties(index: number, size: number): Promise<any> {
-    try {
-      const start = size * (index - 1);
       const end = start + size;
-
-      // 执行查询
-      const cursor = await this.db.query(aql`FOR e IN entity_view
-      SEARCH STARTS_WITH(e['_key'], 'P')
-      SORT +SUBSTRING(e['_key'], 1)
-      LIMIT ${start}, ${end}
-      RETURN {id: +SUBSTRING(e['_key'], 1), name: e['labels']['zh-cn']['value'], description: e['descriptions']['zh-cn']['value'], enName: e['labels']['en']['value'], enDescription: e['descriptions']['en']['value']}`);
-      // 获取查询结果
-      const result = await cursor.all();
-      // 处理查询结果
-      return result;
+      console.log(id);
+      return this.elasticsearchService.get(id).then(async (entity: any) => {
+        console.log(entity['_source']['items']) // [ 'entity/bdi20191862', 'entity/Q6166482' ]
+        const items = entity['_source']['items'];
+        // 使用AQL查询多个items的关系，并合并结果
+        const cursor = await this.db.query(aql`
+            FOR item IN ${items}
+              FOR v, e, p IN 0..1 OUTBOUND DOCUMENT(item)['_id'] GRAPH "graph"
+              FILTER e != null
+              SORT e.mainsnak.property
+              LIMIT ${start}, ${end}
+              RETURN p
+          `);
+        // 获取查询结果
+        const result = await cursor.all();
+        console.log(111);
+        console.log(result);
+        // 处理查询结果
+        return { total: 100, list: result };
+      })
     } catch (error) {
       console.error('Query Error:', error);
     }
   }
+
+ 
 }
