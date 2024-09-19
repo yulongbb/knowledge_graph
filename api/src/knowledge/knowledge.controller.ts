@@ -13,6 +13,7 @@ import { XIdType } from 'src/core';
 import { ApiTags } from '@nestjs/swagger';
 import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
+import { EdgeService } from './edge.service';
 
 @Controller('knowledge')
 @ApiTags('知识融合') // 分组
@@ -22,7 +23,7 @@ export class KnowledgeController {
     private readonly knowledgeService: KnowledgeService,
     private readonly elasticsearchService: EsService,
     private readonly nlpSevice: NLPService,
-
+    private readonly edgeService: EdgeService
   ) { }
 
   @Post('')
@@ -116,6 +117,21 @@ export class KnowledgeController {
   @Get('sync')
   async syncDataToTxt() {
     return await this.elasticsearchService.syncDataToTxt();
+  }
+
+  @Post('link')
+  async addEdge(@Body() edge: any): Promise<any> {
+    return await this.edgeService.addEdge(edge);
+  }
+
+  @Put('link')
+  async updateEdge(@Body() edge: any): Promise<any> {
+    return await this.edgeService.updateEdge(edge);
+  }
+
+  @Delete('link/:id')
+  deleteEdge(@Param('id') id: XIdType): any {
+    return this.edgeService.deleteEdge(id);
   }
 
 

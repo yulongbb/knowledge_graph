@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NodeService } from './node.service';
 
-import { NodeController } from './node.controller';
 
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +8,6 @@ import { Schema } from 'src/ontology/entities/schema.entity';
 import { Property } from 'src/ontology/entities/property.entity';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { EdgeService } from './edge.service';
-import { EdgeController } from './edge.controller';
 import { SchemasService } from 'src/ontology/services/schemas.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { KnowledgeService } from './knowledge.service';
@@ -31,7 +29,7 @@ import { NLPService } from './nlp.service';
         // },
       }),
     }),],
-  controllers: [NodeController, EdgeController,KnowledgeController],
+  controllers: [KnowledgeController],
   exports: [EsService],
   providers: [
     {

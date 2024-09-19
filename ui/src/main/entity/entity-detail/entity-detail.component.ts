@@ -9,7 +9,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
-import { EdgeService } from '../edge.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -100,7 +99,6 @@ export class EntityDetailComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private esService: EsService,
-    private edgeService: EdgeService,
     public propertyService: PropertyService,
     private nodeService: EntityService,
     private router: Router,
@@ -482,17 +480,17 @@ export class EntityDetailComponent implements OnInit {
 
             // 执行更新操作
             updatedEdges.forEach((edge: any) => {
-              requests.push(this.edgeService.updateEdge(edge));
+              requests.push(this.nodeService.updateEdge(edge));
             });
 
             // 执行删除操作
             deletedEdges.forEach((edge: any) => {
-              requests.push(this.edgeService.deleteEdge(edge._key));
+              requests.push(this.nodeService.deleteEdge(edge._key));
             });
 
             // 执行新增操作
             newEdges.forEach((edge: any) => {
-              requests.push(this.edgeService.addEdge(edge));
+              requests.push(this.nodeService.addEdge(edge));
             });
 
             // 并行执行所有请求

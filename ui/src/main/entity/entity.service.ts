@@ -28,6 +28,18 @@ export class EntityService extends RepositoryService<Item> {
     return this.http.get(`${this.option.controller?.name}/${id}`);
   }
 
+  addEdge(edge: any): Observable<any> {
+    return this.http.post(`${this.option.controller?.name}/link`, edge);
+  }
+
+  updateEdge(edge: any): Observable<any> {
+    return this.http.put(`${this.option.controller?.name}/link`, edge);
+  }
+
+  deleteEdge(id: any): Observable<any> {
+    return this.http.delete(`${this.option.controller?.name}/link/${id}`);
+  }
+
   getLinks(
     index?: number,
     size?: number,
