@@ -35,6 +35,7 @@ export class NodeService extends RepositoryService<Item> {
   ): Observable<Array<any>> {
     index = index ? index : 1;
     size = size ? size : 10;
+    console.log(`${this.option.controller?.name}/link/${id}/${size}/${index}`)
     return this.http.post(
       `${this.option.controller?.name}/link/${id}/${size}/${index}`,
       query

@@ -44,7 +44,7 @@ export class KnowledgeController {
   async searchEntity(@Param('index', new ParseIntPipe())
   index: number = 1,
     @Param('size', new ParseIntPipe())
-    size: number = 10, @Body() bool: any,) {
+    size: number = 20, @Body() bool: any,) {
     return await this.elasticsearchService.search(
       {
         size: size,

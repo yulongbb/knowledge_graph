@@ -11,7 +11,9 @@
 </x-input-group>
 
 <x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
-  [bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl }"
+virtualScroll
+[scroll]="{ x: 1500, y: 850 }" 
+[bodyColumnTpl]="{ actions: actionsTpl,  from: fromTpl, to: toTpl }"
   (activatedChange)="action('info', $event)" loading  [allowSelectRow]="true"
   (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
 </x-table>

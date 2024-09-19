@@ -12,6 +12,7 @@ import { EsService } from '../es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { NgxMasonryOptions } from 'ngx-masonry';
 import { NavService } from 'src/services/nav.service';
+import { EntityService } from 'src/main/entity/entity.service';
 
 @Component({
   selector: 'app-search-detail',
@@ -93,6 +94,7 @@ export class SearchDetailComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private service: EsService,
+    private entityService: EntityService,
     public propertyService: PropertyService,
     private nodeService: NodeService,
     private router: Router,
@@ -151,8 +153,9 @@ export class SearchDetailComponent implements OnInit {
               parents.push(x['_source'].type)
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
                 this.properties = signal(p.list);
-                this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+                this.entityService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   let statements: any = [];
+                  console.log(c.list)
                   c.list.forEach((p: any) => {
                     if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                       p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
@@ -224,9 +227,7 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
-
   }
 
   back() {
