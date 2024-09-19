@@ -2,14 +2,11 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, Query, ViewChild, si
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XTableColumn } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NodeService } from 'src/main/node/node.service';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
-import { EdgeService } from 'src/main/edge/edge.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -92,7 +89,6 @@ export class EntityDetailComponent implements OnInit {
     private ontologyService: OntologyService,
     private esService: EsService,
     public propertyService: PropertyService,
-    private nodeService: NodeService,
     private router: Router,
     private message: XMessageService
   ) {
@@ -173,10 +169,10 @@ export class EntityDetailComponent implements OnInit {
         }
         console.log(item)
         if (this.type === 'add') {
-          this.nodeService.post(item).subscribe((x) => {
-            this.message.success('新增成功！');
-            this.router.navigate(['/index/entity']);
-          });
+          // this.nodeService.post(item).subscribe((x) => {
+          //   this.message.success('新增成功！');
+          //   this.router.navigate(['/index/entity']);
+          // });
         } else if (this.type === 'edit') {
          
         }

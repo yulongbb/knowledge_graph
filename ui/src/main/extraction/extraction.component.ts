@@ -7,8 +7,6 @@ import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, map, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
-import { NodeService } from '../node/node.service';
-import { EdgeService } from '../edge/edge.service';
 import { EsService } from '../search/es.service';
 
 
@@ -87,8 +85,6 @@ export class ExtractionComponent extends PageBase {
     public override indexService: IndexService,
     private service: ExtractionService,
     private propertyService: PropertyService,
-    private nodeService: NodeService,
-    private edgeService: EdgeService,
     private esService: EsService,
 
     private message: XMessageService,
@@ -224,7 +220,7 @@ export class ExtractionComponent extends PageBase {
                     type: "statement",
                   }
                   edges.push(edge);
-                  arr.push(this.edgeService.addEdge(edge));
+                  // arr.push(this.edgeService.addEdge(edge));
 
                 })
                 console.log(edges)

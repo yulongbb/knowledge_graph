@@ -6,11 +6,10 @@ import { XTableColumn } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NodeService } from 'src/main/node/node.service';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
-import { EdgeService } from 'src/main/edge/edge.service';
 import { EntityService } from '../entity.service';
+import { EdgeService } from '../edge.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -101,8 +100,8 @@ export class EntityDetailComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private esService: EsService,
-    public propertyService: PropertyService,
     private edgeService: EdgeService,
+    public propertyService: PropertyService,
     private nodeService: EntityService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
