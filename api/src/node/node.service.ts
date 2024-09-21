@@ -312,7 +312,7 @@ export class NodeService {
       if (query.keyword == '%%') {
         cursor = await this.db.query(aql`
           LET langulage = 'zh'
-          LET list = (FOR doc IN  entity_view
+          LET list = (FOR doc IN  entity
           LIMIT ${start}, ${size}
           RETURN doc)
           RETURN {total: COUNT(${collection}), list: list}
