@@ -7,11 +7,11 @@ import { XDialogService, XImagePreviewComponent, XTableColumn } from '@ng-nest/u
 import { map } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NodeService } from 'src/main/node/node.service';
 import { EsService } from '../es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { NgxMasonryOptions } from 'ngx-masonry';
 import { NavService } from 'src/services/nav.service';
+import { EntityService } from 'src/main/entity/entity.service';
 
 @Component({
   selector: 'app-search-detail',
@@ -93,8 +93,8 @@ export class SearchDetailComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private service: EsService,
+    private entityService: EntityService,
     public propertyService: PropertyService,
-    private nodeService: NodeService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
@@ -117,7 +117,36 @@ export class SearchDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.action(this.type);
+    this.service.getEntity(this.id).subscribe((x) => {
+
+      this.ontologyService.get(x._source.type).subscribe((t: any) => {
+        x._type = t.label
+
+        this.entity = signal(x);
+        this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
+          parents.push(x['_source'].type)
+          this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
+            this.properties = signal(p.list);
+            this.entityService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+              let statements: any = [];
+              console.log(c.list)
+              c.list.forEach((p: any) => {
+                if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                  p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                  p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
+                }
+                statements.push(p.edges[0])
+              })
+              this.claims = statements;
+              console.log(this.claims)
+            })
+          });
+        });
+      })
+      this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
+      this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
+      this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
+    });
   }
 
   linkifyText(text: string, entities: any): string {
@@ -138,60 +167,7 @@ export class SearchDetailComponent implements OnInit {
   }
 
 
-  action(type: string) {
-    switch (type) {
-      case 'info':
-        this.service.getEntity(this.id).subscribe((x) => {
 
-          this.ontologyService.get(x._source.type).subscribe((t: any) => {
-            x._type = t.label
-
-            this.entity = signal(x);
-            this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
-              parents.push(x['_source'].type)
-              this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
-                this.properties = signal(p.list);
-                this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
-                  let statements: any = [];
-                  c.list.forEach((p: any) => {
-                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
-                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
-                    }
-                    statements.push(p.edges[0])
-                  })
-                  this.claims = statements;
-                  console.log(this.claims)
-                })
-              });
-            });
-          })
-          this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
-          this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
-          this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
-        });
-        break;
-      case 'edit':
-        this.action('info');
-        break;
-      case 'save':
-        if (this.type === 'add') {
-          this.nodeService.post(this.form.formGroup.value).subscribe((x) => {
-            this.message.success('新增成功！');
-            this.router.navigate(['/index/node']);
-          });
-        } else if (this.type === 'edit') {
-          this.nodeService.put(this.form.formGroup.value).subscribe((x) => {
-            this.message.success('修改成功！');
-            this.router.navigate(['/index/node']);
-          });
-        }
-        break;
-      case 'cancel':
-        this.router.navigate(['/index/node']);
-        break;
-    }
-  }
 
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
@@ -224,9 +200,7 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
-
   }
 
   back() {

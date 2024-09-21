@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class EsService extends RepositoryService<any> {
   constructor(public override http: HttpService) {
-    super(http, { controller: { name: 'api/es' } });
+    super(http, { controller: { name: 'api/knowledge' } });
   }
 
 

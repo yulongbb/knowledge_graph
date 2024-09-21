@@ -17,11 +17,6 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XSelectModule } from '@ng-nest/ui/select';
 
-
-
-
-
-
 @NgModule({
   declarations: [SearchComponent, SearchDetailComponent],
   imports: [

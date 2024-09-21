@@ -9,7 +9,6 @@ import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
 import { XInputModule, XTreeModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
-import { DashboardService } from './dashboard.service';
 import { XTableModule } from '@ng-nest/ui/table';
 import { XCardModule } from '@ng-nest/ui/card';
 import { XCrumbModule } from '@ng-nest/ui/crumb';
@@ -45,6 +44,6 @@ import { XTagModule } from '@ng-nest/ui/tag';
     ]),
   ],
   exports: [RouterModule],
-  providers: [DashboardService]
+  providers: []
 })
 export class DashboardModule {}

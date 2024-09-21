@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class EntityService extends RepositoryService<Item> {
   constructor(public override http: HttpService) {
-    super(http, { controller: { name: 'api/node' } });
+    super(http, { controller: { name: 'api/knowledge' } });
   }
 
 
@@ -26,6 +26,18 @@ export class EntityService extends RepositoryService<Item> {
 
   getItem(id: number | string): Observable<any> {
     return this.http.get(`${this.option.controller?.name}/${id}`);
+  }
+
+  addEdge(edge: any): Observable<any> {
+    return this.http.post(`${this.option.controller?.name}/link`, edge);
+  }
+
+  updateEdge(edge: any): Observable<any> {
+    return this.http.put(`${this.option.controller?.name}/link`, edge);
+  }
+
+  deleteEdge(id: any): Observable<any> {
+    return this.http.delete(`${this.option.controller?.name}/link/${id}`);
   }
 
   getLinks(

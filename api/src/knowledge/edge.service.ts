@@ -1,14 +1,18 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
-import { EsService } from 'src/es/es.service';
-import { NodeService } from 'src/node/node.service';
+import { NodeService } from 'src/knowledge/node.service';
 import { SchemasService } from 'src/ontology/services/schemas.service';
+import { KnowledgeService } from './knowledge.service';
 
 @Injectable()
 export class EdgeService {
 
 
-  constructor(@Inject('ARANGODB') private db: Database, private readonly nodeService: NodeService, public readonly schemasService: SchemasService) { }
+  constructor(
+    @Inject('ARANGODB') private db: Database,
+    private readonly nodeService: NodeService,
+    private readonly knowledgeService: KnowledgeService,
+    public readonly schemasService: SchemasService) { }
 
 
   async addEdge(edge: any): Promise<any> {
@@ -19,7 +23,7 @@ export class EdgeService {
       console.log(edge.mainsnak.datavalue.value.label)
 
       // 查询知识并关联
-      this.nodeService.getEntityBylabel(edge.mainsnak.datavalue.value.label).then((data: any) => {
+      this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label).then((data: any) => {
         console.log(data);
         if (data) {
           edge['_to'] = data['_id'];
@@ -40,7 +44,7 @@ export class EdgeService {
           this.schemasService.getList(1, 10, query).then((schema: any) => {
             if (schema.list.length > 0) {
               // 新增知识并关联
-              this.nodeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } },'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }  }).then((e: any) => {
+              this.knowledgeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
                 console.log(123)
                 console.log(e)
                 edge['_to'] = 'entity/' + e?.items[0]?.index?._id;
@@ -51,7 +55,7 @@ export class EdgeService {
               })
             } else {
               // 新增知识并关联
-              this.nodeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } ,'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }  }).then((e: any) => {
+              this.knowledgeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
                 console.log(123)
                 console.log(e)
                 edge['_to'] = 'entity/' + e.items[0].index._id;

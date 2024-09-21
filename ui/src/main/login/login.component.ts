@@ -1,5 +1,5 @@
 import { UntypedFormGroup } from '@angular/forms';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { UntypedFormBuilder } from '@angular/forms';
@@ -17,8 +17,10 @@ export class LoginComponent implements OnInit {
 
   userForm: UntypedFormGroup = this.formBuilder.group({
     account: ['admin'],
-    password: ['123qwe'],
+    password: ['admin123'],
+    database: ['kgms']
   });
+  data = signal(['kgms', 'demo']);
 
   constructor(
     public authService: AuthService,
@@ -26,9 +28,9 @@ export class LoginComponent implements OnInit {
     public formBuilder: UntypedFormBuilder,
     public message: XMessageService,
     public activatedRoute: ActivatedRoute
-  ) {}
+  ) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   // 登录
   login() {

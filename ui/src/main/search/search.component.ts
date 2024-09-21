@@ -4,8 +4,8 @@ import { EsService } from './es.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
-import { NodeService } from '../node/node.service';
 import { forkJoin } from 'rxjs';
+import { EntityService } from '../entity/entity.service';
 
 @Component({
   selector: 'app-search',
@@ -27,7 +27,7 @@ export class SearchComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     public propertyService: PropertyService,
-    private nodeService: NodeService,
+    private entityService: EntityService,
     private dialogSewrvice: XDialogService
   ) {
 
@@ -42,7 +42,7 @@ export class SearchComponent implements OnInit {
           this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
             parents.push(item['_source'].type)
             this.propertyService.getList(1, 100, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
-              this.nodeService.getLinks(1, 100, item['_id'], {}).subscribe((c: any) => {
+              this.entityService.getLinks(1, 100, item['_id'], {}).subscribe((c: any) => {
                 let statements: any = [];
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {
@@ -119,7 +119,7 @@ export class SearchComponent implements OnInit {
           this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
             parents.push(item['_source'].type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
-              this.nodeService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
+              this.entityService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
                 let statements: any = [];
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {
@@ -158,7 +158,7 @@ export class SearchComponent implements OnInit {
           this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
             parents.push(item['_source'].type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
-              this.nodeService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
+              this.entityService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
                 let statements: any = [];
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {
@@ -222,7 +222,7 @@ export class SearchComponent implements OnInit {
           this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
             parents.push(item['_source'].type)
             this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
-              this.nodeService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
+              this.entityService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
                 let statements: any = [];
                 c.list.forEach((path: any) => {
                   if (path.edges[0]['_from'] != path.edges[0]['_to']) {

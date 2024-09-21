@@ -1,13 +1,5 @@
-import { Component, OnDestroy, OnInit, Query, ViewChild, signal } from '@angular/core';
-import { OntologyService, Schema } from '../ontology/ontology/ontology.service';
-import { Observable, delay, forkJoin, map, of, tap, timeInterval } from 'rxjs';
-import { DashboardService } from './dashboard.service';
-import { XFormRow, XMessageBoxAction, XMessageBoxService, XMessageService, XTableColumn, XTableComponent, XTreeAction, XTreeComponent } from '@ng-nest/ui';
-import { IndexService } from 'src/layout/index/index.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormGroup } from '@angular/forms';
-import { NodeService } from '../node/node.service';
-import { EsService } from '../search/es.service';
+import { Component, ElementRef, OnDestroy, OnInit, Query, ViewChild, signal } from '@angular/core';
+import cytoscape from 'cytoscape';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,571 +8,118 @@ import { EsService } from '../search/es.service';
 
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  total: any = 0;
-  numbers: any = [];
-  diskData = [
-    {
-      "value": 40,
-      "name": "其他",
-      "path": "其他"
-    }];
-  chartOptions: any;
-  value: any;
-  query = { keyword: '' }
-  data1: any;
-  index = 1;
-  size = 20;
-  total1 = 0;
-  data2 = signal<any[]>([]);
-  columns: XTableColumn[] = [
-    { id: 'label', label: '标签', flex: 1.5, sort: true },
-    { id: 'description', label: '描述', flex: 2, sort: true },
-  ];
-
-  items = (index: number, size: number, query: Query) =>
-    this.esService
-      .searchEntity(index, size, {})
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
-
-  unifyNumber(num: any) {
-    if (num === '') {
-      return 0
-    } else {
-      let handleNum = parseFloat(num)
-      let isToFixed = handleNum.toString().includes('.') && handleNum.toString().split('.')[1].length > 2
-      if (isToFixed) {
-        return handleNum.toFixed(2)
-      } else {
-        return handleNum
-      }
-    }
-  }
-
-  data = () =>
-    this.service
-      .getList(1, Number.MAX_SAFE_INTEGER, {
-        sort: [
-          { field: 'pid', value: 'asc' },
-          { field: 'sort', value: 'asc' },
-        ],
-      })
-      .pipe(
-        tap((x: any) => console.log(x)),
-        map((x) => x.list)
-      );
-  id: any;
-  keyword: any = '';
-
-  @ViewChild('treeCom') treeCom!: XTreeComponent;
-
-  formGroup = new UntypedFormGroup({});
-
-  get disabled() {
-    return !['edit', 'add', 'add-root'].includes(this.type);
-  }
-
-  type = 'info';
-
-  selected!: Schema;
-  treeLoading = true;
-
-  @ViewChild('tableCom') tableCom!: XTableComponent;
-
-  selectedRow: any;
-  climas!: Observable<Array<any>>;
-  entities: any = signal([]);
-
-  constructor(
-    private esService: EsService,
-
-    private service: OntologyService, private dashboardService: DashboardService,
-    private message: XMessageService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private msgBox: XMessageBoxService,
-    private nodeService: NodeService,
-
-  ) {
-  }
-
-  ngOnDestroy(): void {
-    // clearInterval(this.timer); // 清除定时器
-  }
-
-  treeActions: XTreeAction[] = [
-    {
-      id: 'add',
-      label: '新增',
-      icon: 'fto-plus-square',
-      handler: (schema: Schema) => {
-        this.action('add', schema);
-      },
-    },
-    {
-      id: 'edit',
-      label: '修改',
-      icon: 'fto-edit',
-      handler: (schema: Schema) => {
-        this.action('edit', schema);
-      },
-    },
-    {
-      id: 'properties',
-      label: '属性',
-      icon: 'fto-list',
-      handler: (schema: Schema) => {
-        this.action('properties', schema);
-      },
-    },
-    {
-      id: 'delete',
-      label: '删除',
-      icon: 'fto-trash-2',
-      handler: (schema: Schema) => {
-        this.action('delete', schema);
-      },
-    },
-  ];
-
-
-  controls: XFormRow[] = [
-    {
-      controls: [
-        {
-          control: 'input',
-          id: 'id',
-          label: 'id',
-          required: true,
-        },
-        {
-          control: 'input',
-          id: 'name',
-          label: '名称',
-          required: true,
-        },
-        {
-          control: 'input',
-          id: 'label',
-          label: '标签',
-        },
-        { control: 'input', id: 'description', label: '描述' },
-        { control: 'input', id: 'collection', label: '表' },
-      ],
-    },
-    {
-      hidden: true,
-      controls: [
-        // {
-        //   control: 'input',
-        //   id: 'id',
-        // },
-        {
-          control: 'input',
-          id: 'pid',
-        },
-      ],
-    },
-  ];
-
-
-  action(type: string, schema: Schema) {
-    console.log(schema);
-    switch (type) {
-      case 'add-root':
-        console.log(schema);
-        this.selected = schema;
-        this.type = type;
-        this.formGroup.reset();
-        this.formGroup.patchValue({
-          // id: XGuid(),
-          pid: null,
-        });
-        break;
-      case 'add':
-        this.selected = schema;
-        this.type = type;
-        this.formGroup.reset();
-        console.log(schema);
-        this.formGroup.patchValue({
-          // id: XGuid(),
-          pid: schema.id,
-        });
-        break;
-      case 'save':
-        if (this.type === 'add' || this.type === 'add-root') {
-          console.log(this.formGroup.value);
-          this.service.post(this.formGroup.value).subscribe((x) => {
-            this.type = 'info';
-            console.log(x);
-            this.treeCom.addNode(x);
-            this.message.success('新增成功！');
-          });
-        } else if (this.type === 'edit') {
-          console.log(this.formGroup.value);
-          this.service.put(this.formGroup.value).subscribe(() => {
-            this.type = 'info';
-            this.treeCom.updateNode(schema, this.formGroup.value);
-            this.message.success('修改成功！');
-          });
-        }
-        break;
-      case 'delete':
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将永久删除此条数据：${schema.label}，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            action === 'confirm' &&
-              this.service.delete(schema.id).subscribe(() => {
-                console.log(schema);
-                this.treeCom.removeNode(schema);
-                this.formGroup.reset();
-                this.message.success('删除成功！');
-              });
-          },
-        });
-        break;
-      case 'edit':
-        this.selected = schema;
-        this.type = type;
-        this.service.get(schema?.id).subscribe((x) => {
-          this.formGroup.patchValue(x);
-        });
-        break;
-      case 'properties':
-        this.router.navigate([`./properties/${schema.id}`], {
-          relativeTo: this.activatedRoute,
-        });
-        break;
-    }
-  }
-
-  selectRow(row: any) {
-    this.selectedRow = row;
-    console.log(row);
-
-    // this.entities= signal([this.selectedRow.labels])
-    this.climas = this.nodeService.getLinks(1, 100, row.id[0], {}).pipe(
-      tap((x: any) => console.log(x)),
-      map((x: any) => x)
-    );
-  }
-
-
-  search(keyword: any) {
-    this.items = (index: number, size: number, query: Query) =>
-      this.nodeService.getList(index, this.size, { collection: 'entity', keyword: `%${keyword}%` }).pipe(
-        tap((x: any) => console.log(x)),
-        map((x: any) => x)
-      );
-
-  }
-
-
+ 
   ngOnInit(): void {
-    this.service.getList(1, Number.MAX_SAFE_INTEGER, {
-      sort: [
-        { field: 'pid', value: 'asc' },
-        { field: 'sort', value: 'asc' },
-      ],
-    }).subscribe((data: any) => {
+    this.initializeCytoscape({});
+    }
+  @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
 
-      this.chartOptions = {
-        backgroundColor: '#555555',
+  initializeCytoscape(data: any): void {
+    const cy = cytoscape({
+      container: this.cyContainer.nativeElement, // container to render in
 
-        series: [
-          {
-            name: '信大知识体系',
-            type: 'treemap',
-            visibleMin: 300,
-            label: {
-              position: 'insideTopLeft',
-              formatter: (params: any) => {
-                let number = params.data.number;
-                if (number && number > 10000) {
-                  let new_number = number / 10000;
-                  number = this.unifyNumber(new_number) + '万';
-                } else {
-                  number + params.value;
-                }
-                let arr = [
-                  '{name|' + params.name + '}',
-                  '{hr|}',
-                  '{budget|' + number + '}',
-                  '{label|' + params.data.id + '}',
-                ];
-                return arr.join('\n');
-              },
-              rich: {
-                budget: {
-                  fontSize: 22,
-                  lineHeight: 30,
-                  color: 'yellow'
-                },
+      elements: data.elements,
+      style: [ // the stylesheet for the graph
+        {
+          selector: 'node',
+          style: {
+            'width': 5,
+            'height': 5,
+            'background-color': '#666',
+            'label': 'data(label)',
+            'font-size': '4px',
+            'text-valign': 'bottom',
 
-                label: {
-                  fontSize: 9,
-                  backgroundColor: 'rgba(0,0,0,0.3)',
-                  color: '#fff',
-                  borderRadius: 2,
-                  padding: [2, 4],
-                  lineHeight: 25,
-                  align: 'right'
-                },
-                name: {
-                  fontSize: 18,
-                  color: '#fff'
-                },
-                hr: {
-                  width: '100%',
-                  borderColor: 'rgba(255,255,255,0.2)',
-                  borderWidth: 0.5,
-                  height: 0,
-                  lineHeight: 10
-                }
-              }
-            },
-            upperLabel: {
-              show: true,
-              height: 30,
-              formatter: (params: any) => {
-                let number = params.data.number;
-                if (number && number > 10000) {
-                  let new_number = number / 10000;
-                  number = this.unifyNumber(new_number) + '万';
-                } else {
-                  number + params.value;
-                }
-                let arr = [
-                  '{name|' + params.name + '}{budget|' + number + '}',
-                ];
-                return arr.join('\n');
-              },
-              rich: {
-                budget: {
-                  fontSize: 22,
-                  lineHeight: 30,
-                  color: 'yellow'
-                },
-
-                label: {
-                  fontSize: 9,
-                  backgroundColor: 'rgba(0,0,0,0.3)',
-                  color: '#fff',
-                  borderRadius: 2,
-                  padding: [2, 4],
-                  lineHeight: 25,
-                  align: 'right'
-                },
-                name: {
-                  fontSize: 18,
-                  color: '#fff'
-                },
-                hr: {
-                  width: '100%',
-                  borderColor: 'rgba(255,255,255,0.2)',
-                  borderWidth: 0.5,
-                  height: 0,
-                  lineHeight: 10
-                }
-              }
-            },
-            itemStyle: {
-              borderColor: '#fff'
-            },
-            levels: [
-              {
-                itemStyle: {
-                  borderColor: '#777',
-                  borderWidth: 0,
-                  gapWidth: 1
-                },
-                upperLabel: {
-                  show: false
-                }
-              },
-
-              {
-                itemStyle: {
-                  borderColor: '#555',
-                  borderWidth: 5,
-                  gapWidth: 1
-                },
-                emphasis: {
-                  itemStyle: {
-                    borderColor: '#ddd'
-                  }
-                }
-              },
-              {
-                itemStyle: {
-                  borderColor: '#555',
-                  borderWidth: 5,
-                  gapWidth: 1
-                },
-                emphasis: {
-                  itemStyle: {
-                    borderColor: '#ddd'
-                  }
-                }
-              },
-              {
-                colorSaturation: [0.35, 0.5],
-                itemStyle: {
-                  borderWidth: 5,
-                  gapWidth: 1,
-                  borderColorSaturation: 0.6
-                }
-              }
-            ],
-            data: this.buildTree(data.list)[0].children
           }
-        ]
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 0.4,
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            "text-opacity": 1,
+            "overlay-opacity": 0,
+            'arrow-scale': 0.3,
+
+            'label': 'data(label)',
+            'font-size': '4px',
+            'control-point-weight': 0.5,
+            'control-point-distance': 30,
+
+          }
+        },
+        {
+          selector: '.highlighted',
+          style: {
+            'background-color': '#61bffc',
+            'line-color': '#61bffc',
+            'target-arrow-color': '#61bffc',
+            'transition-property': 'background-color, line-color, target-arrow-color',
+
+          }
+        }
+      ],
+
+      layout: {
+        name: 'cose',
+
+      },
+
+      // initial viewport state:
+      zoom: 1, // 图表的初始缩放级别.可以设置options.minZoom和options.maxZoom设置缩放级别的限制.
+      pan: { x: 0, y: 0 }, // 图表的初始平移位置.
+
+      // interaction options:
+      minZoom: 1e-50, // 图表缩放级别的最小界限.视口的缩放比例不能小于此缩放级别.
+      maxZoom: 1e50, // 图表缩放级别的最大界限.视口的缩放比例不能大于此缩放级别.
+      zoomingEnabled: true, // 是否通过用户事件和编程方式启用缩放图形.
+      userZoomingEnabled: true, // 是否允许用户事件(例如鼠标滚轮,捏合缩放)缩放图形.对此缩放的编程更改不受此选项的影响.
+      panningEnabled: true, // 是否通过用户事件和编程方式启用平移图形.
+      userPanningEnabled: true, // 是否允许用户事件(例如拖动图形背景)平移图形.平移的程序化更改不受此选项的影响.
+      boxSelectionEnabled: true, // 是否启用了框选择(即拖动框叠加,并将其释放为选择).如果启用,则用户必须点击以平移图表.
+      selectionType: 'single', // 一个字符串，指示用户输入的选择行为.对于'additive',用户进行的新选择将添加到当前所选元素的集合中.对于'single',用户做出的新选择成为当前所选元素的整个集合.
+      touchTapThreshold: 8, // 非负整数,分别表示用户在轻击手势期间可以在触摸设备和桌面设备上移动的最大允许距离.这使得用户更容易点击.
+      // 这些值具有合理的默认值,因此建议不要更改这些选项,除非您有充分的理由这样做.大值几乎肯定会产生不良后果.
+      desktopTapThreshold: 4, // 非负整数,分别表示用户在轻击手势期间可以在触摸设备和桌面设备上移动的最大允许距离.这使得用户更容易点击.
+      // 这些值具有合理的默认值,因此建议不要更改这些选项,除非您有充分的理由这样做.大值几乎肯定会产生不良后果.
+      autolock: false, // 默认情况下是否应锁定节点(根本不可拖动,如果true覆盖单个节点状态).
+      autoungrabify: false, // 默认情况下节点是否不允许被拾取(用户不可抓取,如果true覆盖单个节点状态).
+      autounselectify: false, // 默认情况下节点是否允许被选择(不可变选择状态,如果true覆盖单个元素状态).
 
 
+      // rendering options:
+      headless: false, // true:空运行,不显示不需要容器容纳.false:显示需要容器容纳.
+      styleEnabled: true, // 一个布尔值,指示是否应用样式.
+      hideEdgesOnViewport: false, // 渲染提示,设置为true在渲染窗口时,不渲染边.例如,移动某个顶点时或缩放时,边信息会被临时隐藏,移动结束后,边信息会被执行一次渲染.由于性能增强,此选项现在基本上没有实际意义.
+      hideLabelsOnViewport: true, // 渲染提示,当设置为true使渲染器在平移和缩放期间使用纹理而不是绘制元素时,使大图更具响应性.由于性能增强,此选项现在基本上没有实际意义.
+      textureOnViewport: true, // 渲染提示,当设置为true使渲染器在平移和缩放期间使用纹理而不是绘制元素时,使大图更具响应性.由于性能增强,此选项现在基本上没有实际意义.
+      motionBlur: true, // 渲染提示,设置为true使渲染器使用运动模糊效果使帧之间的过渡看起来更平滑.这可以增加大图的感知性能.由于性能增强,此选项现在基本上没有实际意义.
+      motionBlurOpacity: 0.2, // 当motionBlur:true,此值控制运动模糊帧的不透明度.值越高,运动模糊效果越明显.由于性能增强,此选项现在基本上没有实际意义.
+      wheelSensitivity: 1, // 缩放时更改滚轮灵敏度.这是一个乘法修饰符.因此,0到1之间的值会降低灵敏度(变焦较慢),而大于1的值会增加灵敏度(变焦更快).
+      pixelRatio: 'auto', // 使用手动设置值覆盖屏幕像素比率(1.0建议,如果已设置).这可以通过减少需要渲染的有效区域来提高高密度显示器的性能,
+      // 尽管在最近的浏览器版本中这是不太必要的.如果要使用硬件的实际像素比,可以设置pixelRatio: 'auto'(默认).
+
+
+    });
+    cy.on('tap', (ele: any) => {
+      var target: any = ele.target;
+      if(target==cy){
+        console.log("点击空白处")
+
+      }else if(target.isNode()){
+        console.log("点击节点")
+        console.log(target.data())
+
+      }else if(target.isEdge()){
+        console.log("点击边")
       }
-
-
-      // this.treeNodeclick({ data: this.buildTree(data.list)[0] });
-      // let total = 0;
-      // let types: any = []
-      // data.list.forEach((child: any) => {
-      //   types.push({ id: child.id, name: child.name });
-      // })
-      // this.dashboardService.getNumber(types).subscribe((data) => {
-      //   var arr: any = [];
-      //   data.forEach((n: any) => {
-      //     total += n.value;
-
-      //   });
-      //   data[0].value = total;
-      //   data.forEach((n: any) => {
-      //     if (n.value == 0) { n.value = 1 }
-
-      //     arr.push(this.service.put(n))
-      //   });
-      //   forkJoin(arr).subscribe(() => { });
-
-      // })
-      // console.log(this.buildTree(data.list));
-
     })
   }
 
-
-
-  buildTree(data: any) {
-    let tree: any = [];
-    let map: any = {};
-
-    // 将所有节点放入map中，以便快速查找
-    data.forEach((item: any) => {
-      map[item.id] = { ...item, children: [] };
-    });
-
-    // 构建树
-    data.forEach((item: any) => {
-      if (item.pid !== null) {
-        // 如果有父节点，则将其放入父节点的children数组中
-        map[item.id]['number'] = map[item.id].value;
-        map[item.id].value = 1
-        map[item.pid]['children'].push(map[item.id]);
-      } else {
-        // 否则，作为根节点放入树结构中
-        map[item.id]['number'] = map[item.id].value;
-        map[item.id].value = 1
-        tree.push(map[item.id]);
-      }
-    });
-
-    return tree;
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
   }
-
-
-
-
-
-
-  selectNumber(param: any) {
-
-    this.id = param.id;
-
-    // this.query = { "must": [{ "match": { "P31": this.id } }] }
-    try {
-      this.dashboardService.getValue(param.id).subscribe((value) => {
-        console.log(value);
-        this.value = value;
-      })
-    } catch (e: any) { }
-
-  }
-
-  treeNodeclick(param: any) {
-    /* true 代表点击的是圆点
-       fasle 表示点击的是当前节点的文本
-    */
-
-
-    this.id = param.data.id;
-
-    // this.query = { "must": [{ "match": { "P31": this.id } }] }
-
-    console.log(param.data)
-    // let total = 0;
-    // let types: any = []
-    // types.push({ id: param.data.id, name: param.data.name });
-    // param.data.children.forEach((child: any) => {
-    //   types.push({ id: child.id, name: child.name });
-    // })
-    // this.dashboardService.getNumber(types).subscribe((data) => {
-
-    //   var arr: any = [];
-    //   data.forEach((n: any) => {
-    //     total += n.value;
-
-    //   });
-    //   data.value = total;
-    //   data.forEach((n: any) => {
-    //     if (n.value == 0) { n.value = 1 }
-    //     arr.push(this.service.put(n))
-    //   });
-    //   data = data.sort((a: any, b: any) => b.value - a.value);
-    //   this.numbers = signal(data);
-    //   try {
-    //     this.dashboardService.getValue(param.data.id).subscribe((value) => {
-    //       console.log(value);
-    //       this.value = value;
-    //     })
-    //   } catch (e: any) { }
-
-
-
-    // })
-  }
-
-
-
-
-
-  extractIdsFromTree(data: any): any[] {
-    let ids: any[] = [];
-    ids.push({ id: data.id, name: data.name });
-
-    function traverse(node: any): void {
-      ids.push({ id: node.id, name: node.name });
-      if (node.children) {
-        node.children.forEach((child: any) => traverse(child));
-      }
-    }
-
-    data.children.forEach((rootNode: any) => traverse(rootNode));
-
-    return ids;
-  }
-
-
-
 }
