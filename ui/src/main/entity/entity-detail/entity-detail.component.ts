@@ -493,14 +493,14 @@ export class EntityDetailComponent implements OnInit {
               requests.push(this.nodeService.addEdge(edge));
             });
 
-            // 并行执行所有请求
+            //并行执行所有请求
             forkJoin(requests).subscribe(() => {
               this.message.success('编辑成功！');
               this.router.navigate(['/index/entity']);
             });
 
             item.id = this.id;
-            item['_key'] = this.id;
+            item['_key'] = this.item.items[0].split('/')[1];
             item['items'] = this.item.items;
 
             console.log(item)

@@ -200,7 +200,8 @@ export class EntityComponent extends PageBase {
             type: 'warning',
             callback: (action: XMessageBoxAction) => {
               action === 'confirm' && this.checkedRows.forEach((item) => {
-                this.service.delete(item['_id']).subscribe(() => {
+                console.log(item);
+                this.service.deleteItem(item['_id']).subscribe(() => {
                   this.tableCom.change(this.index);
                   this.message.success('删除成功！');
                 });
@@ -214,7 +215,7 @@ export class EntityComponent extends PageBase {
             type: 'warning',
             callback: (action: XMessageBoxAction) => {
               action === 'confirm' &&
-                this.service.delete(item['_id']).subscribe((data) => {
+                this.service.deleteItem(item['_id']).subscribe((data) => {
                   console.log(data);
                   this.tableCom.change(this.index);
                   this.message.success('删除成功！');

@@ -33,6 +33,7 @@ export class KnowledgeController {
 
   @Delete(':id')
   deleteEntity(@Param('id') id: XIdType): any {
+    console.log(id);
     return this.knowledgeService.deleteEntity(id);
   }
 

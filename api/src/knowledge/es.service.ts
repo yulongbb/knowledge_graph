@@ -24,7 +24,7 @@ export class EsService {
     return await this.elasticsearchService.bulk({
       body: [
         // 指定的数据库为news, 指定的Id = 1
-        { index: { _index: this.defaultIndex, _id: '1' } },
+        { index: { _index: this.defaultIndex, _id: doc.id } },
         doc
       ]
     });

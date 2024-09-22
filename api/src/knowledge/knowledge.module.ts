@@ -44,7 +44,6 @@ import { NLPService } from './nlp.service';
           },
         }),
       inject: [ConfigService],
-
     },
     {
       provide: 'DEFAULT_INDEX',

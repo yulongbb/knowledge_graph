@@ -16,11 +16,15 @@ export class EntityService extends RepositoryService<Item> {
   }
 
   addItem(item: Item): Observable<Item> {
-    return this.http.post(`${this.option.controller?.name}/entity`, item);
+    return this.http.post(`${this.option.controller?.name}`, item);
   }
 
   updateItem(item: Item): Observable<Item> {
-    return this.http.put(`${this.option.controller?.name}/entity`, item);
+    return this.http.put(`${this.option.controller?.name}`, item);
+  }
+
+  deleteItem(item: Item): Observable<Item> {
+    return this.http.delete(`${this.option.controller?.name}/${item}`, );
   }
 
 
