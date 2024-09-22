@@ -120,7 +120,7 @@ export const layoutRoutes: Routes = [
 
   // 属性
   {
-    path: "properties",
+    path: "property",
     loadChildren: () =>
       import("../main/ontology/property/property.module").then(x => x.PropertyModule),
     canLoad: [AuthGuard],
@@ -129,6 +129,16 @@ export const layoutRoutes: Routes = [
     }
   },
 
+  // 标签
+  {
+    path: "tag",
+    loadChildren: () =>
+      import("../main/ontology/tag/tag.module").then(x => x.TagModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
 
   // 抽取
   {

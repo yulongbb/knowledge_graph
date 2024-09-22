@@ -1,0 +1,64 @@
+:host {
+
+
+    > x-container:not(first-child) {
+      margin-top: 1rem;
+    }
+    x-container{
+      height: 100%;
+    }
+    x-header{
+      min-height: 400px;
+    }
+    // x-footer {
+    //   min-height: 50px;
+    //   line-height: 3rem;
+    //   text-align: center;
+    // }
+    x-header {
+      background-color: var(--x-info-200);
+    }
+    x-footer {
+      background-color: var(--x-info-300);
+    }
+    x-main {
+      height: 500px;
+      background-color: var(--x-info-400);
+    }
+    x-aside {
+      min-width: 400px;
+      height: 900px;
+      background-color: var(--x-info-500);
+    }
+
+
+    
+    // .design-td {
+    //   display: flex;
+    //   align-items: center;
+    // }
+    // .design-td x-icon {
+    //   font-size: 4rem;
+    //   padding: 1rem;
+    // }
+    // .design-td-inner {
+    //   margin-left: 0.875rem;
+    //   display: flex;
+    //   flex-direction: column;
+    // }
+    // .design-td-name {
+    //   font-weight: 600;
+    // }
+    // .echart {
+    //   width: 100%;
+    //   height: 500px;
+    // }
+  
+    x-input-group {
+      display: block;
+      width: 100%;
+    }
+    x-input-group:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
