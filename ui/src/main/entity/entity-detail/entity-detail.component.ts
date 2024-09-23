@@ -257,9 +257,7 @@ export class EntityDetailComponent implements OnInit {
                 tags[tag.type] = tags[tag.type]??[];
                 tags[tag.type].push(tag.name);
               })
-              console.log(tags);
               this.tags = tags;
-
             })
             this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {

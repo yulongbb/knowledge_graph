@@ -20,7 +20,8 @@ export class SearchComponent implements OnInit {
   entities!: any;
   query: any = {};
   menu: any;
-
+  tags:any;
+  tag:any;
   constructor(
     private service: EsService,
     private ontologyService: OntologyService,
@@ -63,16 +64,20 @@ export class SearchComponent implements OnInit {
       let menu: any = []
       let arr: any = [];
       console.log(data.total)
-
-      data.aggregations.forEach((m: any) => {
+      let tags: any = []
+      data.tags.forEach((t: any) => {
+        tags.push(t.key);
+      })
+      this.tags = signal(tags);
+      data.types.forEach((m: any) => {
         arr.push(this.ontologyService.get(m.key));
       })
       forkJoin(arr).subscribe((properties: any) => {
-        data.aggregations.forEach((m: any) => {
+        data.types.forEach((m: any) => {
           menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
         })
         let menuMerge = [];
-        menuMerge = data.aggregations.map((m: any, index: any) => {
+        menuMerge = data.types.map((m: any, index: any) => {
           return { ...m, ...menu[index] }
         })
         menuMerge.forEach((m: any) => {
@@ -88,7 +93,6 @@ export class SearchComponent implements OnInit {
 
   search(keyword: any) {
     this.index = 1;
-
     if (keyword != '') {
       if (this.way == '默认检索') {
         this.query = {
@@ -139,8 +143,60 @@ export class SearchComponent implements OnInit {
         })
       });
       this.entities = data.list;
+      let tags: any = []
+      data.tags.forEach((t: any) => {
+        tags.push(t.key);
+      })
+      this.tags = signal(tags);
+    
     })
   }
+
+  selectTag(tag:any){
+    this.index = 1;
+    if (tag.length>0) {
+      let values:any = [];
+      tag.forEach((t:any)=>{
+        values.push({ "term": { "tags.keyword":t } })
+      })
+      this.query = { "must": values }
+    } else {
+      this.query = {}
+    }
+    this.service.searchEntity(this.index, this.size, this.query).subscribe((data: any) => {
+      console.log(data);
+      data.list.forEach((item: any) => {
+        this.ontologyService.get(item._source.type).subscribe((t: any) => {
+          console.log(t)
+          item._type = t.label;
+          this.ontologyService.getAllParentIds(item['_source'].type).subscribe((parents: any) => {
+            parents.push(item['_source'].type)
+            this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }, { field: 'isPrimary', value: true, operation: '=' }] }).subscribe((p: any) => {
+              this.entityService.getLinks(1, 20, item['_id'], {}).subscribe((c: any) => {
+                let statements: any = [];
+                c.list.forEach((path: any) => {
+                  if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                    console.log(path)
+                    path.edges[0].mainsnak.datavalue.value.id = path?.vertices[1]?.id;
+                    path.edges[0].mainsnak.datavalue.value.label = path?.vertices[1]?.labels?.zh?.value;
+                  }
+                  if (p.list?.filter((property: any) => path.edges[0].mainsnak.property == `P${property.id}`).length > 0) {
+                    statements.push(path.edges[0])
+                  }
+                })
+                item.claims = statements;
+              })
+            });
+          });
+        })
+      });
+      this.entities = data.list;
+      let tags: any = []
+      data.tags.forEach((t: any) => {
+        tags.push(t.key);
+      })
+      this.tags = signal(tags);
+    })  }
 
   selectType(type: any) {
     this.index = 1;
@@ -177,6 +233,11 @@ export class SearchComponent implements OnInit {
         })
       });
       this.entities = data.list;
+      let tags: any = []
+      data.tags.forEach((t: any) => {
+        tags.push(t.key);
+      })
+      this.tags = signal(tags);
     })
   }
 

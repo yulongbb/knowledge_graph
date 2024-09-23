@@ -9,6 +9,20 @@
 </div>
 <x-menu [data]="menu()" (nodeClick)="selectType($event)"> </x-menu>
 
+
+<div class="row">
+  <x-checkbox
+    direction="row"
+    [data]="tags()"
+    [(ngModel)]="tag"
+    tagBordered="false"
+    tag
+    (ngModelChange)="selectTag($event)"
+
+  ></x-checkbox>
+</div>
+
+
 <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
   (scrolled)="onScroll()" [scrollWindow]="false">
 

@@ -17,7 +17,7 @@ export class EsService {
   async search(params: any) {
     let data = await this.elasticsearchService.search({
       index: this.defaultIndex, body: params})
-    return { total: data['hits']['total']['value'], list: data['hits']['hits'], aggregations: data['aggregations']['types']['buckets'] };
+    return { total: data['hits']['total']['value'], list: data['hits']['hits'], types: data['aggregations']['types']['buckets'],tags: data['aggregations']['tags']['buckets'] };
   }
 
   async bulk(doc: any) {

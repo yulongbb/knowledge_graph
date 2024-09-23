@@ -64,7 +64,7 @@ export class EntityComponent extends PageBase {
   mergedEntity: any;
   types: any = signal([]);
   query: any;
-  menus:any;
+  menus: any;
   constructor(
     private service: EntityService,
     private esService: EsService,
@@ -85,15 +85,15 @@ export class EntityComponent extends PageBase {
           tap((data: any) => {
             let menu: any = []
             let arr: any = [];
-            data.aggregations.forEach((m: any) => {
+            data.types.forEach((m: any) => {
               arr.push(this.ontologyService.get(m.key));
             })
             forkJoin(arr).subscribe((properties: any) => {
-              data.aggregations.forEach((m: any) => {
+              data.types.forEach((m: any) => {
                 menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
               })
               let menuMerge = [];
-              menuMerge = data.aggregations.map((m: any, index: any) => {
+              menuMerge = data.types.map((m: any, index: any) => {
                 return { ...m, ...menu[index] }
               })
               menuMerge.forEach((m: any) => {
@@ -162,8 +162,8 @@ export class EntityComponent extends PageBase {
       );
   }
 
-  getType(type:any){
-    return this.menus.filter((m:any)=> m.key == type)[0].label.split('(')[0];
+  getType(type: any) {
+    return this.menus.filter((m: any) => m.key == type)[0].label.split('(')[0];
   }
 
   action(type: string, item?: any) {

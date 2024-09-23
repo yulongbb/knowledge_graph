@@ -67,6 +67,12 @@ export class KnowledgeController {
               field: "type.keyword",
               size: 20000
             }
+          },
+          tags: {
+            terms: {
+              field: "tags.keyword",
+              size: 20000
+            }
           }
         },
         highlight: {
