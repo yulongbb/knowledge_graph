@@ -8,7 +8,7 @@ import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { XInputModule } from '@ng-nest/ui/input';
-import { XDrawerModule, XMenuModule, XPageHeaderModule, XTagModule } from "@ng-nest/ui";
+import { XCheckboxModule, XDrawerModule, XMenuModule, XPageHeaderModule, XTagModule } from "@ng-nest/ui";
 import { XUploadModule } from '@ng-nest/ui/upload';
 import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
@@ -44,6 +44,7 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XDialogModule,
     XTagModule,
     XMenuModule,
+    XCheckboxModule,
     EntityRoutesModule
   ],
   declarations: [EntityComponent, EntityDetailComponent]

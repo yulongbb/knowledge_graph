@@ -9,6 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
+import { TagService } from 'src/main/ontology/tag/tag.sevice';
 
 @Component({
   selector: 'app-entity-detail',
@@ -95,11 +96,17 @@ export class EntityDetailComponent implements OnInit {
 
   imgs: any;
 
+  tags: Map<string, Array<string>> | undefined;
+
+  
+  tag = signal([]);
+
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,
     private esService: EsService,
     public propertyService: PropertyService,
+    public tagService: TagService,
     private nodeService: EntityService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -131,6 +138,11 @@ export class EntityDetailComponent implements OnInit {
 
 
   }
+
+  change(value: string) {
+    console.log(value);
+  }
+
   uploadSuccess($event: any) {
     console.log(this.imgs)
     this.imgs[this.imgs.length - 1] =
@@ -237,9 +249,21 @@ export class EntityDetailComponent implements OnInit {
           })
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
+
+            this.tagService.getList(1,50, { filter: [{ field: 'id', value: type.id , relation: 'schemas', operation: '=' }] }).subscribe((data:any)=>{
+              let tags:any = {};
+              data.list.forEach((tag:any)=>{
+                tags[tag.type] = tags[tag.type]??[];
+                tags[tag.type].push(tag.name);
+              })
+              console.log(tags);
+              this.tags = tags;
+
+            })
             this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
               parents.push(this.item.type)
+              
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   console.log(c);
@@ -275,7 +299,6 @@ export class EntityDetailComponent implements OnInit {
                   this.statements = this.statements.sort((a: any, b: any) => {
                     return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
                   });
-                  console.log(this.statements)
 
                   this.statements.forEach((statement: any) => {
                     if (statement.mainsnak.property != 'P31') {
@@ -329,7 +352,6 @@ export class EntityDetailComponent implements OnInit {
                           )
                         }
                       } else {
-                        console.log(statement);
                         if (statement.mainsnak.datatype == 'string') {
                           control.push(
                             {

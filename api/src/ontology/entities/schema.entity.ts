@@ -8,15 +8,16 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Property } from 'src/ontology/entities/property.entity';
+import { Tag } from './tag.entity';
 
 @Entity('ontology_schema')
 export class Schema {
-  @PrimaryColumn('uuid',  { length: 36 })
+  @PrimaryColumn('uuid', { length: 36 })
   id: string;
 
-  @Column({name: 'name'}) name: string;
+  @Column({ name: 'name' }) name: string;
 
-  @Column({default: 1}) value: number;
+  @Column({ default: 1 }) value: number;
   @Column() label: string;
   @Column() description: string;
   @Column() collection: string;
@@ -50,7 +51,7 @@ export class Schema {
     inverseJoinColumn: { name: 'propertyId' },
   })
   properties: Property[];
-  
+
   @ManyToMany(() => Property, (property) => property.types)
   @JoinTable({
     name: 'ontology_type_value',
@@ -58,5 +59,15 @@ export class Schema {
     inverseJoinColumn: { name: 'propertyId' },
   })
   values: Property[];
+
+
+  @ManyToMany(() => Tag, (tag) => tag.schemas)
+  @JoinTable({
+    name: 'ontology_schema_tag',
+    joinColumn: { name: 'schemaId' },
+    inverseJoinColumn: { name: 'tagId' },
+  })
+  tags: Tag[];
+
 
 }
