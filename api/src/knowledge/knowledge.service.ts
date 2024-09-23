@@ -227,6 +227,7 @@ export class KnowledgeService {
     await this.elasticsearchService.bulk({
       id: entity.id,
       type: entity?.type?.id,
+      tags: entity?.tags,
       labels: entity?.labels,
       descriptions: entity?.descriptions,
       aliases: entity?.aliases,

@@ -99,7 +99,7 @@ export class EntityDetailComponent implements OnInit {
   tags: Map<string, Array<string>> | undefined;
 
   
-  tag = signal([]);
+  tag = [];
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -244,6 +244,7 @@ export class EntityDetailComponent implements OnInit {
           console.log(x);
           this.item = x._source;
           this.imgs = [];
+          this.tag = this.item?.tags;
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` })
           })
@@ -407,8 +408,10 @@ export class EntityDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
+        console.log(this.tag)
         let item: any = {
           _key: this.form.formGroup.value._key,
+          tags: this.tag,
           labels: {
             zh: {
               language: 'zh',
