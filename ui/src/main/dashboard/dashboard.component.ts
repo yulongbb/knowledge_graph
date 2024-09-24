@@ -1,5 +1,8 @@
 import { Component, ElementRef, OnDestroy, OnInit, Query, ViewChild, signal } from '@angular/core';
 import cytoscape from 'cytoscape';
+import { EntityService } from '../entity/entity.service';
+import { Observable } from 'rxjs';
+import { EsService } from '../search/es.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,10 +11,24 @@ import cytoscape from 'cytoscape';
 
 })
 export class DashboardComponent implements OnInit, OnDestroy {
- 
+  keyword = '';
+  way = '默认检索';
+
+  constructor(private service: EntityService,
+    private esService: EsService,
+
+  ) {
+
+  }
+
   ngOnInit(): void {
-    this.initializeCytoscape({});
-    }
+    this.esService.searchEntity(1, 1,{}).subscribe((data: any) => {
+      this.service.graph(1,10, data.list[0]._id).subscribe((data:any)=>{
+        this.initializeCytoscape(data);
+      })
+    });
+    
+  }
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
 
   initializeCytoscape(data: any): void {
@@ -106,17 +123,88 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     cy.on('tap', (ele: any) => {
       var target: any = ele.target;
-      if(target==cy){
+      if (target == cy) {
         console.log("点击空白处")
 
-      }else if(target.isNode()){
+      } else if (target.isNode()) {
         console.log("点击节点")
         console.log(target.data())
 
-      }else if(target.isEdge()){
+      } else if (target.isEdge()) {
         console.log("点击边")
       }
     })
+  }
+
+  search(keyword: any) {
+    let query = {}
+
+    if (keyword != '') {
+      if (this.way == '默认检索') {
+        query = {
+          "must": [{
+            "match": {
+              "labels.zh.value": {
+                "query": keyword,
+                "operator": "and"
+              }
+            }
+          }]
+        }
+
+      } else if (this.way == '精确检索') {
+        query = { "should": [{ "term": { "labels.zh.value.keyword": keyword } }] }
+
+      } else {
+        query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
+
+      }
+    }
+    this.esService.searchEntity(1,10,query).subscribe((data: any) => {
+     
+    
+    })
+  }
+
+  modelAsync = signal('');
+  dataAsync = signal(
+    (str: string) =>
+      new Observable<string[]>((x) => {
+        // 替换成http请求
+        let query = {}
+        if (str != '') {
+          if (this.way == '默认检索') {
+            query = {
+              "must": [{
+                "match": {
+                  "labels.zh.value": {
+                    "query": str,
+                    "operator": "and"
+                  }
+                }
+              }]
+            }
+          } else if (this.way == '精确检索') {
+            query = { "should": [{ "term": { "labels.zh.value.keyword": str } }] }
+          } else {
+            query = { "must": [{ "match": { "labels.zh.value": str } }] }
+          }
+        }
+        this.esService.searchEntity(1,10,query).subscribe((data: any) => {
+          x.next(data.list);
+          x.complete();
+        })
+        
+      })
+    
+  );
+  selectNode(node:any){
+    console.log(node)
+    this.modelAsync = signal(node?._source?.labels.zh.value );
+    this.service.graph(1,10,node?._id).subscribe((data:any)=>{
+      this.initializeCytoscape(data);
+    })
+
   }
 
   ngOnDestroy(): void {

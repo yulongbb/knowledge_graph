@@ -14,7 +14,6 @@ import {
   XPosition,
   XRadioNode,
 } from '@ng-nest/ui';
-import { FusionService } from '../fusion/fusion.service';
 import { EntityService } from './entity.service';
 import { EsService } from '../search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
@@ -68,7 +67,6 @@ export class EntityComponent extends PageBase {
   constructor(
     private service: EntityService,
     private esService: EsService,
-    private fusionService: FusionService,
     private ontologyService: OntologyService,
     public override indexService: IndexService,
     private router: Router,
@@ -235,7 +233,7 @@ export class EntityComponent extends PageBase {
         this.mergedEntity = this.fusion(checkedRows);
         break;
       case 'restore':
-        this.fusionService.restore(this.checkedRows[0]).subscribe((data: any) => { console.log(data) });
+        // this.service.restore(this.checkedRows[0]).subscribe((data: any) => { console.log(data) });
         break;
     }
   }
@@ -254,7 +252,7 @@ export class EntityComponent extends PageBase {
   evt(type: string) {
     console.log('output', type);
     if (type == 'confirm') {
-      this.fusionService.fusion(this.mergedEntity).subscribe((data: any) => { console.log(data) });
+      // this.fusionService.fusion(this.mergedEntity).subscribe((data: any) => { console.log(data) });
     }
   }
 

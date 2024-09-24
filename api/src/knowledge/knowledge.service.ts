@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
 import { EsService } from './es.service';
+import { PropertiesService } from 'src/ontology/services/properties.service';
 
 @Injectable()
 export class KnowledgeService {
@@ -9,7 +10,9 @@ export class KnowledgeService {
     @Inject('ARANGODB') private db: Database,
 
     private elasticsearchService: EsService,
-  ) {}
+    private propertiesService: PropertiesService,
+
+  ) { }
 
   async fusion({ entity }: { entity: any }): Promise<any> {
     console.log(entity);
@@ -250,7 +253,7 @@ export class KnowledgeService {
     console.log(myCollection);
     return null;
 
-  
+
   }
   async deleteEntity(id: any): Promise<any> {
     return this.elasticsearchService.get(id).then((data: any) => {
@@ -279,7 +282,7 @@ export class KnowledgeService {
     });
   }
 
-  async graph(
+  async link(
     id: XIdType,
     index: number,
     size: number,
@@ -291,7 +294,6 @@ export class KnowledgeService {
       const end = start + size;
       console.log(id);
       return this.elasticsearchService.get(id).then(async (entity: any) => {
-        console.log(entity['_source']['items']); // [ 'entity/bdi20191862', 'entity/Q6166482' ]
         const items = entity['_source']['items'];
         // 使用AQL查询多个items的关系，并合并结果
         const cursor = await this.db.query(aql`
@@ -313,4 +315,82 @@ export class KnowledgeService {
       console.error('Query Error:', error);
     }
   }
+
+
+  async graph(
+    id: XIdType,
+    index: number,
+    size: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    query: any,
+  ): Promise<any> {
+    try {
+      const start = size * (index - 1);
+      const end = start + size;
+      console.log(id);
+      return this.elasticsearchService.get(id).then(async (entity: any) => {
+        const items = entity['_source']['items'];
+        // 使用AQL查询多个items的关系，并合并结果
+        const cursor = await this.db.query(aql`
+              FOR item IN ${items}
+                LET startNode = DOCUMENT(item)
+                FOR v, e, p IN 0..1 ANY DOCUMENT(item)['_id'] GRAPH "graph"
+                FILTER e != null
+                SORT e.mainsnak.property
+                LIMIT ${start}, ${end}
+                RETURN {vertex: v, edge: e, start: startNode, from:  DOCUMENT(e._from), to: DOCUMENT(e._to) }
+            `);
+        // 获取查询结果
+        // 获取查询结果
+        const result = await cursor.all();
+        const cytoscapeData = { elements: { nodes: [], edges: [] } };
+
+        // 用于存储已添加的节点，防止重复
+        const addedNodes = new Set();
+
+        cytoscapeData.elements.nodes.push({
+          data: {
+            id: result[0].start.id,
+            label: result[0].start.labels.zh.value || '' // 根据你的字段结构选择合适的label
+          }
+        });
+        addedNodes.add(result[0].start.id);
+        await Promise.all(result.map(async ({ vertex, edge, start, from, to }) => {
+          // 添加节点
+          if (!addedNodes.has(vertex.id)) {
+            cytoscapeData.elements.nodes.push({
+              data: {
+                id: vertex.id,
+                label: vertex.labels?.zh?.value || '' // 确保数据结构的安全性
+              }
+            });
+            addedNodes.add(vertex.id);
+          }
+
+          // 添加边
+          if (edge._from !== edge._to) {
+            const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
+            if (property?.name) {
+              cytoscapeData.elements.edges.push({
+                data: {
+                  source: from.id,
+                  target: to.id,
+                  label: property.name || '' // 根据你的边数据结构选择合适的label
+                }
+              });
+            }
+          }
+        }));
+
+        console.log(cytoscapeData);
+
+
+        return cytoscapeData;
+
+      })
+    } catch (error) {
+      console.error('Query Error:', error);
+    }
+  }
+
 }

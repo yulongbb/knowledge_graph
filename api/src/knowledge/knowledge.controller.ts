@@ -143,6 +143,21 @@ export class KnowledgeController {
 
 
   @Post('link/:id/:size/:index')
+  async link(
+    @Param('id') id: XIdType,
+    @Param('index', new ParseIntPipe())
+    index: number = 1,
+    @Param('size', new ParseIntPipe())
+    size: number = 10,
+    @Body() query: any,
+  ): Promise<any> {
+    console.log(id);
+    return this.knowledgeService.link(id, index, size, query);;
+  }
+
+
+  
+  @Post('graph/:id/:size/:index')
   async graph(
     @Param('id') id: XIdType,
     @Param('index', new ParseIntPipe())

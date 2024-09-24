@@ -281,6 +281,7 @@ export class NodeService {
       console.error('Query Error:', error);
     }
   }
+
   async graph(
     id: XIdType,
     index: number,
@@ -326,7 +327,7 @@ export class NodeService {
           });
           addedNodes.add(vertex._id);
         }
-      
+
         // 添加边
         if (edge._from !== edge._to) {
           const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
@@ -341,7 +342,7 @@ export class NodeService {
           }
         }
       }));
-   
+
       console.log(cytoscapeData);
 
       // 现在你可以将 cytoscapeData 传递给 Cytoscape.js 进行渲染

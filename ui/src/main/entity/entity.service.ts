@@ -58,6 +58,22 @@ export class EntityService extends RepositoryService<Item> {
       query
     );
   }
+
+
+  graph(
+    index?: number,
+    size?: number,
+    id?: string,
+    query?: Query
+  ): Observable<Array<any>> {
+    index = index ? index : 1;
+    size = size ? size : 10;
+    console.log(`${this.option.controller?.name}/graph/${id}/${size}/${index}`)
+    return this.http.post(
+      `${this.option.controller?.name}/graph/${id}/${size}/${index}`,
+      query
+    );
+  }
 }
 
 export interface Item extends XId {

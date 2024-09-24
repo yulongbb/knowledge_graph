@@ -302,7 +302,7 @@ export class EntityDetailComponent implements OnInit {
                   this.statements.forEach((statement: any) => {
                     if (statement.mainsnak.property != 'P31') {
                       if (statement._id) {
-                        if (statement.mainsnak.datavalue.type == 'string') {
+                        if (statement?.mainsnak?.datavalue?.type == 'string') {
                           control.push(
                             {
                               control: 'input',
@@ -311,7 +311,7 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value
                             },
                           )
-                        } else if (statement.mainsnak.datavalue.type == 'quantity') {
+                        } else if (statement?.mainsnak?.datavalue?.type == 'quantity') {
                           control.push(
                             {
                               control: 'input',
@@ -320,7 +320,7 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value?.amount
                             },
                           )
-                        } else if (statement.mainsnak.datavalue.type == 'time') {
+                        } else if (statement?.mainsnak?.datavalue?.type == 'time') {
                           control.push(
                             {
                               control: 'input',
@@ -329,7 +329,7 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value?.time
                             },
                           )
-                        } else if (statement.mainsnak.datavalue.type == 'commonsMedia') {
+                        } else if (statement?.mainsnak?.datavalue?.type == 'commonsMedia') {
                           control.push(
                             {
                               control: 'select',
@@ -351,7 +351,7 @@ export class EntityDetailComponent implements OnInit {
                           )
                         }
                       } else {
-                        if (statement.mainsnak.datatype == 'string') {
+                        if (statement?.mainsnak?.datatype == 'string') {
                           control.push(
                             {
                               control: 'input',
@@ -360,7 +360,7 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value
                             },
                           )
-                        } else if (statement.mainsnak.datatype == 'quantity') {
+                        } else if (statement?.mainsnak?.datatype == 'quantity') {
                           control.push(
                             {
                               control: 'input',
@@ -369,7 +369,7 @@ export class EntityDetailComponent implements OnInit {
                               value: statement?.mainsnak?.datavalue?.value?.amount
                             },
                           )
-                        } else if (statement.mainsnak.datatype == 'time') {
+                        } else if (statement?.mainsnak?.datatype == 'time') {
                           control.push(
                             {
                               control: 'input',
