@@ -6,20 +6,21 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { XAutoCompleteModule, XInputModule, XTreeModule } from '@ng-nest/ui';
+import { XAutoCompleteModule, XDialogModule, XInputModule, XTreeModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
 import { XCardModule } from '@ng-nest/ui/card';
 import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { XTagModule } from '@ng-nest/ui/tag';
+import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 
 
 
 
 
 @NgModule({
-  declarations: [DashboardComponent, ],
+  declarations: [DashboardComponent,EntityDetailComponent ],
   imports: [
     CommonModule,
     ShareModule,
@@ -33,6 +34,7 @@ import { XTagModule } from '@ng-nest/ui/tag';
     XCardModule,
     XCrumbModule,
     XTagModule,
+    XDialogModule,
     XAutoCompleteModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')

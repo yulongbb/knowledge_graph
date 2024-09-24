@@ -14,3 +14,16 @@
     <span class="select-item">{{ node?._source?.labels.zh.value }} </span>
 </ng-template>
 <div #cy style="width: 100%; height: 100%;"></div>
+
+
+<x-dialog
+  title="标题"
+  [(visible)]="visible"
+  [placement]="placement()"
+  (close)="evt('close')"
+  (cancel)="evt('cancel')"
+  (confirm)="evt('confirm')"
+>
+<app-entity-detail></app-entity-detail>
+
+</x-dialog>

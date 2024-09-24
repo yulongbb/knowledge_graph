@@ -7,6 +7,7 @@ import { EsService } from '../search/es.service';
 
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
+import { XMessageBoxService, XPlace } from '@ng-nest/ui';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,9 +21,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cy: any;
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
 
+  visible = signal(false);
+  placement = signal<XPlace>('center');
+
+  dialog(place: XPlace) {
+    this.placement.set(place);
+    this.visible.set(true);
+  }
+
+  close() {
+    this.visible.set(false);
+  }
+
+  evt(type: string) {
+    console.log('output', type);
+  }
+
   constructor(private service: EntityService,
     private esService: EsService,
-
+    private msgBox: XMessageBoxService
   ) {
 
   }
@@ -164,6 +181,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               select: (ele: any) => {
                 console.log(ele);
                 console.log('创建知识');
+                this.dialog('center')
               }
             },
 
