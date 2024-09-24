@@ -20,8 +20,8 @@ export class SearchComponent implements OnInit {
   entities!: any;
   query: any = {};
   menu: any;
-  tags:any;
-  tag:any;
+  tags: any;
+  tag: any;
   constructor(
     private service: EsService,
     private ontologyService: OntologyService,
@@ -148,16 +148,16 @@ export class SearchComponent implements OnInit {
         tags.push(t.key);
       })
       this.tags = signal(tags);
-    
+
     })
   }
 
-  selectTag(tag:any){
+  selectTag(tag: any) {
     this.index = 1;
-    if (tag.length>0) {
-      let values:any = [];
-      tag.forEach((t:any)=>{
-        values.push({ "term": { "tags.keyword":t } })
+    if (tag.length > 0) {
+      let values: any = [];
+      tag.forEach((t: any) => {
+        values.push({ "term": { "tags.keyword": t } })
       })
       this.query = { "must": values }
     } else {
@@ -196,7 +196,8 @@ export class SearchComponent implements OnInit {
         tags.push(t.key);
       })
       this.tags = signal(tags);
-    })  }
+    })
+  }
 
   selectType(type: any) {
     this.index = 1;

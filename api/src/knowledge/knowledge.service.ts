@@ -335,7 +335,7 @@ export class KnowledgeService {
               FOR item IN ${items}
                 LET startNode = DOCUMENT(item)
                 FOR v, e, p IN 0..1 ANY DOCUMENT(item)['_id'] GRAPH "graph"
-                FILTER e != null
+                FILTER e != null AND e.mainsnak.property !='P31'
                 SORT e.mainsnak.property
                 LIMIT ${start}, ${end}
                 RETURN {vertex: v, edge: e, start: startNode, from:  DOCUMENT(e._from), to: DOCUMENT(e._to) }
