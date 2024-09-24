@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'color': '#aaa',
 
                 'label': 'data(label)',
-                'font-size': '4px',
+                'font-size': '2px',
                 'control-point-weight': 0.5,
                 'control-point-distance': 30,
 

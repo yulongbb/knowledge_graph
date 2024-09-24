@@ -330,6 +330,7 @@ export class KnowledgeService {
       console.log(id);
       return this.elasticsearchService.get(id).then(async (entity: any) => {
         const items = entity['_source']['items'];
+        console.log(items);
         // 使用AQL查询多个items的关系，并合并结果
         const cursor = await this.db.query(aql`
               FOR item IN ${items}
@@ -350,11 +351,11 @@ export class KnowledgeService {
 
         cytoscapeData.elements.nodes.push({
           data: {
-            id: result[0].start.id,
-            label: result[0].start.labels.zh.value || '' // 根据你的字段结构选择合适的label
+            id: result[0]?.start?.id,
+            label: result[0]?.start?.labels?.zh?.value || '' // 根据你的字段结构选择合适的label
           }
         });
-        addedNodes.add(result[0].start.id);
+        addedNodes.add(result[0]?.start?.id);
         await Promise.all(result.map(async ({ vertex, edge, start, from, to }) => {
           // 添加节点
           if (!addedNodes.has(vertex.id)) {
