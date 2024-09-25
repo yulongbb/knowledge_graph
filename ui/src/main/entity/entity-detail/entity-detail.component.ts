@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild, signal } 
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XTableColumn } from '@ng-nest/ui';
+import { XDialogService, XImagePreviewComponent, XTableColumn } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -10,6 +10,7 @@ import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
+import { NavService } from 'src/services/nav.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -98,8 +99,14 @@ export class EntityDetailComponent implements OnInit {
 
   tags: Map<string, Array<string>> | undefined;
 
-  
+
   tag = [];
+  images: any;
+  videos: any;
+  pdfs: any;
+  entity: any;
+  claims: any;
+  properties: any;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -110,7 +117,10 @@ export class EntityDetailComponent implements OnInit {
     private nodeService: EntityService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private message: XMessageService
+    private message: XMessageService,
+    private dialogSewrvice: XDialogService,
+    public nav: NavService,
+
   ) {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
@@ -139,6 +149,19 @@ export class EntityDetailComponent implements OnInit {
 
   }
 
+
+  preview(image: any) {
+    this.dialogSewrvice.create(XImagePreviewComponent, {
+      width: '100%',
+      height: '100%',
+      className: 'x-image-preview-portal',
+      data: [
+        {
+          src: 'http://localhost:9000/kgms/' + image
+        }
+      ]
+    });
+  }
   change(value: string) {
     console.log(value);
   }
@@ -242,6 +265,8 @@ export class EntityDetailComponent implements OnInit {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x) => {
           console.log(x);
+          this.entity = signal(x);
+
           this.item = x._source;
           this.imgs = [];
           this.tag = this.item?.tags;
@@ -251,21 +276,37 @@ export class EntityDetailComponent implements OnInit {
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
 
-            this.tagService.getList(1,50, { filter: [{ field: 'id', value: type.id , relation: 'schemas', operation: '=' }] }).subscribe((data:any)=>{
-              let tags:any = {};
-              data.list.forEach((tag:any)=>{
-                tags[tag.type] = tags[tag.type]??[];
+            this.tagService.getList(1, 50, { filter: [{ field: 'id', value: type.id, relation: 'schemas', operation: '=' }] }).subscribe((data: any) => {
+              let tags: any = {};
+              data.list.forEach((tag: any) => {
+                tags[tag.type] = tags[tag.type] ?? [];
                 tags[tag.type].push(tag.name);
               })
               this.tags = tags;
             })
-            this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
+            if (this.type == 'edit') {
+              this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
+
+            }
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
               parents.push(this.item.type)
-              
+
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
+                console.log(x.list);
+                this.properties = signal(x.list);
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   console.log(c);
+                  let statements: any = [];
+                  console.log(c.list)
+                  c.list.forEach((p: any) => {
+                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
+                    }
+                    statements.push(p.edges[0])
+                  })
+                  this.claims = statements;
+                  console.log(this.claims)
                   this.statements = [];
 
                   c.list.forEach((p: any) => {
@@ -277,6 +318,7 @@ export class EntityDetailComponent implements OnInit {
                     }
                     this.statements.push(p.edges[0])
                   })
+
                   x.list.forEach((property: any) => {
                     if (c.list.filter((p: any) => `P${property.id}` == p.edges[0].mainsnak.property).length == 0) {
                       this.statements.push({
@@ -397,9 +439,11 @@ export class EntityDetailComponent implements OnInit {
                 })
               });
             });
-          })
-          // 填充基本信息表单
-
+          });
+          this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
+          this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
+          this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
+       
         });
         break;
       case 'edit':
@@ -441,6 +485,7 @@ export class EntityDetailComponent implements OnInit {
               }
               statements.push(p.edges[0])
             })
+
             let existingEdges = statements;
             //更新边
             const updatedEdges: any = [];
@@ -541,9 +586,33 @@ export class EntityDetailComponent implements OnInit {
         break;
     }
   }
+  linkifyText(text: string, entities: any): string {
+    const wikidataBaseUrl = 'http://localhost:4200/index/search/info/';
+    // 简单示例，将“爱因斯坦”替换为指向Wikidata的链接
+    console.log(entities)
+    let entityMap: any = new Map();
+    entities.forEach((entity: any) => {
+      entityMap[entity.word] = entity.id;
+    })
 
+    Object.keys(entityMap).forEach(key => {
+      const link = `<a href="${wikidataBaseUrl}${entityMap[key]}" >${key}</a>`;
+      text = text.replace(new RegExp(key, 'g'), link);
+    });
+
+    return text;
+  }
+
+
+  getStatement(property: any): any {
+    return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
+  }
   backClick() {
     this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
+  }
+  back() {
+    this.nav.back();
+
   }
 }
 

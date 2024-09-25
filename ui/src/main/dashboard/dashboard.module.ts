@@ -14,6 +14,8 @@ import { XCardModule } from '@ng-nest/ui/card';
 import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { XTagModule } from '@ng-nest/ui/tag';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
+import { XMessageBoxService } from '@ng-nest/ui/message-box';
+
 
 
 
@@ -47,6 +49,6 @@ import { EntityDetailComponent } from './entity-detail/entity-detail.component';
     ]),
   ],
   exports: [RouterModule],
-  providers: []
+  providers: [XMessageBoxService]
 })
 export class DashboardModule {}

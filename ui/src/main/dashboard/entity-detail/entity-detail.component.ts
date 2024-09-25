@@ -15,11 +15,12 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntityDetailComponent implements OnInit {
-  es:string = 'entity';
+  es: string = 'entity';
 
   @Input() id: string = '';
+  @Input() type: string = '';
   knowledge: string = '';
-  type: string = '';
+
   schema: string = '';
   item: any;
   statements: any;
@@ -52,7 +53,7 @@ export class EntityDetailComponent implements OnInit {
           .pipe(map((x) => x.list)),
 
     },
-   
+
     {
       control: 'textarea',
       id: 'description',
@@ -116,11 +117,11 @@ export class EntityDetailComponent implements OnInit {
         this.esService.getEntity(this.id).subscribe((x) => {
           console.log(x);
           this.item = x._source;
-         
+
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
             this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
-           
+
           })
           // 填充基本信息表单
 
@@ -154,7 +155,7 @@ export class EntityDetailComponent implements OnInit {
           //   this.router.navigate(['/index/entity']);
           // });
         } else if (this.type === 'edit') {
-         
+
         }
         break;
       case 'cancel':
@@ -162,7 +163,7 @@ export class EntityDetailComponent implements OnInit {
     }
   }
 
- 
+
 }
 
 

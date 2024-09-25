@@ -7,7 +7,7 @@ import { EsService } from '../search/es.service';
 
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
-import { XMessageBoxService, XPlace } from '@ng-nest/ui';
+import { XMessageBoxAction, XMessageBoxService, XPlace } from '@ng-nest/ui';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,11 +16,10 @@ import { XMessageBoxService, XPlace } from '@ng-nest/ui';
 
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
   keyword = '';
   way = '默认检索';
   cy: any;
-  @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
-
   visible = signal(false);
   placement = signal<XPlace>('center');
 
@@ -39,20 +38,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(private service: EntityService,
     private esService: EsService,
-    private msgBox: XMessageBoxService
+    private msgBox: XMessageBoxService,
   ) {
 
   }
 
   ngOnInit(): void {
-
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
-
         cytoscape.use(cxtmenu);
         this.cy = cytoscape({
           container: this.cyContainer.nativeElement, // container to render in
-
           elements: data.elements,
           style: [ // the stylesheet for the graph
             {
@@ -63,7 +59,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'background-color': '#888',
                 'label': 'data(label)',
                 'font-size': '4px',
-
                 'text-valign': 'center',
                 'color': 'white',
                 'text-outline-width': 0.5,
@@ -82,12 +77,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 "overlay-opacity": 0,
                 'arrow-scale': 0.3,
                 'color': '#aaa',
-
                 'label': 'data(label)',
                 'font-size': '2px',
                 'control-point-weight': 0.5,
                 'control-point-distance': 30,
-
               }
             },
             {
@@ -97,20 +90,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'line-color': '#61bffc',
                 'target-arrow-color': '#61bffc',
                 'transition-property': 'background-color, line-color, target-arrow-color',
-
               }
             }
           ],
-
           layout: {
             name: 'cose',
-
           },
-
           // initial viewport state:
           zoom: 1, // 图表的初始缩放级别.可以设置options.minZoom和options.maxZoom设置缩放级别的限制.
           pan: { x: 0, y: 0 }, // 图表的初始平移位置.
-
           // interaction options:
           minZoom: 1e-50, // 图表缩放级别的最小界限.视口的缩放比例不能小于此缩放级别.
           maxZoom: 1e50, // 图表缩放级别的最大界限.视口的缩放比例不能大于此缩放级别.
@@ -127,8 +115,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           autolock: false, // 默认情况下是否应锁定节点(根本不可拖动,如果true覆盖单个节点状态).
           autoungrabify: false, // 默认情况下节点是否不允许被拾取(用户不可抓取,如果true覆盖单个节点状态).
           autounselectify: false, // 默认情况下节点是否允许被选择(不可变选择状态,如果true覆盖单个元素状态).
-
-
           // rendering options:
           headless: false, // true:空运行,不显示不需要容器容纳.false:显示需要容器容纳.
           styleEnabled: true, // 一个布尔值,指示是否应用样式.
@@ -140,33 +126,65 @@ export class DashboardComponent implements OnInit, OnDestroy {
           wheelSensitivity: 1, // 缩放时更改滚轮灵敏度.这是一个乘法修饰符.因此,0到1之间的值会降低灵敏度(变焦较慢),而大于1的值会增加灵敏度(变焦更快).
           pixelRatio: 'auto', // 使用手动设置值覆盖屏幕像素比率(1.0建议,如果已设置).这可以通过减少需要渲染的有效区域来提高高密度显示器的性能,
           // 尽管在最近的浏览器版本中这是不太必要的.如果要使用硬件的实际像素比,可以设置pixelRatio: 'auto'(默认).
-
-
         });
 
         this.cy.cxtmenu({
-          selector: 'node, edge',
+          selector: 'node',
 
           commands: [
             {
               content: '浏览',
               select: (ele: any) => {
                 console.log(ele.id());
+                console.log('浏览知识');
+                this.dialog('center')
               }
             },
 
             {
               content: '编辑',
               select: (ele: any) => {
-                console.log(ele.data('name'));
+                console.log(ele.id());
+                console.log('编辑知识');
+                this.dialog('center')
               },
-              enabled: false
             },
-
             {
               content: '删除',
               select: (ele: any) => {
                 console.log(ele.position());
+                this.msgBox.alert({
+                  title: '删除弹框',
+                  content: '这是一段内容',
+                  placement: 'center',
+                  callback: (action: XMessageBoxAction) => { }
+                });
+              }
+            }
+          ]
+        });
+        this.cy.cxtmenu({
+          selector: 'edge',
+
+          commands: [
+            {
+              content: '编辑',
+              select: (ele: any) => {
+                console.log(ele.id());
+                console.log('编辑知识');
+                this.dialog('center')
+              },
+            },
+            {
+              content: '删除',
+              select: (ele: any) => {
+                console.log(ele.position());
+                this.msgBox.alert({
+                  title: '删除弹框',
+                  content: '这是一段内容',
+                  placement: 'center',
+                  callback: (action: XMessageBoxAction) => { }
+                });
               }
             }
           ]
@@ -174,7 +192,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.cy.cxtmenu({
           selector: 'core',
-
           commands: [
             {
               content: '创建知识',
@@ -184,7 +201,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.dialog('center')
               }
             },
-
           ]
         });
 
@@ -198,7 +214,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
           previousTapStamp = currentTapStamp;
         })
-
         this.cy.on('doubleTap', (ele: any) => {
           var target: any = ele.target;
           if (target == this.cy) {
@@ -217,7 +232,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
       })
     });
-
   }
 
   initializeCytoscape(data: any): void {
@@ -257,13 +271,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       } else {
         query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
-
       }
     }
     this.esService.searchEntity(1, 10, query).subscribe((data: any) => {
     })
   }
-
   modelAsync = signal('');
   dataAsync = signal(
     (str: string) =>
@@ -292,17 +304,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
           x.next(data.list);
           x.complete();
         })
-
       })
-
   );
+  
   selectNode(node: any) {
     console.log(node)
     this.modelAsync = signal(node?._source?.labels.zh.value);
     this.service.graph(1, 10, node?._id).subscribe((data: any) => {
       this.initializeCytoscape(data);
     })
-
   }
 
   ngOnDestroy(): void {
