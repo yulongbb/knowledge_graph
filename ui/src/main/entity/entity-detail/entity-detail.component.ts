@@ -143,10 +143,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.type);
     this.action(this.type);
-
-
   }
 
 
@@ -170,11 +167,8 @@ export class EntityDetailComponent implements OnInit {
     console.log(this.imgs)
     this.imgs[this.imgs.length - 1] =
       { "url": `http://localhost:9000/kgms/${$event.body.name}` }
-
-    // let item: any = {};
-    // item['label'] = $event.body.name;
-    // this.form.formGroup.patchValue(item);
   }
+
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
@@ -266,7 +260,6 @@ export class EntityDetailComponent implements OnInit {
         this.esService.getEntity(this.id).subscribe((x) => {
           console.log(x);
           this.entity = signal(x);
-
           this.item = x._source;
           this.imgs = [];
           this.tag = this.item?.tags;
@@ -443,7 +436,6 @@ export class EntityDetailComponent implements OnInit {
           this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
           this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
           this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
-       
         });
         break;
       case 'edit':
@@ -586,6 +578,7 @@ export class EntityDetailComponent implements OnInit {
         break;
     }
   }
+
   linkifyText(text: string, entities: any): string {
     const wikidataBaseUrl = 'http://localhost:4200/index/search/info/';
     // 简单示例，将“爱因斯坦”替换为指向Wikidata的链接
@@ -594,12 +587,10 @@ export class EntityDetailComponent implements OnInit {
     entities.forEach((entity: any) => {
       entityMap[entity.word] = entity.id;
     })
-
     Object.keys(entityMap).forEach(key => {
       const link = `<a href="${wikidataBaseUrl}${entityMap[key]}" >${key}</a>`;
       text = text.replace(new RegExp(key, 'g'), link);
     });
-
     return text;
   }
 
@@ -607,12 +598,13 @@ export class EntityDetailComponent implements OnInit {
   getStatement(property: any): any {
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
   }
+
   backClick() {
     this.router.navigate([`/index/entity/${this.knowledge}`], { replaceUrl: true });
   }
+
   back() {
     this.nav.back();
-
   }
 }
 

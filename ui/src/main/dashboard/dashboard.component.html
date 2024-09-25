@@ -3,8 +3,8 @@
     <x-input-group compact size="big">
         <x-select [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="20"></x-select>
 
-        <x-auto-complete [style.width.%]="100" (nodeEmit)="selectNode($event)" [data]="dataAsync()" [(ngModel)]="modelAsync" placeholder="检索知识"
-        [nodeTpl]="nodeTpl"></x-auto-complete>
+        <x-auto-complete [style.width.%]="100" (nodeEmit)="selectNode($event)" [data]="dataAsync()"
+            [(ngModel)]="modelAsync" placeholder="检索知识" [nodeTpl]="nodeTpl"></x-auto-complete>
         <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
     </x-input-group>
 </div>
@@ -16,14 +16,7 @@
 <div #cy style="width: 100%; height: 100%;"></div>
 
 
-<x-dialog
-  title="标题"
-  [(visible)]="visible"
-  [placement]="placement()"
-  (close)="evt('close')"
-  (cancel)="evt('cancel')"
-  (confirm)="evt('confirm')"
->
-<app-entity-detail></app-entity-detail>
-
+<x-dialog *ngIf="data" [title]="data.label" [(visible)]="visible" [placement]="placement()" (close)="evt('close')"
+    (cancel)="evt('cancel')" (confirm)="evt('confirm')">
+    <app-entity-detail *ngIf="type" [type]="type" [id]="data.id"></app-entity-detail>
 </x-dialog>

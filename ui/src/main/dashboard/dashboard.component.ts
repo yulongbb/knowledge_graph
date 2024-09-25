@@ -22,8 +22,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cy: any;
   visible = signal(false);
   placement = signal<XPlace>('center');
+  id: any;
+  data: any;
+  type: any;
 
-  dialog(place: XPlace) {
+  dialog(data: any, type: any, place: XPlace) {
+
+    this.data = data;
+    this.type = type;
     this.placement.set(place);
     this.visible.set(true);
   }
@@ -33,7 +39,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   evt(type: string) {
-    console.log('output', type);
+    this.id = null;
+    this.type = null;
+
   }
 
   constructor(private service: EntityService,
@@ -135,9 +143,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             {
               content: '浏览',
               select: (ele: any) => {
-                console.log(ele.id());
+                console.log(ele.data());
                 console.log('浏览知识');
-                this.dialog('center')
+                this.dialog(ele.data(), 'info', 'center')
               }
             },
 
@@ -146,7 +154,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               select: (ele: any) => {
                 console.log(ele.id());
                 console.log('编辑知识');
-                this.dialog('center')
+                this.dialog(ele.data(), '', 'center')
               },
             },
             {
@@ -165,14 +173,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
         this.cy.cxtmenu({
           selector: 'edge',
-
           commands: [
             {
               content: '编辑',
               select: (ele: any) => {
                 console.log(ele.id());
                 console.log('编辑知识');
-                this.dialog('center')
+                this.dialog(ele.data(), '', 'center')
               },
             },
             {
@@ -198,7 +205,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               select: (ele: any) => {
                 console.log(ele);
                 console.log('创建知识');
-                this.dialog('center')
+                this.dialog(ele.data(), '', 'center')
               }
             },
           ]
@@ -306,7 +313,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
       })
   );
-  
+
   selectNode(node: any) {
     console.log(node)
     this.modelAsync = signal(node?._source?.labels.zh.value);
