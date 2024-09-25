@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Query, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Query, ViewChild, inject, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
@@ -7,7 +7,7 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
-import { XDialogService, XImagePreviewComponent } from '@ng-nest/ui';
+import { X_DIALOG_DATA, XDialogRef, XDialogService, XImagePreviewComponent } from '@ng-nest/ui';
 import { EntityService } from 'src/main/entity/entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 
@@ -19,9 +19,10 @@ import { TagService } from 'src/main/ontology/tag/tag.sevice';
 })
 export class EntityDetailComponent implements OnInit {
   es: string = 'entity';
+  data = inject(X_DIALOG_DATA);
+  dialogRef = inject(XDialogRef<EntityDetailComponent>);
 
-  @Input() id: string = '';
-  @Input() type: string = '';
+
   knowledge: string = '';
 
   schema: string = '';
@@ -112,7 +113,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.action(this.type);
+    this.action(this.data.type);
 
 
   }
@@ -130,8 +131,8 @@ export class EntityDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        if (this.id) {
-          this.esService.getEntity(this.id).subscribe((x) => {
+        if (this.data.id) {
+          this.esService.getEntity(this.data.id).subscribe((x) => {
             console.log(x);
             this.entity = signal(x);
             this.item = x._source;
@@ -150,7 +151,7 @@ export class EntityDetailComponent implements OnInit {
                 })
                 this.tags = tags;
               })
-              if (this.type == 'edit') {
+              if (this.data.type == 'edit') {
                 this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
               }
               this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
@@ -159,7 +160,7 @@ export class EntityDetailComponent implements OnInit {
                 this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
                   console.log(x.list);
                   this.properties = signal(x.list);
-                  this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+                  this.nodeService.getLinks(1, 50, this.data.id, {}).subscribe((c: any) => {
                     console.log(c);
                     let statements: any = [];
                     console.log(c.list)
@@ -204,17 +205,23 @@ export class EntityDetailComponent implements OnInit {
           type: this.form.formGroup.value.type,
           images: this.imgs?.map((i: any) => i.url.split('/')[i.url.split('/').length - 1])
         }
-        console.log(this.item)
-        if (this.type === 'add') {
-          this.nodeService.post(item).subscribe((x) => {
+        console.log(item)
+        if (this.data.type === 'add') {
+          this.nodeService.post(item).subscribe((x: any) => {
+            console.log(x);
             this.message.success('新增成功！');
+            this.data.cy.add({
+              data: {
+                id: x.items[0].index._id, label: item.labels.zh.value
+              }
+            })
+            this.dialogRef.close();
+
           });
-        } else if (this.type === 'edit') {
-          item.id = this.id;
+        } else if (this.data.type === 'edit') {
+          item.id = this.data.id;
           item['_key'] = this.item.items[0].split('/')[1];
           item['items'] = this.item.items;
-
-          console.log(item)
 
           this.nodeService.put(item).subscribe((x) => {
             this.message.success('编辑成功！');
@@ -223,6 +230,8 @@ export class EntityDetailComponent implements OnInit {
         }
         break;
       case 'cancel':
+        this.dialogRef.close();
+
         break;
     }
   }

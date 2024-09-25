@@ -1,7 +1,11 @@
 <div class="row">
-  @switch (type) {
+  @switch (data.type) {
   @case ('info') {
   <div class="row">
+    <span class="label">{{ entity()?._source?.labels?.zh?.value }}
+      <!-- <x-buttons>
+            <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
+          </x-buttons> --> </span><span>{{ entity()?._type }}</span>
     <h2>简介</h2>
     <p *ngIf="entity()._source.descriptions" [innerHTML]="
             linkifyText(
@@ -98,7 +102,6 @@
   </div>
   }
   @case ('edit') {
-
       <div class="row" *ngFor="let t of tags | keyvalue">
         <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
           tag></x-checkbox>

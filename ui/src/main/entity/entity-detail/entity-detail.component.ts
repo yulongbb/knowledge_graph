@@ -108,6 +108,9 @@ export class EntityDetailComponent implements OnInit {
   claims: any;
   properties: any;
 
+
+  
+
   constructor(
     private sanitizer: DomSanitizer,
     private ontologyService: OntologyService,

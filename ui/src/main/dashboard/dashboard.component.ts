@@ -7,7 +7,8 @@ import { EsService } from '../search/es.service';
 
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
-import { XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
+import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
+import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,14 +26,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   id: any;
   data: any;
   type: any;
-
   dialog(data: any, type: any, place: XPlace) {
-
-    this.data = data;
-    this.type = type;
-    this.placement.set(place);
-    this.visible.set(true);
+    this.dialogService.create(EntityDetailComponent, {
+      placement: place, // 默认center
+      data: { id: data.id, type: type, cy: this.cy },
+    });
   }
+
 
   close() {
     this.visible.set(false);
@@ -47,7 +47,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(private service: EntityService,
     private esService: EsService,
     private message: XMessageService,
-
+    private dialogService: XDialogService,
     private msgBox: XMessageBoxService,
   ) {
 
@@ -168,9 +168,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   title: '删除弹框',
                   content: '知识删除',
                   placement: 'center',
-                  callback: (action: XMessageBoxAction) => { 
+                  callback: (action: XMessageBoxAction) => {
                     console.log(ele.data());
                     this.service.deleteItem(ele.data()['id']).subscribe(() => {
+                      ele.remove()
                       this.message.success('删除成功！');
                     });
                   }
