@@ -7,8 +7,11 @@ import { EsService } from '../search/es.service';
 
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
+import cola from 'cytoscape-cola';
+
 import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
+import { animate, animation } from '@angular/animations';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,6 +60,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
         cytoscape.use(cxtmenu);
+        cytoscape.use( cola ); // register extension
+
         console.log(data)
         this.cy = cytoscape({
           container: this.cyContainer.nativeElement, // container to render in
@@ -105,7 +110,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }
           ],
           layout: {
-            name: 'cose',
+            name: 'cola',
           },
           // initial viewport state:
           zoom: 1, // 图表的初始缩放级别.可以设置options.minZoom和options.maxZoom设置缩放级别的限制.
@@ -251,6 +256,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   initializeCytoscape(data: any): void {
+    this.cy.nodes().lock();
+
     data.elements.nodes.forEach((node: any) => {
       if (this.cy.nodes().filter((n: any) => n.data().id == node.data.id).length == 0) {
         this.cy.add(node);
@@ -262,7 +269,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
     this.cy.layout({
-      name: 'cose',
+      name: 'cola',
+      animate: true,
+      fit: false,
+    
     }).run();
   }
 
