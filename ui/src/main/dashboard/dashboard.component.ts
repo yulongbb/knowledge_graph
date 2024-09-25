@@ -7,7 +7,7 @@ import { EsService } from '../search/es.service';
 
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
-import { XMessageBoxAction, XMessageBoxService, XPlace } from '@ng-nest/ui';
+import { XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
 
 @Component({
   selector: 'app-dashboard',
@@ -46,6 +46,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(private service: EntityService,
     private esService: EsService,
+    private message: XMessageService,
+
     private msgBox: XMessageBoxService,
   ) {
 
@@ -55,6 +57,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
         cytoscape.use(cxtmenu);
+        console.log(data)
         this.cy = cytoscape({
           container: this.cyContainer.nativeElement, // container to render in
           elements: data.elements,
@@ -163,9 +166,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 console.log(ele.position());
                 this.msgBox.alert({
                   title: '删除弹框',
-                  content: '这是一段内容',
+                  content: '知识删除',
                   placement: 'center',
-                  callback: (action: XMessageBoxAction) => { }
+                  callback: (action: XMessageBoxAction) => { 
+                    console.log(ele.data());
+                    this.service.deleteItem(ele.data()['id']).subscribe(() => {
+                      this.message.success('删除成功！');
+                    });
+                  }
                 });
               }
             }
@@ -205,7 +213,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               select: (ele: any) => {
                 console.log(ele);
                 console.log('创建知识');
-                this.dialog(ele.data(), '', 'center')
+                this.dialog(ele.data(), 'add', 'center')
               }
             },
           ]

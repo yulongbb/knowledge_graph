@@ -344,6 +344,7 @@ export class KnowledgeService {
         // 获取查询结果
         // 获取查询结果
         const result = await cursor.all();
+        console.log(result);
         const cytoscapeData = { elements: { nodes: [], edges: [] } };
 
         // 用于存储已添加的节点，防止重复
@@ -351,8 +352,8 @@ export class KnowledgeService {
 
         cytoscapeData.elements.nodes.push({
           data: {
-            id: result[0]?.start?.id,
-            label: result[0]?.start?.labels?.zh?.value || '' // 根据你的字段结构选择合适的label
+            id: result[0]?.start?.id ??id,
+            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value // 根据你的字段结构选择合适的label
           }
         });
         addedNodes.add(result[0]?.start?.id);

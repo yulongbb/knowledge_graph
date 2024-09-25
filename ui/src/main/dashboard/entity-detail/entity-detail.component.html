@@ -155,6 +155,61 @@
     </x-card>
   </div>
   }
+  @case ('add') {
+
+  <div class="row" *ngFor="let t of tags | keyvalue">
+    <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false" tag></x-checkbox>
+  </div>
+  <div class="row">
+    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl" multiple
+      [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+    <ng-template #textTpl>
+      <x-icon class="upload-icon" type="fto-upload"></x-icon>
+      <span>选择文件</span>
+    </ng-template>
+    <ng-template #filesTpl let-files="$files">
+      <div class="gallery">
+        <div class="warp">
+          <div *ngFor="let file of files">
+            @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
+            @case ('mp4') {
+            <video class="thumbnail" width="200px" controls>
+              <source [src]="file?.url" type="video/mp4" />
+              <p>
+                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+              </p>
+            </video>
+            }
+            @case ('pdf') {
+
+            <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
+            }
+            @default {
+            <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
+            }
+            }
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+  <h3>{{ title }}</h3>
+  <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+    width="100%" labelAlign="end" span="24" space="2"></x-form>
+  <br>
+  <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
+    labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
+  <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
+  <div class="app-footer">
+    <x-buttons space="0.5">
+      <x-button (click)="action('cancel')">取消</x-button>
+      <x-button type="primary" (click)="!formInvalid && action('save')"
+        [disabled]="formInvalid || disabled">保存</x-button>
+    </x-buttons>
+  </div>
+
+  }
+
   @default {
   }
   }
