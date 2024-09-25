@@ -157,7 +157,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               select: (ele: any) => {
                 console.log(ele.id());
                 console.log('编辑知识');
-                this.dialog(ele.data(), '', 'center')
+                this.dialog(ele.data(), 'edit', 'center')
               },
             },
             {

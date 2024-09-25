@@ -98,9 +98,7 @@
   </div>
   }
   @case ('edit') {
-  <div class="row">
 
-    <x-card width="100%">
       <div class="row" *ngFor="let t of tags | keyvalue">
         <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
           tag></x-checkbox>
@@ -142,18 +140,14 @@
       <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
         width="100%" labelAlign="end" span="24" space="2"></x-form>
       <br>
-      <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
-        labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
-      <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
-      <div class="app-footer">
+  <div class="app-footer">
         <x-buttons space="0.5">
           <x-button (click)="action('cancel')">取消</x-button>
           <x-button type="primary" (click)="!formInvalid && action('save')"
             [disabled]="formInvalid || disabled">保存</x-button>
         </x-buttons>
       </div>
-    </x-card>
-  </div>
+
   }
   @case ('add') {
 
@@ -197,10 +191,7 @@
   <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
     width="100%" labelAlign="end" span="24" space="2"></x-form>
   <br>
-  <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
-    labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
-  <!-- <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple (uploadSuccess)="uploadSuccess($event)"></x-upload> -->
-  <div class="app-footer">
+ <div class="app-footer">
     <x-buttons space="0.5">
       <x-button (click)="action('cancel')">取消</x-button>
       <x-button type="primary" (click)="!formInvalid && action('save')"

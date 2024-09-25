@@ -130,7 +130,7 @@ export class EntityDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        if(this.id){
+        if (this.id) {
           this.esService.getEntity(this.id).subscribe((x) => {
             console.log(x);
             this.entity = signal(x);
@@ -155,7 +155,7 @@ export class EntityDetailComponent implements OnInit {
               }
               this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
                 parents.push(this.item.type)
-  
+
                 this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
                   console.log(x.list);
                   this.properties = signal(x.list);
@@ -171,136 +171,6 @@ export class EntityDetailComponent implements OnInit {
                       statements.push(p.edges[0])
                     })
                     this.claims = statements;
-                    console.log(this.claims)
-                    this.statements = [];
-  
-                    c.list.forEach((p: any) => {
-                      if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                        console.log(p.edges[0].mainsnak.property)
-                        p.edges[0].mainsnak.label = x.list.filter((l: any) => l.id == p.edges[0].mainsnak.property.replace('P', ''))[0]?.name;
-                        p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
-                        p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
-                      }
-                      this.statements.push(p.edges[0])
-                    })
-  
-                    x.list.forEach((property: any) => {
-                      if (c.list.filter((p: any) => `P${property.id}` == p.edges[0].mainsnak.property).length == 0) {
-                        this.statements.push({
-                          "mainsnak": {
-                            "snaktype": "value",
-                            "property": `P${property.id}`,
-                            "datavalue": this.getDatavalue(property.type),
-                            "datatype": property.type,
-                            "label": property.name,
-                          },
-                          "type": "statement",
-                          "rank": "normal"
-                        }
-                        )
-                      }
-  
-                    })
-                    let control: any = []
-                    this.statements = this.statements.sort((a: any, b: any) => {
-                      return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
-                    });
-  
-                    this.statements.forEach((statement: any) => {
-                      if (statement.mainsnak.property != 'P31') {
-                        if (statement._id) {
-                          if (statement?.mainsnak?.datavalue?.type == 'string') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?._id,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value
-                              },
-                            )
-                          } else if (statement?.mainsnak?.datavalue?.type == 'quantity') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?._id,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.amount
-                              },
-                            )
-                          } else if (statement?.mainsnak?.datavalue?.type == 'time') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?._id,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.time
-                              },
-                            )
-                          } else if (statement?.mainsnak?.datavalue?.type == 'commonsMedia') {
-                            control.push(
-                              {
-                                control: 'select',
-                                id: 'selectRequired',
-                                label: 'required',
-                                span: 8,
-                                data: this.imgs,
-                                required: true
-                              },
-                            )
-                          } else {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?._id,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.label
-                              },
-                            )
-                          }
-                        } else {
-                          if (statement?.mainsnak?.datatype == 'string') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?.mainsnak?.property,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value
-                              },
-                            )
-                          } else if (statement?.mainsnak?.datatype == 'quantity') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?.mainsnak?.property,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.amount
-                              },
-                            )
-                          } else if (statement?.mainsnak?.datatype == 'time') {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?.mainsnak?.property,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.time
-                              },
-                            )
-                          } else {
-                            control.push(
-                              {
-                                control: 'input',
-                                id: statement?.mainsnak?.property,
-                                label: statement?.mainsnak?.label,
-                                value: statement?.mainsnak?.datavalue?.value?.label
-                              },
-                            )
-                          }
-  
-                        }
-                      }
-                    })
-  
-                    this.controls2 = signal<XControl[]>(control);
                   })
                 });
               });
@@ -310,7 +180,7 @@ export class EntityDetailComponent implements OnInit {
             this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
           });
         }
-     
+
         break;
       case 'edit':
         this.action('info');
@@ -340,107 +210,16 @@ export class EntityDetailComponent implements OnInit {
             this.message.success('新增成功！');
           });
         } else if (this.type === 'edit') {
-          this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
-            let statements: any = [];
-            c.list.forEach((p: any) => {
-              if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
-              }
-              statements.push(p.edges[0])
-            })
+          item.id = this.id;
+          item['_key'] = this.item.items[0].split('/')[1];
+          item['items'] = this.item.items;
 
-            let existingEdges = statements;
-            //更新边
-            const updatedEdges: any = [];
-            //删除边
-            const deletedEdges: any = [];
-            //新增边
-            const newEdges: any = [];
-            Object.keys(this.form2.formGroup.value).forEach((key) => {
-              const value = this.form2.formGroup.value[key];
+          console.log(item)
 
-              const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
-              if (existingEdge) {
-                if (existingEdge.mainsnak.datavalue.type == 'string') {
-                  if (existingEdge.mainsnak.datavalue.value !== value) {
-                    // 值发生变化，进行更新
-                    existingEdge.mainsnak.datavalue.value = value;
-                    updatedEdges.push(existingEdge);
-                  }
-                } else {
-                  if (existingEdge.mainsnak.datavalue.value.label !== value) {
-                    // 值发生变化，进行更新
-                    existingEdge.mainsnak.datavalue.value.label = value;
-                    updatedEdges.push(existingEdge);
-                  }
-                }
-              } else if (value !== undefined && value !== '') {
-                // 新增的边
-                console.log(value)
-                let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
-                statement['_from'] = this.item.items[0];
-                statement['_to'] = this.item.items[0];
-                if (statement.mainsnak.datavalue.type == 'string') {
-                  statement.mainsnak.datavalue.value = value;
-                } else if (statement.mainsnak.datavalue.type == 'time') {
-                  statement.mainsnak.datavalue.value.time = value;
-                } else if (statement.mainsnak.datatype == 'quantity') {
-                  statement.mainsnak.datavalue.value.amount = value;
-                } else if (statement.mainsnak.datatype == 'wikibase-item') {
-                  statement.mainsnak.datavalue.value.label = value;
-                }
-                newEdges.push(statement);
-              }
-            });
-            // 查找需要删除的边
-            existingEdges.forEach((edge: any) => {
-              if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
-                if (edge.mainsnak.property != 'P31') {
-                  deletedEdges.push(edge);
-                }
-              }
-            });
-            console.log('更新')
-            console.log(updatedEdges)
-            console.log('删除')
-            console.log(deletedEdges)
-            console.log('新增')
-            console.log(newEdges)
-
-            const requests: any = [];
-
-            // 执行更新操作
-            updatedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.updateEdge(edge));
-            });
-
-            // 执行删除操作
-            deletedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.deleteEdge(edge._key));
-            });
-
-            // 执行新增操作
-            newEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.addEdge(edge));
-            });
-
-            //并行执行所有请求
-            forkJoin(requests).subscribe(() => {
-              this.message.success('编辑成功！');
-            });
-
-            item.id = this.id;
-            item['_key'] = this.item.items[0].split('/')[1];
-            item['items'] = this.item.items;
-
-            console.log(item)
-
-            this.nodeService.put(item).subscribe((x) => {
-              this.message.success('编辑成功！');
-            });
-
+          this.nodeService.put(item).subscribe((x) => {
+            this.message.success('编辑成功！');
           });
+
         }
         break;
       case 'cancel':
