@@ -70,11 +70,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             {
               selector: 'node',
               style: {
-                'width': 10,
-                'height': 10,
+                'width': 20,
+                'height': 20,
                 'background-color': '#888',
                 'label': 'data(label)',
-                'font-size': '4px',
+                'font-size': '6px',
                 'text-valign': 'center',
                 'color': 'white',
                 'text-outline-width': 0.5,
@@ -94,7 +94,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'arrow-scale': 0.3,
                 'color': '#aaa',
                 'label': 'data(label)',
-                'font-size': '2px',
+                'font-size': '6px',
                 'control-point-weight': 0.5,
                 'control-point-distance': 30,
               }
