@@ -216,11 +216,12 @@ export class KnowledgeService {
           items: ['entity/' + doc['_key']],
           images: entity?.images,
         });
+        console.log(JSON.stringify(data));
         document.document(doc['_key']).then((existingDocument) => {
           existingDocument.id = data['items'][0]['index']['_id'];
           document.update(doc['_key'], existingDocument);
         });
-        return data;
+        return doc;
       },
       (err) => console.error('Failed to save document:', err),
     );
