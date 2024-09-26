@@ -108,7 +108,6 @@ export class EntityDetailComponent implements OnInit {
   claims: any;
   properties: any;
 
-
   
 
   constructor(
@@ -558,7 +557,6 @@ export class EntityDetailComponent implements OnInit {
 
             //并行执行所有请求
             forkJoin(requests).subscribe(() => {
-              this.message.success('编辑成功！');
               this.router.navigate(['/index/entity']);
             });
 

@@ -321,7 +321,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   initializeCytoscape(data: any): void {
-    this.cy.nodes().lock();
 
     data.elements.nodes.forEach((node: any) => {
       if (this.cy.nodes().filter((n: any) => n.data().id == node.data.id).length == 0) {

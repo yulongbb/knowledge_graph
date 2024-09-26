@@ -178,7 +178,7 @@ export class EntityDetailComponent implements OnInit {
 
                     this.statements = [];
 
-                    c.list.filter((p: any) => p.type == 'wikibase-item').forEach((p: any) => {
+                    c.list.forEach((p: any) => {
                       if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                         p.edges[0].mainsnak.label = x.list.filter((l: any) => l.id == p.edges[0].mainsnak.property.replace('P', ''))[0]?.name;
                         p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
@@ -208,6 +208,8 @@ export class EntityDetailComponent implements OnInit {
                     this.statements = this.statements.sort((a: any, b: any) => {
                       return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
                     });
+
+                    console.log(this.statements)
 
                     this.statements.forEach((statement: any) => {
                       if (statement.mainsnak.property != 'P31') {
@@ -368,7 +370,6 @@ export class EntityDetailComponent implements OnInit {
                 }
               } else if (value !== undefined && value !== '') {
                 // 新增的边
-                console.log(value)
                 let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
                 statement['_from'] = this.item.items[0];
                 statement['_to'] = this.item.items[0];
@@ -378,9 +379,7 @@ export class EntityDetailComponent implements OnInit {
                   statement.mainsnak.datavalue.value.time = value;
                 } else if (statement.mainsnak.datatype == 'quantity') {
                   statement.mainsnak.datavalue.value.amount = value;
-                } else if (statement.mainsnak.datatype == 'wikibase-item') {
-                  statement.mainsnak.datavalue.value.label = value;
-                }
+                } 
                 newEdges.push(statement);
               }
             });
@@ -399,27 +398,27 @@ export class EntityDetailComponent implements OnInit {
             console.log('新增')
             console.log(newEdges)
 
-            const requests: any = [];
+            // const requests: any = [];
 
-            // 执行更新操作
-            updatedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.updateEdge(edge));
-            });
+            // // 执行更新操作
+            // updatedEdges.forEach((edge: any) => {
+            //   requests.push(this.nodeService.updateEdge(edge));
+            // });
 
-            // 执行删除操作
-            deletedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.deleteEdge(edge._key));
-            });
+            // // 执行删除操作
+            // deletedEdges.forEach((edge: any) => {
+            //   requests.push(this.nodeService.deleteEdge(edge._key));
+            // });
 
-            // 执行新增操作
-            newEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.addEdge(edge));
-            });
+            // // 执行新增操作
+            // newEdges.forEach((edge: any) => {
+            //   requests.push(this.nodeService.addEdge(edge));
+            // });
 
-            //并行执行所有请求
-            forkJoin(requests).subscribe(() => {
-              this.message.success('编辑成功！');
-            });
+            // //并行执行所有请求
+            // forkJoin(requests).subscribe(() => {
+            //   this.message.success('编辑成功！');
+            // });
 
             item.id = this.data.id;
             item['_key'] = this.item.items[0].split('/')[1];
@@ -429,6 +428,8 @@ export class EntityDetailComponent implements OnInit {
 
             this.nodeService.put(item).subscribe((x) => {
               this.message.success('编辑成功！');
+              this.dialogRef.close();
+
             });
 
           });

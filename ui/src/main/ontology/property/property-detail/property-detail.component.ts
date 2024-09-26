@@ -173,7 +173,7 @@ export class PropertyDetailComponent implements OnInit {
             .post(this.form.formGroup.value)
             .subscribe((x) => {
               this.message.success('新增成功！');
-              this.router.navigate(['/index/properties']);
+              this.router.navigate(['/index/property']);
             });
         } else if (this.type === 'edit') {
           this.form.formGroup.value['id']=Number.parseInt(this.id);
@@ -182,7 +182,7 @@ export class PropertyDetailComponent implements OnInit {
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
-            this.router.navigate(['/index/properties']);
+            this.router.navigate(['/index/property']);
           });
         }
         break;
