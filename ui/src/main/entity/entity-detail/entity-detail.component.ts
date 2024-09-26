@@ -100,7 +100,7 @@ export class EntityDetailComponent implements OnInit {
   tags: Map<string, Array<string>> | undefined;
 
 
-  tag = [];
+  tag:any =signal([]);
   images: any;
   videos: any;
   pdfs: any;
@@ -264,7 +264,7 @@ export class EntityDetailComponent implements OnInit {
           this.entity = signal(x);
           this.item = x._source;
           this.imgs = [];
-          this.tag = this.item?.tags;
+          this.tag =signal( this.item?.tags);
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` })
           })
@@ -606,6 +606,15 @@ export class EntityDetailComponent implements OnInit {
 
   back() {
     this.nav.back();
+  }
+
+  close($event: string | number) {
+    console.log(this.tag)
+    this.tag.update((x:any) => {
+      x.splice(x.indexOf($event), 1);
+      return [...x];
+    });
+    
   }
 }
 
