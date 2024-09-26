@@ -96,16 +96,6 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-  // 模块设计
-  {
-    path: "design",
-    loadChildren: () =>
-      import("../main/design/design.module").then(x => x.DesignModule),
-    canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
 
   // 本体
   {

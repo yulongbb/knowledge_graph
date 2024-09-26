@@ -8,6 +8,7 @@ import { EsService } from '../search/es.service';
 import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
 import cola from 'cytoscape-cola';
+import edgehandles from 'cytoscape-edgehandles';
 
 import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
@@ -60,7 +61,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
         cytoscape.use(cxtmenu);
-        cytoscape.use( cola ); // register extension
+        cytoscape.use(cola); // register extension
+        cytoscape.use(edgehandles);
 
         console.log(data)
         this.cy = cytoscape({
@@ -107,6 +109,60 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'target-arrow-color': '#61bffc',
                 'transition-property': 'background-color, line-color, target-arrow-color',
               }
+            },
+            // some style for the extension
+
+            {
+              selector: '.eh-handle',
+              style: {
+                'background-color': 'red',
+                'width': 12,
+                'height': 12,
+                'shape': 'ellipse',
+                'overlay-opacity': 0,
+                'border-width': 12, // makes the handle easier to hit
+                'border-opacity': 0
+              }
+            },
+
+            {
+              selector: '.eh-hover',
+              style: {
+                'background-color': 'red'
+              }
+            },
+
+            {
+              selector: '.eh-source',
+              style: {
+                'border-width': 2,
+                'border-color': 'red'
+              }
+            },
+
+            {
+              selector: '.eh-target',
+              style: {
+                'border-width': 2,
+                'border-color': 'red'
+              }
+            },
+
+            {
+              selector: '.eh-preview, .eh-ghost-edge',
+              style: {
+                'background-color': 'red',
+                'line-color': 'red',
+                'target-arrow-color': 'red',
+                'source-arrow-color': 'red'
+              }
+            },
+
+            {
+              selector: '.eh-ghost-edge.eh-preview-active',
+              style: {
+                'opacity': 0
+              }
             }
           ],
           layout: {
@@ -143,7 +199,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           pixelRatio: 'auto', // 使用手动设置值覆盖屏幕像素比率(1.0建议,如果已设置).这可以通过减少需要渲染的有效区域来提高高密度显示器的性能,
           // 尽管在最近的浏览器版本中这是不太必要的.如果要使用硬件的实际像素比,可以设置pixelRatio: 'auto'(默认).
         });
-
+        var eh =  this.cy.edgehandles();
         this.cy.cxtmenu({
           selector: 'node',
 
@@ -163,6 +219,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 console.log(ele.id());
                 console.log('编辑知识');
                 this.dialog(ele.data(), 'edit', 'center')
+              },
+            },
+            {
+              content: '连接',
+              select: (ele: any) => {
+                console.log(ele.id());
+                console.log('连接知识');
+                eh.start(ele);
               },
             },
             {
@@ -224,6 +288,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             },
           ]
         });
+     
 
         var doubleClickDelayMs = 350;
         var previousTapStamp: any;
@@ -272,7 +337,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       name: 'cola',
       animate: true,
       fit: false,
-    
+
     }).run();
   }
 
