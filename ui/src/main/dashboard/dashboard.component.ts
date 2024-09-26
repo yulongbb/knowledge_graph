@@ -72,15 +72,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
             {
               selector: 'node',
               style: {
-                'width': 20,
-                'height': 20,
-                'background-color': '#888',
+                'border-color': '#ffffff',
+                'border-width': 2,
+                'background-image': 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1536 1399q0 109-62.5 187t-150.5 78h-854q-88 0-150.5-78t-62.5-187q0-85 8.5-160.5t31.5-152 58.5-131 94-89 134.5-34.5q131 128 313 128t313-128q76 0 134.5 34.5t94 89 58.5 131 31.5 152 8.5 160.5zm-256-887q0 159-112.5 271.5t-271.5 112.5-271.5-112.5-112.5-271.5 112.5-271.5 271.5-112.5 271.5 112.5 112.5 271.5z" fill="#fff"/></svg>`),
+                'background-width': '60%',
+                'background-height': '60%',
+                'color': '#333333',
                 'label': 'data(label)',
-                'font-size': '6px',
-                'text-valign': 'center',
-                'color': 'white',
-                'text-outline-width': 0.5,
-                'text-outline-color': '#888',
+                'text-valign': 'bottom',
+                'text-margin-y': 6,
+                'text-background-color': '#ffffff',
+                'text-background-opacity': 0.5,
+              }
+            },
+            {
+              selector: 'node.hover',
+              style: {
+                'border-color': '#000000',
+                'text-background-color': '#eeeeee',
+                'text-background-opacity': 1
+              }
+            },
+            {
+              selector: 'node:selected',
+              style: {
+                'border-color': '#ff0000',
+                'border-width': 6,
+                'border-opacity': 0.5
               }
             },
             {
@@ -102,36 +120,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
               }
             },
             {
-              selector: '.highlighted',
+              selector: 'edge.hover',
               style: {
-                'background-color': '#61bffc',
-                'line-color': '#61bffc',
-                'target-arrow-color': '#61bffc',
-                'transition-property': 'background-color, line-color, target-arrow-color',
+                'line-color': '#999999'
               }
             },
-            // some style for the extension
-
+            // edgehandles
             {
               selector: '.eh-handle',
               style: {
                 'background-color': 'red',
+                'background-image': [],
                 'width': 12,
                 'height': 12,
                 'shape': 'ellipse',
                 'overlay-opacity': 0,
-                'border-width': 12, // makes the handle easier to hit
-                'border-opacity': 0
+                'border-width': 12,
+                'border-opacity': 0,
+                'label': ''
               }
             },
-
             {
               selector: '.eh-hover',
               style: {
                 'background-color': 'red'
               }
             },
-
             {
               selector: '.eh-source',
               style: {
@@ -139,7 +153,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'border-color': 'red'
               }
             },
-
             {
               selector: '.eh-target',
               style: {
@@ -147,17 +160,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'border-color': 'red'
               }
             },
-
             {
               selector: '.eh-preview, .eh-ghost-edge',
               style: {
                 'background-color': 'red',
                 'line-color': 'red',
                 'target-arrow-color': 'red',
-                'source-arrow-color': 'red'
+                'source-arrow-color': 'red',
               }
             },
-
             {
               selector: '.eh-ghost-edge.eh-preview-active',
               style: {
@@ -165,41 +176,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
               }
             }
           ],
+
           layout: {
-            name: 'cola',
+            name: 'cose',
+            animate: false,
           },
-          // initial viewport state:
-          zoom: 1, // 图表的初始缩放级别.可以设置options.minZoom和options.maxZoom设置缩放级别的限制.
-          pan: { x: 0, y: 0 }, // 图表的初始平移位置.
-          // interaction options:
-          minZoom: 1e-50, // 图表缩放级别的最小界限.视口的缩放比例不能小于此缩放级别.
-          maxZoom: 1e50, // 图表缩放级别的最大界限.视口的缩放比例不能大于此缩放级别.
-          zoomingEnabled: true, // 是否通过用户事件和编程方式启用缩放图形.
-          userZoomingEnabled: true, // 是否允许用户事件(例如鼠标滚轮,捏合缩放)缩放图形.对此缩放的编程更改不受此选项的影响.
-          panningEnabled: true, // 是否通过用户事件和编程方式启用平移图形.
-          userPanningEnabled: true, // 是否允许用户事件(例如拖动图形背景)平移图形.平移的程序化更改不受此选项的影响.
-          boxSelectionEnabled: true, // 是否启用了框选择(即拖动框叠加,并将其释放为选择).如果启用,则用户必须点击以平移图表.
-          selectionType: 'single', // 一个字符串，指示用户输入的选择行为.对于'additive',用户进行的新选择将添加到当前所选元素的集合中.对于'single',用户做出的新选择成为当前所选元素的整个集合.
-          touchTapThreshold: 8, // 非负整数,分别表示用户在轻击手势期间可以在触摸设备和桌面设备上移动的最大允许距离.这使得用户更容易点击.
-          // 这些值具有合理的默认值,因此建议不要更改这些选项,除非您有充分的理由这样做.大值几乎肯定会产生不良后果.
-          desktopTapThreshold: 4, // 非负整数,分别表示用户在轻击手势期间可以在触摸设备和桌面设备上移动的最大允许距离.这使得用户更容易点击.
-          // 这些值具有合理的默认值,因此建议不要更改这些选项,除非您有充分的理由这样做.大值几乎肯定会产生不良后果.
-          autolock: false, // 默认情况下是否应锁定节点(根本不可拖动,如果true覆盖单个节点状态).
-          autoungrabify: false, // 默认情况下节点是否不允许被拾取(用户不可抓取,如果true覆盖单个节点状态).
-          autounselectify: false, // 默认情况下节点是否允许被选择(不可变选择状态,如果true覆盖单个元素状态).
-          // rendering options:
-          headless: false, // true:空运行,不显示不需要容器容纳.false:显示需要容器容纳.
-          styleEnabled: true, // 一个布尔值,指示是否应用样式.
-          hideEdgesOnViewport: false, // 渲染提示,设置为true在渲染窗口时,不渲染边.例如,移动某个顶点时或缩放时,边信息会被临时隐藏,移动结束后,边信息会被执行一次渲染.由于性能增强,此选项现在基本上没有实际意义.
-          hideLabelsOnViewport: true, // 渲染提示,当设置为true使渲染器在平移和缩放期间使用纹理而不是绘制元素时,使大图更具响应性.由于性能增强,此选项现在基本上没有实际意义.
-          textureOnViewport: true, // 渲染提示,当设置为true使渲染器在平移和缩放期间使用纹理而不是绘制元素时,使大图更具响应性.由于性能增强,此选项现在基本上没有实际意义.
-          motionBlur: true, // 渲染提示,设置为true使渲染器使用运动模糊效果使帧之间的过渡看起来更平滑.这可以增加大图的感知性能.由于性能增强,此选项现在基本上没有实际意义.
-          motionBlurOpacity: 0.2, // 当motionBlur:true,此值控制运动模糊帧的不透明度.值越高,运动模糊效果越明显.由于性能增强,此选项现在基本上没有实际意义.
-          wheelSensitivity: 1, // 缩放时更改滚轮灵敏度.这是一个乘法修饰符.因此,0到1之间的值会降低灵敏度(变焦较慢),而大于1的值会增加灵敏度(变焦更快).
-          pixelRatio: 'auto', // 使用手动设置值覆盖屏幕像素比率(1.0建议,如果已设置).这可以通过减少需要渲染的有效区域来提高高密度显示器的性能,
-          // 尽管在最近的浏览器版本中这是不太必要的.如果要使用硬件的实际像素比,可以设置pixelRatio: 'auto'(默认).
         });
-        var eh =  this.cy.edgehandles();
+        var eh = this.cy.edgehandles();
         this.cy.cxtmenu({
           selector: 'node',
 
@@ -288,7 +271,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             },
           ]
         });
-     
+
 
         var doubleClickDelayMs = 350;
         var previousTapStamp: any;
@@ -335,8 +318,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.cy.layout({
       name: 'cola',
       animate: true,
-      fit: false,
-
     }).run();
   }
 
