@@ -88,6 +88,9 @@
         <x-text-retract *ngIf="!entity['highlight']" max="100"
           [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
         <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
+        <div class="row">
+          <x-tag *ngFor="let tag of entity['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+        </div>
         <div class="time">
           <span>{{entity['_source']?.modified}}</span>
           <span>{{entity['_source']?.items}}</span>
@@ -139,7 +142,9 @@
           </x-col>
         </x-row>
 
-
+        <div class="row">
+          <x-tag *ngFor="let tag of entity['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+        </div>
         <div class="time">
           <span>{{entity['_source']?.modified}}</span>
           <span>{{entity['_source']?.items}}</span>
@@ -183,7 +188,9 @@
             </div>
           </div>
         </div>
-
+        <div class="row">
+          <x-tag *ngFor="let tag of entity['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+        </div>
         <div class="time">
           <span>{{entity['_source']?.modified}}</span>
           <span>{{entity['_source']?.items}}</span>
@@ -238,6 +245,9 @@
             </p>
           </dd>
         </dl>
+        <div class="row">
+          <x-tag *ngFor="let tag of entity['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+        </div>
         <div class="time">
           <span>{{entity['_source']?.modified}}</span>
           <span>{{entity['_source']?.items}}</span>

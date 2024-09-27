@@ -8,7 +8,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XQuery } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { map } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
 import { TagService } from '../tag.sevice';
 
@@ -48,6 +48,11 @@ export class TagDetailComponent implements OnInit {
       maxlength: 16,
       // pattern: /^[A-Za-z0-9]{4,16}$/,
       // message: '只能包括数字、字母的组合，长度为4-16位'
+    },
+    {
+      control: 'textarea',
+      id: 'tags',
+      label: '标签集合',
     },
     {
       control: 'input',
@@ -119,13 +124,28 @@ export class TagDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value);
-          this.tagService
-            .post(this.form.formGroup.value)
-            .subscribe((x) => {
+          this.form.formGroup.value.tags = this.form.formGroup.value.tags.split('\n').filter((t: any) => t != '');
+
+          if (this.form.formGroup.value.tags.length == 0) {
+            console.log('新增单个');
+            this.tagService
+              .post(this.form.formGroup.value)
+              .subscribe((x) => {
+                this.message.success('新增成功！');
+                this.router.navigate(['/index/tag']);
+              });
+          } else {
+            let arr: any = []
+            this.form.formGroup.value.tags.forEach((t: any) => {
+              arr.push(this.tagService.post({name: t, type: this.form.formGroup.value.type, schemas:this.form.formGroup.value.schemas}))
+            });
+            forkJoin(arr).subscribe(() => {
               this.message.success('新增成功！');
               this.router.navigate(['/index/tag']);
-            });
+            })
+          }
+
+
         } else if (this.type === 'edit') {
           this.form.formGroup.value['id'] = Number.parseInt(this.id);
           console.log(this.form.formGroup.value);

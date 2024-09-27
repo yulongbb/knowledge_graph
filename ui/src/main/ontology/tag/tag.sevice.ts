@@ -14,4 +14,5 @@ export class TagService extends RepositoryService<Tag> {
 export interface Tag extends XId {
   name?: string;
   type?: string;
+  schemas?: any;
 }

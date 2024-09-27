@@ -1,39 +1,44 @@
 <div class="row">
 
-<div class="card">
-  <div class="bottom">
+  <div class="card">
+    <div class="bottom">
 
-  @switch (data.type) {
-  @case ('info') {
-  <div class="row">
-    <span class="label">{{ entity()?._source?.labels?.zh?.value }}
-      <!-- <x-buttons>
+      @switch (data.type) {
+      @case ('info') {
+      <div class="row">
+        <span class="label">{{ entity()?._source?.labels?.zh?.value }}
+          <!-- <x-buttons>
             <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
           </x-buttons> --> </span><span>{{ entity()?._type }}</span>
-    <h2>简介</h2>
-    <p *ngIf="entity()._source.descriptions" [innerHTML]="
+        <div class="row">
+          <x-tag *ngFor="let tag of entity()['_source']?.tags"
+            [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
+            size="mini">{{tag}}</x-tag>
+        </div>
+        <h2>简介</h2>
+        <p *ngIf="entity()._source.descriptions" [innerHTML]="
             linkifyText(
               entity()?._source?.descriptions?.zh?.value,
               entity()?._source?.entities
             )
           "></p>
-    <dl *ngFor="let property of properties()">
-      <dl *ngIf="getStatement(property).length > 0">
-        <dt>
-          {{ property.name }}
-        </dt>
-        <dd>
-          <i *ngFor="let statement of getStatement(property)">
-            <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+        <dl *ngFor="let property of properties()">
+          <dl *ngIf="getStatement(property).length > 0">
+            <dt>
+              {{ property.name }}
+            </dt>
+            <dd>
+              <i *ngFor="let statement of getStatement(property)">
+                <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                       'http://localhost:4200/index/search/info/' +
                       statement.mainsnak.datavalue.value.id
                     ">{{ statement.mainsnak.datavalue.value.label }}</a>
-            </strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'string'">
-              {{ statement.mainsnak.datavalue.value }}
-            </strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-              <img *ngIf="
+                </strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'string'">
+                  {{ statement.mainsnak.datavalue.value }}
+                </strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
+                  <img *ngIf="
                       statement?.mainsnak?.datavalue?.value?.split('.')[
                         statement?.mainsnak.datavalue.value.split('.').length - 1
                       ] != 'mp4'
@@ -41,181 +46,186 @@
                       'http://localhost:9000/kgms/' +
                       statement?.mainsnak?.datavalue.value
                     " />
-              <video *ngIf="
+                  <video *ngIf="
                       statement?.mainsnak.datavalue.value.split('.')[
                         statement?.mainsnak.datavalue.value.split('.').length - 1
                       ] == 'mp4'
                     " width="200px" controls>
-                <source [src]="
+                    <source [src]="
                         'http://localhost:9000/kgms/' +
                         statement?.mainsnak.datavalue.value
                       " type="video/mp4" />
-                <p>
-                  你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                </p>
-              </video>
-            </strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
-              statement.mainsnak.datavalue.value.amount
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-              statement.mainsnak.datavalue.value.text }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
-              statement.mainsnak.datavalue.value
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-              statement.mainsnak.datavalue.value.latitude }},{{
-              statement.mainsnak.datavalue.value.longitude
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-              statement.mainsnak.datavalue.value.time
-              }}</strong>
-          </i>
-        </dd>
-      </dl>
-    </dl>
-    <div class="time">
-      <span>{{ entity()?._source?.modified }}</span>
-      <span>{{ entity()?._id }}</span>
-    </div>
-    <div class="gallery" *ngIf="images">
-      <div class="warp">
-        <div *ngFor="let image of images">
-          <div (click)="preview(image)" class="thumbnail"
-            style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
+                    <p>
+                      你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                    </p>
+                  </video>
+                </strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+                    [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+                  statement.mainsnak.datavalue.value.amount
+                  }}</strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                  statement.mainsnak.datavalue.value.text }}</strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+                  statement.mainsnak.datavalue.value
+                  }}</strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+                  statement.mainsnak.datavalue.value.latitude }},{{
+                  statement.mainsnak.datavalue.value.longitude
+                  }}</strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+                  statement.mainsnak.datavalue.value.time
+                  }}</strong>
+              </i>
+            </dd>
+          </dl>
+        </dl>
+        <div class="time">
+          <span>{{ entity()?._source?.modified }}</span>
+          <span>{{ entity()?._id }}</span>
         </div>
-      </div>
-    </div>
-
-    <div *ngFor="let video of videos">
-      <video width="100%" controls>
-        <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
-        <p>
-          你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-        </p>
-      </video>
-    </div>
-
-    <div *ngFor="let pdf of pdfs">
-      <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
-        [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
-      </iframe>
-    </div>
-  </div>
-  }
-  @case ('edit') {
-  <div class="row" *ngFor="let t of tags | keyvalue">
-    <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false" tag></x-checkbox>
-  </div>
-  <div class="row">
-    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl" multiple
-      [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
-    <ng-template #textTpl>
-      <x-icon class="upload-icon" type="fto-upload"></x-icon>
-      <span>选择文件</span>
-    </ng-template>
-    <ng-template #filesTpl let-files="$files">
-      <div class="gallery">
-        <div class="warp">
-          <div *ngFor="let file of files">
-            @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
-            @case ('mp4') {
-            <video class="thumbnail" width="200px" controls>
-              <source [src]="file?.url" type="video/mp4" />
-              <p>
-                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-              </p>
-            </video>
-            }
-            @case ('pdf') {
-
-            <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
-            }
-            @default {
-            <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
-            }
-            }
+        <div class="gallery" *ngIf="images">
+          <div class="warp">
+            <div *ngFor="let image of images">
+              <div (click)="preview(image)" class="thumbnail"
+                style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
+            </div>
           </div>
         </div>
-      </div>
-    </ng-template>
-  </div>
-  <h3>{{ title }}</h3>
-  <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-    width="100%" labelAlign="end" span="24" space="2"></x-form>
-  <br>
-  <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
-  labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
 
-  <div class="app-footer">
-    <x-buttons space="0.5">
-      <x-button (click)="action('cancel')">取消</x-button>
-      <x-button type="primary" (click)="!formInvalid && action('save')"
-        [disabled]="formInvalid || disabled">保存</x-button>
-    </x-buttons>
-  </div>
+        <div *ngFor="let video of videos">
+          <video width="100%" controls>
+            <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+            <p>
+              你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+            </p>
+          </video>
+        </div>
 
-  }
-  @case ('add') {
-
-  <div class="row" *ngFor="let t of tags | keyvalue">
-    <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false" tag></x-checkbox>
-  </div>
-  <div class="row">
-    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl" multiple
-      [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
-    <ng-template #textTpl>
-      <x-icon class="upload-icon" type="fto-upload"></x-icon>
-      <span>选择文件</span>
-    </ng-template>
-    <ng-template #filesTpl let-files="$files">
-      <div class="gallery">
-        <div class="warp">
-          <div *ngFor="let file of files">
-            @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
-            @case ('mp4') {
-            <video class="thumbnail" width="200px" controls>
-              <source [src]="file?.url" type="video/mp4" />
-              <p>
-                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-              </p>
-            </video>
-            }
-            @case ('pdf') {
-
-            <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
-            }
-            @default {
-            <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
-            }
-            }
-          </div>
+        <div *ngFor="let pdf of pdfs">
+          <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
+            [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
+          </iframe>
         </div>
       </div>
-    </ng-template>
+      }
+      @case ('edit') {
+
+
+          <div class="row" *ngFor="let t of tags | keyvalue">
+            <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
+              tag></x-checkbox>
+          </div>
+
+      <div class="row">
+        <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+          multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+        <ng-template #textTpl>
+          <x-icon class="upload-icon" type="fto-upload"></x-icon>
+          <span>选择文件</span>
+        </ng-template>
+        <ng-template #filesTpl let-files="$files">
+          <div class="gallery">
+            <div class="warp">
+              <div *ngFor="let file of files">
+                @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
+                @case ('mp4') {
+                <video class="thumbnail" width="200px" controls>
+                  <source [src]="file?.url" type="video/mp4" />
+                  <p>
+                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                  </p>
+                </video>
+                }
+                @case ('pdf') {
+
+                <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
+                }
+                @default {
+                <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
+                }
+                }
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <h3>{{ title }}</h3>
+      <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+        width="100%" labelAlign="end" span="24" space="2"></x-form>
+      <br>
+      <x-form *ngIf="controls2" #form2 [controls]="controls2()" direction="row" labelSuffix=":" width="100%"
+        labelWidth="10rem" labelAlign="end" direction="row" span="24" space="1.5"></x-form>
+
+      <div class="app-footer">
+        <x-buttons space="0.5">
+          <x-button (click)="action('cancel')">取消</x-button>
+          <x-button type="primary" (click)="!formInvalid && action('save')"
+            [disabled]="formInvalid || disabled">保存</x-button>
+        </x-buttons>
+      </div>
+
+      }
+      @case ('add') {
+
+      <div class="row" *ngFor="let t of tags | keyvalue">
+        <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
+          tag></x-checkbox>
+      </div>
+      <div class="row">
+        <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+          multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+        <ng-template #textTpl>
+          <x-icon class="upload-icon" type="fto-upload"></x-icon>
+          <span>选择文件</span>
+        </ng-template>
+        <ng-template #filesTpl let-files="$files">
+          <div class="gallery">
+            <div class="warp">
+              <div *ngFor="let file of files">
+                @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
+                @case ('mp4') {
+                <video class="thumbnail" width="200px" controls>
+                  <source [src]="file?.url" type="video/mp4" />
+                  <p>
+                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                  </p>
+                </video>
+                }
+                @case ('pdf') {
+
+                <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
+                }
+                @default {
+                <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
+                }
+                }
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <h3>{{ title }}</h3>
+      <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+        width="100%" labelAlign="end" span="24" space="2"></x-form>
+      <br>
+      <div class="app-footer">
+        <x-buttons space="0.5">
+          <x-button (click)="action('cancel')">取消</x-button>
+          <x-button type="primary" (click)="!formInvalid && action('save')"
+            [disabled]="formInvalid || disabled">保存</x-button>
+        </x-buttons>
+      </div>
+
+      }
+
+      @default {
+      }
+      }
+
+
+    </div>
+
   </div>
-  <h3>{{ title }}</h3>
-  <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-    width="100%" labelAlign="end" span="24" space="2"></x-form>
-  <br>
-  <div class="app-footer">
-    <x-buttons space="0.5">
-      <x-button (click)="action('cancel')">取消</x-button>
-      <x-button type="primary" (click)="!formInvalid && action('save')"
-        [disabled]="formInvalid || disabled">保存</x-button>
-    </x-buttons>
-  </div>
-
-  }
-
-  @default {
-  }
-  }
-
-
-  </div>
-
-</div>
 </div>

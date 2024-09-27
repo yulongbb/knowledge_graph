@@ -9,6 +9,9 @@
         </x-buttons> --> </span><span>{{ entity()?._type }}</span>
     </ng-template>
     <div class="bottom">
+      <div class="row">
+        <x-tag *ngFor="let tag of entity()['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+      </div>
       <h2>简介</h2>
       <p *ngIf="entity()._source.descriptions" [innerHTML]="
           linkifyText(

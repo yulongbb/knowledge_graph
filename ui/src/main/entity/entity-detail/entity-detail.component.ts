@@ -271,7 +271,7 @@ export class EntityDetailComponent implements OnInit {
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             console.log(type);
 
-            this.tagService.getList(1, 50, { filter: [{ field: 'id', value: type.id, relation: 'schemas', operation: '=' }] }).subscribe((data: any) => {
+            this.tagService.getList(1, 500, { filter: [{ field: 'id', value: type.id, relation: 'schemas', operation: '=' }] }).subscribe((data: any) => {
               let tags: any = {};
               data.list.forEach((tag: any) => {
                 tags[tag.type] = tags[tag.type] ?? [];
@@ -444,10 +444,10 @@ export class EntityDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
-        console.log(this.tag)
+        console.log(this.tag())
         let item: any = {
           _key: this.form.formGroup.value._key,
-          tags: this.tag,
+          tags: this.tag(),
           labels: {
             zh: {
               language: 'zh',
@@ -470,108 +470,111 @@ export class EntityDetailComponent implements OnInit {
             this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
-          this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
-            let statements: any = [];
-            c.list.forEach((p: any) => {
-              if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
-              }
-              statements.push(p.edges[0])
-            })
+         
+      
+          item.id = this.id;
+          item['_key'] = this.item.items[0].split('/')[1];
+          item['items'] = this.item.items;
 
-            let existingEdges = statements;
-            //更新边
-            const updatedEdges: any = [];
-            //删除边
-            const deletedEdges: any = [];
-            //新增边
-            const newEdges: any = [];
-            Object.keys(this.form2.formGroup.value).forEach((key) => {
-              const value = this.form2.formGroup.value[key];
-
-              const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
-              if (existingEdge) {
-                if (existingEdge.mainsnak.datavalue.type == 'string') {
-                  if (existingEdge.mainsnak.datavalue.value !== value) {
-                    // 值发生变化，进行更新
-                    existingEdge.mainsnak.datavalue.value = value;
-                    updatedEdges.push(existingEdge);
+          console.log(item)
+          this.nodeService.put(item).subscribe((x) => {
+            this.message.success('编辑成功！');
+            this.router.navigate(['/index/entity']);
+            this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
+              let statements: any = [];
+              c.list.forEach((p: any) => {
+                if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                  p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
+                  p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+                }
+                statements.push(p.edges[0])
+              })
+  
+              let existingEdges = statements;
+              //更新边
+              const updatedEdges: any = [];
+              //删除边
+              const deletedEdges: any = [];
+              //新增边
+              const newEdges: any = [];
+              Object.keys(this.form2.formGroup.value).forEach((key) => {
+                const value = this.form2.formGroup.value[key];
+  
+                const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
+                if (existingEdge) {
+                  if (existingEdge.mainsnak.datavalue.type == 'string') {
+                    if (existingEdge.mainsnak.datavalue.value !== value) {
+                      // 值发生变化，进行更新
+                      existingEdge.mainsnak.datavalue.value = value;
+                      updatedEdges.push(existingEdge);
+                    }
+                  } else {
+                    if (existingEdge.mainsnak.datavalue.value.label !== value) {
+                      // 值发生变化，进行更新
+                      existingEdge.mainsnak.datavalue.value.label = value;
+                      updatedEdges.push(existingEdge);
+                    }
                   }
-                } else {
-                  if (existingEdge.mainsnak.datavalue.value.label !== value) {
-                    // 值发生变化，进行更新
-                    existingEdge.mainsnak.datavalue.value.label = value;
-                    updatedEdges.push(existingEdge);
+                } else if (value !== undefined && value !== '') {
+                  // 新增的边
+                  console.log(value)
+                  let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
+                  statement['_from'] = this.item.items[0];
+                  statement['_to'] = this.item.items[0];
+                  if (statement.mainsnak.datavalue.type == 'string') {
+                    statement.mainsnak.datavalue.value = value;
+                  } else if (statement.mainsnak.datavalue.type == 'time') {
+                    statement.mainsnak.datavalue.value.time = value;
+                  } else if (statement.mainsnak.datatype == 'quantity') {
+                    statement.mainsnak.datavalue.value.amount = value;
+                  } else if (statement.mainsnak.datatype == 'wikibase-item') {
+                    statement.mainsnak.datavalue.value.label = value;
+                  }
+                  newEdges.push(statement);
+                }
+              });
+              // 查找需要删除的边
+              existingEdges.forEach((edge: any) => {
+                if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
+                  if (edge.mainsnak.property != 'P31') {
+                    deletedEdges.push(edge);
                   }
                 }
-              } else if (value !== undefined && value !== '') {
-                // 新增的边
-                console.log(value)
-                let statement = this.statements.filter((statement: any) => statement.mainsnak.property == key)[0]
-                statement['_from'] = this.item.items[0];
-                statement['_to'] = this.item.items[0];
-                if (statement.mainsnak.datavalue.type == 'string') {
-                  statement.mainsnak.datavalue.value = value;
-                } else if (statement.mainsnak.datavalue.type == 'time') {
-                  statement.mainsnak.datavalue.value.time = value;
-                } else if (statement.mainsnak.datatype == 'quantity') {
-                  statement.mainsnak.datavalue.value.amount = value;
-                } else if (statement.mainsnak.datatype == 'wikibase-item') {
-                  statement.mainsnak.datavalue.value.label = value;
-                }
-                newEdges.push(statement);
-              }
+              });
+              console.log('更新')
+              console.log(updatedEdges)
+              console.log('删除')
+              console.log(deletedEdges)
+              console.log('新增')
+              console.log(newEdges)
+  
+              const requests: any = [];
+  
+              // 执行更新操作
+              updatedEdges.forEach((edge: any) => {
+                requests.push(this.nodeService.updateEdge(edge));
+              });
+  
+              // 执行删除操作
+              deletedEdges.forEach((edge: any) => {
+                requests.push(this.nodeService.deleteEdge(edge._key));
+              });
+  
+              // 执行新增操作
+              newEdges.forEach((edge: any) => {
+                requests.push(this.nodeService.addEdge(edge));
+              });
+  
+              //并行执行所有请求
+              forkJoin(requests).subscribe(() => {
+                this.router.navigate(['/index/entity']);
+              });
+  
+  
+  
             });
-            // 查找需要删除的边
-            existingEdges.forEach((edge: any) => {
-              if (!this.form2.formGroup.value.hasOwnProperty(edge._id) || this.form2.formGroup.value[edge._id] == '') {
-                if (edge.mainsnak.property != 'P31') {
-                  deletedEdges.push(edge);
-                }
-              }
-            });
-            console.log('更新')
-            console.log(updatedEdges)
-            console.log('删除')
-            console.log(deletedEdges)
-            console.log('新增')
-            console.log(newEdges)
-
-            const requests: any = [];
-
-            // 执行更新操作
-            updatedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.updateEdge(edge));
-            });
-
-            // 执行删除操作
-            deletedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.deleteEdge(edge._key));
-            });
-
-            // 执行新增操作
-            newEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.addEdge(edge));
-            });
-
-            //并行执行所有请求
-            forkJoin(requests).subscribe(() => {
-              this.router.navigate(['/index/entity']);
-            });
-
-            item.id = this.id;
-            item['_key'] = this.item.items[0].split('/')[1];
-            item['items'] = this.item.items;
-
-            console.log(item)
-
-            this.nodeService.put(item).subscribe((x) => {
-              this.message.success('编辑成功！');
-              this.router.navigate(['/index/entity']);
-            });
-
           });
+        
         }
         break;
       case 'cancel':
