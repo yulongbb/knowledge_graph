@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, Query, ViewChild, signal } 
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
-import { XDialogService, XImagePreviewComponent, XTableColumn } from '@ng-nest/ui';
+import { XDialogService, XGuid, XImagePreviewComponent, XTableColumn, XTableRow } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -34,9 +34,6 @@ export class EntityDetailComponent implements OnInit {
       id: 'label',
       label: '标签',
       required: true,
-
-      // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
-      // message: '邮箱格式不正确，admin@ngnest.com'
     },
     {
       control: 'find',
@@ -54,22 +51,11 @@ export class EntityDetailComponent implements OnInit {
           .pipe(map((x) => x.list)),
 
     },
-    // {
-    //   control: 'input',
-    //   id: 'type',
-    //   label: '类型',
-    //   required: true,
-    //   value: 'item',
-    //   // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
-    //   // message: '手机号格式不正确，+8615212345678'
-    // },
     {
       control: 'textarea',
       id: 'description',
       label: '描述',
       required: true,
-      // pattern: /^((\+?86)|(\(\+86\)))?1\d{10}$/,
-      // message: '手机号格式不正确，+8615212345678'
     },
     {
       control: 'input', id: '_key', label: 'ID',
@@ -99,8 +85,7 @@ export class EntityDetailComponent implements OnInit {
 
   tags: Map<string, Array<string>> | undefined;
 
-
-  tag:any =signal([]);
+  tag: any = signal([]);
   images: any;
   videos: any;
   pdfs: any;
@@ -108,7 +93,29 @@ export class EntityDetailComponent implements OnInit {
   claims: any;
   properties: any;
 
-  
+
+
+
+  columns2: XTableColumn[] = [
+    { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
+    { id: 'property', label: '属性名', flex: 1 },
+    { id: 'name', label: '属性值', flex: 1 },
+    { id: 'status', label: '启用', width: 100 },
+    { id: 'actions', label: '操作', width: 100 }
+  ];
+
+
+  add() {
+    // this.data = [...this.data, { id: XGuid(), name: '', position: '', status: false }];
+  }
+
+  del(row: XTableRow) {
+    // const index = this.data.findIndex((x) => x.id === row.id);
+    // if (index >= 0) {
+    //   this.data.splice(index, 1);
+    // }
+  }
+
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -147,7 +154,6 @@ export class EntityDetailComponent implements OnInit {
   ngOnInit(): void {
     this.action(this.type);
   }
-
 
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
@@ -264,7 +270,7 @@ export class EntityDetailComponent implements OnInit {
           this.entity = signal(x);
           this.item = x._source;
           this.imgs = [];
-          this.tag =signal( this.item?.tags);
+          this.tag = signal(this.item?.tags);
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` })
           })
@@ -281,156 +287,152 @@ export class EntityDetailComponent implements OnInit {
             })
             if (this.type == 'edit') {
               this.form.formGroup.patchValue({ _key: x?._id, label: this.item?.labels?.zh?.value, type: { id: type?.id, label: type?.name }, description: this.item.descriptions?.zh?.value });
-
             }
             this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
               parents.push(this.item.type)
 
               this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-                console.log(x.list);
-                this.properties = signal(x.list);
+                this.properties = x.list.map((p: any) => p.name);
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
-                  console.log(c);
-                  let statements: any = [];
-                  console.log(c.list)
-                  c.list.forEach((p: any) => {
-                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
-                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
-                    }
-                    statements.push(p.edges[0])
-                  })
-                  this.claims = statements;
-                  console.log(this.claims)
+              
                   this.statements = [];
+                  console.log(x.list);
 
                   c.list.forEach((p: any) => {
-                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                      console.log(p.edges[0].mainsnak.property)
-                      p.edges[0].mainsnak.label = x.list.filter((l: any) => l.id == p.edges[0].mainsnak.property.replace('P', ''))[0]?.name;
-                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
-                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
-                    }
-                    this.statements.push(p.edges[0])
-                  })
-
-                  x.list.forEach((property: any) => {
-                    if (c.list.filter((p: any) => `P${property.id}` == p.edges[0].mainsnak.property).length == 0) {
-                      this.statements.push({
-                        "mainsnak": {
-                          "snaktype": "value",
-                          "property": `P${property.id}`,
-                          "datavalue": this.getDatavalue(property.type),
-                          "datatype": property.type,
-                          "label": property.name,
-                        },
-                        "type": "statement",
-                        "rank": "normal"
+                    if(p.edges[0].mainsnak.property!='P31'){
+                      console.log( x.list)
+                      console.log( p.edges[0].mainsnak.property)
+                      console.log(x.list.filter((p2: any) => p.edges[0].mainsnak.property==`P${p2.id}` ))
+                      p.edges[0].mainsnak.label = x.list.filter((p2: any) => p.edges[0].mainsnak.property==`P${p2.id}` )[0]?.name;
+                      if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                        console.log(p.edges[0].mainsnak.property)
+                       
+                        p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                        p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
                       }
-                      )
+                      this.statements.push(p.edges[0])
                     }
-
+                  
                   })
-                  let control: any = []
-                  this.statements = this.statements.sort((a: any, b: any) => {
-                    return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
-                  });
+                  console.log(this.statements);
 
-                  this.statements.forEach((statement: any) => {
-                    if (statement.mainsnak.property != 'P31') {
-                      if (statement._id) {
-                        if (statement?.mainsnak?.datavalue?.type == 'string') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?._id,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value
-                            },
-                          )
-                        } else if (statement?.mainsnak?.datavalue?.type == 'quantity') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?._id,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.amount
-                            },
-                          )
-                        } else if (statement?.mainsnak?.datavalue?.type == 'time') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?._id,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.time
-                            },
-                          )
-                        } else if (statement?.mainsnak?.datavalue?.type == 'commonsMedia') {
-                          control.push(
-                            {
-                              control: 'select',
-                              id: 'selectRequired',
-                              label: 'required',
-                              span: 8,
-                              data: this.imgs,
-                              required: true
-                            },
-                          )
-                        } else {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?._id,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.label
-                            },
-                          )
-                        }
-                      } else {
-                        if (statement?.mainsnak?.datatype == 'string') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?.mainsnak?.property,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value
-                            },
-                          )
-                        } else if (statement?.mainsnak?.datatype == 'quantity') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?.mainsnak?.property,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.amount
-                            },
-                          )
-                        } else if (statement?.mainsnak?.datatype == 'time') {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?.mainsnak?.property,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.time
-                            },
-                          )
-                        } else {
-                          control.push(
-                            {
-                              control: 'input',
-                              id: statement?.mainsnak?.property,
-                              label: statement?.mainsnak?.label,
-                              value: statement?.mainsnak?.datavalue?.value?.label
-                            },
-                          )
-                        }
+                  // x.list.forEach((property: any) => {
+                  //   if (c.list.filter((p: any) => `P${property.id}` == p.edges[0].mainsnak.property).length == 0) {
+                  //     this.statements.push({
+                  //       "mainsnak": {
+                  //         "snaktype": "value",
+                  //         "property": `P${property.id}`,
+                  //         "datavalue": this.getDatavalue(property.type),
+                  //         "datatype": property.type,
+                  //         "label": property.name,
+                  //       },
+                  //       "type": "statement",
+                  //       "rank": "normal"
+                  //     }
+                  //     )
+                  //   }
 
-                      }
-                    }
-                  })
+                  // })
+                //   let control: any = []
+                //   this.statements = this.statements.sort((a: any, b: any) => {
+                //     return a.mainsnak.label === b.mainsnak.label ? 0 : a.mainsnak.label > b.mainsnak.label ? 1 : -1;
+                //   });
 
-                  this.controls2 = signal<XControl[]>(control);
+                //   this.statements.forEach((statement: any) => {
+                //     if (statement.mainsnak.property != 'P31') {
+                //       if (statement._id) {
+                //         if (statement?.mainsnak?.datavalue?.type == 'string') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?._id,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value
+                //             },
+                //           )
+                //         } else if (statement?.mainsnak?.datavalue?.type == 'quantity') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?._id,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.amount
+                //             },
+                //           )
+                //         } else if (statement?.mainsnak?.datavalue?.type == 'time') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?._id,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.time
+                //             },
+                //           )
+                //         } else if (statement?.mainsnak?.datavalue?.type == 'commonsMedia') {
+                //           control.push(
+                //             {
+                //               control: 'select',
+                //               id: 'selectRequired',
+                //               label: 'required',
+                //               span: 8,
+                //               data: this.imgs,
+                //               required: true
+                //             },
+                //           )
+                //         } else {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?._id,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.label
+                //             },
+                //           )
+                //         }
+                //       } else {
+                //         if (statement?.mainsnak?.datatype == 'string') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?.mainsnak?.property,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value
+                //             },
+                //           )
+                //         } else if (statement?.mainsnak?.datatype == 'quantity') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?.mainsnak?.property,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.amount
+                //             },
+                //           )
+                //         } else if (statement?.mainsnak?.datatype == 'time') {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?.mainsnak?.property,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.time
+                //             },
+                //           )
+                //         } else {
+                //           control.push(
+                //             {
+                //               control: 'input',
+                //               id: statement?.mainsnak?.property,
+                //               label: statement?.mainsnak?.label,
+                //               value: statement?.mainsnak?.datavalue?.value?.label
+                //             },
+                //           )
+                //         }
+
+                //       }
+                //     }
+                //   })
+
+                //   this.controls2 = signal<XControl[]>(control);
                 })
               });
             });
@@ -470,8 +472,8 @@ export class EntityDetailComponent implements OnInit {
             this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
-         
-      
+
+
           item.id = this.id;
           item['_key'] = this.item.items[0].split('/')[1];
           item['items'] = this.item.items;
@@ -489,7 +491,7 @@ export class EntityDetailComponent implements OnInit {
                 }
                 statements.push(p.edges[0])
               })
-  
+
               let existingEdges = statements;
               //更新边
               const updatedEdges: any = [];
@@ -499,7 +501,7 @@ export class EntityDetailComponent implements OnInit {
               const newEdges: any = [];
               Object.keys(this.form2.formGroup.value).forEach((key) => {
                 const value = this.form2.formGroup.value[key];
-  
+
                 const existingEdge = existingEdges.find((edge: any) => edge._id === key && this.form2.formGroup.value[edge._id] != '');
                 if (existingEdge) {
                   if (existingEdge.mainsnak.datavalue.type == 'string') {
@@ -547,34 +549,34 @@ export class EntityDetailComponent implements OnInit {
               console.log(deletedEdges)
               console.log('新增')
               console.log(newEdges)
-  
+
               const requests: any = [];
-  
+
               // 执行更新操作
               updatedEdges.forEach((edge: any) => {
                 requests.push(this.nodeService.updateEdge(edge));
               });
-  
+
               // 执行删除操作
               deletedEdges.forEach((edge: any) => {
                 requests.push(this.nodeService.deleteEdge(edge._key));
               });
-  
+
               // 执行新增操作
               newEdges.forEach((edge: any) => {
                 requests.push(this.nodeService.addEdge(edge));
               });
-  
+
               //并行执行所有请求
               forkJoin(requests).subscribe(() => {
                 this.router.navigate(['/index/entity']);
               });
-  
-  
-  
+
+
+
             });
           });
-        
+
         }
         break;
       case 'cancel':
@@ -598,7 +600,6 @@ export class EntityDetailComponent implements OnInit {
     return text;
   }
 
-
   getStatement(property: any): any {
     return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
   }
@@ -613,11 +614,11 @@ export class EntityDetailComponent implements OnInit {
 
   close($event: string | number) {
     console.log(this.tag)
-    this.tag.update((x:any) => {
+    this.tag.update((x: any) => {
       x.splice(x.indexOf($event), 1);
       return [...x];
     });
-    
+
   }
 }
 
