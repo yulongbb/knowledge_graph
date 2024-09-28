@@ -100,11 +100,10 @@ export class EntityDetailComponent implements OnInit {
   properties: any;
   constructor(
     private sanitizer: DomSanitizer,
-    private ontologyService: OntologyService,
     private esService: EsService,
     private nodeService: EntityService,
     public tagService: TagService,
-
+    private ontologyService: OntologyService,
     public propertyService: PropertyService,
     private dialogSewrvice: XDialogService,
     private message: XMessageService

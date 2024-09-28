@@ -32,9 +32,8 @@
             )
           "
         ></p>
-           
-          <dl *ngFor="let property of propertyData()">
 
+        <dl *ngFor="let property of propertyData()">
           <dl *ngIf="getStatement(property).length > 0">
             <dt>
               {{ property.name }}
@@ -123,7 +122,7 @@
             </dd>
           </dl>
         </dl>
-     
+
         <div class="time">
           <span>{{ entity()?._source?.modified }}</span>
           <span>{{ entity()?._id }}</span>
@@ -333,6 +332,11 @@
           } @case ('name') {
           <x-input
             *ngIf="row?.mainsnak?.datatype == 'string'"
+            [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value"
+          ></x-input>
+          <x-input
+            *ngIf="row?.mainsnak?.datatype == 'url'"
             [style.width.%]="100"
             [(ngModel)]="row.mainsnak.datavalue.value"
           ></x-input>

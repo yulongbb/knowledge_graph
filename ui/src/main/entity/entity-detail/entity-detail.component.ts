@@ -24,6 +24,7 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
+import { values } from 'lodash';
 
 @Component({
   selector: 'app-entity-detail',
@@ -124,18 +125,17 @@ export class EntityDetailComponent implements OnInit {
     this.statements = [
       ...this.statements,
       {
+        state: 'add',
         _from: this.item.items[0],
         mainsnak: {
           snaktype: 'value',
-          property: 'P31',
+          property: '',
           hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
           datavalue: {
-            value: {
-              time: '',
-            },
-            type: 'time',
+            value: '',
+            type: 'string',
           },
-          datatype: 'time',
+          datatype: 'string',
         },
         type: 'statement',
         rank: 'normal',
@@ -175,11 +175,6 @@ export class EntityDetailComponent implements OnInit {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      console.log(this.id);
-      // this.climas = this.nodeService.getLinks(1, 20, this.id, {}).pipe(
-      //   tap((x: any) => console.log(x.list)),
-      //   map((x: any) => x)
-      // );
     });
   }
 
@@ -199,10 +194,21 @@ export class EntityDetailComponent implements OnInit {
       ],
     });
   }
-  change(statements: any) {
-    statements.mainsnak.property = `P${this.propertyData.filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
-    console.log(statements);
 
+  change(statements: any) {
+    console.log(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type)
+    switch(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type){
+      case 'url':
+        statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datatype = 'url';
+        statements.mainsnak.datavalue = {
+          value: '',
+          type: 'string',
+        }
+        break;
+    }
+    statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
+    console.log(statements);
   }
 
   uploadSuccess($event: any) {
@@ -431,6 +437,7 @@ export class EntityDetailComponent implements OnInit {
           this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
             let statements: any = [];
             c.list.forEach((p: any) => {
+              p.edges[0].state = 'info';
               if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                 p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
                 p.edges[0].mainsnak.datavalue.value.label =
@@ -441,7 +448,7 @@ export class EntityDetailComponent implements OnInit {
 
 
 
-            this.newEdges = this.statements;
+            this.newEdges = this.statements.filter((s:any)=> s.state=='add');
 
             console.log('更新');
             console.log(this.updatedEdges);
@@ -450,41 +457,38 @@ export class EntityDetailComponent implements OnInit {
             console.log('新增');
             console.log(this.newEdges);
 
-            // const requests: any = [];
+            const requests: any = [];
 
-            // // 执行更新操作
-            // this.updatedEdges.forEach((edge: any) => {
-            //   requests.push(this.nodeService.updateEdge(edge));
-            // });
+            // 执行更新操作
+            this.updatedEdges.forEach((edge: any) => {
+              requests.push(this.nodeService.updateEdge(edge));
+            });
 
-            // // 执行删除操作
-            // this.deletedEdges.forEach((edge: any) => {
-            //   requests.push(this.nodeService.deleteEdge(edge._key));
-            // });
+            // 执行删除操作
+            this.deletedEdges.forEach((edge: any) => {
+              requests.push(this.nodeService.deleteEdge(edge._key));
+            });
 
-            // 执行新增操作
-            // this.newEdges.forEach((edge: any) => {
-            //   console.log(edge)
-            //   requests.push(this.nodeService.addEdge(edge));
-            // });
+            //执行新增操作
+            this.newEdges.forEach((edge: any) => {
+              console.log(edge)
+              requests.push(this.nodeService.addEdge(edge));
+            });
 
             //并行执行所有请求
-            // forkJoin(requests).subscribe((data) => {
-            //   console.log(data);
-            //   // this.router.navigate(['/index/entity']);
-            // });
+            forkJoin(requests).subscribe((data) => {
+              console.log(data);
+              // this.router.navigate(['/index/entity']);
+            });
           });
 
-          // item.id = this.id;
-          // item['_key'] = this.item.items[0].split('/')[1];
-          // item['items'] = this.item.items;
-
-          // console.log(item)
-          // this.nodeService.put(item).subscribe((x) => {
-          //   this.message.success('编辑成功！');
-          //   this.router.navigate(['/index/entity']);
-
-          // });
+          item.id = this.id;
+          item['_key'] = this.item.items[0].split('/')[1];
+          item['items'] = this.item.items;
+          this.nodeService.put(item).subscribe((x) => {
+            this.message.success('编辑成功！');
+            this.router.navigate(['/index/entity']);
+          });
         }
         break;
       case 'cancel':

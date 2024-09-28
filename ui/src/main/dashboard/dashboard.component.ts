@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, Query, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, Query, TemplateRef, ViewChild, signal, viewChild } from '@angular/core';
 
 
 import { EntityService } from '../entity/entity.service';
@@ -13,6 +13,8 @@ import edgehandles from 'cytoscape-edgehandles';
 import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { animate, animation } from '@angular/animations';
+import { OntologyService } from '../ontology/ontology/ontology.service';
+import { PropertyService } from '../ontology/property/property.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +24,9 @@ import { animate, animation } from '@angular/animations';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
+  contentTpl = viewChild.required<TemplateRef<void>>('contentTpl');
+  properties:any;
+  model1:any;
   keyword = '';
   way = '默认检索';
   cy: any;
@@ -49,6 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   constructor(private service: EntityService,
+    private ontologyService: OntologyService,
+    public propertyService: PropertyService,
     private esService: EsService,
     private message: XMessageService,
     private dialogService: XDialogService,
@@ -299,6 +306,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
             console.log("双击边")
           }
         })
+
+
+        this.cy.on('ehcomplete',(event:any, sourceNode:any, targetNode:any, addedEdge:any)=>{
+          console.log(event)
+          console.log(sourceNode.data())
+          console.log(targetNode.data())
+          console.log(addedEdge.data())
+
+          this.esService.getEntity(sourceNode.data().id).subscribe((x:any)=>{
+            console.log(x['_source'].type)
+            this.ontologyService.get(x._source.type).subscribe((type: any) => {
+              this.ontologyService.getAllParentIds(x._source.type).subscribe((parents: any) => {
+                parents.push(x._source.type)
+
+                this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
+                  console.log(x.list.filter((p:any)=> p.type=='wikibase-item'));
+                  this.properties = signal(x.list.filter((p:any)=> p.type=='wikibase-item'))
+                });
+              });
+            });
+
+          })
+       
+          this.msgBox.alert({
+            title: '选择关系',
+            content: this.contentTpl(),
+            backdropClose: true,
+            callback: (action: XMessageBoxAction) => {
+              console.log(this.model1)
+            }
+          });
+        });
       })
     });
   }
