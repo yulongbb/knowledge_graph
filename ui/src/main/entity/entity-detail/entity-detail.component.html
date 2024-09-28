@@ -1,84 +1,129 @@
 <div class="row">
-  @switch (type) {
-  @case ('info') {
+  @switch (type) { @case ('info') {
   <div class="row">
-    <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id"
-      (backClick)="back()">
+    <x-page-header
+      [title]="entity()?._source?.labels?.zh?.value.slice(0, 20)"
+      [subTitle]="entity()?._id"
+      (backClick)="back()"
+    >
     </x-page-header>
-    <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+    <x-card
+      width="100%"
+      class="card"
+      [bodyStyle]="{ padding: 10, }"
+      [header]="header"
+    >
       <ng-template #header>
-        <span class="label">{{ entity()?._source?.labels?.zh?.value }}
+        <span class="label"
+          >{{ entity()?._source?.labels?.zh?.value }}
           <!-- <x-buttons>
                 <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-              </x-buttons> --> </span><span>{{ entity()?._type }}</span>
+              </x-buttons> --> </span
+        ><span>{{ entity()?._type }}</span>
       </ng-template>
       <div class="bottom">
         <h2>简介</h2>
-        <p *ngIf="entity()._source.descriptions" [innerHTML]="
-                linkifyText(
-                  entity()?._source?.descriptions?.zh?.value,
-                  entity()?._source?.entities
-                )
-              "></p>
-        <dl *ngFor="let property of properties()">
+        <p
+          *ngIf="entity()._source.descriptions"
+          [innerHTML]="
+            linkifyText(
+              entity()?._source?.descriptions?.zh?.value,
+              entity()?._source?.entities
+            )
+          "
+        ></p>
+           
+          <dl *ngFor="let property of propertyData()">
+
           <dl *ngIf="getStatement(property).length > 0">
             <dt>
               {{ property.name }}
             </dt>
             <dd>
               <i *ngFor="let statement of getStatement(property)">
-                <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
-                          'http://localhost:4200/index/search/info/' +
-                          statement.mainsnak.datavalue.value.id
-                        ">{{ statement.mainsnak.datavalue.value.label }}</a>
+                <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"
+                  ><a
+                    [href]="
+                      'http://localhost:4200/index/search/info/' +
+                      statement.mainsnak.datavalue.value.id
+                    "
+                    >{{ statement.mainsnak.datavalue.value.label }}</a
+                  >
                 </strong>
                 <strong *ngIf="statement.mainsnak.datatype == 'string'">
                   {{ statement.mainsnak.datavalue.value }}
                 </strong>
                 <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-                  <img *ngIf="
-                          statement?.mainsnak?.datavalue?.value?.split('.')[
-                            statement?.mainsnak.datavalue.value.split('.').length - 1
-                          ] != 'mp4'
-                        " width="200px" [src]="
-                          'http://localhost:9000/kgms/' +
-                          statement?.mainsnak?.datavalue.value
-                        " />
-                  <video *ngIf="
-                          statement?.mainsnak.datavalue.value.split('.')[
-                            statement?.mainsnak.datavalue.value.split('.').length - 1
-                          ] == 'mp4'
-                        " width="200px" controls>
-                    <source [src]="
-                            'http://localhost:9000/kgms/' +
-                            statement?.mainsnak.datavalue.value
-                          " type="video/mp4" />
+                  <img
+                    *ngIf="
+                      statement?.mainsnak?.datavalue?.value?.split('.')[
+                        statement?.mainsnak.datavalue.value.split('.').length -
+                          1
+                      ] != 'mp4'
+                    "
+                    width="200px"
+                    [src]="
+                      'http://localhost:9000/kgms/' +
+                      statement?.mainsnak?.datavalue.value
+                    "
+                  />
+                  <video
+                    *ngIf="
+                      statement?.mainsnak.datavalue.value.split('.')[
+                        statement?.mainsnak.datavalue.value.split('.').length -
+                          1
+                      ] == 'mp4'
+                    "
+                    width="200px"
+                    controls
+                  >
+                    <source
+                      [src]="
+                        'http://localhost:9000/kgms/' +
+                        statement?.mainsnak.datavalue.value
+                      "
+                      type="video/mp4"
+                    />
                     <p>
-                      你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                      你的浏览器不支持 HTML5 视频。这里有一个<a
+                        href="myVideo.mp4"
+                        download="myVideo.mp4"
+                        >视频</a
+                      >链接。
                     </p>
                   </video>
                 </strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                    [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'url'"
+                  ><a
+                    target="_blank"
+                    [href]="statement?.mainsnak.datavalue.value"
+                    >{{ statement?.mainsnak.datavalue.value }}</a
+                  ></strong
+                >
                 <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
                   statement.mainsnak.datavalue.value.amount
-                  }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                  statement.mainsnak.datavalue.value.text }}</strong>
+                }}</strong>
+                <strong
+                  *ngIf="statement.mainsnak.datatype == 'monolingualtext'"
+                  >{{ statement.mainsnak.datavalue.value.text }}</strong
+                >
                 <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
                   statement.mainsnak.datavalue.value
-                  }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-                  statement.mainsnak.datavalue.value.latitude }},{{
-                  statement.mainsnak.datavalue.value.longitude
-                  }}</strong>
+                }}</strong>
+                <strong
+                  *ngIf="statement.mainsnak.datatype == 'globe-coordinate'"
+                  >{{ statement.mainsnak.datavalue.value.latitude }},{{
+                    statement.mainsnak.datavalue.value.longitude
+                  }}</strong
+                >
                 <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
                   statement.mainsnak.datavalue.value.time
-                  }}</strong>
+                }}</strong>
               </i>
             </dd>
           </dl>
         </dl>
+     
         <div class="time">
           <span>{{ entity()?._source?.modified }}</span>
           <span>{{ entity()?._id }}</span>
@@ -86,42 +131,76 @@
         <div class="gallery" *ngIf="images">
           <div class="warp">
             <div *ngFor="let image of images">
-              <div (click)="preview(image)" class="thumbnail"
-                style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
+              <div
+                (click)="preview(image)"
+                class="thumbnail"
+                style="background-image: url('http://localhost:9000/kgms/{{
+                  image
+                }}')"
+              ></div>
             </div>
           </div>
         </div>
 
         <div *ngFor="let video of videos">
           <video width="100%" controls>
-            <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+            <source
+              [src]="'http://localhost:9000/kgms/' + video"
+              type="video/mp4"
+            />
             <p>
-              你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+              你的浏览器不支持 HTML5 视频。这里有一个<a
+                href="myVideo.mp4"
+                download="myVideo.mp4"
+                >视频</a
+              >链接。
             </p>
           </video>
         </div>
 
         <div *ngFor="let pdf of pdfs">
-          <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
-            [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
+          <iframe
+            id="inlineFrameExample"
+            title="Inline Frame Example"
+            frameborder="0"
+            width="100%"
+            height="1500"
+            [src]="
+              trustUrl(
+                'http://localhost:7777/web/viewer.html?file=/pdf/kgms/' + pdf
+              )
+            "
+          >
           </iframe>
         </div>
       </div>
     </x-card>
   </div>
-  }
-  @case ('add') {
+  } @case ('add') {
   <div class="row">
     <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
     </x-page-header>
     <x-card width="100%">
       <div class="row" *ngFor="let t of tags | keyvalue">
-        <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-          tag></x-checkbox>
+        <x-checkbox
+          [label]="t.key"
+          direction="row"
+          [data]="t.value"
+          [(ngModel)]="tag"
+          tagBordered="false"
+          tag
+        ></x-checkbox>
       </div>
       <div class="row">
-        <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
-          multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+        <x-upload
+          action="http://localhost:3000/api/minio-client/uploadFile"
+          [text]="textTpl"
+          [filesTpl]="filesTpl"
+          multiple
+          [(ngModel)]="imgs"
+          (uploadSuccess)="uploadSuccess($event)"
+          multipleModel="add"
+        ></x-upload>
         <ng-template #textTpl>
           <x-icon class="upload-icon" type="fto-upload"></x-icon>
           <span>选择文件</span>
@@ -130,112 +209,175 @@
           <div class="gallery">
             <div class="warp">
               <div *ngFor="let file of files">
-                @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
-                @case ('mp4') {
+                @switch (file?.url?.split('.')[file?.url.split('.').length - 1])
+                { @case ('mp4') {
                 <video class="thumbnail" width="200px" controls>
                   <source [src]="file?.url" type="video/mp4" />
                   <p>
-                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                    你的浏览器不支持 HTML5 视频。这里有一个<a
+                      href="myVideo.mp4"
+                      download="myVideo.mp4"
+                      >视频</a
+                    >链接。
                   </p>
                 </video>
-                }
-                @case ('pdf') {
+                } @case ('pdf') {
 
-                <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
-                }
-                @default {
-                <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
-                }
-                }
+                <a [href]="file?.url" target="_blank"> {{ file?.url }}</a>
+                } @default {
+                <div
+                  class="thumbnail"
+                  [style]="'background-image: url(' + file?.url + ')'"
+                ></div>
+                } }
               </div>
             </div>
           </div>
         </ng-template>
       </div>
       <h3>{{ title }}</h3>
-      <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-        width="100%" labelAlign="end" span="24" space="2"></x-form>
-      <br>
+      <x-form
+        #form
+        [disabled]="disabled"
+        [controls]="controls"
+        direction="row"
+        labelSuffix=":"
+        labelWidth="6rem"
+        width="100%"
+        labelAlign="end"
+        span="24"
+        space="2"
+      ></x-form>
+      <br />
       <div class="app-footer">
         <x-buttons space="0.5">
           <x-button (click)="action('cancel')">取消</x-button>
-          <x-button type="primary" (click)="!formInvalid && action('save')"
-            [disabled]="formInvalid || disabled">保存</x-button>
+          <x-button
+            type="primary"
+            (click)="!formInvalid && action('save')"
+            [disabled]="formInvalid || disabled"
+            >保存</x-button
+          >
         </x-buttons>
       </div>
     </x-card>
   </div>
-  }
-  @case ('edit') {
+  } @case ('edit') {
   <div class="row">
-    <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id"
-      (backClick)="back()">
+    <x-page-header
+      [title]="entity()?._source?.labels?.zh?.value.slice(0, 20)"
+      [subTitle]="entity()?._id"
+      (backClick)="back()"
+    >
     </x-page-header>
 
     <x-collapse bordered>
       <x-collapse-panel label="基本信息" active="true">
-        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-          width="100%" labelAlign="end" span="24" space="2"></x-form>
-        <br>
+        <x-form
+          #form
+          [disabled]="disabled"
+          [controls]="controls"
+          direction="row"
+          labelSuffix=":"
+          labelWidth="6rem"
+          width="100%"
+          labelAlign="end"
+          span="24"
+          space="2"
+        ></x-form>
+        <br />
       </x-collapse-panel>
     </x-collapse>
 
-
     <x-collapse>
-      <x-collapse-panel label="属性信息"  active="true">
-   
-        <x-button [style.marginBottom.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
-        <x-table [columns]="columns2" [data]="statements" loading [showPagination]="false" [allowSelectRow]="false"
-          [bodyColumnTpl]="{ actions: actionsTpl }" [bodyTdTpl]="bodyTdTpl">
+      <x-collapse-panel label="属性信息" active="true">
+        <x-button
+          [style.marginBottom.rem]="1"
+          (click)="add()"
+          icon="fto-plus"
+          type="primary"
+          >新增</x-button
+        >
+        <x-table
+          [columns]="columns2"
+          [data]="statements"
+          loading
+          [showPagination]="false"
+          [allowSelectRow]="false"
+          [bodyColumnTpl]="{ actions: actionsTpl }"
+          [bodyTdTpl]="bodyTdTpl"
+        >
         </x-table>
-    
+
         <ng-template #actionsTpl let-column="$column" let-row="$row">
           <div>
             <x-link type="primary" (click)="del(row)">删除</x-link>
           </div>
         </ng-template>
-    
+
         <ng-template #bodyTdTpl let-column="$column" let-row="$row">
-          @switch (column.id) {
-          @case ('property') {
-          <x-select [style.width.%]="100" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label" [data]="properties"></x-select>
-    
+          @switch (column.id) { @case ('property') {
+          <x-select
+            [style.width.%]="100"
+            [nodeTpl]="nodeTpl"
+            [(ngModel)]="row.mainsnak.label"
+            [data]="properties"
+            (ngModelChange)="change(row)"
+          ></x-select>
+
           <ng-template #nodeTpl let-node="$node">
             @if (node) {
-            <span class="select-item"> {{ node.label}}</span>
+            <span class="select-item"> {{ node.label }}</span>
             }
           </ng-template>
-          }
-          @case ('name') {
-            <x-input *ngIf="row?.mainsnak?.datatype=='string'" [style.width.%]="100" [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-            <x-input *ngIf="row?.mainsnak?.datatype=='quantity'" [style.width.%]="100" [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input>
-            <x-input *ngIf="row?.mainsnak?.datatype=='time'" [style.width.%]="100" [(ngModel)]="row.mainsnak.datavalue.value.time"></x-input>
-            <x-input *ngIf="row?.mainsnak?.datatype=='wikibase-item'" [style.width.%]="100" [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
-          }
-    
-          @case ('status') {
+          } @case ('name') {
+          <x-input
+            *ngIf="row?.mainsnak?.datatype == 'string'"
+            [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value"
+          ></x-input>
+          <x-input
+            *ngIf="row?.mainsnak?.datatype == 'quantity'"
+            [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value.amount"
+          ></x-input>
+          <x-date-picker
+            *ngIf="row?.mainsnak?.datatype == 'time'"
+            [(ngModel)]="row.mainsnak.datavalue.value.time"
+          ></x-date-picker>
+          <x-input
+            *ngIf="row?.mainsnak?.datatype == 'wikibase-item'"
+            [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value.label"
+          ></x-input>
+          } @case ('status') {
           <x-switch [(ngModel)]="row.status"></x-switch>
-          }
-          @default {
+          } @default {
           {{ row[column.id] }}
-          }
-          }
+          } }
         </ng-template>
       </x-collapse-panel>
     </x-collapse>
 
     <x-collapse>
-      <x-collapse-panel label="标签标注" style="overflow: scroll;">
-        <div style="display: block;width: 100%; overflow: scroll;">
+      <x-collapse-panel label="标签标注" style="overflow: scroll">
+        <div style="display: block; width: 100%; overflow: scroll">
           <div *ngFor="let t of tags | keyvalue">
-            <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-              tag></x-checkbox>
+            <x-checkbox
+              [label]="t.key"
+              direction="row"
+              [data]="t.value"
+              [(ngModel)]="tag"
+              tagBordered="false"
+              tag
+            ></x-checkbox>
           </div>
         </div>
         <div class="row">
-          标签：
-          @for (item of tag(); track item) {
-          <x-tag type="primary" closable (close)="close(item)">{{ item }}</x-tag>
+          标签： @for (item of tag(); track item) {
+          <x-tag type="primary" closable (close)="close(item)">{{
+            item
+          }}</x-tag>
           }
         </div>
       </x-collapse-panel>
@@ -244,8 +386,15 @@
     <x-collapse>
       <x-collapse-panel label="媒体文件">
         <div class="row">
-          <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
-            multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+          <x-upload
+            action="http://localhost:3000/api/minio-client/uploadFile"
+            [text]="textTpl"
+            [filesTpl]="filesTpl"
+            multiple
+            [(ngModel)]="imgs"
+            (uploadSuccess)="uploadSuccess($event)"
+            multipleModel="add"
+          ></x-upload>
           <ng-template #textTpl>
             <x-icon class="upload-icon" type="fto-upload"></x-icon>
             <span>选择文件</span>
@@ -254,23 +403,27 @@
             <div class="gallery">
               <div class="warp">
                 <div *ngFor="let file of files">
-                  @switch (file?.url?.split('.')[file?.url.split('.').length - 1]) {
-                  @case ('mp4') {
+                  @switch (file?.url?.split('.')[file?.url.split('.').length -
+                  1]) { @case ('mp4') {
                   <video class="thumbnail" width="200px" controls>
                     <source [src]="file?.url" type="video/mp4" />
                     <p>
-                      你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                      你的浏览器不支持 HTML5 视频。这里有一个<a
+                        href="myVideo.mp4"
+                        download="myVideo.mp4"
+                        >视频</a
+                      >链接。
                     </p>
                   </video>
-                  }
-                  @case ('pdf') {
+                  } @case ('pdf') {
 
-                  <a [href]="file?.url" target="_blank"> {{file?.url}}</a>
-                  }
-                  @default {
-                  <div class="thumbnail" [style]="'background-image: url('+file?.url+')'"></div>
-                  }
-                  }
+                  <a [href]="file?.url" target="_blank"> {{ file?.url }}</a>
+                  } @default {
+                  <div
+                    class="thumbnail"
+                    [style]="'background-image: url(' + file?.url + ')'"
+                  ></div>
+                  } }
                 </div>
               </div>
             </div>
@@ -280,20 +433,17 @@
     </x-collapse>
     <h3>{{ title }}</h3>
 
-
     <div class="app-footer">
       <x-buttons space="0.5">
         <x-button (click)="action('cancel')">取消</x-button>
-        <x-button type="primary" (click)="!formInvalid && action('save')"
-          [disabled]="formInvalid || disabled">保存</x-button>
+        <x-button
+          type="primary"
+          (click)="!formInvalid && action('save')"
+          [disabled]="formInvalid || disabled"
+          >保存</x-button
+        >
       </x-buttons>
     </div>
-
   </div>
-  }
-  @default {
-  }
-  }
-
-
+  } @default { } }
 </div>
