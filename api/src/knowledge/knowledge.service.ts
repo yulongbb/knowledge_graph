@@ -356,19 +356,27 @@ export class KnowledgeService {
 
         cytoscapeData.elements.nodes.push({
           data: {
-            _id: result[0]?.start?.id['_id']??items[0],
-            id: result[0]?.start?.id ??id,
+            _id: result[0]?.start?.id['_id'] ?? items[0],
+            images: entity['_source'].images,
+            id: result[0]?.start?.id ?? id,
+            base: [],
             label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value // 根据你的字段结构选择合适的label
+
           }
         });
         addedNodes.add(result[0]?.start?.id);
         await Promise.all(result.map(async ({ vertex, edge, start, from, to }) => {
+
+
           // 添加节点
           if (!addedNodes.has(vertex.id)) {
+            let data = await this.elasticsearchService.get(vertex.id);
             cytoscapeData.elements.nodes.push({
               data: {
                 _id: vertex['_id'],
+                images: data['_source']['images'],
                 id: vertex.id,
+                base: [],
                 label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
               }
             });
@@ -387,6 +395,27 @@ export class KnowledgeService {
                   label: property.name || '' // 根据你的边数据结构选择合适的label
                 }
               });
+            }
+          }
+
+          // 添加边
+          if (edge._from == edge._to) {
+            const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
+            if (property?.name) {
+              cytoscapeData.elements.nodes.forEach((node: any) => {
+                if (node.data._id == edge._from) {
+                 
+                  if (node['data']['base'].filter((b: any) => b._id == edge._id).length == 0) {
+                    node['data']['base'].push({
+                      _id: edge._id, 
+                      value: edge.mainsnak.datavalue.value,
+                      label: property.name || '' 
+                    });
+
+                  }
+                }
+              });
+
             }
           }
         }));

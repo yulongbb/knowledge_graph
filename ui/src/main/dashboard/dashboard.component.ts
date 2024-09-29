@@ -9,12 +9,14 @@ import cytoscape from 'cytoscape';
 import cxtmenu from 'cytoscape-cxtmenu';
 import cola from 'cytoscape-cola';
 import edgehandles from 'cytoscape-edgehandles';
+import cytoscapePopper from 'cytoscape-popper';
 
 import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { animate, animation } from '@angular/animations';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
+import { createPopper } from '@popperjs/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.type = null;
 
   }
+  popperInstances = new Map();
 
   constructor(private service: EntityService,
     private ontologyService: OntologyService,
@@ -72,10 +75,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         cytoscape.use(cola); // register extension
         cytoscape.use(edgehandles);
 
+        cytoscape.use(cytoscapePopper(createPopper)); // register extension
+
         console.log(data)
         this.cy = cytoscape({
           container: this.cyContainer.nativeElement, // container to render in
-          elements: data.elements,
           style: [ // the stylesheet for the graph
             {
               selector: 'node',
@@ -193,7 +197,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         var eh = this.cy.edgehandles();
         this.cy.cxtmenu({
           selector: 'node',
-
           commands: [
             {
               content: '浏览',
@@ -258,12 +261,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   title: '删除弹框',
                   content: '这是一段内容',
                   placement: 'center',
-                  callback: (action: XMessageBoxAction) => { 
+                  callback: (action: XMessageBoxAction) => {
                     if (action === 'confirm') {
                       console.log(ele.data())
                       ele.remove();
-                      this.service.deleteEdge(ele.data()['_id']).subscribe((e:any)=>{
-                        this.message.success('关系删除成功' );
+                      this.service.deleteEdge(ele.data()['_id']).subscribe((e: any) => {
+                        this.message.success('关系删除成功');
                       })
 
                     } else if (action === 'close') {
@@ -292,7 +295,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           ]
         });
 
-
         var doubleClickDelayMs = 350;
         var previousTapStamp: any;
         this.cy.on('tap', (ele: any) => {
@@ -313,6 +315,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             console.log("双击节点")
             console.log(target.data())
             this.service.graph(1, 100, target.data().id).subscribe((data: any) => {
+              console.log(data)
+
               this.initializeCytoscape(data);
             })
           } else if (target.isEdge()) {
@@ -385,15 +389,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
             }
           });
         });
+
+        this.initializeCytoscape(data);
       })
     });
   }
+
+
+  // 销毁所有 Popper 实例
+
 
   initializeCytoscape(data: any): void {
 
     data.elements.nodes.forEach((node: any) => {
       if (this.cy.nodes().filter((n: any) => n.data().id == node.data.id).length == 0) {
         this.cy.add(node);
+      } else {
+        if(this.cy.getElementById(node.data.id).data().base.length==0){
+          this.cy.getElementById(node.data.id).data(node.data);
+
+        }
+
       }
     })
     data.elements.edges.forEach((edge: any) => {
@@ -401,6 +417,51 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.cy.add(edge);
       }
     });
+    this.cy.nodes().forEach((n: any) => {
+      console.log(n.data())
+      const existingPopper = n.scratch('_popper');
+      if (existingPopper) {
+        console.log(existingPopper)
+        existingPopper.destroy();
+      }
+      let popper = n.popper({
+        content: () => {
+          let div = document.createElement('div');
+
+          div.innerHTML = `<img width="50px" src="http://localhost:9000/kgms/${n.data().images[0]}" />${n.data()['base'].map((b: any) => '<p>' + b.label + ':' + b.value + '</p>')}`
+
+          document.body.appendChild(div);
+
+          return div;
+        },
+        popper: {
+          placement: 'right',
+          modifiers: {
+            preventOverflow: {
+              boundariesElement: document.body,
+              padding: 10,
+              priority: []
+            },
+            hide: {
+              enabled: true
+            }
+          }
+
+        }
+      });
+      n.scratch('_popper', popper)
+      let update = () => {
+        popper.update();
+      };
+
+      n.on('position', update);
+
+      this.cy.on('pan zoom resize', update);
+
+
+
+    })
+
     this.cy.layout({
       name: 'cola',
       animate: true,
@@ -468,12 +529,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log(node)
     this.modelAsync = signal(node?._source?.labels.zh.value);
     this.service.graph(1, 10, node?._id).subscribe((data: any) => {
+
       this.initializeCytoscape(data);
     })
   }
 
 
   ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
   }
 }
