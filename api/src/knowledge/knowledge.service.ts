@@ -351,8 +351,12 @@ export class KnowledgeService {
         // 用于存储已添加的节点，防止重复
         const addedNodes = new Set();
 
+        console.log(111);
+        console.log(result[0]?.start);
+
         cytoscapeData.elements.nodes.push({
           data: {
+            _id: result[0]?.start?.id['_id']??items[0],
             id: result[0]?.start?.id ??id,
             label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value // 根据你的字段结构选择合适的label
           }
@@ -363,8 +367,9 @@ export class KnowledgeService {
           if (!addedNodes.has(vertex.id)) {
             cytoscapeData.elements.nodes.push({
               data: {
+                _id: vertex['_id'],
                 id: vertex.id,
-                label: vertex.labels?.zh?.value || '' // 确保数据结构的安全性
+                label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
               }
             });
             addedNodes.add(vertex.id);

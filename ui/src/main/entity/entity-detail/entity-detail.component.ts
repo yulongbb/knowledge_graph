@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  Query,
   ViewChild,
   signal,
 } from '@angular/core';
@@ -24,7 +23,6 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
-import { values } from 'lodash';
 
 @Component({
   selector: 'app-entity-detail',
@@ -144,6 +142,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   del(row: XTableRow) {
+    console.log(row);
     // const index = this.data.findIndex((x) => x.id === row.id);
     // if (index >= 0) {
     //   this.data.splice(index, 1);
@@ -152,16 +151,16 @@ export class EntityDetailComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private message: XMessageService,
+    private dialogSewrvice: XDialogService,
+    public nav: NavService,
     private ontologyService: OntologyService,
     private esService: EsService,
     public propertyService: PropertyService,
     public tagService: TagService,
     private nodeService: EntityService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private message: XMessageService,
-    private dialogSewrvice: XDialogService,
-    public nav: NavService
   ) {
     // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
@@ -249,7 +248,6 @@ export class EntityDetailComponent implements OnInit {
         };
         emptyDatavalue.type = 'globecoordinate';
         break;
-
       case 'quantity':
         emptyDatavalue.value = {
           amount: '',
@@ -271,7 +269,6 @@ export class EntityDetailComponent implements OnInit {
         };
         emptyDatavalue.type = 'time';
         break;
-
       case 'tabular-data':
       case 'geo-shape':
         emptyDatavalue.value = {
@@ -281,7 +278,6 @@ export class EntityDetailComponent implements OnInit {
         };
         emptyDatavalue.type = 'wikibase-entityid';
         break;
-
       case 'wikibase-item':
       case 'wikibase-property':
       case 'wikibase-lexeme':
@@ -294,7 +290,6 @@ export class EntityDetailComponent implements OnInit {
         };
         emptyDatavalue.type = 'wikibase-entityid';
         break;
-
       default:
         emptyDatavalue.value = null;
         emptyDatavalue.type = 'unknown';
@@ -363,7 +358,6 @@ export class EntityDetailComponent implements OnInit {
                     this.nodeService
                       .getLinks(1, 50, this.id, {})
                       .subscribe((c: any) => {
-                        console.log(c.list)
                         this.statements = [];
                         c.list.forEach((p: any) => {
                           if (p.edges[0].mainsnak.property != 'P31') {
@@ -381,7 +375,6 @@ export class EntityDetailComponent implements OnInit {
                             this.statements.push(p.edges[0]);
                           }
                           this.claims = this.statements;
-
                         });
                       });
                   });
@@ -427,7 +420,6 @@ export class EntityDetailComponent implements OnInit {
             (i: any) => i.url.split('/')[i.url.split('/').length - 1]
           ),
         };
-        console.log(this.item);
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
@@ -445,43 +437,33 @@ export class EntityDetailComponent implements OnInit {
               }
               statements.push(p.edges[0]);
             });
-
-
-
             this.newEdges = this.statements.filter((s:any)=> s.state=='add');
-
             console.log('更新');
             console.log(this.updatedEdges);
             console.log('删除');
             console.log(this.deletedEdges);
             console.log('新增');
             console.log(this.newEdges);
-
             const requests: any = [];
-
             // 执行更新操作
             this.updatedEdges.forEach((edge: any) => {
               requests.push(this.nodeService.updateEdge(edge));
             });
-
             // 执行删除操作
             this.deletedEdges.forEach((edge: any) => {
               requests.push(this.nodeService.deleteEdge(edge._key));
             });
-
             //执行新增操作
             this.newEdges.forEach((edge: any) => {
               console.log(edge)
               requests.push(this.nodeService.addEdge(edge));
             });
-
             //并行执行所有请求
             forkJoin(requests).subscribe((data) => {
               console.log(data);
               // this.router.navigate(['/index/entity']);
             });
           });
-
           item.id = this.id;
           item['_key'] = this.item.items[0].split('/')[1];
           item['items'] = this.item.items;
@@ -499,8 +481,6 @@ export class EntityDetailComponent implements OnInit {
 
   linkifyText(text: string, entities: any): string {
     const wikidataBaseUrl = 'http://localhost:4200/index/search/info/';
-    // 简单示例，将“爱因斯坦”替换为指向Wikidata的链接
-    console.log(entities);
     let entityMap: any = new Map();
     entities.forEach((entity: any) => {
       entityMap[entity.word] = entity.id;
@@ -513,17 +493,9 @@ export class EntityDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-    console.log(property);
-    console.log(this.claims);
     return this.claims.filter(
       (c: any) => c.mainsnak.property == `P${property.id}`
     );
-  }
-
-  backClick() {
-    this.router.navigate([`/index/entity/${this.knowledge}`], {
-      replaceUrl: true,
-    });
   }
 
   back() {
@@ -537,8 +509,6 @@ export class EntityDetailComponent implements OnInit {
       return [...x];
     });
   }
-
-
 }
 
 interface Datavalue {

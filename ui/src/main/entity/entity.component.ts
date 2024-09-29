@@ -25,23 +25,16 @@ import { OntologyService } from '../ontology/ontology/ontology.service';
   styleUrls: ['./entity.component.scss'],
 })
 export class EntityComponent extends PageBase {
+  @ViewChild('tableCom') tableCom!: XTableComponent;
+
   id: any;
   knowledge: any;
   keyword = '';
   size = 20;
   index = 1;
-
   value: XPosition = 'right';
-
-
-  detail(row: XTableRow, column: XTableColumn) {
-    this.id = row.id[0].split('/')[1];
-  }
-
   data: any;
-
   checkedRows: XTableRow[] = [];
-
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
     { id: 'actions', label: '操作', width: 150, right: 0 },
@@ -51,8 +44,6 @@ export class EntityComponent extends PageBase {
     { id: 'description', label: '描述', flex: 1.5, sort: true },
     { id: 'aliase', label: '别名', flex: 2 },
   ];
-
-  @ViewChild('tableCom') tableCom!: XTableComponent;
   model1: any;
 
   layout: XData<XRadioNode> = [
@@ -74,7 +65,6 @@ export class EntityComponent extends PageBase {
     private message: XMessageService,
     private msgBox: XMessageBoxService
   ) {
-
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.data = (index: number, size: number, query: Query) => this.esService
@@ -105,10 +95,13 @@ export class EntityComponent extends PageBase {
           }),
           map((x: any) => x)
         );
-
     });
   }
 
+  detail(row: XTableRow, column: XTableColumn) {
+    this.id = row.id[0].split('/')[1];
+  }
+  
   setCheckedRows(checked: boolean, row: XTableRow) {
     if (checked) {
       if (!this.checkedRows.some((x) => x.id === row.id)) {

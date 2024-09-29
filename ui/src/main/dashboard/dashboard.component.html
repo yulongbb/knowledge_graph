@@ -17,11 +17,6 @@
 
 
 <ng-template #contentTpl>
-    <x-select [data]="properties()" [(ngModel)]="model1" [nodeTpl]="nodeTpl"></x-select>
-
-    <ng-template #nodeTpl let-node="$node">
-        @if (node) {
-          <span class="select-item"> {{ node?.name }}</span>
-        }
-      </ng-template>
-  </ng-template>
+    <x-select [data]="properties()" [(ngModel)]="model1" 
+    ></x-select>
+</ng-template>

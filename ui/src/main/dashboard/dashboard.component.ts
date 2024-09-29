@@ -25,8 +25,9 @@ import { PropertyService } from '../ontology/property/property.service';
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
   contentTpl = viewChild.required<TemplateRef<void>>('contentTpl');
-  properties:any;
-  model1:any;
+  properties: any;
+  propertyData: any;
+  model1: any;
   keyword = '';
   way = '默认检索';
   cy: any;
@@ -308,33 +309,61 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
 
 
-        this.cy.on('ehcomplete',(event:any, sourceNode:any, targetNode:any, addedEdge:any)=>{
-          console.log(event)
-          console.log(sourceNode.data())
-          console.log(targetNode.data())
-          console.log(addedEdge.data())
+        this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEdge: any) => {
 
-          this.esService.getEntity(sourceNode.data().id).subscribe((x:any)=>{
+
+          this.esService.getEntity(sourceNode.data().id).subscribe((x: any) => {
             console.log(x['_source'].type)
             this.ontologyService.get(x._source.type).subscribe((type: any) => {
               this.ontologyService.getAllParentIds(x._source.type).subscribe((parents: any) => {
                 parents.push(x._source.type)
 
                 this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-                  console.log(x.list.filter((p:any)=> p.type=='wikibase-item'));
-                  this.properties = signal(x.list.filter((p:any)=> p.type=='wikibase-item'))
+                  this.propertyData = signal(x.list.filter((p: any) => p.type == 'wikibase-item'));
+                  this.properties = signal(x.list.filter((p: any) => p.type == 'wikibase-item').map((p: any) => p.name)
+                  )
                 });
               });
             });
 
           })
-       
+
           this.msgBox.alert({
             title: '选择关系',
             content: this.contentTpl(),
             backdropClose: true,
             callback: (action: XMessageBoxAction) => {
               console.log(this.model1)
+              let property = this.propertyData().filter((p: any) => p.name == this.model1)[0];
+              console.log(property)
+
+
+              let edge = {
+                '_from': sourceNode.data()['_id'],
+                '_to': targetNode.data()['_id'],
+                "mainsnak": {
+                  "snaktype": "value",
+                  "property": `P${property.id}`,
+                  "datavalue": {
+                    "value": {
+                      "entity-type": "item",
+                      "numeric-id": Number.parseInt(targetNode.data()['_id'].split('/')[1].replace('Q', '')),
+                      "id": targetNode.data()['_id'].split('/')[1]
+                    },
+                    "type": "wikibase-entityid"
+                  },
+                  "datatype": "wikibase-item"
+                },
+                "type": "statement",
+                "rank": "normal"
+              }
+
+              this.service.addEdge(edge).subscribe((e: any) => {
+                console.log(e)
+
+              })
+
+
             }
           });
         });
@@ -424,6 +453,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.initializeCytoscape(data);
     })
   }
+
 
   ngOnDestroy(): void {
     throw new Error('Method not implemented.');
