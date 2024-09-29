@@ -381,6 +381,7 @@ export class KnowledgeService {
             if (property?.name) {
               cytoscapeData.elements.edges.push({
                 data: {
+                  _id: edge['_key'],
                   source: from.id,
                   target: to.id,
                   label: property.name || '' // 根据你的边数据结构选择合适的label

@@ -244,11 +244,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           selector: 'edge',
           commands: [
             {
-              content: '编辑',
+              content: '限定',
               select: (ele: any) => {
                 console.log(ele.id());
-                console.log('编辑知识');
-                this.dialog(ele.data(), '', 'center')
+                console.log('添加限定');
               },
             },
             {
@@ -259,7 +258,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   title: '删除弹框',
                   content: '这是一段内容',
                   placement: 'center',
-                  callback: (action: XMessageBoxAction) => { }
+                  callback: (action: XMessageBoxAction) => { 
+                    if (action === 'confirm') {
+                      console.log(ele.data())
+                      ele.remove();
+                      this.service.deleteEdge(ele.data()['_id']).subscribe((e:any)=>{
+                        this.message.success('关系删除成功' );
+                      })
+
+                    } else if (action === 'close') {
+                      this.message.info('已关闭窗口！');
+                    } else if (action === 'cancel') {
+                      this.message.info('已取消窗口！');
+                    }
+                  }
                 });
               }
             }
@@ -308,16 +320,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
           }
         })
 
-
         this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEdge: any) => {
-
-
           this.esService.getEntity(sourceNode.data().id).subscribe((x: any) => {
             console.log(x['_source'].type)
             this.ontologyService.get(x._source.type).subscribe((type: any) => {
               this.ontologyService.getAllParentIds(x._source.type).subscribe((parents: any) => {
                 parents.push(x._source.type)
-
                 this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
                   this.propertyData = signal(x.list.filter((p: any) => p.type == 'wikibase-item'));
                   this.properties = signal(x.list.filter((p: any) => p.type == 'wikibase-item').map((p: any) => p.name)
@@ -325,9 +333,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 });
               });
             });
-
           })
-
           this.msgBox.alert({
             title: '选择关系',
             content: this.contentTpl(),
@@ -367,7 +373,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     }
                   });
                   addedEdge.remove();
-
                 })
               } else if (action === 'close') {
                 this.message.info('已取消创建关系！');
@@ -376,10 +381,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 addedEdge.remove();
                 this.message.info('已取消创建关系！');
               }
-
               console.log(action);
-
-
             }
           });
         });
