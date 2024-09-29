@@ -333,35 +333,51 @@ export class DashboardComponent implements OnInit, OnDestroy {
             content: this.contentTpl(),
             backdropClose: true,
             callback: (action: XMessageBoxAction) => {
-              console.log(this.model1)
-              let property = this.propertyData().filter((p: any) => p.name == this.model1)[0];
-              console.log(property)
-
-
-              let edge = {
-                '_from': sourceNode.data()['_id'],
-                '_to': targetNode.data()['_id'],
-                "mainsnak": {
-                  "snaktype": "value",
-                  "property": `P${property.id}`,
-                  "datavalue": {
-                    "value": {
-                      "entity-type": "item",
-                      "numeric-id": Number.parseInt(targetNode.data()['_id'].split('/')[1].replace('Q', '')),
-                      "id": targetNode.data()['_id'].split('/')[1]
+              if (action === 'confirm') {
+                console.log(this.model1)
+                let property = this.propertyData().filter((p: any) => p.name == this.model1)[0];
+                console.log(property)
+                let edge = {
+                  '_from': sourceNode.data()['_id'],
+                  '_to': targetNode.data()['_id'],
+                  "mainsnak": {
+                    "snaktype": "value",
+                    "property": `P${property.id}`,
+                    "datavalue": {
+                      "value": {
+                        "entity-type": "item",
+                        "numeric-id": Number.parseInt(targetNode.data()['_id'].split('/')[1].replace('Q', '')),
+                        "id": targetNode.data()['_id'].split('/')[1]
+                      },
+                      "type": "wikibase-entityid"
                     },
-                    "type": "wikibase-entityid"
+                    "datatype": "wikibase-item"
                   },
-                  "datatype": "wikibase-item"
-                },
-                "type": "statement",
-                "rank": "normal"
+                  "type": "statement",
+                  "rank": "normal"
+                }
+
+                this.service.addEdge(edge).subscribe((e: any) => {
+                  this.message.success('关系创建成功');
+                  this.cy.add({
+                    "data": {
+                      "source": sourceNode.data().id,
+                      "target": targetNode.data().id,
+                      "label": property.name
+                    }
+                  });
+                  addedEdge.remove();
+
+                })
+              } else if (action === 'close') {
+                this.message.info('已取消创建关系！');
+                addedEdge.remove();
+              } else if (action === 'cancel') {
+                addedEdge.remove();
+                this.message.info('已取消创建关系！');
               }
 
-              this.service.addEdge(edge).subscribe((e: any) => {
-                console.log(e)
-
-              })
+              console.log(action);
 
 
             }
