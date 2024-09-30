@@ -17,76 +17,44 @@ export class EdgeService {
 
   async addEdge(edge: any): Promise<any> {
     const myCollection = this.db.collection('link');
-     
-    return myCollection.save(edge);;
-    // if(edge['_to']){
-    //   result = myCollection.save(edge).then(
-    //     () => console.log('Document removed successfully'),
-    //     (err) => console.error('Failed to remove document:', err),
-    //   )
-    // }else{
-    //   if (edge.mainsnak.datatype == 'wikibase-item') {
-    //     console.log(edge.mainsnak.datavalue.value.label)
+    if (edge.mainsnak.datatype == 'wikibase-item') {
+      // 查询知识并关联
+      let data = await this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label)
+      console.log(data);
+      if (data) {
+        edge['_to'] = data['_id'];
+        edge.mainsnak.datavalue.value.id = data['_key'];
+        return myCollection.save(edge);;
+      } else {
+        let query: any = {
+          filter: [{
+            field: 'id',
+            value: Number.parseInt(edge.mainsnak.property.replace('P', '')),
+            relation: 'values',
+            operation: '=',
+          }]
+        };
+        let schema = await this.schemasService.getList(1, 10, query);
+        if (schema.list.length > 0) {
+          // 新增知识并关联
+          let e = await this.knowledgeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } });
+          edge['_to'] = e['_id']
+          edge.mainsnak.datavalue.value.id = e['_key'];
+          return myCollection.save(edge);;
 
-    //     // 查询知识并关联
-    //     this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label).then((data: any) => {
-    //       console.log(data);
-    //       if (data) {
-    //         edge['_to'] = data['_id'];
-    //         edge.mainsnak.datavalue.value.id = data['_key'];
-    //         result = myCollection.save(edge).then(
-    //           () => console.log('Document removed successfully'),
-    //           (err) => console.error('Failed to remove document:', err),
-    //         )
-    //       } else {
-    //         let query: any = {
-    //           filter: [{
-    //             field: 'id',
-    //             value: Number.parseInt(edge.mainsnak.property.replace('P', '')),
-    //             relation: 'values',
-    //             operation: '=',
-    //           }]
-    //         };
-    //         this.schemasService.getList(1, 10, query).then((schema: any) => {
-    //           if (schema.list.length > 0) {
-    //             // 新增知识并关联
-    //             this.knowledgeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
-
-    //               edge['_to'] = e['_id']
-    //               edge.mainsnak.datavalue.value.id = e['_key'];
-
-    //               result = myCollection.save(edge).then(
-    //                 () => console.log('Document removed successfully'),
-    //                 (err) => console.error('Failed to remove document:', err),
-    //               )
-    //             })
-    //           } else {
-    //             // 新增知识并关联
-    //             this.knowledgeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
-
-    //               edge['_to'] = e['_id']
-    //               edge.mainsnak.datavalue.value.id = e['_key'];
-    //                 result = myCollection.save(edge).then(
-    //                 () => console.log('Document removed successfully'),
-    //                 (err) => console.error('Failed to remove document:', err),
-    //               )
-    //             })
-    //           }
-    //         })
-    //       }
-    //     })
-    //   } else {
-    //     console.log(edge)
-    //     edge['_to'] = edge['_from'];
-    //     myCollection.save(edge).then(
-    //       (data) =>  result = data,
-    //       (err) => console.error('Failed to remove document:', err),
-    //     )
-    //   }
-    // }
-
-
-   
+        } else {
+          // 新增知识并关联
+          let e = this.knowledgeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } });
+          edge['_to'] = e['_id']
+          edge.mainsnak.datavalue.value.id = e['_key'];
+          return myCollection.save(edge);
+        }
+      }
+    } else {
+      console.log(edge)
+      edge['_to'] = edge['_from'];
+      return myCollection.save(edge);
+    }
   }
 
   updateEdge(edge: any): Promise<any> {
