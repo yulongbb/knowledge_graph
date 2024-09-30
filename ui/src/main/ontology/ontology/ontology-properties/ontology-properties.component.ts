@@ -35,7 +35,6 @@ export class OntologyPropertiesComponent implements OnInit {
 
     constructor(
         private ontologyService: OntologyService,
-
         public service: PropertyService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
