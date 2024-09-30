@@ -72,7 +72,7 @@ export class EntityDetailComponent implements OnInit {
       label: '描述',
       required: true,
     },
-  
+
   ];
 
   query: any;
@@ -101,7 +101,7 @@ export class EntityDetailComponent implements OnInit {
   claims: any;
 
   properties: any;
-  propertyData:any;
+  propertyData: any;
 
   statements: any;
   //更新边
@@ -123,8 +123,8 @@ export class EntityDetailComponent implements OnInit {
     this.statements = [
       ...this.statements,
       {
-        state: 'add',
         _from: this.item.items[0],
+        _to: this.item.items[0],
         mainsnak: {
           snaktype: 'value',
           property: '',
@@ -141,12 +141,35 @@ export class EntityDetailComponent implements OnInit {
     ];
   }
 
-  del(row: XTableRow) {
+  save(row: any) {
     console.log(row);
-    // const index = this.data.findIndex((x) => x.id === row.id);
-    // if (index >= 0) {
-    //   this.data.splice(index, 1);
-    // }
+    if (row._key) {
+      // 更新
+      this.nodeService.updateEdge(row).subscribe(() => {
+        this.message.success('更新成功！');
+      })
+    } else {
+      // 新增
+      this.nodeService.addEdge(row).subscribe((data) => {
+        console.log(data);
+        const index = this.statements.findIndex((x: any) => x.id === row.id);
+        this.statements[index]['_key'] = data['_key'];
+        this.message.success('新增成功！');
+      })
+    }
+
+  }
+
+  del(row: any) {
+    console.log(row);
+    const index = this.statements.findIndex((x: any) => x.id === row.id);
+    if (index >= 0) {
+      this.statements.splice(index, 1);
+    }
+    this.nodeService.deleteEdge(row._key).subscribe(() => {
+
+      this.message.success('删除成功！');
+    })
   }
 
   constructor(
@@ -195,10 +218,10 @@ export class EntityDetailComponent implements OnInit {
   }
 
   change(statements: any) {
-    console.log(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type)
-    switch(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type){
+    console.log(this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type)
+    switch (this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type) {
       case 'url':
-        statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
         statements.mainsnak.datatype = 'url';
         statements.mainsnak.datavalue = {
           value: '',
@@ -206,7 +229,7 @@ export class EntityDetailComponent implements OnInit {
         }
         break;
     }
-    statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
+    statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
     console.log(statements);
   }
 
@@ -353,7 +376,7 @@ export class EntityDetailComponent implements OnInit {
                   })
                   .subscribe((x: any) => {
                     console.log(x.list)
-                    this.propertyData=signal(x.list) ;
+                    this.propertyData = signal(x.list);
                     this.properties = x.list.map((p: any) => p.name);
                     this.nodeService
                       .getLinks(1, 50, this.id, {})
@@ -437,32 +460,32 @@ export class EntityDetailComponent implements OnInit {
               }
               statements.push(p.edges[0]);
             });
-            this.newEdges = this.statements.filter((s:any)=> s.state=='add');
-            console.log('更新');
-            console.log(this.updatedEdges);
-            console.log('删除');
-            console.log(this.deletedEdges);
-            console.log('新增');
-            console.log(this.newEdges);
-            const requests: any = [];
-            // 执行更新操作
-            this.updatedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.updateEdge(edge));
-            });
-            // 执行删除操作
-            this.deletedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.deleteEdge(edge._key));
-            });
-            //执行新增操作
-            this.newEdges.forEach((edge: any) => {
-              console.log(edge)
-              requests.push(this.nodeService.addEdge(edge));
-            });
-            //并行执行所有请求
-            forkJoin(requests).subscribe((data) => {
-              console.log(data);
-              // this.router.navigate(['/index/entity']);
-            });
+            // this.newEdges = this.statements.filter((s:any)=> s.state=='add');
+            // console.log('更新');
+            // console.log(this.updatedEdges);
+            // console.log('删除');
+            // console.log(this.deletedEdges);
+            // console.log('新增');
+            // console.log(this.newEdges);
+            // const requests: any = [];
+            // // 执行更新操作
+            // this.updatedEdges.forEach((edge: any) => {
+            //   requests.push(this.nodeService.updateEdge(edge));
+            // });
+            // // 执行删除操作
+            // this.deletedEdges.forEach((edge: any) => {
+            //   requests.push(this.nodeService.deleteEdge(edge._key));
+            // });
+            // //执行新增操作
+            // this.newEdges.forEach((edge: any) => {
+            //   console.log(edge)
+            //   requests.push(this.nodeService.addEdge(edge));
+            // });
+            // //并行执行所有请求
+            // forkJoin(requests).subscribe((data) => {
+            //   console.log(data);
+            //   // this.router.navigate(['/index/entity']);
+            // });
           });
           item.id = this.id;
           item['_key'] = this.item.items[0].split('/')[1];

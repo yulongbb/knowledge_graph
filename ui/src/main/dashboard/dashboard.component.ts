@@ -419,44 +419,44 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.cy.nodes().forEach((n: any) => {
       console.log(n.data())
-      const existingPopper = n.scratch('_popper');
-      if (existingPopper) {
-        console.log(existingPopper)
-        existingPopper.destroy();
-      }
-      let popper = n.popper({
-        content: () => {
-          let div = document.createElement('div');
+      // const existingPopper = n.scratch('_popper');
+      // if (existingPopper) {
+      //   console.log(existingPopper)
+      //   existingPopper.destroy();
+      // }
+      // let popper = n.popper({
+      //   content: () => {
+      //     let div = document.createElement('div');
 
-          div.innerHTML = `<img width="50px" src="http://localhost:9000/kgms/${n.data().images[0]}" />${n.data()['base'].map((b: any) => '<p>' + b.label + ':' + b.value + '</p>')}`
+      //     div.innerHTML = `<img width="50px" src="http://localhost:9000/kgms/${n.data().images[0]}" />${n.data()['base'].map((b: any) => '<p>' + b.label + ':' + b.value + '</p>')}`
 
-          document.body.appendChild(div);
+      //     document.body.appendChild(div);
 
-          return div;
-        },
-        popper: {
-          placement: 'right',
-          modifiers: {
-            preventOverflow: {
-              boundariesElement: document.body,
-              padding: 10,
-              priority: []
-            },
-            hide: {
-              enabled: true
-            }
-          }
+      //     return div;
+      //   },
+      //   popper: {
+      //     placement: 'right',
+      //     modifiers: {
+      //       preventOverflow: {
+      //         boundariesElement: document.body,
+      //         padding: 10,
+      //         priority: []
+      //       },
+      //       hide: {
+      //         enabled: true
+      //       }
+      //     }
 
-        }
-      });
-      n.scratch('_popper', popper)
-      let update = () => {
-        popper.update();
-      };
+      //   }
+      // });
+      // n.scratch('_popper', popper)
+      // let update = () => {
+      //   popper.update();
+      // };
 
-      n.on('position', update);
+      // n.on('position', update);
 
-      this.cy.on('pan zoom resize', update);
+      // this.cy.on('pan zoom resize', update);
 
 
 

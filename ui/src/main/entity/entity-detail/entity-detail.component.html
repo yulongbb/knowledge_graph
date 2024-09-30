@@ -308,6 +308,7 @@
 
         <ng-template #actionsTpl let-column="$column" let-row="$row">
           <div>
+            <x-link type="primary" (click)="save(row)">保存</x-link>
             <x-link type="primary" (click)="del(row)">删除</x-link>
           </div>
         </ng-template>

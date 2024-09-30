@@ -16,77 +16,77 @@ export class EdgeService {
 
 
   async addEdge(edge: any): Promise<any> {
-    let result = null;
     const myCollection = this.db.collection('link');
+     
+    return myCollection.save(edge);;
+    // if(edge['_to']){
+    //   result = myCollection.save(edge).then(
+    //     () => console.log('Document removed successfully'),
+    //     (err) => console.error('Failed to remove document:', err),
+    //   )
+    // }else{
+    //   if (edge.mainsnak.datatype == 'wikibase-item') {
+    //     console.log(edge.mainsnak.datavalue.value.label)
 
-    if(edge['_to']){
-      result = myCollection.save(edge).then(
-        () => console.log('Document removed successfully'),
-        (err) => console.error('Failed to remove document:', err),
-      )
-    }else{
-      if (edge.mainsnak.datatype == 'wikibase-item') {
-        console.log(edge.mainsnak.datavalue.value.label)
-  
-        // 查询知识并关联
-        this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label).then((data: any) => {
-          console.log(data);
-          if (data) {
-            edge['_to'] = data['_id'];
-            edge.mainsnak.datavalue.value.id = data['_key'];
-            result = myCollection.save(edge).then(
-              () => console.log('Document removed successfully'),
-              (err) => console.error('Failed to remove document:', err),
-            )
-          } else {
-            let query: any = {
-              filter: [{
-                field: 'id',
-                value: Number.parseInt(edge.mainsnak.property.replace('P', '')),
-                relation: 'values',
-                operation: '=',
-              }]
-            };
-            this.schemasService.getList(1, 10, query).then((schema: any) => {
-              if (schema.list.length > 0) {
-                // 新增知识并关联
-                this.knowledgeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
-       
-                  edge['_to'] = e['_id']
-                  edge.mainsnak.datavalue.value.id = e['_key'];
-  
-                  result = myCollection.save(edge).then(
-                    () => console.log('Document removed successfully'),
-                    (err) => console.error('Failed to remove document:', err),
-                  )
-                })
-              } else {
-                // 新增知识并关联
-                this.knowledgeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
-  
-                  edge['_to'] = e['_id']
-                  edge.mainsnak.datavalue.value.id = e['_key'];
-                    result = myCollection.save(edge).then(
-                    () => console.log('Document removed successfully'),
-                    (err) => console.error('Failed to remove document:', err),
-                  )
-                })
-              }
-            })
-          }
-        })
-      } else {
-        console.log(edge)
-        edge['_to'] = edge['_from'];
-        result = myCollection.save(edge).then(
-          () => console.log('Document removed successfully'),
-          (err) => console.error('Failed to remove document:', err),
-        )
-      }
-    }
+    //     // 查询知识并关联
+    //     this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label).then((data: any) => {
+    //       console.log(data);
+    //       if (data) {
+    //         edge['_to'] = data['_id'];
+    //         edge.mainsnak.datavalue.value.id = data['_key'];
+    //         result = myCollection.save(edge).then(
+    //           () => console.log('Document removed successfully'),
+    //           (err) => console.error('Failed to remove document:', err),
+    //         )
+    //       } else {
+    //         let query: any = {
+    //           filter: [{
+    //             field: 'id',
+    //             value: Number.parseInt(edge.mainsnak.property.replace('P', '')),
+    //             relation: 'values',
+    //             operation: '=',
+    //           }]
+    //         };
+    //         this.schemasService.getList(1, 10, query).then((schema: any) => {
+    //           if (schema.list.length > 0) {
+    //             // 新增知识并关联
+    //             this.knowledgeService.addEntity({ 'type': { 'id': schema.list[0].id }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
+
+    //               edge['_to'] = e['_id']
+    //               edge.mainsnak.datavalue.value.id = e['_key'];
+
+    //               result = myCollection.save(edge).then(
+    //                 () => console.log('Document removed successfully'),
+    //                 (err) => console.error('Failed to remove document:', err),
+    //               )
+    //             })
+    //           } else {
+    //             // 新增知识并关联
+    //             this.knowledgeService.addEntity({ 'type': { 'id': 'E4' }, 'labels': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } }, 'descriptions': { 'zh': { 'language': 'zh-cn', 'value': edge.mainsnak.datavalue.value.label } } }).then((e: any) => {
+
+    //               edge['_to'] = e['_id']
+    //               edge.mainsnak.datavalue.value.id = e['_key'];
+    //                 result = myCollection.save(edge).then(
+    //                 () => console.log('Document removed successfully'),
+    //                 (err) => console.error('Failed to remove document:', err),
+    //               )
+    //             })
+    //           }
+    //         })
+    //       }
+    //     })
+    //   } else {
+    //     console.log(edge)
+    //     edge['_to'] = edge['_from'];
+    //     myCollection.save(edge).then(
+    //       (data) =>  result = data,
+    //       (err) => console.error('Failed to remove document:', err),
+    //     )
+    //   }
+    // }
 
 
-    return result;
+   
   }
 
   updateEdge(edge: any): Promise<any> {
