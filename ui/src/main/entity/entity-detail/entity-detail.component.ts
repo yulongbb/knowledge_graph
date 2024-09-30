@@ -220,7 +220,13 @@ export class EntityDetailComponent implements OnInit {
   change(statements: any) {
     console.log(this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type)
     switch (this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type) {
+      case 'commonsMedia':
+      case 'external-id':
+      case 'string':
       case 'url':
+      case 'math':
+      case 'monolingualtext':
+      case 'musical-notation':
         statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
         statements.mainsnak.datatype = 'url';
         statements.mainsnak.datavalue = {
@@ -228,7 +234,51 @@ export class EntityDetailComponent implements OnInit {
           type: 'string',
         }
         break;
+      case 'globe-coordinate':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datatype = 'globe-coordinate';
+        statements.mainsnak.datavalue = {
+          value: {
+            latitude: 0,
+            longitude: 0,
+            altitude: null,
+            precision: 0,
+            globe: 'http://www.wikidata.org/entity/Q2', // Default to Earth
+          },
+          type: 'globecoordinate',
+        }
+        break;
+
+      case 'quantity':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datatype = 'quantity';
+        statements.mainsnak.datavalue = {
+          value: {
+            amount: 0,
+            unit: '1',
+            upperBound: null,
+            lowerBound: null,
+          },
+          type: 'quantity',
+        }
+        break;
+      case 'time':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datatype = 'time';
+        statements.mainsnak.datavalue = {
+          value: {
+            time: '',
+            timezone: 0,
+            before: 0,
+            after: 0,
+            precision: 0,
+            calendarmodel: 'http://www.wikidata.org/entity/Q1985727', // Default to Gregorian calendar
+          },
+          type: 'time'
+        }
+        break;
     }
+
     statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
     console.log(statements);
   }

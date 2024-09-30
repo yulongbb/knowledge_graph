@@ -63,15 +63,24 @@ export class PropertyDetailComponent implements OnInit {
       label: '值类型',
       required: true,
       data: [
-        'time',
-        'external-id',
-        'monolingualtext',
-        'url',
-        'wikibase-item',
-        'quantity',
         'commonsMedia',
+        'external-id',
         'string',
+        'url',
+        'math',
+        'monolingualtext',
+        'musical-notation',
+        'globe-coordinate',
+        'quantity',
+        'time',
+        'globe-coordinate',
+        'tabular-data',
+        'geo-shape',
+        'wikibase-item',
         'wikibase-property',
+        'wikibase-lexeme',
+        'wikibase-form',
+        'wikibase-sense',
       ]
     },
     {
@@ -176,7 +185,7 @@ export class PropertyDetailComponent implements OnInit {
               this.router.navigate(['/index/property']);
             });
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id']=Number.parseInt(this.id);
+          this.form.formGroup.value['id'] = Number.parseInt(this.id);
           console.log(this.form.formGroup.value);
 
           this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
