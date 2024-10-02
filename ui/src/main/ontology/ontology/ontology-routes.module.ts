@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OntologyPropertiesComponent } from './ontology-properties/ontology-properties.component';
 import { OntologyComponent } from './ontology.component';
-import { PropertyDetailComponent } from './property-detail/property-detail.component';
+import { PropertyDetailComponent } from '../property/property-detail/property-detail.component';
 
 
 const routes: Routes = [

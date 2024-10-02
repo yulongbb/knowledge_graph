@@ -96,10 +96,25 @@ export class OntologyComponent extends PageBase {
           label: '名称',
           required: true,
         },
+
+
+
         {
           control: 'input',
           id: 'label',
           label: '标签',
+        },
+        {
+          control: 'color-picker',
+          id: 'color',
+          label: '颜色'
+        },
+
+        {
+          control: 'input',
+          id: 'name',
+          label: '图标',
+          required: true,
         },
         { control: 'input', id: 'description', label: '描述' },
         { control: 'input', id: 'collection', label: '表' },

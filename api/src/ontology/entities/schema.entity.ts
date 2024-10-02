@@ -36,6 +36,9 @@ export class Schema {
 
   @Column({ nullable: true, type: 'text' })
   path?: string;
+  @Column({ nullable: true, type: 'text' })
+  color?: string;
+  @Column({ nullable: true, type: 'text' })
 
   @ManyToOne(() => Schema, (schema) => schema.children)
   parent: Schema;

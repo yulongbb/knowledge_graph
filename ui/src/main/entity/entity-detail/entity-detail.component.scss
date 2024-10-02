@@ -1,9 +1,10 @@
-
 :host {
   padding: 1rem;
   display: block;
- 
 
+  x-link:not(:first-child) {
+    margin-left: 1rem;
+  }
 
   >.app-footer,
   >h3 {
@@ -13,7 +14,7 @@
   >h3 {
     margin: 0;
   }
- 
+
 
   .row:not(:first-child) {
     margin-top: 1rem;
@@ -81,7 +82,7 @@
     border: 0.0625rem solid var(--x-border);
   }
 
-  
+
 
   .row x-affix:not(:first-child) {
     margin-left: 1rem;
@@ -147,19 +148,21 @@
     display: none;
   }
 
-  
+
   .gallery {
     width: 100%;
     display: flex;
   }
+
   .gallery .warp {
     width: 100%;
     display: grid;
-    grid-template-columns: 15% 15% 15% 15%  15% 15% auto;
+    grid-template-columns: 15% 15% 15% 15% 15% 15% auto;
     grid-gap: 5px;
     padding: 10px;
     flex: none;
   }
+
   .gallery .thumbnail {
     border: 1px solid #CCC;
     width: 100%;
@@ -170,7 +173,7 @@
     background-position: center center;
   }
 
-  .gallery .thumbnail b{
+  .gallery .thumbnail b {
     display: block;
     width: 100%;
     background-color: gray;
@@ -178,6 +181,5 @@
     font-size: 18px;
   }
 
- 
-}
 
+}

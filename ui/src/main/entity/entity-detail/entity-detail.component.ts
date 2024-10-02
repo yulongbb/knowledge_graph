@@ -72,7 +72,7 @@ export class EntityDetailComponent implements OnInit {
       label: '描述',
       required: true,
     },
-  
+
   ];
 
   query: any;
@@ -101,7 +101,7 @@ export class EntityDetailComponent implements OnInit {
   claims: any;
 
   properties: any;
-  propertyData:any;
+  propertyData: any;
 
   statements: any;
   //更新边
@@ -115,7 +115,6 @@ export class EntityDetailComponent implements OnInit {
     { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
     { id: 'property', label: '属性名', flex: 1 },
     { id: 'name', label: '属性值', flex: 1 },
-    { id: 'status', label: '编辑', width: 100 },
     { id: 'actions', label: '操作', width: 100 },
   ];
 
@@ -123,8 +122,8 @@ export class EntityDetailComponent implements OnInit {
     this.statements = [
       ...this.statements,
       {
-        state: 'add',
         _from: this.item.items[0],
+        
         mainsnak: {
           snaktype: 'value',
           property: '',
@@ -141,12 +140,37 @@ export class EntityDetailComponent implements OnInit {
     ];
   }
 
-  del(row: XTableRow) {
+  save(row: any) {
+    if(row.mainsnak.datavalue.type!='wikibase-entityid'){
+      row['_to'] = this.item.items[0]
+    }
+    if (row._key) {
+      // 更新
+      this.nodeService.updateEdge(row).subscribe(() => {
+        this.message.success('更新成功！');
+      })
+    } else {
+      // 新增
+      this.nodeService.addEdge(row).subscribe((data) => {
+        console.log(data);
+        const index = this.statements.findIndex((x: any) => x.id === row.id);
+        this.statements[index]['_key'] = data['_key'];
+        this.message.success('新增成功！');
+      })
+    }
+
+  }
+
+  del(row: any) {
     console.log(row);
-    // const index = this.data.findIndex((x) => x.id === row.id);
-    // if (index >= 0) {
-    //   this.data.splice(index, 1);
-    // }
+    const index = this.statements.findIndex((x: any) => x.id === row.id);
+    if (index >= 0) {
+      this.statements.splice(index, 1);
+    }
+    this.nodeService.deleteEdge(row._key).subscribe(() => {
+
+      this.message.success('删除成功！');
+    })
   }
 
   constructor(
@@ -195,18 +219,79 @@ export class EntityDetailComponent implements OnInit {
   }
 
   change(statements: any) {
-    console.log(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type)
-    switch(this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].type){
+    statements.mainsnak.datatype = this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type;
+    switch (statements.mainsnak.datatype) {
+      case 'commonsMedia':
+      case 'external-id':
+      case 'string':
       case 'url':
-        statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
-        statements.mainsnak.datatype = 'url';
+      case 'math':
+      case 'monolingualtext':
+      case 'musical-notation':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         }
         break;
+      case 'globe-coordinate':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datavalue = {
+          value: {
+            latitude: 0,
+            longitude: 0,
+            altitude: null,
+            precision: 0,
+            globe: 'http://www.wikidata.org/entity/Q2', // Default to Earth
+          },
+          type: 'globecoordinate',
+        }
+        break;
+
+      case 'quantity':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datavalue = {
+          value: {
+            amount: 0,
+            unit: '1',
+            upperBound: null,
+            lowerBound: null,
+          },
+          type: 'quantity',
+        }
+        break;
+      case 'time':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datavalue = {
+          value: {
+            time: '',
+            timezone: 0,
+            before: 0,
+            after: 0,
+            precision: 0,
+            calendarmodel: 'http://www.wikidata.org/entity/Q1985727', // Default to Gregorian calendar
+          },
+          type: 'time'
+        }
+        break;
+      case 'wikibase-item':
+      case 'wikibase-property':
+      case 'wikibase-lexeme':
+      case 'wikibase-form':
+      case 'wikibase-sense':
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.datavalue = {
+          value: {
+            'entity-type':  statements.mainsnak.datatype.replace('wikibase-', ''),
+            'numeric-id': 0,
+            id: '',
+          },
+          type: 'wikibase-entityid'
+        }
+        break;
     }
-    statements.mainsnak.property = `P${this.propertyData().filter((p:any)=> p.name==statements.mainsnak.label)[0].id}`
+
+    statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
     console.log(statements);
   }
 
@@ -221,82 +306,7 @@ export class EntityDetailComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  getDatavalue(datatype: any) {
-    const emptyDatavalue: Datavalue = {
-      value: null,
-      type: '',
-    };
-    switch (datatype) {
-      case 'commonsMedia':
-      case 'external-id':
-      case 'string':
-      case 'url':
-      case 'math':
-      case 'monolingualtext':
-      case 'musical-notation':
-        emptyDatavalue.value = '';
-        emptyDatavalue.type = 'string';
-        break;
-
-      case 'globe-coordinate':
-        emptyDatavalue.value = {
-          latitude: 0,
-          longitude: 0,
-          altitude: null,
-          precision: 0,
-          globe: 'http://www.wikidata.org/entity/Q2', // Default to Earth
-        };
-        emptyDatavalue.type = 'globecoordinate';
-        break;
-      case 'quantity':
-        emptyDatavalue.value = {
-          amount: '',
-          unit: '1',
-          upperBound: null,
-          lowerBound: null,
-        };
-        emptyDatavalue.type = 'quantity';
-        break;
-
-      case 'time':
-        emptyDatavalue.value = {
-          time: '',
-          timezone: 0,
-          before: 0,
-          after: 0,
-          precision: 0,
-          calendarmodel: 'http://www.wikidata.org/entity/Q1985727', // Default to Gregorian calendar
-        };
-        emptyDatavalue.type = 'time';
-        break;
-      case 'tabular-data':
-      case 'geo-shape':
-        emptyDatavalue.value = {
-          'entity-type': 'tabular-data',
-          id: '',
-          title: '',
-        };
-        emptyDatavalue.type = 'wikibase-entityid';
-        break;
-      case 'wikibase-item':
-      case 'wikibase-property':
-      case 'wikibase-lexeme':
-      case 'wikibase-form':
-      case 'wikibase-sense':
-        emptyDatavalue.value = {
-          'entity-type': datatype.replace('wikibase-', ''),
-          'numeric-id': 0,
-          id: '',
-        };
-        emptyDatavalue.type = 'wikibase-entityid';
-        break;
-      default:
-        emptyDatavalue.value = null;
-        emptyDatavalue.type = 'unknown';
-    }
-    return emptyDatavalue;
-  }
-
+  
   action(type: string) {
     switch (type) {
       case 'info':
@@ -353,7 +363,7 @@ export class EntityDetailComponent implements OnInit {
                   })
                   .subscribe((x: any) => {
                     console.log(x.list)
-                    this.propertyData=signal(x.list) ;
+                    this.propertyData = signal(x.list);
                     this.properties = x.list.map((p: any) => p.name);
                     this.nodeService
                       .getLinks(1, 50, this.id, {})
@@ -436,32 +446,6 @@ export class EntityDetailComponent implements OnInit {
                   p.vertices[1].labels.zh.value;
               }
               statements.push(p.edges[0]);
-            });
-            this.newEdges = this.statements.filter((s:any)=> s.state=='add');
-            console.log('更新');
-            console.log(this.updatedEdges);
-            console.log('删除');
-            console.log(this.deletedEdges);
-            console.log('新增');
-            console.log(this.newEdges);
-            const requests: any = [];
-            // 执行更新操作
-            this.updatedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.updateEdge(edge));
-            });
-            // 执行删除操作
-            this.deletedEdges.forEach((edge: any) => {
-              requests.push(this.nodeService.deleteEdge(edge._key));
-            });
-            //执行新增操作
-            this.newEdges.forEach((edge: any) => {
-              console.log(edge)
-              requests.push(this.nodeService.addEdge(edge));
-            });
-            //并行执行所有请求
-            forkJoin(requests).subscribe((data) => {
-              console.log(data);
-              // this.router.navigate(['/index/entity']);
             });
           });
           item.id = this.id;

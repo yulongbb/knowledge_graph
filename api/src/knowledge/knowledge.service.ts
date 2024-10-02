@@ -347,17 +347,15 @@ export class KnowledgeService {
         const result = await cursor.all();
         console.log(result);
         const cytoscapeData = { elements: { nodes: [], edges: [] } };
-
         // 用于存储已添加的节点，防止重复
         const addedNodes = new Set();
-
         console.log(111);
         console.log(result[0]?.start);
-
         cytoscapeData.elements.nodes.push({
           data: {
             _id: result[0]?.start?.id['_id'] ?? items[0],
             images: entity['_source'].images,
+            type: entity['_source']['type'],
             id: result[0]?.start?.id ?? id,
             base: [],
             label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value ,
@@ -373,6 +371,7 @@ export class KnowledgeService {
               data: {
                 _id: vertex['_id'],
                 images: data['_source']['images'],
+                type: data['_source']['type'],
                 id: vertex.id,
                 base: [],
                 label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
@@ -381,7 +380,6 @@ export class KnowledgeService {
             });
             addedNodes.add(vertex.id);
           }
-
           // 添加边
           if (edge._from !== edge._to) {
             const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
@@ -396,34 +394,27 @@ export class KnowledgeService {
               });
             }
           }
-
           // 添加边
           if (edge._from == edge._to) {
             const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
             if (property?.name) {
               cytoscapeData.elements.nodes.forEach((node: any) => {
                 if (node.data._id == edge._from) {
-                 
                   if (node['data']['base'].filter((b: any) => b._id == edge._id).length == 0) {
                     node['data']['base'].push({
-                      _id: edge._id, 
+                      _id: edge._id,
                       value: edge.mainsnak.datavalue.value,
-                      label: property.name || '' 
+                      label: property.name || ''
                     });
 
                   }
                 }
               });
-
             }
           }
         }));
-
         console.log(cytoscapeData);
-
-
         return cytoscapeData;
-
       })
     } catch (error) {
       console.error('Query Error:', error);

@@ -72,7 +72,7 @@
                 statement.mainsnak.datavalue.value.longitude
                 }}</strong>
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                statement.mainsnak.datavalue.value.time
+                statement.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
                 }}</strong>
             </i>
           </dd>
