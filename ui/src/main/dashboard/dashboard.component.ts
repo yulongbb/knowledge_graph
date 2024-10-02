@@ -428,7 +428,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         content: () => {
           let div = document.createElement('div');
 
-          div.innerHTML = `<img width="50px" src="http://localhost:9000/kgms/${n.data().images[0]}" />${n.data()['base'].map((b: any) => '<p>' + b.label + ':' + b.value + '</p>')}`
+          div.innerHTML = `<img width="50px" src="http://localhost:9000/kgms/${n.data().images[0]}" /><p>${n.data().description}</p>`
+          
+          // ${n.data()['base'].map((b: any) => '<small>' + b.label + ':' + b.value + '<br></small>')}
 
           document.body.appendChild(div);
 

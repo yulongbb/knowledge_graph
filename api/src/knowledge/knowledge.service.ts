@@ -360,14 +360,12 @@ export class KnowledgeService {
             images: entity['_source'].images,
             id: result[0]?.start?.id ?? id,
             base: [],
-            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value // 根据你的字段结构选择合适的label
-
+            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value ,
+            description: result[0]?.start?.descriptions?.zh?.value || entity['_source']?.descriptions?.zh?.value // 根据你的字段结构选择合适的label
           }
         });
         addedNodes.add(result[0]?.start?.id);
         await Promise.all(result.map(async ({ vertex, edge, start, from, to }) => {
-
-
           // 添加节点
           if (!addedNodes.has(vertex.id)) {
             let data = await this.elasticsearchService.get(vertex.id);
@@ -378,6 +376,7 @@ export class KnowledgeService {
                 id: vertex.id,
                 base: [],
                 label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
+                description: vertex.descriptions?.zh?.value || '', // 确保数据结构的安全性
               }
             });
             addedNodes.add(vertex.id);
