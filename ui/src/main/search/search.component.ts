@@ -26,6 +26,7 @@ export class SearchComponent implements OnInit {
   index = 1;
   entities!: any;
   images!: any;
+  videos!: any;
   query: any = {};
   types: any;
   tags: any;
@@ -47,9 +48,15 @@ export class SearchComponent implements OnInit {
       .searchEntity(this.index, this.size, {})
       .subscribe((data: any) => {
         this.images = [];
+        this.videos = [];
 
         data.list.forEach((item: any) => {
           item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
             if (
               image.split('.')[image.split('.').length - 1] != 'mp4' &&
               image.split('.')[image.split('.').length - 1] != 'pdf'
@@ -173,7 +180,22 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
+        this.images = [];
+        this.videos = [];
         data.list.forEach((item: any) => {
+          item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
+            if (
+              image.split('.')[image.split('.').length - 1] != 'mp4' &&
+              image.split('.')[image.split('.').length - 1] != 'pdf'
+            ) {
+              this.images.push(image);
+            }
+          });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService
@@ -246,7 +268,22 @@ export class SearchComponent implements OnInit {
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
+        this.images = [];
+        this.videos = [];
         data.list.forEach((item: any) => {
+          item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
+            if (
+              image.split('.')[image.split('.').length - 1] != 'mp4' &&
+              image.split('.')[image.split('.').length - 1] != 'pdf'
+            ) {
+              this.images.push(image);
+            }
+          });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             console.log(t);
             item._type = t.label;
@@ -315,7 +352,22 @@ export class SearchComponent implements OnInit {
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
+        this.images = [];
+        this.videos = [];
         data.list.forEach((item: any) => {
+          item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
+            if (
+              image.split('.')[image.split('.').length - 1] != 'mp4' &&
+              image.split('.')[image.split('.').length - 1] != 'pdf'
+            ) {
+              this.images.push(image);
+            }
+          });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             console.log(t);
             item._type = t.label;
@@ -410,6 +462,11 @@ export class SearchComponent implements OnInit {
 
         data.list.forEach((item: any) => {
           item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
             if (
               image.split('.')[image.split('.').length - 1] != 'mp4' &&
               image.split('.')[image.split('.').length - 1] != 'pdf'

@@ -340,7 +340,16 @@
         </div>
       </div>
     }
-    @case ('视频') {}
+    @case ('视频') {
+      <div *ngFor="let video of videos">
+        <video width="100%" controls>
+          <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+          <p>
+            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+          </p>
+        </video>
+      </div>
+    }
     @case ('文件') {}
   }
 
