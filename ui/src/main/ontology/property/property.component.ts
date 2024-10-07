@@ -33,7 +33,7 @@ export class PropertyComponent extends PageBase {
   index = 1;
   size = 15;
 
-  query: XQuery = { filter: [] };
+  query: any = { filter: [] };
 
   data = (index: number, size: number, query: any) =>
     this.service.getList(index, size, query).pipe((x: any) => {

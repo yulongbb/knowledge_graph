@@ -17,6 +17,9 @@ export class EdgeService {
 
   async addEdge(edge: any): Promise<any> {
     const myCollection = this.db.collection('link');
+    if(edge['_to']){
+      return myCollection.save(edge);
+    }
     if (edge.mainsnak.datatype == 'wikibase-item') {
       // 查询知识并关联
       let data = await this.nodeService.getNodeBylabel(edge.mainsnak.datavalue.value.label)

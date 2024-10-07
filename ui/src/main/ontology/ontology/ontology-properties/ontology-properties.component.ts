@@ -17,7 +17,7 @@ export class OntologyPropertiesComponent implements OnInit {
     index = 1;
     size = 20;
 
-    query: XQuery = { filter: [] };
+    query: any= { filter: [] };
 
     schemaId!: string;
     data :any;

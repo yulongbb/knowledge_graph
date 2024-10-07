@@ -1,5 +1,14 @@
-import { Component, ElementRef, OnDestroy, OnInit, Query, TemplateRef, ViewChild, signal, viewChild } from '@angular/core';
-
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  Query,
+  TemplateRef,
+  ViewChild,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { EntityService } from '../entity/entity.service';
 import { Observable } from 'rxjs';
@@ -11,7 +20,14 @@ import cola from 'cytoscape-cola';
 import edgehandles from 'cytoscape-edgehandles';
 import cytoscapePopper from 'cytoscape-popper';
 
-import { XDialogRef, XDialogService, XMessageBoxAction, XMessageBoxService, XMessageService, XPlace } from '@ng-nest/ui';
+import {
+  XDialogRef,
+  XDialogService,
+  XMessageBoxAction,
+  XMessageBoxService,
+  XMessageService,
+  XPlace,
+} from '@ng-nest/ui';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { animate, animation } from '@angular/animations';
 import { OntologyService } from '../ontology/ontology/ontology.service';
@@ -23,7 +39,6 @@ import { color } from 'echarts';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
@@ -46,7 +61,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-
   close() {
     this.visible.set(false);
   }
@@ -54,20 +68,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   evt(type: string) {
     this.id = null;
     this.type = null;
-
   }
   popperInstances = new Map();
 
-  constructor(private service: EntityService,
+  constructor(
+    private service: EntityService,
     private ontologyService: OntologyService,
     public propertyService: PropertyService,
     private esService: EsService,
     private message: XMessageService,
     private dialogService: XDialogService,
-    private msgBox: XMessageBoxService,
-  ) {
-
-  }
+    private msgBox: XMessageBoxService
+  ) {}
 
   ngOnInit(): void {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
@@ -75,77 +87,79 @@ export class DashboardComponent implements OnInit, OnDestroy {
         cytoscape.use(cxtmenu);
         cytoscape.use(cola); // register extension
         cytoscape.use(edgehandles);
-
         cytoscape.use(cytoscapePopper(createPopper)); // register extension
+        this.ontologyService.getList(1, 100, {}).subscribe((schemas: any) => {
+          let colors = schemas.list
+            .filter((schema: any) => schema.color != null)
+            .map((s: any) => {
+              return { id: s.id, label: s.label, color: s.color };
+            });
+          console.log(colors);
 
-        console.log(data)
-        this.ontologyService.getList(1,100,{}).subscribe((schemas:any)=>{
-          let colors = schemas.list.filter((schema:any)=> schema.color!=null).map((s:any)=>{return {id: s.id, label: s.label, color: s.color}});
-          console.log(colors)
-
-          const colorMap:any = {}
-          colors.forEach((c:any)=>{
+          const colorMap: any = {};
+          colors.forEach((c: any) => {
             colorMap[c.id] = c.color;
-          })
-          console.log(colorMap)
+          });
+          console.log(colorMap);
           this.cy = cytoscape({
             container: this.cyContainer.nativeElement, // container to render in
-            style: [ // the stylesheet for the graph
+            style: [
+              // the stylesheet for the graph
               {
                 selector: 'node',
                 style: {
-                  'border-color': 'colorMap(data(type))',
+                  'border-color':  '#ffffff',
                   'border-width': 2,
-                  'background-image': 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1536 1399q0 109-62.5 187t-150.5 78h-854q-88 0-150.5-78t-62.5-187q0-85 8.5-160.5t31.5-152 58.5-131 94-89 134.5-34.5q131 128 313 128t313-128q76 0 134.5 34.5t94 89 58.5 131 31.5 152 8.5 160.5zm-256-887q0 159-112.5 271.5t-271.5 112.5-271.5-112.5-112.5-271.5 112.5-271.5 271.5-112.5 271.5 112.5 112.5 271.5z" fill="#fff"/></svg>`),
-                  'background-width': '60%',
-                  'background-height': '60%',
-                  'color': '#333333',
-                  'label': 'data(label)',
+                  'background-image': 'data(images)',
+                  'background-fit': 'cover',
+                  'background-image-opacity': 0.5,
+                  color: '#333333',
+                  label: 'data(label)',
                   'text-valign': 'bottom',
                   'text-margin-y': 6,
                   'text-background-color': '#ffffff',
                   'text-background-opacity': 0.5,
-                }
+                },
               },
               {
                 selector: 'node.hover',
                 style: {
                   'border-color': '#000000',
                   'text-background-color': '#eeeeee',
-                  'text-background-opacity': 1
-                }
+                  'text-background-opacity': 1,
+                },
               },
               {
                 selector: 'node:selected',
                 style: {
                   'border-color': '#ff0000',
                   'border-width': 6,
-                  'border-opacity': 0.5
-                }
+                  'border-opacity': 0.5,
+                },
               },
               {
                 selector: 'edge',
                 style: {
-                  'width': 0.4,
+                  width: 0.4,
                   'line-color': '#ccc',
-                  'target-arrow-color': '#ccc',
+                  'target-arrow-color': '#000',
                   'target-arrow-shape': 'triangle',
                   'curve-style': 'bezier',
-                  "text-opacity": 1,
-                  "overlay-opacity": 0,
+                  'text-opacity': 1,
+                  'overlay-opacity': 0,
                   'arrow-scale': 0.3,
-                  'color': '#aaa',
-                  'label': 'data(label)',
-                  'font-size': '6px',
+                  color: '#000',
+                  label: 'data(label)',
+                  'font-size': '12px',
                   'control-point-weight': 0.5,
                   'control-point-distance': 30,
-                }
+                },
               },
               {
                 selector: 'edge.hover',
                 style: {
-                  'line-color': '#999999'
-                }
+                  'line-color': '#999999',
+                },
               },
               // edgehandles
               {
@@ -153,34 +167,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 style: {
                   'background-color': 'red',
                   'background-image': [],
-                  'width': 12,
-                  'height': 12,
-                  'shape': 'ellipse',
+                  width: 12,
+                  height: 12,
+                  shape: 'ellipse',
                   'overlay-opacity': 0,
                   'border-width': 12,
                   'border-opacity': 0,
-                  'label': ''
-                }
+                  label: '',
+                },
               },
               {
                 selector: '.eh-hover',
                 style: {
-                  'background-color': 'red'
-                }
+                  'background-color': 'red',
+                },
               },
               {
                 selector: '.eh-source',
                 style: {
                   'border-width': 2,
-                  'border-color': 'red'
-                }
+                  'border-color': 'red',
+                },
               },
               {
                 selector: '.eh-target',
                 style: {
                   'border-width': 2,
-                  'border-color': 'red'
-                }
+                  'border-color': 'red',
+                },
               },
               {
                 selector: '.eh-preview, .eh-ghost-edge',
@@ -189,16 +203,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
                   'line-color': 'red',
                   'target-arrow-color': 'red',
                   'source-arrow-color': 'red',
-                }
+                },
               },
               {
                 selector: '.eh-ghost-edge.eh-preview-active',
                 style: {
-                  'opacity': 0
-                }
-              }
+                  opacity: 0,
+                },
+              },
             ],
-  
+
             layout: {
               name: 'cose',
               animate: false,
@@ -213,16 +227,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 select: (ele: any) => {
                   console.log(ele.data());
                   console.log('浏览知识');
-                  this.dialog(ele.data(), 'info', 'center')
-                }
+                  this.dialog(ele.data(), 'info', 'center');
+                },
               },
-  
+
               {
                 content: '编辑',
                 select: (ele: any) => {
                   console.log(ele.id());
                   console.log('编辑知识');
-                  this.dialog(ele.data(), 'edit', 'center')
+                  this.dialog(ele.data(), 'edit', 'center');
                 },
               },
               {
@@ -243,15 +257,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     placement: 'center',
                     callback: (action: XMessageBoxAction) => {
                       console.log(ele.data());
-                      this.service.deleteItem(ele.data()['id']).subscribe(() => {
-                        ele.remove()
-                        this.message.success('删除成功！');
-                      });
-                    }
+                      this.service
+                        .deleteItem(ele.data()['id'])
+                        .subscribe(() => {
+                          ele.remove();
+                          this.message.success('删除成功！');
+                        });
+                    },
                   });
-                }
-              }
-            ]
+                },
+              },
+            ],
           });
           this.cy.cxtmenu({
             selector: 'edge',
@@ -273,24 +289,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     placement: 'center',
                     callback: (action: XMessageBoxAction) => {
                       if (action === 'confirm') {
-                        console.log(ele.data())
+                        console.log(ele.data());
                         ele.remove();
-                        this.service.deleteEdge(ele.data()['_id']).subscribe((e: any) => {
-                          this.message.success('关系删除成功');
-                        })
-  
+                        this.service
+                          .deleteEdge(ele.data()['_id'])
+                          .subscribe((e: any) => {
+                            this.message.success('关系删除成功');
+                          });
                       } else if (action === 'close') {
                         this.message.info('已关闭窗口！');
                       } else if (action === 'cancel') {
                         this.message.info('已取消窗口！');
                       }
-                    }
+                    },
                   });
-                }
-              }
-            ]
+                },
+              },
+            ],
           });
-  
+
           this.cy.cxtmenu({
             selector: 'core',
             commands: [
@@ -299,12 +316,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 select: (ele: any) => {
                   console.log(ele);
                   console.log('创建知识');
-                  this.dialog(ele.data(), 'add', 'center')
-                }
+                  this.dialog(ele.data(), 'add', 'center');
+                },
               },
-            ]
+            ],
           });
-  
+
           var doubleClickDelayMs = 350;
           var previousTapStamp: any;
           this.cy.on('tap', (ele: any) => {
@@ -314,125 +331,164 @@ export class DashboardComponent implements OnInit, OnDestroy {
               ele.target.trigger('doubleTap', ele);
             }
             previousTapStamp = currentTapStamp;
-          })
+          });
           this.cy.on('doubleTap', (ele: any) => {
             var target: any = ele.target;
             if (target == this.cy) {
-              console.log("双击空白处")
-              console.log(this.cy.nodes())
-  
+              console.log('双击空白处');
+              console.log(this.cy.nodes());
             } else if (target.isNode()) {
-              console.log("双击节点")
-              console.log(target.data())
-              this.service.graph(1, 100, target.data().id).subscribe((data: any) => {
-                console.log(data)
-  
-                this.initializeCytoscape(data);
-              })
-            } else if (target.isEdge()) {
-              console.log("双击边")
-            }
-          })
-  
-          this.cy.on('ehcomplete', (event: any, sourceNode: any, targetNode: any, addedEdge: any) => {
-            this.esService.getEntity(sourceNode.data().id).subscribe((x: any) => {
-              console.log(x['_source'].type)
-              this.ontologyService.get(x._source.type).subscribe((type: any) => {
-                this.ontologyService.getAllParentIds(x._source.type).subscribe((parents: any) => {
-                  parents.push(x._source.type)
-                  this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((x: any) => {
-                    this.propertyData = signal(x.list.filter((p: any) => p.type == 'wikibase-item'));
-                    this.properties = signal(x.list.filter((p: any) => p.type == 'wikibase-item').map((p: any) => p.name)
-                    )
-                  });
+              console.log('双击节点');
+              console.log(target.data());
+              this.service
+                .graph(1, 100, target.data().id)
+                .subscribe((data: any) => {
+                  console.log(data);
+
+                  this.initializeCytoscape(data);
                 });
-              });
-            })
-            this.msgBox.alert({
-              title: '选择关系',
-              content: this.contentTpl(),
-              backdropClose: true,
-              callback: (action: XMessageBoxAction) => {
-                if (action === 'confirm') {
-                  console.log(this.model1)
-                  let property = this.propertyData().filter((p: any) => p.name == this.model1)[0];
-                  console.log(property)
-                  let edge = {
-                    '_from': sourceNode.data()['_id'],
-                    '_to': targetNode.data()['_id'],
-                    "mainsnak": {
-                      "snaktype": "value",
-                      "property": `P${property.id}`,
-                      "datavalue": {
-                        "value": {
-                          "entity-type": "item",
-                          "numeric-id": Number.parseInt(targetNode.data()['_id'].split('/')[1].replace('Q', '')),
-                          "id": targetNode.data()['_id'].split('/')[1]
-                        },
-                        "type": "wikibase-entityid"
-                      },
-                      "datatype": "wikibase-item"
-                    },
-                    "type": "statement",
-                    "rank": "normal"
-                  }
-  
-                  this.service.addEdge(edge).subscribe((e: any) => {
-                    this.message.success('关系创建成功');
-                    this.cy.add({
-                      "data": {
-                        "source": sourceNode.data().id,
-                        "target": targetNode.data().id,
-                        "label": property.name
-                      }
-                    });
-                    addedEdge.remove();
-                  })
-                } else if (action === 'close') {
-                  this.message.info('已取消创建关系！');
-                  addedEdge.remove();
-                } else if (action === 'cancel') {
-                  addedEdge.remove();
-                  this.message.info('已取消创建关系！');
-                }
-                console.log(action);
-              }
-            });
+            } else if (target.isEdge()) {
+              console.log('双击边');
+            }
           });
-  
+
+          this.cy.on(
+            'ehcomplete',
+            (event: any, sourceNode: any, targetNode: any, addedEdge: any) => {
+              this.esService
+                .getEntity(sourceNode.data().id)
+                .subscribe((x: any) => {
+                  console.log(x['_source'].type);
+                  this.ontologyService
+                    .get(x._source.type)
+                    .subscribe((type: any) => {
+                      this.ontologyService
+                        .getAllParentIds(x._source.type)
+                        .subscribe((parents: any) => {
+                          parents.push(x._source.type);
+                          this.propertyService
+                            .getList(1, 50, {
+                              filter: [
+                                {
+                                  field: 'id',
+                                  value: parents as string[],
+                                  relation: 'schemas',
+                                  operation: 'IN',
+                                },
+                              ],
+                            })
+                            .subscribe((x: any) => {
+                              this.propertyData = signal(
+                                x.list.filter(
+                                  (p: any) => p.type == 'wikibase-item'
+                                )
+                              );
+                              this.properties = signal(
+                                x.list
+                                  .filter((p: any) => p.type == 'wikibase-item')
+                                  .map((p: any) => p.name)
+                              );
+                            });
+                        });
+                    });
+                });
+              this.msgBox.alert({
+                title: '选择关系',
+                content: this.contentTpl(),
+                backdropClose: true,
+                callback: (action: XMessageBoxAction) => {
+                  if (action === 'confirm') {
+                    console.log(this.model1);
+                    let property = this.propertyData().filter(
+                      (p: any) => p.name == this.model1
+                    )[0];
+                    console.log(property);
+                    let edge = {
+                      _from: sourceNode.data()['_id'],
+                      _to: targetNode.data()['_id'],
+                      mainsnak: {
+                        snaktype: 'value',
+                        property: `P${property.id}`,
+                        datavalue: {
+                          value: {
+                            'entity-type': 'item',
+                            'numeric-id': Number.parseInt(
+                              targetNode
+                                .data()
+                                ['_id'].split('/')[1]
+                                .replace('Q', '')
+                            ),
+                            id: targetNode.data()['_id'].split('/')[1],
+                          },
+                          type: 'wikibase-entityid',
+                        },
+                        datatype: 'wikibase-item',
+                      },
+                      type: 'statement',
+                      rank: 'normal',
+                    };
+                    console.log(edge)
+
+                    this.service.addEdge(edge).subscribe((e: any) => {
+                      this.message.success('关系创建成功');
+                      this.cy.add({
+                        data: {
+                          source: sourceNode.data().id,
+                          target: targetNode.data().id,
+                          label: property.name,
+                        },
+                      });
+                      addedEdge.remove();
+                    });
+                  } else if (action === 'close') {
+                    this.message.info('已取消创建关系！');
+                    addedEdge.remove();
+                  } else if (action === 'cancel') {
+                    addedEdge.remove();
+                    this.message.info('已取消创建关系！');
+                  }
+                  console.log(action);
+                },
+              });
+            }
+          );
+
           this.initializeCytoscape(data);
-
-
-        })
-     
-      })
+        });
+      });
     });
   }
 
-
   // 销毁所有 Popper 实例
 
-
   initializeCytoscape(data: any): void {
-
     data.elements.nodes.forEach((node: any) => {
-      if (this.cy.nodes().filter((n: any) => n.data().id == node.data.id).length == 0) {
+      if (
+        this.cy.nodes().filter((n: any) => n.data().id == node.data.id)
+          .length == 0
+      ) {
         this.cy.add(node);
       } else {
-        if(this.cy.getElementById(node.data.id).data().base.length==0){
+        if (this.cy.getElementById(node.data.id).data().base.length == 0) {
           this.cy.getElementById(node.data.id).data(node.data);
-
         }
-
       }
-    })
+    });
     data.elements.edges.forEach((edge: any) => {
-      if (this.cy.edges().filter((e: any) => e.data().source == edge.data.source && e.data().target == edge.data.target).length == 0) {
+      if (
+        this.cy
+          .edges()
+          .filter(
+            (e: any) =>
+              e.data().source == edge.data.source &&
+              e.data().target == edge.data.target
+          ).length == 0
+      ) {
         this.cy.add(edge);
       }
     });
     this.cy.nodes().forEach((n: any) => {
-      console.log(n.data())
+      console.log(n.data());
       // const existingPopper = n.scratch('_popper');
       // if (existingPopper) {
       //   console.log(existingPopper)
@@ -471,84 +527,80 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // n.on('position', update);
 
       // this.cy.on('pan zoom resize', update);
+    });
 
-
-
-    })
-
-    this.cy.layout({
-      name: 'cola',
-      animate: true,
-    }).run();
+    this.cy
+      .layout({
+        name: 'cola',
+        animate: true,
+      })
+      .run();
   }
 
-
   search(keyword: any) {
-    let query = {}
+    let query = {};
     if (keyword != '') {
       if (this.way == '默认检索') {
         query = {
-          "must": [{
-            "match": {
-              "labels.zh.value": {
-                "query": keyword,
-                "operator": "and"
-              }
-            }
-          }]
-        }
-
+          must: [
+            {
+              match: {
+                'labels.zh.value': {
+                  query: keyword,
+                  operator: 'and',
+                },
+              },
+            },
+          ],
+        };
       } else if (this.way == '精确检索') {
-        query = { "should": [{ "term": { "labels.zh.value.keyword": keyword } }] }
-
+        query = { should: [{ term: { 'labels.zh.value.keyword': keyword } }] };
       } else {
-        query = { "must": [{ "match": { "labels.zh.value": keyword } }] }
+        query = { must: [{ match: { 'labels.zh.value': keyword } }] };
       }
     }
-    this.esService.searchEntity(1, 10, query).subscribe((data: any) => {
-    })
+    this.esService.searchEntity(1, 10, query).subscribe((data: any) => {});
   }
   modelAsync = signal('');
   dataAsync = signal(
     (str: string) =>
       new Observable<string[]>((x) => {
         // 替换成http请求
-        let query = {}
+        let query = {};
         if (str != '') {
           if (this.way == '默认检索') {
             query = {
-              "must": [{
-                "match": {
-                  "labels.zh.value": {
-                    "query": str,
-                    "operator": "and"
-                  }
-                }
-              }]
-            }
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: str,
+                      operator: 'and',
+                    },
+                  },
+                },
+              ],
+            };
           } else if (this.way == '精确检索') {
-            query = { "should": [{ "term": { "labels.zh.value.keyword": str } }] }
+            query = { should: [{ term: { 'labels.zh.value.keyword': str } }] };
           } else {
-            query = { "must": [{ "match": { "labels.zh.value": str } }] }
+            query = { must: [{ match: { 'labels.zh.value': str } }] };
           }
         }
         this.esService.searchEntity(1, 10, query).subscribe((data: any) => {
           x.next(data.list);
           x.complete();
-        })
+        });
       })
   );
 
   selectNode(node: any) {
-    console.log(node)
+    console.log(node);
     this.modelAsync = signal(node?._source?.labels.zh.value);
     this.service.graph(1, 10, node?._id).subscribe((data: any) => {
-
       this.initializeCytoscape(data);
-    })
+    });
   }
 
-
-  ngOnDestroy(): void {
-  }
+  ngOnDestroy(): void {}
 }
