@@ -508,7 +508,7 @@ export class SearchComponent implements OnInit {
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
+          item?._source?.images?.forEach((image: any) => {
             if (
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
