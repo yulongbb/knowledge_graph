@@ -167,6 +167,6 @@ export class KnowledgeController {
     @Body() query: any,
   ): Promise<any> {
     console.log(id);
-    return this.knowledgeService.graph(id, index, size, query);;
+    return this.knowledgeService.graph(id, index, size, query);
   }
 }

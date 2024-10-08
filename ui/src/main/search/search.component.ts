@@ -28,11 +28,8 @@ export class SearchComponent implements OnInit {
   entities: any;
   images!: any;
   videos!: any;
-<<<<<<< HEAD
-=======
   pdfs!: any;
 
->>>>>>> 9633ef2a9afccf4a6e2b645dd1e3ca6c48b43bd8
   query: any = {};
   types: any;
   tags: any;
@@ -543,6 +540,7 @@ export class SearchComponent implements OnInit {
           item?._source?.images?.forEach((image: any) => {
             if (
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
             ) {
