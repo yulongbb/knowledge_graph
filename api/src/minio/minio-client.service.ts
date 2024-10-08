@@ -7,7 +7,7 @@ import { MINIO_CONFIG } from './config';
 export class MinioClientService {
   private readonly baseBucket = MINIO_CONFIG.MINIO_BUCKET;
 
-  constructor(private readonly minio: MinioService) {}
+  constructor(private readonly minio: MinioService) { }
 
   get client() {
     return this.minio.client;
@@ -30,10 +30,10 @@ export class MinioClientService {
       file.originalname.length,
     );
     const filename = hashedFileName + ext;
-  
+
     const fileName = `${filename}`;
     const fileBuffer = file.buffer;
-  
+
     // 定义一个函数来映射文件扩展名到内容类型
     const getContentType = (extension: string): string => {
       switch (extension.toLowerCase()) {
@@ -49,9 +49,9 @@ export class MinioClientService {
           return 'application/octet-stream'; // 默认为二进制数据
       }
     };
-  
+
     const contentType = getContentType(ext);
-  
+
     return new Promise<any>((resolve) => {
       this.client.putObject(
         baseBucket,

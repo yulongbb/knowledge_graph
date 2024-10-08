@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SearchComponent } from './search.component';
 import { RouterModule } from '@angular/router';
 import { XDrawerModule } from '@ng-nest/ui/drawer';
-import { XAvatarModule, XButtonModule, XCheckboxModule, XInputModule, XMenuModule, XRadioModule, XTagModule, XTimelineModule } from '@ng-nest/ui';
+import { XAvatarModule, XButtonModule, XCheckboxModule, XInputModule, XLinkModule, XMenuModule, XRadioModule, XTagModule, XTimelineModule } from '@ng-nest/ui';
 import { ShareModule } from 'src/share/share.module';
 import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
@@ -39,6 +39,7 @@ import { XSelectModule } from '@ng-nest/ui/select';
     XSelectModule,
     XCheckboxModule,
     XTagModule,
+    XLinkModule,
     InfiniteScrollDirective,
     RouterModule.forChild([
       {

@@ -11,6 +11,7 @@ import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-search',
@@ -24,9 +25,14 @@ export class SearchComponent implements OnInit {
   keyword = '';
   size = 10;
   index = 1;
-  entities!: any;
+  entities: any;
   images!: any;
   videos!: any;
+<<<<<<< HEAD
+=======
+  pdfs!: any;
+
+>>>>>>> 9633ef2a9afccf4a6e2b645dd1e3ca6c48b43bd8
   query: any = {};
   types: any;
   tags: any;
@@ -34,6 +40,7 @@ export class SearchComponent implements OnInit {
   data = signal(['知识', '图片', '视频', '文件']);
 
   constructor(
+    private sanitizer: DomSanitizer,
     private service: EsService,
     private ontologyService: OntologyService,
     private router: Router,
@@ -41,159 +48,207 @@ export class SearchComponent implements OnInit {
     public propertyService: PropertyService,
     private entityService: EntityService,
     private dialogSewrvice: XDialogService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.service
-      .searchEntity(this.index, this.size, {})
-      .subscribe((data: any) => {
-        this.images = [];
-        this.videos = [];
-
-        data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push(image);
-            }
-            if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
-            ) {
-              this.images.push(image);
-            }
-          });
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 100, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    console.log(p.list);
-                    this.entityService
-                      .getLinks(1, 100, item['_id'], {})
-                      .subscribe((c: any) => {
-                        console.log(c);
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          console.log(path);
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                      });
-                  });
-              });
-          });
-        });
-        this.entities = data.list;
-        let menu: any = [];
-        let arr: any = [];
-        console.log(data.total);
-        let tags: any = [];
-        data.tags.forEach((t: any) => {
-          tags.push(t.key);
-        });
-        this.tags = signal(tags);
-        data.types.forEach((m: any) => {
-          arr.push(this.ontologyService.get(m.key));
-        });
-        forkJoin(arr).subscribe((properties: any) => {
-          data.types.forEach((m: any) => {
-            menu.push({
-              id: m.key,
-              label: properties.filter((p: any) => p.id == m.key)[0].name,
-            });
-          });
-          let menuMerge = [];
-          menuMerge = data.types.map((m: any, index: any) => {
-            return { ...m, ...menu[index] };
-          });
-          menuMerge.forEach((m: any) => {
-            m.label = m.label + '(' + m.doc_count + ')';
-          });
-          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
-          this.types = signal(menuMerge);
-          console.log(menuMerge);
-        });
-      });
   }
 
   selectMenu(menu: any) {
-    console.log(menu.label);
+    this.entities = null;
+    this.types = null;
+    this.tags = null;
+    this.images = null;
+    this.videos = null;
+    this.pdfs = null;
     this.menu = signal(menu.label);
+
+
   }
 
   search(keyword: any) {
     this.index = 1;
-    if (keyword != '') {
-      if (this.way == '默认检索') {
-        this.query = {
-          must: [
-            {
-              match: {
-                'labels.zh.value': {
-                  query: keyword,
-                  operator: 'and',
+
+    switch (this.menu()) {
+      case '知识':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
                 },
-              },
-            },
-          ],
-        };
-      } else if (this.way == '精确检索') {
-        this.query = {
-          should: [{ term: { 'labels.zh.value.keyword': keyword } }],
-        };
-      } else {
-        this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
-      }
-    } else {
-      this.query = {};
+              ],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              should: [{ term: { 'labels.zh.value.keyword': keyword } }],
+            };
+          } else {
+            this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
+          }
+        } else {
+          this.query = {};
+        }
+        break;
+      case '图片':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': keyword } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+    
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': keyword } },],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          }
+        } else {
+          this.query = {
+            should: [
+              { "wildcard": { "images": "*jpg" } },
+              { "wildcard": { "images": "*png" } },
+              { "wildcard": { "images": "*webp" } }],
+          };
+        }
+        break;
+      case '视频':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "wildcard": { "images": "*mp4" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': keyword } }
+              ],
+              should: [{ "wildcard": { "images": "*mp4" } }],
+            };
+    
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': keyword } },],
+              should: [{ "wildcard": { "images": "*mp4" } }],
+            };
+          }
+        } else {
+          this.query = {
+            should: [{ "wildcard": { "images": "*mp4" } }],
+          };
+        }
+        break;
+
+      case '文件':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': keyword } }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+    
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': keyword } },],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          }
+        } else {
+          this.query = {
+            should: [{ "wildcard": { "images": "*pdf" } }],
+          };
+        }
+        break;
+      default:
+        this.query = {};
+        break;
     }
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
+        console.log(data);
+        this.tags = null;
+        this.types = null;
         this.images = [];
         this.videos = [];
+        this.pdfs = [];
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
-              this.videos.push(image);
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             }
+
             if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
+              image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.images.push(image);
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description:item?._source.descriptions.zh.value  });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -245,11 +300,34 @@ export class SearchComponent implements OnInit {
           });
         });
         this.entities = data.list;
+        let menu: any = [];
+        let arr: any = [];
+        data.types.forEach((m: any) => {
+          arr.push(this.ontologyService.get(m.key));
+        });
+        forkJoin(arr).subscribe((properties: any) => {
+          data.types.forEach((m: any) => {
+            menu.push({
+              id: m.key,
+              label: properties.filter((p: any) => p.id == m.key)[0].name,
+            });
+          });
+          let menuMerge = [];
+          menuMerge = data.types.map((m: any, index: any) => {
+            return { ...m, ...menu[index] };
+          });
+          menuMerge.forEach((m: any) => {
+            m.label = m.label + '(' + m.doc_count + ')';
+          });
+          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          this.types = menuMerge;
+          console.log(menuMerge);
+        });
         let tags: any = [];
         data.tags.forEach((t: any) => {
           tags.push(t.key);
         });
-        this.tags = signal(tags);
+        this.tags = tags;
       });
   }
 
@@ -434,11 +512,14 @@ export class SearchComponent implements OnInit {
           .navigate([`/index/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
-          .then(() => {});
+          .then(() => { });
         break;
     }
   }
 
+  trustUrl(url: string) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
@@ -458,20 +539,26 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
-        console.log(data);
-
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
-              this.videos.push(image);
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             }
+
             if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
+              image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.images.push(image);
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description:item?._source.descriptions.zh.value  });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -527,8 +614,6 @@ export class SearchComponent implements OnInit {
             this.entities.push(d);
           });
         }
-
-        console.log(this.entities);
       });
   }
 }
