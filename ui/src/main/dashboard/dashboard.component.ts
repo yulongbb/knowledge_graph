@@ -140,14 +140,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 selector: 'edge',
                 style: {
-                  width: 0.4,
-                  'line-color': '#ccc',
-                  'target-arrow-color': '#000',
+                  width: 1.5,
+                  'line-color': '#aaa',
+                  'target-arrow-color': '#aaa',
                   'target-arrow-shape': 'triangle',
                   'curve-style': 'bezier',
                   'text-opacity': 1,
                   'overlay-opacity': 0,
-                  'arrow-scale': 0.3,
+                  'arrow-scale': 1.2,
                   color: '#000',
                   label: 'data(label)',
                   'font-size': '12px',
@@ -452,7 +452,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               });
             }
           );
-
           this.initializeCytoscape(data);
         });
       });

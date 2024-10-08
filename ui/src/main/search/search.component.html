@@ -333,15 +333,30 @@
     @case ('图片') {
       <div class="gallery">
         <div class="warp">
-
           <div *ngFor="let image of images">
             <div (click)="preview(image)" class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
           </div>
         </div>
       </div>
     }
-    @case ('视频') {}
-    @case ('文件') {}
+    @case ('视频') {
+      <div *ngFor="let video of videos">
+        <video width="100%" controls>
+          <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+          <p>
+            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+          </p>
+        </video>
+      </div>
+
+    }
+    @case ('文件') {
+      <div *ngFor="let pdf of pdfs">
+        <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="500"
+          [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
+        </iframe>
+      </div>
+    }
   }
 
  

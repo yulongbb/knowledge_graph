@@ -11,6 +11,7 @@ import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-search',
@@ -26,6 +27,9 @@ export class SearchComponent implements OnInit {
   index = 1;
   entities!: any;
   images!: any;
+  videos!: any;
+  pdfs!: any;
+
   query: any = {};
   types: any;
   tags: any;
@@ -33,6 +37,7 @@ export class SearchComponent implements OnInit {
   data = signal(['知识', '图片', '视频', '文件']);
 
   constructor(
+    private sanitizer: DomSanitizer,
     private service: EsService,
     private ontologyService: OntologyService,
     private router: Router,
@@ -40,23 +45,13 @@ export class SearchComponent implements OnInit {
     public propertyService: PropertyService,
     private entityService: EntityService,
     private dialogSewrvice: XDialogService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.service
       .searchEntity(this.index, this.size, {})
       .subscribe((data: any) => {
-        this.images = [];
-
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
-            ) {
-              this.images.push(image);
-            }
-          });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService
@@ -142,6 +137,112 @@ export class SearchComponent implements OnInit {
   selectMenu(menu: any) {
     console.log(menu.label);
     this.menu = signal(menu.label);
+    switch (menu.label) {
+      case '图片':
+        this.query = {
+          should: [
+            { "wildcard": { "images": "*.jpg" } },
+            { "wildcard": { "images": "*.png" } },
+            { "wildcard": { "images": "*.webp" } }],
+        };
+        break;
+      case '视频':
+        this.query = {
+          should: [{ "wildcard": { "images": "*.mp4" } }],
+        };
+        break;
+      case '文件':
+        this.query = {
+          should: [{ "wildcard": { "images": "*pdf" } }],
+        };
+        break;
+      default:
+        this.query = {};
+        break;
+    }
+    this.service
+      .searchEntity(this.index, this.size, this.query)
+      .subscribe((data: any) => {
+        this.images = [];
+        this.videos = [];
+        this.pdfs = [];
+        data.list.forEach((item: any) => {
+          item._source.images.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push(image);
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'pdf'
+            ) {
+              this.pdfs.push(image);
+            }
+          });
+          this.ontologyService.get(item._source.type).subscribe((t: any) => {
+            item._type = t.label;
+            this.ontologyService
+              .getAllParentIds(item['_source'].type)
+              .subscribe((parents: any) => {
+                parents.push(item['_source'].type);
+                this.propertyService
+                  .getList(1, 50, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                      { field: 'isPrimary', value: true, operation: '=' },
+                    ],
+                  })
+                  .subscribe((p: any) => {
+                    this.entityService
+                      .getLinks(1, 20, item['_id'], {})
+                      .subscribe((c: any) => {
+                        let statements: any = [];
+                        c.list.forEach((path: any) => {
+                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                            console.log(path);
+                            path.edges[0].mainsnak.datavalue.value.id =
+                              path?.vertices[1]?.id;
+                            path.edges[0].mainsnak.datavalue.value.label =
+                              path?.vertices[1]?.labels?.zh?.value;
+                          }
+                          if (
+                            p.list?.filter(
+                              (property: any) =>
+                                path.edges[0].mainsnak.property ==
+                                `P${property.id}`
+                            ).length > 0
+                          ) {
+                            statements.push(path.edges[0]);
+                          }
+                        });
+                        item.claims = statements;
+                        console.log(item);
+                      });
+                  });
+              });
+          });
+        });
+        this.entities = data.list;
+        let tags: any = [];
+        data.tags.forEach((t: any) => {
+          tags.push(t.key);
+        });
+        this.tags = signal(tags);
+      });
   }
 
   search(keyword: any) {
@@ -382,11 +483,13 @@ export class SearchComponent implements OnInit {
           .navigate([`/index/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
-          .then(() => {});
+          .then(() => { });
         break;
     }
   }
-
+  trustUrl(url: string) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
@@ -406,15 +509,26 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
-        console.log(data);
-
         data.list.forEach((item: any) => {
           item._source.images.forEach((image: any) => {
             if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
             ) {
               this.images.push(image);
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push(image);
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'pdf'
+            ) {
+              this.pdfs.push(image);
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -470,8 +584,6 @@ export class SearchComponent implements OnInit {
             this.entities.push(d);
           });
         }
-
-        console.log(this.entities);
       });
   }
 }
