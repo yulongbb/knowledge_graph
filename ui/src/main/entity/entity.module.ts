@@ -14,7 +14,7 @@ import { XImageModule } from '@ng-nest/ui/image';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XRadioModule } from '@ng-nest/ui/radio';
 import { XPaginationModule } from '@ng-nest/ui/pagination';
-import { XDialogComponent, XDialogModule } from '@ng-nest/ui/dialog';
+import { XDialogModule } from '@ng-nest/ui/dialog';
 
 
 
@@ -51,6 +51,6 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XInputNumberModule,
     EntityRoutesModule
   ],
-  declarations: [EntityComponent, EntityDetailComponent]
+  declarations: [EntityComponent, EntityDetailComponent, ]
 })
 export class EntityModule { }

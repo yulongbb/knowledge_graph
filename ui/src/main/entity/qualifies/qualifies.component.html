@@ -1,0 +1,52 @@
+<h4 x-dialog-title x-dialog-drag-handle>{{ data.title }}</h4>
+<div x-dialog-content>
+    <x-button [style.marginBottom.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
+    <x-table [columns]="columns2" [data]="qualifiers" loading [showPagination]="false" [allowSelectRow]="false"
+        [bodyColumnTpl]="{  actions: actionsTpl }" [bodyTdTpl]="bodyTdTpl">
+    </x-table>
+
+
+    <ng-template #actionsTpl let-column="$column" let-row="$row">
+        <div>
+            <x-link type="primary" (click)="save(row)">保存</x-link>
+            <x-link type="danger" (click)="del(row)">删除</x-link>
+        </div>
+    </ng-template>
+
+    <ng-template #bodyTdTpl let-column="$column" let-row="$row">
+        
+        @switch (column?.id) { @case ('property') {
+        <x-select [style.width.%]="100" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label" [data]="properties"
+            (ngModelChange)="change(row)"></x-select>
+
+        <ng-template #nodeTpl let-node="$node">
+            @if (node) {
+            <span class="select-item"> {{ node.label }}</span>
+            }
+        </ng-template>
+        } @case ('name') {
+        <x-input *ngIf="row?.mainsnak?.datatype == 'string'" [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+        <x-input *ngIf="row?.mainsnak?.datatype == 'url'" [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+        <x-input-number *ngIf="row?.mainsnak?.datatype == 'quantity'" [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
+
+
+        <x-date-picker *ngIf="row?.mainsnak?.datatype == 'time'"
+            [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
+
+        <x-input *ngIf="row?.mainsnak?.datatype == 'wikibase-item'" [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
+        <x-input-group *ngIf="row?.mainsnak?.datatype == 'globe-coordinate'" [style.width.%]="100" compact>
+            <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
+            <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
+        </x-input-group>
+        } @default {
+        {{ row[column.id] }}
+        } }
+    </ng-template>
+</div>
+<div x-dialog-actions>
+    <x-button x-dialog-close>关闭</x-button>
+</div>

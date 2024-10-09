@@ -119,6 +119,17 @@ export const layoutRoutes: Routes = [
     }
   },
 
+    // 属性
+    {
+      path: "qualify",
+      loadChildren: () =>
+        import("../main/ontology/qualify/qualify.module").then(x => x.QualifyModule),
+      canLoad: [AuthGuard],
+      data: {
+        shouldReuse: true
+      }
+    },
+
   // 标签
   {
     path: "tag",

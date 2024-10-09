@@ -1,5 +1,6 @@
 <div class="row">
-  <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id" (backClick)="back()">
+  <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id"
+    (backClick)="back()">
   </x-page-header>
   <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
@@ -10,7 +11,9 @@
     </ng-template>
     <div class="bottom">
       <div class="row">
-        <x-tag *ngFor="let tag of entity()['_source']?.tags" [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false" size="mini">{{tag}}</x-tag>
+        <x-tag *ngFor="let tag of entity()['_source']?.tags"
+          [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
+          size="mini">{{tag}}</x-tag>
       </div>
       <h2>简介</h2>
       <p *ngIf="entity()._source.descriptions" [innerHTML]="
@@ -74,7 +77,70 @@
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
                 statement.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
                 }}</strong>
+              {{statement.mainsnak.qualifiers|json}}
+              <dl *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
+                <dl>
+                  <dt>
+                    {{ qualify.key |json }}
+                  </dt>
+                  <dd>
+                    <i *ngFor="let qlf of qualify.value ">
+                      <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
+                        'http://localhost:4200/index/search/info/' +
+                        qlf.mainsnak.datavalue.value.id
+                      ">{{ qlf.mainsnak.datavalue.value.label }}</a>
+                  </strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'string'">
+                    {{ qlf.mainsnak.datavalue.value }}
+                  </strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'commonsMedia'">
+                    <img *ngIf="
+                    qlf?.mainsnak?.datavalue?.value?.split('.')[
+                    qlf?.mainsnak.datavalue.value.split('.').length - 1
+                        ] != 'mp4'
+                      " width="200px" [src]="
+                        'http://localhost:9000/kgms/' +
+                        qlf?.mainsnak?.datavalue.value
+                      " />
+                    <video *ngIf="
+                    qlf?.mainsnak.datavalue.value.split('.')[
+                    qlf?.mainsnak.datavalue.value.split('.').length - 1
+                        ] == 'mp4'
+                      " width="200px" controls>
+                      <source [src]="
+                          'http://localhost:9000/kgms/' +
+                          qlf?.mainsnak.datavalue.value
+                        " type="video/mp4" />
+                      <p>
+                        你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                      </p>
+                    </video>
+                  </strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'url'"><a target="_blank"
+                      [href]="qlf?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'quantity'">{{
+                    qlf.mainsnak.datavalue.value.amount
+                    }}</strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'monolingualtext'">{{
+                    qlf.mainsnak.datavalue.value.text }}</strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'geo-shape'">{{
+                    qlf.mainsnak.datavalue.value
+                    }}</strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'globe-coordinate'">{{
+                    qlf.mainsnak.datavalue.value.latitude }},{{
+                      qlf.mainsnak.datavalue.value.longitude
+                    }}</strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
+                    qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
+                    }}</strong>
+
+                    </i>
+                   
+                  </dd>
+                </dl>
+              </dl>
             </i>
+
           </dd>
         </dl>
       </dl>
@@ -85,7 +151,8 @@
       <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
-            <div (click)="preview(image)" class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
+            <div (click)="preview(image)" class="thumbnail"
+              style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
           </div>
         </div>
       </div>

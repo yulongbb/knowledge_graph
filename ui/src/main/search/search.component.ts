@@ -1,9 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import {
-  XData,
   XDialogService,
   XImagePreviewComponent,
-  XSliderNode,
 } from '@ng-nest/ui';
 import { EsService } from './es.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,6 +30,7 @@ export class SearchComponent implements OnInit {
 
   query: any = {};
   types: any;
+  type: any;
   tags: any;
   tag: any;
   data = signal(['知识', '图片', '视频', '文件']);
@@ -58,13 +57,11 @@ export class SearchComponent implements OnInit {
     this.videos = null;
     this.pdfs = null;
     this.menu = signal(menu.label);
-
-
   }
 
   search(keyword: any) {
+    this.keyword = keyword;
     this.index = 1;
-
     switch (this.menu()) {
       case '知识':
         if (keyword != '') {
@@ -89,7 +86,7 @@ export class SearchComponent implements OnInit {
             this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
           }
         } else {
-          this.query = {};
+          this.query = { must: [] };
         }
         break;
       case '图片':
@@ -121,7 +118,7 @@ export class SearchComponent implements OnInit {
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
-    
+
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
@@ -163,7 +160,7 @@ export class SearchComponent implements OnInit {
               ],
               should: [{ "wildcard": { "images": "*mp4" } }],
             };
-    
+
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
@@ -176,7 +173,6 @@ export class SearchComponent implements OnInit {
           };
         }
         break;
-
       case '文件':
         if (keyword != '') {
           if (this.way == '默认检索') {
@@ -200,7 +196,7 @@ export class SearchComponent implements OnInit {
               ],
               should: [{ "wildcard": { "images": "*pdf" } }],
             };
-    
+
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
@@ -245,7 +241,7 @@ export class SearchComponent implements OnInit {
             if (
               image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description:item?._source.descriptions.zh.value  });
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
@@ -329,38 +325,62 @@ export class SearchComponent implements OnInit {
   }
 
   selectTag(tag: any) {
-    this.index = 1;
-    if (tag.length > 0) {
-      let values: any = [];
-      tag.forEach((t: any) => {
-        values.push({ term: { 'tags.keyword': t } });
-      });
-      this.query = { must: values };
+    if (this.type && this.type.id) {
+      if (tag.length > 0) {
+        let values: any = [];
+        tag.forEach((t: any) => {
+          values.push({ term: { 'tags.keyword': t } });
+        })
+        this.query = { must: [{ term: { 'type.keyword': this.type.id } }].concat(values) };
+      } else {
+        this.query = { must: [{ term: { 'type.keyword': this.type.id } }] };
+      }
     } else {
-      this.query = {};
+      if (tag.length > 0) {
+        let values: any = [];
+        tag.forEach((t: any) => {
+          values.push({ term: { 'tags.keyword': t } });
+        })
+        this.query = { must: values };
+      } else {
+        this.query = {};
+      }
+
     }
+    console.log(this.query)
+    this.index = 1;
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
+        this.tags = null;
+
         this.images = [];
         this.videos = [];
+        this.pdfs = [];
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
-              this.videos.push(image);
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             }
+
             if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
+              image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.images.push(image);
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            console.log(t);
             item._type = t.label;
             this.ontologyService
               .getAllParentIds(item['_source'].type)
@@ -402,49 +422,258 @@ export class SearchComponent implements OnInit {
                           }
                         });
                         item.claims = statements;
+                        console.log(item);
                       });
                   });
               });
           });
         });
         this.entities = data.list;
+
         let tags: any = [];
         data.tags.forEach((t: any) => {
           tags.push(t.key);
         });
-        this.tags = signal(tags);
+        this.tags = tags;
       });
   }
 
   selectType(type: any) {
+    this.type = type;
     this.index = 1;
-    if (type.id) {
-      this.query = { must: [{ term: { 'type.keyword': type.id } }] };
-    } else {
-      this.query = {};
+    console.log(type)
+
+    switch (this.menu()) {
+      case '知识':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } }
+              ],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [{ term: { 'labels.zh.value.keyword': this.keyword } }, { term: { 'type.keyword': type.id } }],
+            };
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } }
+              ]
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = { must: [{ term: { 'type.keyword': type.id } }] };
+          } else {
+            this.query = {};
+          }
+        }
+        break;
+      case '图片':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } },
+                { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },
+              { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          } else {
+            this.query = {
+              should: [
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }]
+            };
+          }
+        }
+        break;
+      case '视频':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } },
+                { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } },
+                { term: { 'type.keyword': type.id } },
+                { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } },
+                { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } },{ "wildcard": { "images": "*mp4" } }],
+
+            };
+          } else {
+            this.query = {
+              must: [{ "wildcard": { "images": "*mp4" } }],
+
+            };
+          }
+
+        }
+        break;
+      case '文件':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          }
+        } else {
+
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+
+            };
+          } else {
+            this.query = {
+              should: [{ "wildcard": { "images": "*pdf" } }],
+
+            };
+          }
+        }
+        break;
+      default:
+        this.query = {};
+        break;
     }
+
+    console.log(this.query);
+
+
     this.service
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
+        this.tags = null;
+
         this.images = [];
         this.videos = [];
+        this.pdfs = [];
         data.list.forEach((item: any) => {
-          item._source.images.forEach((image: any) => {
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
-              this.videos.push(image);
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             }
+
             if (
-              image.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image.split('.')[image.split('.').length - 1] != 'pdf'
+              image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.images.push(image);
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            console.log(t);
             item._type = t.label;
             this.ontologyService
               .getAllParentIds(item['_source'].type)
@@ -486,17 +715,19 @@ export class SearchComponent implements OnInit {
                           }
                         });
                         item.claims = statements;
+                        console.log(item);
                       });
                   });
               });
           });
         });
         this.entities = data.list;
+
         let tags: any = [];
         data.tags.forEach((t: any) => {
           tags.push(t.key);
         });
-        this.tags = signal(tags);
+        this.tags = tags;
       });
   }
 
@@ -556,7 +787,7 @@ export class SearchComponent implements OnInit {
             if (
               image.split('.')[image.split('.').length - 1] == 'pdf'
             ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description:item?._source.descriptions.zh.value  });
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
           this.ontologyService.get(item._source.type).subscribe((t: any) => {

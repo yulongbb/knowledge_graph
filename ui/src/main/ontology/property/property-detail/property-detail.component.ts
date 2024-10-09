@@ -11,6 +11,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
 import { PropertyService } from '../property.service';
+import { QualifyService } from '../../qualify/qualify.service';
 
 @Component({
   selector: 'app-property-detail',
@@ -85,6 +86,21 @@ export class PropertyDetailComponent implements OnInit {
     },
     {
       control: 'find',
+      id: 'qualifiers',
+      label: '限定',
+      required: false,
+      multiple: true,
+      tableColumns: [
+        { id: 'id', label: '序号', flex: 0.4, left: 0 },
+        { id: 'label', label: '名称', flex: 0.5, sort: true },
+        { id: 'description', label: '描述', flex: 2.5, sort: true },
+      ],
+      tableData: (index: number, size: number, query: XQuery) =>
+        this.qualifyService
+          .getList(1, Number.MAX_SAFE_INTEGER, {}),
+    },
+    {
+      control: 'find',
       id: 'types',
       label: '尾部实体',
       required: false,
@@ -115,6 +131,7 @@ export class PropertyDetailComponent implements OnInit {
   constructor(
     private ontologyService: OntologyService,
     private propertyService: PropertyService,
+    private qualifyService: QualifyService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService
@@ -143,6 +160,18 @@ export class PropertyDetailComponent implements OnInit {
       case 'info':
         console.log(this.id);
         this.propertyService.get(this.id as string).subscribe((x: any) => {
+          
+          this.qualifyService.getList(1, 10, {filter:[
+            {
+              field: 'id',
+              value: x.id as string,
+              relation: 'properties',
+              operation: '=',
+            },
+          ]}).subscribe((q: any) => {
+            x['qualifiers'] = q.list;
+          });
+          
           this.query.filter = [
             {
               field: 'id',
@@ -151,6 +180,7 @@ export class PropertyDetailComponent implements OnInit {
               operation: '=',
             },
           ];
+          
           this.ontologyService
             .getList(1, 10, this.query)
             .subscribe((y: any) => {

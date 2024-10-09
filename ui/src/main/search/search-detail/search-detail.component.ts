@@ -200,7 +200,9 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-    return this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
+    let statement= this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
+    statement.mainsnak.qualifers as Map<string, Array<any>>;
+    return statement;
   }
 
   back() {

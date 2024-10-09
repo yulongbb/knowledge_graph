@@ -185,8 +185,15 @@
       <x-collapse-panel label="属性信息" active="true">
         <x-button [style.marginBottom.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
         <x-table [columns]="columns2" [data]="statements" loading [showPagination]="false" [allowSelectRow]="false"
-          [bodyColumnTpl]="{ actions: actionsTpl }" [bodyTdTpl]="bodyTdTpl">
+          [bodyColumnTpl]="{ qualify: qualifyTpl, actions: actionsTpl }" [bodyTdTpl]="bodyTdTpl">
         </x-table>
+
+        <ng-template #qualifyTpl let-column="$column" let-row="$row">
+          <div>
+            <x-link type="primary" (click)="dialog(row)">编辑</x-link>
+          </div>
+        </ng-template>
+
 
         <ng-template #actionsTpl let-column="$column" let-row="$row">
           <div>

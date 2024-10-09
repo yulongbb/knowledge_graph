@@ -10,6 +10,7 @@ import {
   XMessageBoxAction,
   XMessageBoxService,
   XMessageService,
+  XDialogService,
   XPlace,
   XPosition,
   XRadioNode,
@@ -17,7 +18,6 @@ import {
 import { EntityService } from './entity.service';
 import { EsService } from '../search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
-
 @Component({
   selector: 'app-entity',
 
@@ -63,7 +63,8 @@ export class EntityComponent extends PageBase {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
-    private msgBox: XMessageBoxService
+    private msgBox: XMessageBoxService,
+
   ) {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
@@ -97,6 +98,9 @@ export class EntityComponent extends PageBase {
         );
     });
   }
+
+
+
 
   detail(row: XTableRow, column: XTableColumn) {
     this.id = row.id[0].split('/')[1];

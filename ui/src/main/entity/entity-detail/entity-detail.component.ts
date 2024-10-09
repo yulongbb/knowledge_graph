@@ -14,6 +14,7 @@ import {
   XImagePreviewComponent,
   XTableColumn,
   XTableRow,
+  XPlace,
 } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
@@ -23,6 +24,7 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
+import {QualifiesDialogComponent} from '../qualifies/qualifies.component'
 
 @Component({
   selector: 'app-entity-detail',
@@ -104,26 +106,55 @@ export class EntityDetailComponent implements OnInit {
   propertyData: any;
 
   statements: any;
-  //更新边
-  updatedEdges: any = [];
-  //删除边
-  deletedEdges: any = [];
-  //新增边
-  newEdges: any = [];
+ 
 
   columns2: XTableColumn[] = [
-    { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
+    { id: 'index', label: '序号', width: 40, left: 0, type: 'index' },
     { id: 'property', label: '属性名', flex: 1 },
     { id: 'name', label: '属性值', flex: 1 },
+    { id: 'qualify', label: '限定', width: 80 },
     { id: 'actions', label: '操作', width: 100 },
   ];
 
+
+
+  constructor(
+    private sanitizer: DomSanitizer,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private message: XMessageService,
+    private dialogService: XDialogService,
+    public nav: NavService,
+    private ontologyService: OntologyService,
+    private esService: EsService,
+    public propertyService: PropertyService,
+    public tagService: TagService,
+    private nodeService: EntityService,
+  ) {
+    // 获取路由参数
+    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
+      this.id = x.get('id') as string;
+      this.type = x.get('type') as string;
+      if (this.type === 'info') {
+        this.title = '查看实体';
+        this.disabled = true;
+      } else if (this.type === 'add') {
+        this.title = '新增实体';
+      } else if (this.type === 'update') {
+        this.title = '修改实体';
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    this.action(this.type);
+  }
   add() {
     this.statements = [
       ...this.statements,
       {
         _from: this.item.items[0],
-        
+
         mainsnak: {
           snaktype: 'value',
           property: '',
@@ -141,7 +172,7 @@ export class EntityDetailComponent implements OnInit {
   }
 
   save(row: any) {
-    if(row.mainsnak.datavalue.type!='wikibase-entityid'){
+    if (row.mainsnak.datavalue.type != 'wikibase-entityid') {
       row['_to'] = this.item.items[0]
     }
     if (row._key) {
@@ -173,40 +204,17 @@ export class EntityDetailComponent implements OnInit {
     })
   }
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private message: XMessageService,
-    private dialogSewrvice: XDialogService,
-    public nav: NavService,
-    private ontologyService: OntologyService,
-    private esService: EsService,
-    public propertyService: PropertyService,
-    public tagService: TagService,
-    private nodeService: EntityService,
-  ) {
-    // 获取路由参数
-    this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      this.id = x.get('id') as string;
-      this.type = x.get('type') as string;
-      if (this.type === 'info') {
-        this.title = '查看实体';
-        this.disabled = true;
-      } else if (this.type === 'add') {
-        this.title = '新增实体';
-      } else if (this.type === 'update') {
-        this.title = '修改实体';
-      }
+  dialog(row: any) {
+    this.dialogService.create(QualifiesDialogComponent, {
+      draggable: true,
+      resizable: true,
+      data: row
     });
   }
 
-  ngOnInit(): void {
-    this.action(this.type);
-  }
 
   preview(image: any) {
-    this.dialogSewrvice.create(XImagePreviewComponent, {
+    this.dialogService.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
@@ -282,7 +290,7 @@ export class EntityDetailComponent implements OnInit {
         statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
         statements.mainsnak.datavalue = {
           value: {
-            'entity-type':  statements.mainsnak.datatype.replace('wikibase-', ''),
+            'entity-type': statements.mainsnak.datatype.replace('wikibase-', ''),
             'numeric-id': 0,
             id: '',
           },
@@ -306,7 +314,7 @@ export class EntityDetailComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  
+
   action(type: string) {
     switch (type) {
       case 'info':

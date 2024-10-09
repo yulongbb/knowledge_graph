@@ -54,6 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   id: any;
   data: any;
   type: any;
+
   dialog(data: any, type: any, place: XPlace) {
     this.dialogService.create(EntityDetailComponent, {
       placement: place, // 默认center
@@ -79,7 +80,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private message: XMessageService,
     private dialogService: XDialogService,
     private msgBox: XMessageBoxService
-  ) {}
+  ) {
+  
+   }
 
   ngOnInit(): void {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
@@ -108,7 +111,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 selector: 'node',
                 style: {
-                  'border-color':  '#ffffff',
+                  'border-color': '#ffffff',
                   'border-width': 2,
                   'background-image': 'data(images)',
                   'background-fit': 'cover',
@@ -416,7 +419,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                             'numeric-id': Number.parseInt(
                               targetNode
                                 .data()
-                                ['_id'].split('/')[1]
+                              ['_id'].split('/')[1]
                                 .replace('Q', '')
                             ),
                             id: targetNode.data()['_id'].split('/')[1],
@@ -559,7 +562,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         query = { must: [{ match: { 'labels.zh.value': keyword } }] };
       }
     }
-    this.esService.searchEntity(1, 10, query).subscribe((data: any) => {});
+    this.esService.searchEntity(1, 10, query).subscribe((data: any) => { });
   }
   modelAsync = signal('');
   dataAsync = signal(
@@ -602,5 +605,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void { }
 }

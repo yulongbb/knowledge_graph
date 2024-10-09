@@ -1,0 +1,54 @@
+<au-tool>
+  <x-button type="primary" icon="fto-plus" (click)="action('add')"
+    >新增</x-button
+  >
+</au-tool>
+
+<x-input-group compact>
+  <x-input
+    [style.width.%]="100"
+    placeholder="输入中文名"
+    [(ngModel)]="name"
+    (keyup.enter)="searchName(name)"
+  ></x-input>
+  <x-input
+  [style.width.%]="100"
+  placeholder="输入英文名"
+  [(ngModel)]="enName"
+  (keyup.enter)="searchEnName(enName)"
+></x-input>
+<x-input
+    [style.width.%]="100"
+    placeholder="输入中文描述"
+    [(ngModel)]="description"
+    (keyup.enter)="searchDescription(description)"
+  ></x-input>
+</x-input-group>
+
+<x-table
+  #tableCom
+  [columns]="columns"
+  [rowHeight]="35"
+  [data]="data"
+  [size]="size"
+  [(index)]="index"
+  [query]="query"
+  [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }"
+  loading
+></x-table>
+
+<ng-template #actionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-eye" (click)="action('info', row)" title="查看"></x-link>
+    <x-link icon="fto-edit" (click)="action('edit', row)" title="修改"></x-link>
+    <x-link
+      icon="fto-trash-2"
+      (click)="action('delete', row)"
+      title="删除"
+    ></x-link>
+  </div>
+</ng-template>
+
+<ng-template #iconTpl let-column="$column" let-row="$row">
+  <x-icon *ngIf="row.icon" [type]="row.icon"></x-icon>
+</ng-template>
