@@ -310,6 +310,10 @@ export class EntityDetailComponent implements OnInit {
     };
   }
 
+  upload($event:any, row:any){
+    row.mainsnak.datavalue.value = $event.body.name;
+  }
+
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
