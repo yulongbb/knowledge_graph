@@ -103,10 +103,6 @@ export class QualifiesDialogComponent implements OnInit {
 
     }
     ngOnInit(): void {
-        console.log()
-
-
-
         this.qualifyService
             .getList(1, 50, {
                 filter: [
