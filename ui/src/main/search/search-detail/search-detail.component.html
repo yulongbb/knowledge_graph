@@ -128,6 +128,10 @@
               <p *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
                 <small *ngFor="let qlf of getQualify(qualify)">
                   <i>{{qlf.mainsnak.label}}:</i>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
+                    qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
+                    }}</strong>
+                 
                   <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
                         'http://localhost:4200/index/search/info/' +
                         qlf.mainsnak.datavalue.value.id
@@ -155,30 +159,8 @@
                           qlf?.mainsnak?.datavalue?.value
                         "
                       />
-                      <video
-                        *ngIf="
-                          qlf?.mainsnak?.datavalue?.value?.split('.').pop() ===
-                          'mp4'
-                        "
-                        width="200px"
-                        controls
-                      >
-                        <source
-                          [src]="
-                            'http://localhost:9000/kgms/' +
-                            qlf?.mainsnak?.datavalue?.value
-                          "
-                          type="video/mp4"
-                        />
-                        <p>
-                          你的浏览器不支持 HTML5 视频。这里有一个<a
-                            href="myVideo.mp4"
-                            download="myVideo.mp4"
-                            >视频</a
-                          >链接。
-                        </p>
-                      </video>
-                    </strong>
+                    </video>
+                      
                     <strong *ngIf="qlf.mainsnak.datatype === 'url'">
                       <a
                         target="_blank"
@@ -200,10 +182,8 @@
                     qlf.mainsnak.datavalue.value.latitude }},{{
                     qlf.mainsnak.datavalue.value.longitude
                     }}</strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
-                    qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
-                    }}</strong>
-
+                  
+                  </strong>
                 </small>
 
               </p>

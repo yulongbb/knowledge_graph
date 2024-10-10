@@ -96,9 +96,6 @@ export class OntologyComponent extends PageBase {
           label: '名称',
           required: true,
         },
-
-
-
         {
           control: 'input',
           id: 'label',
@@ -109,7 +106,6 @@ export class OntologyComponent extends PageBase {
           id: 'color',
           label: '颜色'
         },
-
         {
           control: 'input',
           id: 'name',

@@ -104,6 +104,7 @@ export class SearchComponent implements OnInit {
                 }
               ],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -114,6 +115,7 @@ export class SearchComponent implements OnInit {
                 { term: { 'labels.zh.value.keyword': keyword } }
               ],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -123,6 +125,7 @@ export class SearchComponent implements OnInit {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -131,6 +134,7 @@ export class SearchComponent implements OnInit {
         } else {
           this.query = {
             should: [
+              { "wildcard": { "images": "*jpeg" } },
               { "wildcard": { "images": "*jpg" } },
               { "wildcard": { "images": "*png" } },
               { "wildcard": { "images": "*webp" } }],
@@ -225,6 +229,7 @@ export class SearchComponent implements OnInit {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {
             if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
@@ -361,6 +366,7 @@ export class SearchComponent implements OnInit {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {
             if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
@@ -494,6 +500,7 @@ export class SearchComponent implements OnInit {
                 { term: { 'type.keyword': type.id } }
               ],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -505,6 +512,7 @@ export class SearchComponent implements OnInit {
                 { term: { 'type.keyword': type.id } }
               ],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -516,6 +524,7 @@ export class SearchComponent implements OnInit {
               { term: { 'type.keyword': type.id } }
               ],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -526,6 +535,7 @@ export class SearchComponent implements OnInit {
             this.query = {
               must: [{ term: { 'type.keyword': type.id } }],
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
@@ -533,6 +543,7 @@ export class SearchComponent implements OnInit {
           } else {
             this.query = {
               should: [
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }]
@@ -654,6 +665,7 @@ export class SearchComponent implements OnInit {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {
             if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
