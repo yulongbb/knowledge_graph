@@ -1,27 +1,48 @@
 <div class="row">
-  <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0,20)" [subTitle]="entity()?._id"
-    (backClick)="back()">
+  <x-page-header
+    [title]="entity()?._source?.labels?.zh?.value.slice(0, 20)"
+    [subTitle]="entity()?._id"
+    (backClick)="back()"
+  >
   </x-page-header>
-  <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
+  <x-card
+    width="100%"
+    class="card"
+    [bodyStyle]="{ padding: 10, }"
+    [header]="header"
+  >
     <ng-template #header>
-      <span class="label">{{ entity()?._source?.labels?.zh?.value }}
+      <span class="label"
+        >{{ entity()?._source?.labels?.zh?.value }}
         <!-- <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-        </x-buttons> --> </span><span>{{ entity()?._type }}</span>
+        </x-buttons> --> </span
+      ><span>{{ entity()?._type }}</span>
     </ng-template>
     <div class="bottom">
       <div class="row">
-        <x-tag *ngFor="let tag of entity()['_source']?.tags"
-          [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
-          size="mini">{{tag}}</x-tag>
+        <x-tag
+          *ngFor="let tag of entity()['_source']?.tags"
+          [style]="{
+            margin: '5px',
+            backgroundColor: '#4494d5',
+            color: 'white'
+          }"
+          bordered="false"
+          size="mini"
+          >{{ tag }}</x-tag
+        >
       </div>
       <h2>简介</h2>
-      <p *ngIf="entity()._source.descriptions" [innerHTML]="
+      <p
+        *ngIf="entity()._source.descriptions"
+        [innerHTML]="
           linkifyText(
             entity()?._source?.descriptions?.zh?.value,
             entity()?._source?.entities
           )
-        "></p>
+        "
+      ></p>
       <dl *ngFor="let property of properties()">
         <dl *ngIf="getStatement(property).length > 0">
           <dt>
@@ -29,118 +50,168 @@
           </dt>
           <dd>
             <i *ngFor="let statement of getStatement(property)">
-              <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+              <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"
+                ><a
+                  [href]="
                     'http://localhost:4200/index/search/info/' +
                     statement.mainsnak.datavalue.value.id
-                  ">{{ statement.mainsnak.datavalue.value.label }}</a>
+                  "
+                  >{{ statement.mainsnak.datavalue.value.label }}</a
+                >
               </strong>
               <strong *ngIf="statement.mainsnak.datatype == 'string'">
                 {{ statement.mainsnak.datavalue.value }}
               </strong>
               <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-                <img *ngIf="
+                <img
+                  *ngIf="
                     statement?.mainsnak?.datavalue?.value?.split('.')[
                       statement?.mainsnak.datavalue.value.split('.').length - 1
                     ] != 'mp4'
-                  " width="200px" [src]="
+                  "
+                  width="200px"
+                  [src]="
                     'http://localhost:9000/kgms/' +
                     statement?.mainsnak?.datavalue.value
-                  " />
-                <video *ngIf="
+                  "
+                />
+                <video
+                  *ngIf="
                     statement?.mainsnak.datavalue.value.split('.')[
                       statement?.mainsnak.datavalue.value.split('.').length - 1
                     ] == 'mp4'
-                  " width="200px" controls>
-                  <source [src]="
+                  "
+                  width="200px"
+                  controls
+                >
+                  <source
+                    [src]="
                       'http://localhost:9000/kgms/' +
                       statement?.mainsnak.datavalue.value
-                    " type="video/mp4" />
+                    "
+                    type="video/mp4"
+                  />
                   <p>
-                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                    你的浏览器不支持 HTML5 视频。这里有一个<a
+                      href="myVideo.mp4"
+                      download="myVideo.mp4"
+                      >视频</a
+                    >链接。
                   </p>
                 </video>
               </strong>
-              <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                  [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'url'"
+                ><a
+                  target="_blank"
+                  [href]="statement?.mainsnak.datavalue.value"
+                  >{{ statement?.mainsnak.datavalue.value }}</a
+                ></strong
+              >
               <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
                 statement.mainsnak.datavalue.value.amount
-                }}</strong>
-              <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                statement.mainsnak.datavalue.value.text }}</strong>
+              }}</strong>
+              <strong
+                *ngIf="statement.mainsnak.datatype == 'monolingualtext'"
+                >{{ statement.mainsnak.datavalue.value.text }}</strong
+              >
               <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
                 statement.mainsnak.datavalue.value
-                }}</strong>
-              <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-                statement.mainsnak.datavalue.value.latitude }},{{
-                statement.mainsnak.datavalue.value.longitude
-                }}</strong>
+              }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'"
+                >{{ statement.mainsnak.datavalue.value.latitude }},{{
+                  statement.mainsnak.datavalue.value.longitude
+                }}</strong
+              >
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                statement.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
-                }}</strong>
-              {{statement.mainsnak.qualifiers|json}}
-              <dl *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
-                <dl>
-                  <dt>
-                    {{ qualify.key |json }}
-                  </dt>
-                  <dd>
-                    <i *ngFor="let qlf of qualify.value ">
-                      <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
-                        'http://localhost:4200/index/search/info/' +
-                        qlf.mainsnak.datavalue.value.id
-                      ">{{ qlf.mainsnak.datavalue.value.label }}</a>
-                  </strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'string'">
-                    {{ qlf.mainsnak.datavalue.value }}
-                  </strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'commonsMedia'">
-                    <img *ngIf="
-                    qlf?.mainsnak?.datavalue?.value?.split('.')[
-                    qlf?.mainsnak.datavalue.value.split('.').length - 1
-                        ] != 'mp4'
-                      " width="200px" [src]="
-                        'http://localhost:9000/kgms/' +
-                        qlf?.mainsnak?.datavalue.value
-                      " />
-                    <video *ngIf="
-                    qlf?.mainsnak.datavalue.value.split('.')[
-                    qlf?.mainsnak.datavalue.value.split('.').length - 1
-                        ] == 'mp4'
-                      " width="200px" controls>
-                      <source [src]="
+                statement.mainsnak.datavalue.value.time
+                  | date : "yyyy年MM月dd日"
+              }}</strong>
+              <p><small
+                *ngFor="
+                  let qualify of (statement.mainsnak.qualifiers | keyvalue) ||
+                    []
+                "
+              >
+                  <i *ngFor="let qlf of getQualify(qualify)">
+                    <i>{{qlf.mainsnak.label}}</i>
+
+                    <strong *ngIf="qlf.mainsnak.datatype === 'wikibase-item'">
+                      <a
+                        [href]="
+                          'http://localhost:4200/index/search/info/' +
+                          qlf.mainsnak.datavalue.value.id
+                        "
+                      >
+                        {{ qlf.mainsnak.datavalue.value.label }}
+                      </a>
+                    </strong>
+                    <strong *ngIf="qlf.mainsnak.datatype === 'string'">
+                      {{ qlf.mainsnak.datavalue.value }}
+                    </strong>
+                    <strong *ngIf="qlf.mainsnak.datatype === 'commonsMedia'">
+                      <img
+                        *ngIf="
+                          qlf?.mainsnak?.datavalue?.value?.split('.').pop() !==
+                          'mp4'
+                        "
+                        width="200px"
+                        [src]="
                           'http://localhost:9000/kgms/' +
-                          qlf?.mainsnak.datavalue.value
-                        " type="video/mp4" />
-                      <p>
-                        你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                      </p>
-                    </video>
-                  </strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'url'"><a target="_blank"
-                      [href]="qlf?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'quantity'">{{
-                    qlf.mainsnak.datavalue.value.amount
+                          qlf?.mainsnak?.datavalue?.value
+                        "
+                      />
+                      <video
+                        *ngIf="
+                          qlf?.mainsnak?.datavalue?.value?.split('.').pop() ===
+                          'mp4'
+                        "
+                        width="200px"
+                        controls
+                      >
+                        <source
+                          [src]="
+                            'http://localhost:9000/kgms/' +
+                            qlf?.mainsnak?.datavalue?.value
+                          "
+                          type="video/mp4"
+                        />
+                        <p>
+                          你的浏览器不支持 HTML5 视频。这里有一个<a
+                            href="myVideo.mp4"
+                            download="myVideo.mp4"
+                            >视频</a
+                          >链接。
+                        </p>
+                      </video>
+                    </strong>
+                    <strong *ngIf="qlf.mainsnak.datatype === 'url'">
+                      <a
+                        target="_blank"
+                        [href]="qlf?.mainsnak.datavalue.value"
+                        >{{ qlf?.mainsnak.datavalue.value }}</a
+                      >
+                    </strong>
+                    <strong *ngIf="qlf.mainsnak.datatype === 'quantity'">{{
+                      qlf.mainsnak.datavalue.value.amount
                     }}</strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'monolingualtext'">{{
-                    qlf.mainsnak.datavalue.value.text }}</strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'geo-shape'">{{
-                    qlf.mainsnak.datavalue.value
+                    <strong
+                      *ngIf="qlf.mainsnak.datatype === 'monolingualtext'"
+                      >{{ qlf.mainsnak.datavalue.value.text }}</strong
+                    >
+                    <strong *ngIf="qlf.mainsnak.datatype === 'geo-shape'">{{
+                      qlf.mainsnak.datavalue.value
                     }}</strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'globe-coordinate'">{{
-                    qlf.mainsnak.datavalue.value.latitude }},{{
-                      qlf.mainsnak.datavalue.value.longitude
+                    <strong *ngIf="qlf.mainsnak.datatype === 'globe-coordinate'"
+                      >{{ qlf.mainsnak.datavalue.value.latitude }},
+                      {{ qlf.mainsnak.datavalue.value.longitude }}</strong
+                    >
+                    <strong *ngIf="qlf.mainsnak.datatype === 'time'">{{
+                      qlf.mainsnak.datavalue.value.time
+                        | date : "yyyy年MM月dd日"
                     }}</strong>
-                  <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
-                    qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
-                    }}</strong>
-
-                    </i>
-                   
-                  </dd>
-                </dl>
-              </dl>
+                  </i>
+              </small></p>
             </i>
-
           </dd>
         </dl>
       </dl>
@@ -151,24 +222,46 @@
       <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
-            <div (click)="preview(image)" class="thumbnail"
-              style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
+            <div
+              (click)="preview(image)"
+              class="thumbnail"
+              style="background-image: url('http://localhost:9000/kgms/{{
+                image
+              }}')"
+            ></div>
           </div>
         </div>
       </div>
 
       <div *ngFor="let video of videos">
         <video width="100%" controls>
-          <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
+          <source
+            [src]="'http://localhost:9000/kgms/' + video"
+            type="video/mp4"
+          />
           <p>
-            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+            你的浏览器不支持 HTML5 视频。这里有一个<a
+              href="myVideo.mp4"
+              download="myVideo.mp4"
+              >视频</a
+            >链接。
           </p>
         </video>
       </div>
 
       <div *ngFor="let pdf of pdfs">
-        <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
-          [src]="trustUrl('http://localhost:7777/web/viewer.html?file=/pdf/kgms/'+pdf)">
+        <iframe
+          id="inlineFrameExample"
+          title="Inline Frame Example"
+          frameborder="0"
+          width="100%"
+          height="1500"
+          [src]="
+            trustUrl(
+              'http://localhost:7777/web/viewer.html?file=/pdf/kgms/' + pdf
+            )
+          "
+        >
         </iframe>
       </div>
     </div>
