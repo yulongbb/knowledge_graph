@@ -1,4 +1,4 @@
-import { Component, inject, signal, } from '@angular/core';
+import { Component, inject, OnInit, signal, } from '@angular/core';
 import { XButtonComponent } from '@ng-nest/ui/button';
 import {
     XDialogActionsDirective,
@@ -74,12 +74,12 @@ import { Qualify, QualifyService } from './../../ontology/qualify/qualify.servic
     ],
     templateUrl: './qualifies.component.html'
 })
-export class QualifiesDialogComponent {
+export class QualifiesDialogComponent implements OnInit {
     data: any = inject(X_DIALOG_DATA);
 
     item: any;
 
-    qualifiers:any;
+    qualifiers: any;
 
     properties: any;
     propertyData: any;
@@ -94,12 +94,8 @@ export class QualifiesDialogComponent {
     ];
 
     constructor(
-        private sanitizer: DomSanitizer,
         private message: XMessageService,
-        private dialogService: XDialogService,
         public nav: NavService,
-        private ontologyService: OntologyService,
-        private esService: EsService,
         private qualifyService: QualifyService,
         public tagService: TagService,
         private nodeService: EntityService,
@@ -107,12 +103,6 @@ export class QualifiesDialogComponent {
 
     }
     ngOnInit(): void {
-        console.log({
-            field: 'id',
-            value: this.data.mainsnak.property.replace('P', ''),
-            relation: 'properties',
-            operation: '=',
-        },)
         this.qualifyService
             .getList(1, 50, {
                 filter: [
@@ -127,34 +117,20 @@ export class QualifiesDialogComponent {
             .subscribe((x: any) => {
                 console.log(x.list)
                 this.propertyData = signal(x.list);
-
                 this.properties = x.list.map((p: any) => p.label);
-                console.log(this.properties)
-                //   this.nodeService
-                //     .getLinks(1, 50, this.id, {})
-                //     .subscribe((c: any) => {
-                //       this.statements = [];
-                //       c.list.forEach((p: any) => {
-                //         if (p.edges[0].mainsnak.property != 'P31') {
-                //           p.edges[0].mainsnak.label = x.list.filter(
-                //             (p2: any) =>
-                //               p.edges[0].mainsnak.property == `P${p2.id}`
-                //           )[0]?.name;
-                //           if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                //             console.log(p.edges[0].mainsnak.property);
-                //             p.edges[0].mainsnak.datavalue.value.id =
-                //               p.vertices[1]?.id;
-                //             p.edges[0].mainsnak.datavalue.value.label =
-                //               p.vertices[1]?.labels?.zh?.value;
-                //           }
-                //           this.statements.push(p.edges[0]);
-                //         }
-                //         this.claims = this.statements;
-                //       });
-                //     });
             });
+
+        this.qualifiers = [];
+        Object.keys(this.data.mainsnak.qualifiers).map((key) => {
+            console.log(key)
+            console.log(this.data.mainsnak.qualifiers[key]);
+            this.data.mainsnak.qualifiers[key].forEach((qlf: any) => {
+                this.qualifiers.push(qlf);
+            })
+        })
     }
-    add() {console.log(this.data.mainsnak)
+    add() {
+        console.log(this.properties)
         if (!this.qualifiers) {
             this.qualifiers = []
         }
@@ -181,8 +157,8 @@ export class QualifiesDialogComponent {
         console.log(this.qualifiers);
 
         this.data.mainsnak.qualifiers = {};
-        this.qualifiers.forEach((qualify:any)=>{
-            if(!this.data.mainsnak.qualifiers[qualify.mainsnak.property]){
+        this.qualifiers.forEach((qualify: any) => {
+            if (!this.data.mainsnak.qualifiers[qualify.mainsnak.property]) {
                 this.data.mainsnak.qualifiers[qualify.mainsnak.property] = []
             }
             this.data.mainsnak.qualifiers[qualify.mainsnak.property].push(qualify)

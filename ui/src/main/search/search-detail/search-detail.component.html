@@ -123,39 +123,34 @@
                 }}</strong
               >
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                statement.mainsnak.datavalue.value.time
-                  | date : "yyyy年MM月dd日"
-              }}</strong>
-              <p><small
-                *ngFor="
-                  let qualify of (statement.mainsnak.qualifiers | keyvalue) ||
-                    []
-                "
-              >
-                  <i *ngFor="let qlf of getQualify(qualify)">
-                    <i>{{qlf.mainsnak.label}}</i>
-
-                    <strong *ngIf="qlf.mainsnak.datatype === 'wikibase-item'">
-                      <a
-                        [href]="
-                          'http://localhost:4200/index/search/info/' +
-                          qlf.mainsnak.datavalue.value.id
-                        "
-                      >
-                        {{ qlf.mainsnak.datavalue.value.label }}
-                      </a>
-                    </strong>
-                    <strong *ngIf="qlf.mainsnak.datatype === 'string'">
-                      {{ qlf.mainsnak.datavalue.value }}
-                    </strong>
-                    <strong *ngIf="qlf.mainsnak.datatype === 'commonsMedia'">
-                      <img
-                        *ngIf="
-                          qlf?.mainsnak?.datavalue?.value?.split('.').pop() !==
-                          'mp4'
-                        "
-                        width="200px"
-                        [src]="
+                statement.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
+                }}</strong>
+              <p *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
+                <small *ngFor="let qlf of getQualify(qualify)">
+                  <i>{{qlf.mainsnak.label}}:</i>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
+                        'http://localhost:4200/index/search/info/' +
+                        qlf.mainsnak.datavalue.value.id
+                      ">{{ qlf.mainsnak.datavalue.value.label }}</a>
+                  </strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'string'">
+                    {{ qlf.mainsnak.datavalue.value }}
+                  </strong>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'commonsMedia'">
+                    <img *ngIf="
+                    qlf?.mainsnak?.datavalue?.value?.split('.')[
+                    qlf?.mainsnak.datavalue.value.split('.').length - 1
+                        ] != 'mp4'
+                      " width="200px" [src]="
+                        'http://localhost:9000/kgms/' +
+                        qlf?.mainsnak?.datavalue.value
+                      " />
+                    <video *ngIf="
+                    qlf?.mainsnak.datavalue.value.split('.')[
+                    qlf?.mainsnak.datavalue.value.split('.').length - 1
+                        ] == 'mp4'
+                      " width="200px" controls>
+                      <source [src]="
                           'http://localhost:9000/kgms/' +
                           qlf?.mainsnak?.datavalue?.value
                         "
@@ -201,16 +196,17 @@
                     <strong *ngIf="qlf.mainsnak.datatype === 'geo-shape'">{{
                       qlf.mainsnak.datavalue.value
                     }}</strong>
-                    <strong *ngIf="qlf.mainsnak.datatype === 'globe-coordinate'"
-                      >{{ qlf.mainsnak.datavalue.value.latitude }},
-                      {{ qlf.mainsnak.datavalue.value.longitude }}</strong
-                    >
-                    <strong *ngIf="qlf.mainsnak.datatype === 'time'">{{
-                      qlf.mainsnak.datavalue.value.time
-                        | date : "yyyy年MM月dd日"
+                  <strong *ngIf="qlf.mainsnak.datatype == 'globe-coordinate'">{{
+                    qlf.mainsnak.datavalue.value.latitude }},{{
+                    qlf.mainsnak.datavalue.value.longitude
                     }}</strong>
-                  </i>
-              </small></p>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
+                    qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
+                    }}</strong>
+
+                </small>
+
+              </p>
             </i>
           </dd>
         </dl>

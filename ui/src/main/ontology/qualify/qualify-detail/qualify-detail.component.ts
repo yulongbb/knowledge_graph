@@ -27,7 +27,7 @@ export class QualifyDetailComponent implements OnInit {
    
     {
       control: 'input',
-      id: 'name',
+      id: 'label',
       label: '名称',
       required: true,
       maxlength: 16,

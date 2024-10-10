@@ -24,7 +24,7 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
-import {QualifiesDialogComponent} from '../qualifies/qualifies.component'
+import { QualifiesDialogComponent } from '../qualifies/qualifies.component'
 
 @Component({
   selector: 'app-entity-detail',
@@ -106,7 +106,7 @@ export class EntityDetailComponent implements OnInit {
   propertyData: any;
 
   statements: any;
- 
+
 
   columns2: XTableColumn[] = [
     { id: 'index', label: '序号', width: 40, left: 0, type: 'index' },
@@ -189,6 +189,8 @@ export class EntityDetailComponent implements OnInit {
         this.message.success('新增成功！');
       })
     }
+
+
 
   }
 
@@ -308,6 +310,10 @@ export class EntityDetailComponent implements OnInit {
     this.imgs[this.imgs.length - 1] = {
       url: `http://localhost:9000/kgms/${$event.body.name}`,
     };
+  }
+
+  upload($event: any, row: any) {
+    row.mainsnak.datavalue.value = $event.body.name;
   }
 
   trustUrl(url: string) {

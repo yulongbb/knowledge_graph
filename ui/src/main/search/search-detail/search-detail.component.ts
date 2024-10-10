@@ -205,7 +205,8 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getQualify(qualify:any){
-    return qualify.value as any;
+    return qualify.value;
+
   }
 
   back() {
