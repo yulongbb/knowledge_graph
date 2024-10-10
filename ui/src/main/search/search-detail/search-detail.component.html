@@ -77,15 +77,10 @@
               <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
                 statement.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
                 }}</strong>
-              {{statement.mainsnak.qualifiers|json}}
-              <dl *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
-                <dl>
-                  <dt>
-                    {{ qualify.key |json }}
-                  </dt>
-                  <dd>
-                    <i *ngFor="let qlf of qualify.value ">
-                      <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
+              <p *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
+                <small *ngFor="let qlf of getQualify(qualify)">
+                  <i>{{qlf.mainsnak.label}}:</i>
+                  <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
                         'http://localhost:4200/index/search/info/' +
                         qlf.mainsnak.datavalue.value.id
                       ">{{ qlf.mainsnak.datavalue.value.label }}</a>
@@ -128,17 +123,15 @@
                     }}</strong>
                   <strong *ngIf="qlf.mainsnak.datatype == 'globe-coordinate'">{{
                     qlf.mainsnak.datavalue.value.latitude }},{{
-                      qlf.mainsnak.datavalue.value.longitude
+                    qlf.mainsnak.datavalue.value.longitude
                     }}</strong>
                   <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
                     qlf.mainsnak.datavalue.value.time | date:'yyyy年MM月dd日'
                     }}</strong>
 
-                    </i>
-                   
-                  </dd>
-                </dl>
-              </dl>
+                </small>
+
+              </p>
             </i>
 
           </dd>
