@@ -151,7 +151,7 @@ export class SearchDetailComponent implements OnInit {
         });
       })
       this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
-      this.videos = signal(x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4')); 
+      this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4'); 
       this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
     });
   }

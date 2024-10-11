@@ -37,7 +37,7 @@ export class EntityComponent extends PageBase {
   checkedRows: XTableRow[] = [];
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-    { id: 'actions', label: '操作', width: 150, right: 0 },
+    { id: 'actions', label: '操作', width: 100, right: 0 },
     { id: '_id', label: '序号', width: 100, left: 0, },
     { id: 'type', label: '类型', width: 100, sort: true },
     { id: 'label', label: '标签', flex: 0.5, sort: true },
