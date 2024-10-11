@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { PageBase } from 'src/share/base/base-page';
-import { XTreeAction, XTreeComponent } from '@ng-nest/ui/tree';
+import { XTreeAction, XTreeComponent, XGuid } from '@ng-nest/ui';
 import { XFormRow } from '@ng-nest/ui/form';
 import { UntypedFormGroup } from '@angular/forms';
 import {
@@ -10,9 +10,9 @@ import {
 } from 'src/main/ontology/ontology/ontology.service';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
-import { map, tap } from 'rxjs';
-import { XGuid } from '@ng-nest/ui/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { XFormComponent, XControl } from '@ng-nest/ui/form';
+import { forkJoin, map, tap } from 'rxjs';
 
 @Component({
   selector: 'app-ontology',
@@ -21,6 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class OntologyComponent extends PageBase {
   @ViewChild('treeCom') treeCom!: XTreeComponent;
+  @ViewChild('form') form!: XFormComponent;
 
   formGroup = new UntypedFormGroup({});
 
@@ -88,13 +89,16 @@ export class OntologyComponent extends PageBase {
           control: 'input',
           id: 'id',
           label: 'id',
-          required: true,
         },
         {
           control: 'input',
           id: 'name',
           label: '名称',
-          required: true,
+        },
+        {
+          control: 'textarea',
+          id: 'ontologies',
+          label: '类型集合',
         },
         {
           control: 'input',
@@ -108,9 +112,8 @@ export class OntologyComponent extends PageBase {
         },
         {
           control: 'input',
-          id: 'name',
+          id: 'icon',
           label: '图标',
-          required: true,
         },
         { control: 'input', id: 'description', label: '描述' },
         { control: 'input', id: 'collection', label: '表' },
@@ -119,10 +122,6 @@ export class OntologyComponent extends PageBase {
     {
       hidden: true,
       controls: [
-        // {
-        //   control: 'input',
-        //   id: 'id',
-        // },
         {
           control: 'input',
           id: 'pid',
@@ -143,15 +142,12 @@ export class OntologyComponent extends PageBase {
   }
 
   action(type: string, schema: Schema) {
-    console.log(schema);
     switch (type) {
       case 'add-root':
-        console.log(schema);
         this.selected = schema;
         this.type = type;
         this.formGroup.reset();
         this.formGroup.patchValue({
-          // id: XGuid(),
           pid: null,
         });
         break;
@@ -159,21 +155,31 @@ export class OntologyComponent extends PageBase {
         this.selected = schema;
         this.type = type;
         this.formGroup.reset();
-        console.log(schema);
         this.formGroup.patchValue({
-          // id: XGuid(),
           pid: schema.id,
         });
         break;
       case 'save':
         if (this.type === 'add' || this.type === 'add-root') {
           console.log(this.formGroup.value);
-          this.service.post(this.formGroup.value).subscribe((x) => {
-            this.type = 'info';
-            console.log(x);
-            this.treeCom.addNode(x);
-            this.message.success('新增成功！');
-          });
+          this.form.formGroup.value.ontologies = this.form.formGroup.value.ontologies.split('\n').filter((t: any) => t != '');
+          if (this.form.formGroup.value.ontologies.length == 0) {
+            console.log('新增单个');
+            this.service.post(this.formGroup.value).subscribe((x) => {
+              this.type = 'info';
+              console.log(x);
+              this.treeCom.addNode(x);
+              this.message.success('新增成功！');
+            });
+          } else {
+            let arr: any = []
+            this.form.formGroup.value.ontologies.forEach((t: any) => {
+              arr.push(this.service.post({ id: XGuid(), name: t, label: t, pid: this.selected.id }))
+            });
+            forkJoin(arr).subscribe(() => {
+              this.message.success('新增成功！');
+            })
+          }
         } else if (this.type === 'edit') {
           console.log(this.formGroup.value);
           this.service.put(this.formGroup.value).subscribe(() => {

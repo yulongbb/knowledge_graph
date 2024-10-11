@@ -7,6 +7,7 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
+import { EntityService } from 'src/main/entity/entity.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -90,6 +91,8 @@ export class EntityDetailComponent implements OnInit {
     private esService: EsService,
     public propertyService: PropertyService,
     private router: Router,
+    private nodeService: EntityService,
+
     private message: XMessageService
   ) {
 
@@ -169,10 +172,10 @@ export class EntityDetailComponent implements OnInit {
         }
         console.log(item)
         if (this.type === 'add') {
-          // this.nodeService.post(item).subscribe((x) => {
-          //   this.message.success('新增成功！');
-          //   this.router.navigate(['/index/entity']);
-          // });
+          this.nodeService.post(item).subscribe((x) => {
+            this.message.success('新增成功！');
+            this.router.navigate(['/index/entity']);
+          });
         } else if (this.type === 'edit') {
          
         }

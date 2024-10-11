@@ -81,12 +81,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private dialogService: XDialogService,
     private msgBox: XMessageBoxService
   ) {
-  
-   }
+
+  }
 
   ngOnInit(): void {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
+        console.log(data);
         cytoscape.use(cxtmenu);
         cytoscape.use(cola); // register extension
         cytoscape.use(edgehandles);
@@ -97,13 +98,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .map((s: any) => {
               return { id: s.id, label: s.label, color: s.color };
             });
-          console.log(colors);
-
           const colorMap: any = {};
           colors.forEach((c: any) => {
             colorMap[c.id] = c.color;
           });
-          console.log(colorMap);
           this.cy = cytoscape({
             container: this.cyContainer.nativeElement, // container to render in
             style: [
@@ -229,8 +227,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '浏览',
                 select: (ele: any) => {
-                  console.log(ele.data());
-                  console.log('浏览知识');
                   this.dialog(ele.data(), 'info', 'center');
                 },
               },
@@ -238,16 +234,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '编辑',
                 select: (ele: any) => {
-                  console.log(ele.id());
-                  console.log('编辑知识');
                   this.dialog(ele.data(), 'edit', 'center');
                 },
               },
               {
                 content: '连接',
                 select: (ele: any) => {
-                  console.log(ele.id());
-                  console.log('连接知识');
                   eh.start(ele);
                 },
               },
@@ -286,14 +278,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '删除',
                 select: (ele: any) => {
-                  console.log(ele.position());
                   this.msgBox.alert({
                     title: '删除弹框',
                     content: '这是一段内容',
                     placement: 'center',
                     callback: (action: XMessageBoxAction) => {
                       if (action === 'confirm') {
-                        console.log(ele.data());
                         ele.remove();
                         this.service
                           .deleteEdge(ele.data()['_id'])
@@ -318,8 +308,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '创建知识',
                 select: (ele: any) => {
-                  console.log(ele);
-                  console.log('创建知识');
                   this.dialog(ele.data(), 'add', 'center');
                 },
               },
@@ -343,7 +331,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               console.log(this.cy.nodes());
             } else if (target.isNode()) {
               console.log('双击节点');
-              console.log(target.data());
               this.service
                 .graph(1, 100, target.data().id)
                 .subscribe((data: any) => {
@@ -362,7 +349,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               this.esService
                 .getEntity(sourceNode.data().id)
                 .subscribe((x: any) => {
-                  console.log(x['_source'].type);
                   this.ontologyService
                     .get(x._source.type)
                     .subscribe((type: any) => {
@@ -402,11 +388,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 backdropClose: true,
                 callback: (action: XMessageBoxAction) => {
                   if (action === 'confirm') {
-                    console.log(this.model1);
                     let property = this.propertyData().filter(
                       (p: any) => p.name == this.model1
                     )[0];
-                    console.log(property);
                     let edge = {
                       _from: sourceNode.data()['_id'],
                       _to: targetNode.data()['_id'],
@@ -431,8 +415,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                       type: 'statement',
                       rank: 'normal',
                     };
-                    console.log(edge)
-
                     this.service.addEdge(edge).subscribe((e: any) => {
                       this.message.success('关系创建成功');
                       this.cy.add({
@@ -451,7 +433,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     addedEdge.remove();
                     this.message.info('已取消创建关系！');
                   }
-                  console.log(action);
                 },
               });
             }
@@ -461,8 +442,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     });
   }
-
-  // 销毁所有 Popper 实例
 
   initializeCytoscape(data: any): void {
     data.elements.nodes.forEach((node: any) => {
@@ -491,7 +470,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
     this.cy.nodes().forEach((n: any) => {
-      console.log(n.data());
       // const existingPopper = n.scratch('_popper');
       // if (existingPopper) {
       //   console.log(existingPopper)
@@ -598,7 +576,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   );
 
   selectNode(node: any) {
-    console.log(node);
     this.modelAsync = signal(node?._source?.labels.zh.value);
     this.service.graph(1, 10, node?._id).subscribe((data: any) => {
       this.initializeCytoscape(data);

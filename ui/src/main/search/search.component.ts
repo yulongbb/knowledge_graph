@@ -106,6 +106,7 @@ export class SearchComponent implements OnInit {
               should: [
                 { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
@@ -117,6 +118,7 @@ export class SearchComponent implements OnInit {
               should: [
                 { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
@@ -127,6 +129,7 @@ export class SearchComponent implements OnInit {
               should: [
                 { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
@@ -136,6 +139,7 @@ export class SearchComponent implements OnInit {
             should: [
               { "wildcard": { "images": "*jpeg" } },
               { "wildcard": { "images": "*jpg" } },
+              { "wildcard": { "images": "*jpeg" } },
               { "wildcard": { "images": "*png" } },
               { "wildcard": { "images": "*webp" } }],
           };
@@ -368,6 +372,7 @@ export class SearchComponent implements OnInit {
             if (
               image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
             ) {
@@ -537,6 +542,7 @@ export class SearchComponent implements OnInit {
               should: [
                 { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
@@ -545,6 +551,7 @@ export class SearchComponent implements OnInit {
               should: [
                 { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }]
             };
@@ -667,6 +674,7 @@ export class SearchComponent implements OnInit {
             if (
               image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
               image.split('.')[image.split('.').length - 1] == 'png' ||
               image.split('.')[image.split('.').length - 1] == 'webp'
             ) {

@@ -37,7 +37,7 @@ export class EntityComponent extends PageBase {
   checkedRows: XTableRow[] = [];
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-    { id: 'actions', label: '操作', width: 150, right: 0 },
+    { id: 'actions', label: '操作', width: 100, right: 0 },
     { id: '_id', label: '序号', width: 100, left: 0, },
     { id: 'type', label: '类型', width: 100, sort: true },
     { id: 'label', label: '标签', flex: 0.5, sort: true },
@@ -45,12 +45,10 @@ export class EntityComponent extends PageBase {
     { id: 'aliase', label: '别名', flex: 2 },
   ];
   model1: any;
-
   layout: XData<XRadioNode> = [
     { label: '列表', icon: 'fto-list' },
     { label: '卡片', icon: 'fto-grid' },
   ];
-
   mergedEntity: any;
   types: any = signal([]);
   query: any;
@@ -98,9 +96,6 @@ export class EntityComponent extends PageBase {
         );
     });
   }
-
-
-
 
   detail(row: XTableRow, column: XTableColumn) {
     this.id = row.id[0].split('/')[1];
@@ -235,12 +230,8 @@ export class EntityComponent extends PageBase {
     }
   }
 
-
-
   visible = false;
   placement = signal<XPlace>('center');
-
-
 
   close() {
     this.visible = false;
@@ -331,12 +322,7 @@ export class EntityComponent extends PageBase {
     console.log(mergedEntity);
     return mergedEntity;
   }
-
 }
-
-
-
-
 
 interface Label {
   language: string;

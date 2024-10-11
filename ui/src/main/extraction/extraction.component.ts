@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, map, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
 import { EsService } from '../search/es.service';
+import { EntityService } from 'src/main/entity/entity.service';
 
 
 @Component({
@@ -86,7 +87,7 @@ export class ExtractionComponent extends PageBase {
     private service: ExtractionService,
     private propertyService: PropertyService,
     private esService: EsService,
-
+    private nodeService: EntityService,
     private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -208,7 +209,7 @@ export class ExtractionComponent extends PageBase {
                     }
                   }
                   let edge = {
-                    _from: 'entity/' + e.list[0]['_id'],
+                    _from: e.list[0]._source.items[0],
                     mainsnak: {
                       snaktype: "value",
                       property: `P${property.id}`,
@@ -220,7 +221,7 @@ export class ExtractionComponent extends PageBase {
                     type: "statement",
                   }
                   edges.push(edge);
-                  // arr.push(this.edgeService.addEdge(edge));
+                  arr.push(this.nodeService.addEdge(edge));
 
                 })
                 console.log(edges)
