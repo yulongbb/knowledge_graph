@@ -333,25 +333,7 @@ export class EntityDetailComponent implements OnInit {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` });
           });
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
-            this.tagService
-              .getList(1, 500, {
-                filter: [
-                  {
-                    field: 'id',
-                    value: type.id,
-                    relation: 'schemas',
-                    operation: '=',
-                  },
-                ],
-              })
-              .subscribe((data: any) => {
-                let tags: any = {};
-                data.list.forEach((tag: any) => {
-                  tags[tag.type] = tags[tag.type] ?? [];
-                  tags[tag.type].push(tag.name);
-                });
-                this.tags = tags;
-              });
+          
             if (this.type == 'edit') {
               this.form.formGroup.patchValue({
                 _key: x?._id,
@@ -364,6 +346,25 @@ export class EntityDetailComponent implements OnInit {
               .getAllParentIds(this.item.type)
               .subscribe((parents: any) => {
                 parents.push(this.item.type);
+                this.tagService
+                .getList(1, 500, {
+                  filter: [
+                    {
+                      field: 'id',
+                      value: parents as string[],
+                      relation: 'schemas',
+                      operation: 'IN',
+                    },
+                  ],
+                })
+                .subscribe((data: any) => {
+                  let tags: any = {};
+                  data.list.forEach((tag: any) => {
+                    tags[tag.type] = tags[tag.type] ?? [];
+                    tags[tag.type].push(tag.name);
+                  });
+                  this.tags = tags;
+                });
                 this.propertyService
                   .getList(1, 50, {
                     filter: [
