@@ -12,6 +12,7 @@ import { PropertyService } from 'src/main/ontology/property/property.service';
 import { NgxMasonryOptions } from 'ngx-masonry';
 import { NavService } from 'src/services/nav.service';
 import { EntityService } from 'src/main/entity/entity.service';
+import { Statement } from '@angular/compiler';
 
 @Component({
   selector: 'app-search-detail',
@@ -122,11 +123,11 @@ export class SearchDetailComponent implements OnInit {
       this.ontologyService.get(x._source.type).subscribe((t: any) => {
         x._type = t.label
 
-        this.entity = x;
+        this.entity = signal(x);
         this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
           parents.push(x['_source'].type)
           this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
-            this.properties = p.list;
+            this.properties = signal(p.list);
             this.entityService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
               let statements: any = [];
               console.log(c.list)
@@ -137,14 +138,20 @@ export class SearchDetailComponent implements OnInit {
                 }
                 statements.push(p.edges[0])
               })
-              this.claims = statements;
-              console.log(this.claims)
+              let claims:any = {}
+              statements.forEach((statement:any)=>{
+                if(!claims[statement.mainsnak.property]){
+                  claims[statement.mainsnak.property] = []
+                }
+                claims[statement.mainsnak.property].push(statement);
+              })
+              this.claims = signal(claims)
             })
           });
         });
       })
       this.images = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] != 'mp4' && image?.split('.')[image.split('.').length - 1] != 'pdf');
-      this.videos = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4');
+      this.videos = signal(x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'mp4')); 
       this.pdfs = x?._source?.images.filter((image: any) => image?.split('.')[image.split('.').length - 1] == 'pdf');
     });
   }
@@ -199,10 +206,11 @@ export class SearchDetailComponent implements OnInit {
     this.router.navigate([`/index/search/${this.knowledge}`], { replaceUrl: true });
   }
 
-  getStatement(property: any): any {
-    let statement= this.claims?.filter((c: any) => c.mainsnak.property == `P${property.id}`);
-    return statement;
+
+  getClaim(claim:any){
+    return claim.value?.filter((c: any) => c.mainsnak.property != `P31`);
   }
+
 
   getQualify(qualify:any){
     return qualify.value;
