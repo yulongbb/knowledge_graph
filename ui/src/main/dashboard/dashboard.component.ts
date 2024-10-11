@@ -87,6 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
+        console.log(data);
         cytoscape.use(cxtmenu);
         cytoscape.use(cola); // register extension
         cytoscape.use(edgehandles);
