@@ -122,11 +122,11 @@ export class SearchDetailComponent implements OnInit {
       this.ontologyService.get(x._source.type).subscribe((t: any) => {
         x._type = t.label
 
-        this.entity = signal(x);
+        this.entity = x;
         this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
           parents.push(x['_source'].type)
           this.propertyService.getList(1, 50, { filter: [{ field: 'id', value: parents as string[], relation: 'schemas', operation: 'IN' }] }).subscribe((p: any) => {
-            this.properties = signal(p.list);
+            this.properties = p.list;
             this.entityService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
               let statements: any = [];
               console.log(c.list)
@@ -200,7 +200,7 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-    let statement= this.claims.filter((c: any) => c.mainsnak.property == `P${property.id}`);
+    let statement= this.claims?.filter((c: any) => c.mainsnak.property == `P${property.id}`);
     return statement;
   }
 
