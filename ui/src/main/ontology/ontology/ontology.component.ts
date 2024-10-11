@@ -11,7 +11,6 @@ import {
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { map, tap } from 'rxjs';
-import { XGuid } from '@ng-nest/ui/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -95,11 +94,7 @@ export class OntologyComponent extends PageBase {
           id: 'name',
           label: '名称',
           required: true,
-        },
-
-
-
-        {
+        }, {
           control: 'input',
           id: 'label',
           label: '标签',
@@ -112,7 +107,7 @@ export class OntologyComponent extends PageBase {
 
         {
           control: 'input',
-          id: 'name',
+          id: 'icon',
           label: '图标',
           required: true,
         },
@@ -123,10 +118,6 @@ export class OntologyComponent extends PageBase {
     {
       hidden: true,
       controls: [
-        // {
-        //   control: 'input',
-        //   id: 'id',
-        // },
         {
           control: 'input',
           id: 'pid',
@@ -147,15 +138,12 @@ export class OntologyComponent extends PageBase {
   }
 
   action(type: string, schema: Schema) {
-    console.log(schema);
     switch (type) {
       case 'add-root':
-        console.log(schema);
         this.selected = schema;
         this.type = type;
         this.formGroup.reset();
         this.formGroup.patchValue({
-          // id: XGuid(),
           pid: null,
         });
         break;
@@ -163,9 +151,7 @@ export class OntologyComponent extends PageBase {
         this.selected = schema;
         this.type = type;
         this.formGroup.reset();
-        console.log(schema);
         this.formGroup.patchValue({
-          // id: XGuid(),
           pid: schema.id,
         });
         break;
