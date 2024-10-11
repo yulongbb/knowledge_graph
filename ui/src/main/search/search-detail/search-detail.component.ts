@@ -96,9 +96,7 @@ export class SearchDetailComponent implements OnInit {
     private service: EsService,
     private entityService: EntityService,
     public propertyService: PropertyService,
-    private router: Router,
     private activatedRoute: ActivatedRoute,
-    private message: XMessageService,
     public nav: NavService,
     private dialogSewrvice: XDialogService
   ) {
@@ -119,10 +117,8 @@ export class SearchDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.service.getEntity(this.id).subscribe((x) => {
-
       this.ontologyService.get(x._source.type).subscribe((t: any) => {
         x._type = t.label
-
         this.entity = signal(x);
         this.ontologyService.getAllParentIds(x['_source'].type).subscribe((parents: any) => {
           parents.push(x['_source'].type)
@@ -173,9 +169,6 @@ export class SearchDetailComponent implements OnInit {
     return text;
   }
 
-
-
-
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
@@ -189,7 +182,6 @@ export class SearchDetailComponent implements OnInit {
     });
   }
 
-
   uploadSuccess($event: any) {
     let item: any = {};
     item['label'] = $event.body.name;
@@ -200,12 +192,6 @@ export class SearchDetailComponent implements OnInit {
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
-
-
-  backClick() {
-    this.router.navigate([`/index/search/${this.knowledge}`], { replaceUrl: true });
-  }
-
 
   getClaim(claim:any){
     return claim.value?.filter((c: any) => c.mainsnak.property != `P31`);
@@ -218,7 +204,6 @@ export class SearchDetailComponent implements OnInit {
   }
 
   back() {
-    this.nav.back();
-
+    window.history.back();
   }
 }
