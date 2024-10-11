@@ -219,8 +219,8 @@
             [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
           <x-input-number *ngIf="row?.mainsnak?.datatype == 'quantity'" [style.width.%]="100"
             [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
-          <x-upload *ngIf="row?.mainsnak?.datatype == 'commonsMedia'"
-          (uploadSuccess)="upload($event,row)" action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
+          <x-upload *ngIf="row?.mainsnak?.datatype == 'commonsMedia'" (uploadSuccess)="upload($event,row)"
+            action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
 
           <x-date-picker *ngIf="row?.mainsnak?.datatype == 'time'"
             [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
@@ -280,8 +280,11 @@
 
                   <a [href]="file?.url" target="_blank"> {{ file?.url }}</a>
                   } @default {
-                  <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'"></div>
+                  <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'"> <x-button
+                     (click)="removeFile(file,files)"  icon="fto-trash" type="info" circle></x-button>
+                  </div>
                   } }
+
                 </div>
               </div>
             </div>
