@@ -12,6 +12,10 @@ export class OntologyService extends RepositoryService<Schema> {
   getAllParentIds(id:  string): Observable<any> {
     return this.http.get(`${this.option.controller?.name}/parent/${id}`);
   }
+
+  getChildren(id:  string): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/children/${id}`);
+  }
 }
 
 

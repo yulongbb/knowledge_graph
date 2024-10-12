@@ -15,10 +15,39 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     super(schemasRepository, dataSource);
   }
 
-  async getAllParentIds(schemaId: string): Promise<string[]> {
+  async getParent(schemaId: string): Promise<string[]> {
     const parentIds: string[] = [];
     await this.getParentIdsRecursively(schemaId, parentIds);
     return parentIds;
+  }
+
+
+  async getChildren(schemaId: string): Promise<string[]> {
+    const children: any = [];
+    console.log('123')
+
+    await this.getchildrenIdsRecursively(schemaId, children);
+    return children;
+  }
+
+  private async getchildrenIdsRecursively(schemaId: string, children: any): Promise<void> {
+    console.log(schemaId)
+
+    const schema:any = await this.schemasRepository.findOne({
+      where: { id: schemaId },
+      relations: ['children'],
+    });
+    console.log(schema)
+    children.push(schema);
+    if (schema.children) {
+      schema.children?.forEach(async (child: any) => {
+        children.push(child);
+       
+
+        await this.getchildrenIdsRecursively(child.id, children);
+
+      })
+    }
   }
 
   private async getParentIdsRecursively(schemaId: string, parentIds: string[]): Promise<void> {

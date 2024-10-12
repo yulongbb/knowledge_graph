@@ -11,8 +11,18 @@ export class SchemasController extends XControllerService<Schema, XQuery> {
     super(schemasService);
   }
 
-  @Get('parent/:id')
-  getAllParentIds(@Param('id') id: XIdType): any {
-    return this.schemasService.getAllParentIds(id);
+  @Get('children/:id')
+  getChildren(@Param('id') id: XIdType): any {
+    console.log(id);
+    return this.schemasService.getChildren(id);
   }
+
+
+  @Get('parent/:id')
+  getParent(@Param('id') id: XIdType): any {
+    return this.schemasService.getParent(id);
+  }
+
+
+
 }

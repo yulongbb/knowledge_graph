@@ -148,6 +148,7 @@ export class OntologyComponent extends PageBase {
         this.type = type;
         this.formGroup.reset();
         this.formGroup.patchValue({
+          id: XGuid(),
           pid: null,
         });
         break;
@@ -156,22 +157,15 @@ export class OntologyComponent extends PageBase {
         this.type = type;
         this.formGroup.reset();
         this.formGroup.patchValue({
+          id: XGuid(),
           pid: schema.id,
         });
         break;
       case 'save':
         if (this.type === 'add' || this.type === 'add-root') {
           console.log(this.formGroup.value);
-          this.form.formGroup.value.ontologies = this.form.formGroup.value.ontologies.split('\n').filter((t: any) => t != '');
-          if (this.form.formGroup.value.ontologies.length == 0) {
-            console.log('新增单个');
-            this.service.post(this.formGroup.value).subscribe((x) => {
-              this.type = 'info';
-              console.log(x);
-              this.treeCom.addNode(x);
-              this.message.success('新增成功！');
-            });
-          } else {
+          if(this.form.formGroup.value.ontologies){
+            this.form.formGroup.value.ontologies = this.form.formGroup.value.ontologies.split('\n').filter((t: any) => t != '');
             let arr: any = []
             this.form.formGroup.value.ontologies.forEach((t: any) => {
               arr.push(this.service.post({ id: XGuid(), name: t, label: t, pid: this.selected.id }))
@@ -179,7 +173,16 @@ export class OntologyComponent extends PageBase {
             forkJoin(arr).subscribe(() => {
               this.message.success('新增成功！');
             })
+          }else{
+            console.log('新增单个');
+            this.service.post(this.formGroup.value).subscribe((x) => {
+              this.type = 'info';
+              console.log(x);
+              this.treeCom.addNode(x);
+              this.message.success('新增成功！');
+            });
           }
+        
         } else if (this.type === 'edit') {
           console.log(this.formGroup.value);
           this.service.put(this.formGroup.value).subscribe(() => {
