@@ -3,17 +3,13 @@ import { Component, Query, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import { Property, PropertyService } from './property.service';
 import {
-  XFormRow,
-  XGuid,
   XMessageService,
-  XQuery,
   XTableColumn,
   XTableComponent,
   XTreeNode,
 } from '@ng-nest/ui';
 import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OntologyService } from '../ontology/ontology.service';
 import { map, tap } from 'rxjs';
 
 @Component({
@@ -25,7 +21,7 @@ export class PropertyComponent extends PageBase {
   formGroup = new UntypedFormGroup({});
   name = '';
   enName = '';
-  description= '';
+  description = '';
   selected!: Property;
   type = 'add';
   loading = true;
@@ -66,14 +62,13 @@ export class PropertyComponent extends PageBase {
   constructor(
     private service: PropertyService,
     public override indexService: IndexService,
-    private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute
   ) {
     super(indexService);
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   searchName(name: any) {
     this.query.filter = [{ field: 'name', value: name as string }];

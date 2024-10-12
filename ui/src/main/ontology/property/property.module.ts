@@ -9,8 +9,6 @@ import { NgNestModule } from "src/share/ng-nest.module";
 import { PropertyDetailComponent } from "./property-detail/property-detail.component";
 import { XInputModule } from "@ng-nest/ui";
 
-
-
 @NgModule({
   imports: [
     CommonModule,
@@ -23,4 +21,4 @@ import { XInputModule } from "@ng-nest/ui";
   ],
   declarations: [PropertyComponent, PropertyDetailComponent]
 })
-export class PropertyModule {}
+export class PropertyModule { }

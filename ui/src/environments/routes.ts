@@ -173,7 +173,15 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-
+  {
+    path: "weapon",
+    loadChildren: () =>
+      import("../main/weapon/weapon.module").then(x => x.WeaponModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
 
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
