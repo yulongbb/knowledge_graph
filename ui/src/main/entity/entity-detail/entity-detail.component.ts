@@ -307,6 +307,10 @@ export class EntityDetailComponent implements OnInit {
 
   uploadSuccess($event: any) {
     console.log(this.imgs);
+    this.form.formGroup.patchValue({
+      label: $event.body.name,
+      description: $event.body.name,
+    });
     this.imgs[this.imgs.length - 1] = {
       url: `http://localhost:9000/kgms/${$event.body.name}`,
     };
