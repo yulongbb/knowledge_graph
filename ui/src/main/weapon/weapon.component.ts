@@ -75,30 +75,24 @@ export class WeaponComponent implements OnInit {
             });
             this.tags = tags;
           });
-
       });
     this.ontologyService
       .getChildren('Q10273457').subscribe((data: any) => {
         console.log(data);
         let menu: any = [];
-        let categories: any = []
         data.forEach((d: any) => {
           if (d.id != 'E1') {
             if (d.pid == 'Q10273457') {
-              categories.push(d.id)
               menu.push({ id: d.id, label: d.name, })
             } else {
               menu.push({ id: d.id, label: d.name, pid: d?.pid })
             }
           }
-
         })
-        menu.forEach((m: any) => {
-          if (categories.indexOf(m.pid) > 0) {
-            console.log(m);
-          }
-        })
-        this.category = signal(menu)
+        this.category = menu.map((m: any) => m.id);
+        this.types = signal(menu)
+        console.log(this.category)
+        this.search('');
       })
   }
 
@@ -120,6 +114,11 @@ export class WeaponComponent implements OnInit {
             this.query = {
               must: [
                 {
+                  "terms": {
+                    "type": this.category
+                  }
+                },
+                {
                   match: {
                     'labels.zh.value': {
                       query: keyword,
@@ -137,7 +136,15 @@ export class WeaponComponent implements OnInit {
             this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
           }
         } else {
-          this.query = { must: [] };
+          this.query = {
+            must: [
+              {
+                terms: {
+                  'type.keyword': this.category
+                }
+              },
+            ]
+          };
         }
         break;
       case '图片':
@@ -374,11 +381,11 @@ export class WeaponComponent implements OnInit {
         //   this.types = menuMerge;
         //   console.log(menuMerge);
         // });
-        let tags: any = [];
-        data.tags.forEach((t: any) => {
-          tags.push(t.key);
-        });
-        this.tags = tags;
+        // let tags: any = [];
+        // data.tags.forEach((t: any) => {
+        //   tags.push(t.key);
+        // });
+        // this.tags = tags;
       });
   }
 

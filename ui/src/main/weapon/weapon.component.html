@@ -14,7 +14,7 @@
     <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
   </x-input-group>
 </div>
-<x-menu  size="small" [data]="category()" (nodeClick)="selectType($event)"> </x-menu>
+<x-menu  size="small" [data]="types()" (nodeClick)="selectType($event)"> </x-menu>
 
 <div style="display: block; width: 100%; overflow: scroll">
   <div *ngFor="let t of tags | keyvalue">
