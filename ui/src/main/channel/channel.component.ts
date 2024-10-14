@@ -13,11 +13,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 
 @Component({
-  selector: 'app-weapon',
-  styleUrls: ['./weapon.component.scss'],
-  templateUrl: './weapon.component.html',
+  selector: 'app-channel',
+  styleUrls: ['./channel.component.scss'],
+  templateUrl: './channel.component.html',
 })
-export class WeaponComponent implements OnInit {
+export class ChannelComponent implements OnInit {
   way = '默认检索';
   menu: any = signal('知识');
 
@@ -53,9 +53,9 @@ export class WeaponComponent implements OnInit {
 
   ngOnInit(): void {
     this.ontologyService
-      .getAllParentIds('Q10273457')
+      .getAllParentIds('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8')
       .subscribe((parents: any) => {
-        parents.push('Q10273457');
+        parents.push('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8');
         this.tagService
           .getList(1, 500, {
             filter: [
@@ -77,12 +77,12 @@ export class WeaponComponent implements OnInit {
           });
       });
     this.ontologyService
-      .getChildren('Q10273457').subscribe((data: any) => {
+      .getChildren('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8').subscribe((data: any) => {
         console.log(data);
         let menu: any = [];
         data.forEach((d: any) => {
           if (d.id != 'E1') {
-            if (d.pid == 'Q10273457') {
+            if (d.pid == 'dc2ca095-8786-cbf6-5c94-d6d8bcd885c8') {
               menu.push({ id: d.id, label: d.name, })
             } else {
               menu.push({ id: d.id, label: d.name, pid: d?.pid })
@@ -90,8 +90,10 @@ export class WeaponComponent implements OnInit {
           }
         })
         this.category = menu.map((m: any) => m.id);
+        this.category.unshift('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8')
         menu.unshift({ id: '', label: '全部' });
         this.types = signal(menu)
+        console.log(this.category)
         this.search('');
       })
   }

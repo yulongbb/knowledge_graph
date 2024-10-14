@@ -182,7 +182,15 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-
+  {
+    path: "channel",
+    loadChildren: () =>
+      import("../main/channel/channel.module").then(x => x.ChannelModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页

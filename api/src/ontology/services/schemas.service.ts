@@ -27,13 +27,12 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     await this.getChildrenIdsRecursively(schemaId, children);
     return children;
   }
-  
+
   private async getChildrenIdsRecursively(schemaId: string, children: any): Promise<void> {
     const schema: any = await this.schemasRepository.findOne({
       where: { id: schemaId },
       relations: ['children'],
     });
-  
     if (schema.children) {
       for (const child of schema.children) {
         children.push(child);
@@ -41,7 +40,7 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
       }
     }
   }
-  
+
   private async getParentIdsRecursively(schemaId: string, parentIds: string[]): Promise<void> {
     const schema = await this.schemasRepository.findOne({
       where: { id: schemaId },

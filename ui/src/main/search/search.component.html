@@ -289,14 +289,15 @@
           [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
       </ng-template>
       <div class="bottom">
-
-        <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="50%"
-              [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
+        <p>
+          <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="50%"
+            [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
+        </p>
         <p>
           <x-text-retract *ngIf="!entity['highlight']" max="100"
-          [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-          </p>
-     
+            [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
+        </p>
+
         <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
 
         <div class="row">
@@ -345,13 +346,11 @@
   <div *ngFor="let pdf of pdfs">
     <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
-        <x-link type="primary"
-          (click)="action('info', pdf)">{{pdf.label}}</x-link>
+        <x-link type="primary" (click)="action('info', pdf)">{{pdf.label}}</x-link>
       </ng-template>
       <div class="bottom">
-        <x-text-retract  max="100"
-          [content]="pdf?.description"></x-text-retract>
-      
+        <x-text-retract max="100" [content]="pdf?.description"></x-text-retract>
+
       </div>
     </x-card>
   </div>
