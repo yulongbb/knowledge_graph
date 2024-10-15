@@ -117,7 +117,7 @@ export class ApplicationDetailComponent implements OnInit {
             .post(this.form.formGroup.value)
             .subscribe((x) => {
               this.message.success('新增成功！');
-              this.router.navigate(['/index/application']);
+              this.router.navigate(['/index/applications']);
             });
         } else if (this.type === 'edit') {
           this.form.formGroup.value['id'] = Number.parseInt(this.id);
@@ -126,12 +126,12 @@ export class ApplicationDetailComponent implements OnInit {
           this.applicationService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
-            this.router.navigate(['/index/application']);
+            this.router.navigate(['/index/applications']);
           });
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/application']);
+        this.router.navigate(['/index/applications']);
         break;
     }
   }
