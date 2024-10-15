@@ -11,6 +11,7 @@ import { forkJoin, map, tap } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-weapon',
@@ -53,9 +54,9 @@ export class WeaponComponent implements OnInit {
 
   ngOnInit(): void {
     this.ontologyService
-      .getAllParentIds('Q10273457')
+      .getAllParentIds(environment.weapon)
       .subscribe((parents: any) => {
-        parents.push('Q10273457');
+        parents.push(environment.weapon);
         this.tagService
           .getList(1, 500, {
             filter: [
@@ -77,12 +78,12 @@ export class WeaponComponent implements OnInit {
           });
       });
     this.ontologyService
-      .getChildren('Q10273457').subscribe((data: any) => {
+      .getChildren(environment.weapon).subscribe((data: any) => {
         console.log(data);
         let menu: any = [];
         data.forEach((d: any) => {
           if (d.id != 'E1') {
-            if (d.pid == 'Q10273457') {
+            if (d.pid == environment.weapon) {
               menu.push({ id: d.id, label: d.name, })
             } else {
               menu.push({ id: d.id, label: d.name, pid: d?.pid })

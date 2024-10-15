@@ -11,6 +11,7 @@ import { forkJoin, map, tap } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-channel',
@@ -53,9 +54,9 @@ export class ChannelComponent implements OnInit {
 
   ngOnInit(): void {
     this.ontologyService
-      .getAllParentIds('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8')
+      .getAllParentIds(environment.channel)
       .subscribe((parents: any) => {
-        parents.push('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8');
+        parents.push(environment.channel);
         this.tagService
           .getList(1, 500, {
             filter: [
@@ -77,12 +78,12 @@ export class ChannelComponent implements OnInit {
           });
       });
     this.ontologyService
-      .getChildren('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8').subscribe((data: any) => {
+      .getChildren(environment.channel).subscribe((data: any) => {
         console.log(data);
         let menu: any = [];
         data.forEach((d: any) => {
           if (d.id != 'E1') {
-            if (d.pid == 'dc2ca095-8786-cbf6-5c94-d6d8bcd885c8') {
+            if (d.pid == environment.channel) {
               menu.push({ id: d.id, label: d.name, })
             } else {
               menu.push({ id: d.id, label: d.name, pid: d?.pid })
@@ -90,7 +91,7 @@ export class ChannelComponent implements OnInit {
           }
         })
         this.category = menu.map((m: any) => m.id);
-        this.category.unshift('dc2ca095-8786-cbf6-5c94-d6d8bcd885c8')
+        this.category.unshift(environment.channel)
         menu.unshift({ id: '', label: '全部' });
         this.types = signal(menu)
         console.log(this.category)
