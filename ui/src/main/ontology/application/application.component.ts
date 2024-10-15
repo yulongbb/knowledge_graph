@@ -1,7 +1,6 @@
 import { PageBase } from 'src/share/base/base-page';
 import { Component, Query, ViewChild } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
-import { Qualify, QualifyService } from './qualify.service';
 import {
   XFormRow,
   XGuid,
@@ -13,32 +12,56 @@ import {
 } from '@ng-nest/ui';
 import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OntologyService } from '../ontology/ontology.service';
 import { map, tap } from 'rxjs';
+import { Application, ApplicationService } from './application.sevice';
+import { OntologyService } from '../ontology/ontology.service';
 
 @Component({
-  selector: 'app-qualify',
-  templateUrl: 'qualify.component.html',
-  styleUrls: ['./qualify.component.scss'],
+  selector: 'app-application',
+  templateUrl: 'application.component.html',
+  styleUrls: ['./application.component.scss'],
 })
-export class QualifyComponent extends PageBase {
+export class ApplicationComponent extends PageBase {
   formGroup = new UntypedFormGroup({});
   name = '';
   enName = '';
-  description = '';
-  selected!: Qualify;
+  description= '';
+  selected!: Application;
   type = 'add';
   loading = true;
 
   index = 1;
   size = 15;
 
-  query: any = { filter: [] };
+  query: XQuery = { filter: [] };
 
   data = (index: number, size: number, query: any) =>
-    this.service.getList(index, size, query).pipe((x: any) => {
-      return x;
-    });
+    this.service.getList(index, size, query).pipe(
+      tap((x:any) => console.log(x)),
+      map((x:any) => {
+        x.list.forEach((item: any) => {
+
+          this.ontologyService
+          .getList(1, 50, {
+            filter: [
+              {
+                field: 'id',
+                value: item.id,
+                relation: 'applications',
+                operation: '=',
+              },
+            ],
+          })
+          .subscribe((p: any) => {
+            console.log(p.list[0].id);
+            item.ontologies = p.list.map((o:any)=> o.id);
+          });
+
+        })
+        return x;
+
+      })
+    );
 
   model: any;
   tree: XTreeNode[] = [
@@ -55,23 +78,24 @@ export class QualifyComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'id', label: '序号', flex: 0.4, left: 0 },
-    { id: 'actions', label: '操作', width: 100 },
-    { id: 'label', label: '名称', flex: 1, sort: true },
-    { id: 'description', label: '描述', flex: 1, sort: true },
+    { id: 'actions', label: '操作', width: 200 },
+    { id: 'name', label: '名称', flex: 0.5, sort: true },
   ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
 
   constructor(
-    private service: QualifyService,
+    private service: ApplicationService,
     public override indexService: IndexService,
     private message: XMessageService,
+    private ontologyService: OntologyService,
+
     private router: Router,
     private activatedRoute: ActivatedRoute
   ) {
     super(indexService);
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   searchName(name: any) {
     this.query.filter = [{ field: 'name', value: name as string }];

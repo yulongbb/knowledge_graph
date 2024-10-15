@@ -10,10 +10,7 @@ export const environment = {
   defaultPage: 'home',
   // Api请求地址
   api: 'http://localhost:3333/',
-  // 万国兵器
-  weapon: 'Q10273457',
-  // 新闻资讯
-  channel: 'dc2ca095-8786-cbf6-5c94-d6d8bcd885c8'
+
 };
 
 /*

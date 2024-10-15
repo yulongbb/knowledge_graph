@@ -12,11 +12,14 @@ import { TagsService } from './services/tags.service';
 import { TagsController } from './controllers/tags.controller';
 import { Tag } from './entities/tag.entity';
 import { Qualify } from './entities/qualify.entity';
+import { Application } from './entities/application.entity';
+import { ApplicationsController } from './controllers/applications.controller';
+import { ApplicationsService } from './services/applications.service';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Schema, Property, Qualify, Tag])],
-  controllers: [SchemasController, PropertiesController, QualifiersController, TagsController],
-  providers: [SchemasService, PropertiesService, QualifiersService, TagsService]
+  imports: [TypeOrmModule.forFeature([Schema, Property, Qualify, Tag, Application])],
+  controllers: [SchemasController, PropertiesController, QualifiersController, TagsController, ApplicationsController],
+  providers: [SchemasService, PropertiesService, QualifiersService, TagsService, ApplicationsService]
 })
 export class OntologynModule { }

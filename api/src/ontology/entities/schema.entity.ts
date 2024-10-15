@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Property } from 'src/ontology/entities/property.entity';
 import { Tag } from './tag.entity';
+import { Application } from './application.entity';
 
 @Entity('ontology_schema')
 export class Schema {
@@ -71,6 +72,16 @@ export class Schema {
     inverseJoinColumn: { name: 'tagId' },
   })
   tags: Tag[];
+
+
+  
+  @ManyToMany(() => Application, (application) => application.schemas)
+  @JoinTable({
+    name: 'ontology_schema_application',
+    joinColumn: { name: 'schemaId' },
+    inverseJoinColumn: { name: 'applicationId' },
+  })
+  applications: Application[];
 
 
 }

@@ -4,7 +4,7 @@ import {
   XImagePreviewComponent,
 } from '@ng-nest/ui';
 import { EsService } from './es.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
 import { EntityService } from '../entity/entity.service';
@@ -13,11 +13,11 @@ import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-channel',
-  styleUrls: ['./channel.component.scss'],
-  templateUrl: './channel.component.html',
+  selector: 'app-application',
+  styleUrls: ['./application.component.scss'],
+  templateUrl: './application.component.html',
 })
-export class ChannelComponent implements OnInit {
+export class ApplicationComponent implements OnInit {
   way = '默认检索';
   menu: any = signal('知识');
 
@@ -37,6 +37,8 @@ export class ChannelComponent implements OnInit {
   data = signal(['知识', '图片', '视频', '文件']);
   category: any;
 
+
+
   constructor(
     private sanitizer: DomSanitizer,
     private service: EsService,
@@ -47,13 +49,20 @@ export class ChannelComponent implements OnInit {
     public propertyService: PropertyService,
     private entityService: EntityService,
     private dialogSewrvice: XDialogService
-  ) { }
+  ) {
+  
+
+  }
 
   ngOnInit(): void {
+  // 获取路由参数
+  this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
+    let id = x.get('id') as string;
+    console.log(id)
     this.ontologyService
-      .getAllParentIds(environment.channel)
+      .getAllParentIds(id)
       .subscribe((parents: any) => {
-        parents.push(environment.channel);
+        parents.push(id);
         this.tagService
           .getList(1, 500, {
             filter: [
@@ -75,12 +84,12 @@ export class ChannelComponent implements OnInit {
           });
       });
     this.ontologyService
-      .getChildren(environment.channel).subscribe((data: any) => {
+      .getChildren(id).subscribe((data: any) => {
         console.log(data);
         let menu: any = [];
         data.forEach((d: any) => {
           if (d.id != 'E1') {
-            if (d.pid == environment.channel) {
+            if (d.pid == id) {
               menu.push({ id: d.id, label: d.name, })
             } else {
               menu.push({ id: d.id, label: d.name, pid: d?.pid })
@@ -88,11 +97,13 @@ export class ChannelComponent implements OnInit {
           }
         })
         this.category = menu.map((m: any) => m.id);
-        this.category.unshift(environment.channel)
+        this.category.unshift(id)
+
         menu.unshift({ id: '', label: '全部' });
         this.types = signal(menu)
         this.search('');
       })
+  });
   }
 
   selectMenu(menu: any) {
@@ -179,6 +190,7 @@ export class ChannelComponent implements OnInit {
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
+
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
@@ -385,6 +397,34 @@ export class ChannelComponent implements OnInit {
           });
         });
         this.entities = data.list;
+        // let menu: any = [];
+        // let arr: any = [];
+        // data.types.forEach((m: any) => {
+        //   arr.push(this.ontologyService.get(m.key));
+        // });
+        // forkJoin(arr).subscribe((properties: any) => {
+        //   data.types.forEach((m: any) => {
+        //     menu.push({
+        //       id: m.key,
+        //       label: properties.filter((p: any) => p.id == m.key)[0].name,
+        //     });
+        //   });
+        //   let menuMerge = [];
+        //   menuMerge = data.types.map((m: any, index: any) => {
+        //     return { ...m, ...menu[index] };
+        //   });
+        //   menuMerge.forEach((m: any) => {
+        //     m.label = m.label + '(' + m.doc_count + ')';
+        //   });
+        //   menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+        //   this.types = menuMerge;
+        //   console.log(menuMerge);
+        // });
+        // let tags: any = [];
+        // data.tags.forEach((t: any) => {
+        //   tags.push(t.key);
+        // });
+        // this.tags = tags;
       });
   }
 
@@ -417,6 +457,7 @@ export class ChannelComponent implements OnInit {
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
+
         this.images = [];
         this.videos = [];
         this.pdfs = [];
@@ -654,6 +695,7 @@ export class ChannelComponent implements OnInit {
 
             };
           }
+
         }
         break;
       case '文件':
@@ -706,6 +748,9 @@ export class ChannelComponent implements OnInit {
         this.query = {};
         break;
     }
+
+    console.log(this.query);
+
 
     this.service
       .searchEntity(this.index, this.size, this.query)
@@ -791,6 +836,8 @@ export class ChannelComponent implements OnInit {
   }
 
   action(type: string, item?: any) {
+    console.log(item);
+
     switch (type) {
       case 'info':
         this.router

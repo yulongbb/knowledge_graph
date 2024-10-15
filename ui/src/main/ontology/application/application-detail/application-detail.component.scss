@@ -1,0 +1,19 @@
+:host {
+  padding: 1rem;
+  display: block;
+  x-input-group {
+    display: block;
+    width: 100%;
+  }
+
+  x-input-group:not(:first-child) {
+      margin-top: 1rem;
+  }
+  > .app-footer,
+  > h3 {
+    padding-left: 6rem;
+  }
+  > h3 {
+    margin: 0;
+  }
+}

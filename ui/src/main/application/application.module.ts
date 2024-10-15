@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WeaponComponent } from './weapon.component';
+import { ApplicationComponent } from './application.component';
 import { RouterModule } from '@angular/router';
 import { XDrawerModule } from '@ng-nest/ui/drawer';
 import { XAvatarModule, XButtonModule, XCheckboxModule, XInputModule, XLinkModule, XMenuModule, XRadioModule, XTagModule, XTimelineModule } from '@ng-nest/ui';
@@ -9,16 +9,16 @@ import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
 import { EsService } from './es.service';
-import { WeaponDetailComponent } from './weapon-detail/weapon-detail.component';
 import { XTextRetractModule } from '@ng-nest/ui/text-retract';
 import { NgxMasonryModule } from 'ngx-masonry';
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XSelectModule } from '@ng-nest/ui/select';
+import { ApplicationDetailComponent } from './application-detail/application-detail.component';
 
 @NgModule({
-  declarations: [WeaponComponent, WeaponDetailComponent],
+  declarations: [ApplicationComponent, ApplicationDetailComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -44,14 +44,14 @@ import { XSelectModule } from '@ng-nest/ui/select';
     RouterModule.forChild([
       {
         path: '',
-        component: WeaponComponent,
+        component: ApplicationComponent,
       },
-      { path: ':type', component: WeaponDetailComponent },
-      { path: ':type/:id', component: WeaponDetailComponent }
+      { path: ':type', component: ApplicationDetailComponent },
+      { path: ':type/:id', component: ApplicationDetailComponent }
     ]),
   ],
   exports: [RouterModule],
   providers: [EsService]
 
 })
-export class WeaponModule {}
+export class ApplicationModule {}

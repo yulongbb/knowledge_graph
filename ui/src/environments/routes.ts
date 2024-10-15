@@ -119,16 +119,16 @@ export const layoutRoutes: Routes = [
     }
   },
 
-    // 属性
-    {
-      path: "qualify",
-      loadChildren: () =>
-        import("../main/ontology/qualify/qualify.module").then(x => x.QualifyModule),
-      canLoad: [AuthGuard],
-      data: {
-        shouldReuse: true
-      }
-    },
+  // 属性
+  {
+    path: "qualify",
+    loadChildren: () =>
+      import("../main/ontology/qualify/qualify.module").then(x => x.QualifyModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
 
   // 标签
   {
@@ -153,7 +153,15 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-
+  {
+    path: "applications",
+    loadChildren: () =>
+      import("../main/ontology/application/application.module").then(x => x.ApplicationModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
 
   {
     path: "entity",
@@ -174,23 +182,15 @@ export const layoutRoutes: Routes = [
     }
   },
   {
-    path: "weapon",
+    path: "application",
     loadChildren: () =>
-      import("../main/weapon/weapon.module").then(x => x.WeaponModule),
+      import("../main/application/application.module").then(x => x.ApplicationModule),
     // canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
   },
-  {
-    path: "channel",
-    loadChildren: () =>
-      import("../main/channel/channel.module").then(x => x.ChannelModule),
-    // canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
+
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页

@@ -15,12 +15,12 @@ import { EntityService } from 'src/main/entity/entity.service';
 import { Statement } from '@angular/compiler';
 
 @Component({
-  selector: 'app-weapon-detail',
-  templateUrl: './weapon-detail.component.html',
-  styleUrls: ['./weapon-detail.component.scss'],
+  selector: 'app-application-detail',
+  templateUrl: './application-detail.component.html',
+  styleUrls: ['./application-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WeaponDetailComponent implements OnInit {
+export class ApplicationDetailComponent implements OnInit {
   id: string = '';
   knowledge: string = '';
   type: string = '';
