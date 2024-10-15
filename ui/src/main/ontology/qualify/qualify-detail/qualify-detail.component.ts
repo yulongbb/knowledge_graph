@@ -112,14 +112,17 @@ export class QualifyDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         console.log(this.id);
-     
+        this.qualifyService.get(this.id as string).subscribe((x: any) => {
+          this.form.formGroup.patchValue(x);
+
+        });
+
         break;
       case 'edit':
         this.action('info');
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value);
           this.qualifyService
             .post(this.form.formGroup.value)
             .subscribe((x) => {
@@ -128,8 +131,6 @@ export class QualifyDetailComponent implements OnInit {
             });
         } else if (this.type === 'edit') {
           this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup.value);
-
           this.qualifyService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');

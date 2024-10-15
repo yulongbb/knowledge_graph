@@ -7,7 +7,6 @@ import { EsService } from './es.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
-import { forkJoin, map, tap } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
@@ -37,8 +36,6 @@ export class ChannelComponent implements OnInit {
   tag: any;
   data = signal(['知识', '图片', '视频', '文件']);
   category: any;
-
-
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -94,7 +91,6 @@ export class ChannelComponent implements OnInit {
         this.category.unshift(environment.channel)
         menu.unshift({ id: '', label: '全部' });
         this.types = signal(menu)
-        console.log(this.category)
         this.search('');
       })
   }
@@ -183,7 +179,6 @@ export class ChannelComponent implements OnInit {
                 { "wildcard": { "images": "*png" } },
                 { "wildcard": { "images": "*webp" } }],
             };
-
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': keyword } },],
@@ -390,34 +385,6 @@ export class ChannelComponent implements OnInit {
           });
         });
         this.entities = data.list;
-        // let menu: any = [];
-        // let arr: any = [];
-        // data.types.forEach((m: any) => {
-        //   arr.push(this.ontologyService.get(m.key));
-        // });
-        // forkJoin(arr).subscribe((properties: any) => {
-        //   data.types.forEach((m: any) => {
-        //     menu.push({
-        //       id: m.key,
-        //       label: properties.filter((p: any) => p.id == m.key)[0].name,
-        //     });
-        //   });
-        //   let menuMerge = [];
-        //   menuMerge = data.types.map((m: any, index: any) => {
-        //     return { ...m, ...menu[index] };
-        //   });
-        //   menuMerge.forEach((m: any) => {
-        //     m.label = m.label + '(' + m.doc_count + ')';
-        //   });
-        //   menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
-        //   this.types = menuMerge;
-        //   console.log(menuMerge);
-        // });
-        // let tags: any = [];
-        // data.tags.forEach((t: any) => {
-        //   tags.push(t.key);
-        // });
-        // this.tags = tags;
       });
   }
 
@@ -450,7 +417,6 @@ export class ChannelComponent implements OnInit {
       .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         console.log(data);
-
         this.images = [];
         this.videos = [];
         this.pdfs = [];
@@ -688,7 +654,6 @@ export class ChannelComponent implements OnInit {
 
             };
           }
-
         }
         break;
       case '文件':
@@ -741,9 +706,6 @@ export class ChannelComponent implements OnInit {
         this.query = {};
         break;
     }
-
-    console.log(this.query);
-
 
     this.service
       .searchEntity(this.index, this.size, this.query)
@@ -829,8 +791,6 @@ export class ChannelComponent implements OnInit {
   }
 
   action(type: string, item?: any) {
-    console.log(item);
-
     switch (type) {
       case 'info':
         this.router
