@@ -9,6 +9,7 @@ import { ExtractionModule } from 'src/extraction/extraction.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
+import { DatasetModule } from './dataset/dataset.module';
 
 
 @Module({
@@ -30,6 +31,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
     OntologynModule,
     ExtractionModule,
     KnowledgeModule,
+    DatasetModule,
     MinioClientModule,
     AuthModule,
     RedisModule,

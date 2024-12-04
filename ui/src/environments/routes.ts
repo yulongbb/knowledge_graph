@@ -140,7 +140,18 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-
+  // 数据集
+  {
+    path: "dataset",
+    loadChildren: () =>
+      import("../main/dataset/dataset.module").then(
+        x => x.DatasetModule
+      ),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
   // 抽取
   {
     path: "extraction",
