@@ -6,7 +6,7 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { XAutoCompleteModule, XCheckboxModule, XDialogModule, XInputModule, XTextRetractModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
+import { XAutoCompleteModule, XCheckboxModule, XDialogModule, XInputModule, XMenuModule, XTextRetractModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
@@ -41,6 +41,7 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
     XDialogModule,
     XUploadModule,
     XCheckboxModule,
+    XMenuModule,
     XAutoCompleteModule,
     LeafletModule,
     InfiniteScrollDirective,

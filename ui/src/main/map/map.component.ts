@@ -20,6 +20,8 @@ import {
 } from '@ng-nest/ui';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import { EsService } from '../search/es.service';
+import { forkJoin } from 'rxjs';
+import { OntologyService } from '../ontology/ontology/ontology.service';
 
 @Component({
   selector: 'app-map',
@@ -29,16 +31,19 @@ import { EsService } from '../search/es.service';
 export class MapComponent implements OnInit, OnDestroy {
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 2, attribution: '...' })
     ],
-    zoom: 1,
+    zoom: 3,
     center: latLng(46.879966, -121.726909)
   };
 
   markers: Marker[] = [];
   entities:any;
+  types: any;
+  type: any;
   constructor(
     private service: EsService,
+    private ontologyService: OntologyService,
     private message: XMessageService,
     private dialogService: XDialogService,
     private msgBox: XMessageBoxService
@@ -65,6 +70,32 @@ export class MapComponent implements OnInit, OnDestroy {
       .subscribe((data: any) => {
         console.log(data.list);
         this.entities = data.list;
+        this.entities = data.list;
+        let menu: any = [];
+        let arr: any = [];
+        data.types.forEach((m: any) => {
+          arr.push(this.ontologyService.get(m.key));
+        });
+        forkJoin(arr).subscribe((properties: any) => {
+          data.types.forEach((m: any) => {
+            menu.push({
+              id: m.key,
+              label: properties.filter((p: any) => p.id == m.key)[0].name,
+            });
+          });
+          let menuMerge = [];
+          menuMerge = data.types.map((m: any, index: any) => {
+            return { ...m, ...menu[index] };
+          });
+          menuMerge.forEach((m: any) => {
+            m.label = m.label + '(' + m.doc_count + ')';
+          });
+          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          this.types = menuMerge;
+          console.log(menuMerge);
+        });
+       
+     
         data.list.forEach((entity: any) => {
 
           console.log(entity._source.location);
@@ -75,6 +106,10 @@ export class MapComponent implements OnInit, OnDestroy {
       });
     // 添加新的标记到标记数组
     console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
+
+  selectType($event:any){
+
   }
 
   onScroll() {}
