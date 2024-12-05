@@ -213,6 +213,8 @@
             }
           </ng-template>
           } @case ('name') {
+            <x-textarea *ngIf="row?.mainsnak?.datatype == 'monolingualtext'" [style.width.%]="100"
+            [(ngModel)]="row.mainsnak.datavalue.value"></x-textarea>
           <x-input *ngIf="row?.mainsnak?.datatype == 'string'" [style.width.%]="100"
             [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
           <x-input *ngIf="row?.mainsnak?.datatype == 'url'" [style.width.%]="100"

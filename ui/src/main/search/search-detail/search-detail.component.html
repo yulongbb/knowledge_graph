@@ -1,42 +1,24 @@
 <div class="row">
-  <x-page-header
-    [title]="entity()?._source?.labels?.zh?.value.slice(0, 20)"
-    [subTitle]="entity()?._id"
-    (backClick)="back()"
-  >
+  <x-page-header [title]="entity()?._source?.labels?.zh?.value.slice(0, 20)" [subTitle]="entity()?._id"
+    (backClick)="back()">
   </x-page-header>
-  <x-card
-    width="100%"
-    class="card"
-    [bodyStyle]="{ padding: 10, }"
-    [header]="header"
-  >
+  <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
     <ng-template #header>
-      <span class="label"
-        >{{ entity()?._source?.labels?.zh?.value }}
+      <span class="label">{{ entity()?._source?.labels?.zh?.value }}
         <!-- <x-buttons>
           <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
-        </x-buttons> --> </span
-      ><span>{{ entity()?._type }}</span>
+        </x-buttons> --> </span><span>{{ entity()?._type }}</span>
     </ng-template>
     <div class="bottom">
       <div class="row">
-        <x-tag
-          *ngFor="let tag of entity()['_source']?.tags"
-          [style]="{
+        <x-tag *ngFor="let tag of entity()['_source']?.tags" [style]="{
             margin: '5px',
             backgroundColor: '#4494d5',
             color: 'white'
-          }"
-          bordered="false"
-          size="mini"
-          >{{ tag }}</x-tag
-        >
+          }" bordered="false" size="mini">{{ tag }}</x-tag>
       </div>
       <h2>简介</h2>
-      <p
-        *ngIf="entity()._source.descriptions"
-        [innerHTML]="
+      <p *ngIf="entity()._source.descriptions" [innerHTML]="
           linkifyText(
             entity()?._source?.descriptions?.zh?.value,
             entity()?._source?.entities
@@ -45,15 +27,20 @@
       <div *ngFor="let claim of claims()| keyvalue">
         <dl *ngFor="let statement of getClaim(claim)">
           <dt>
-            <span  *ngIf="getClaim(claim).indexOf(statement)==0">{{statement.mainsnak.label}}</span>
+            <span *ngIf="getClaim(claim).indexOf(statement)==0">{{statement.mainsnak.label}}</span>
           </dt>
-         
+
           <dd>
             <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                     'http://localhost:4200/index/search/info/' +
                     statement.mainsnak.datavalue.value.id
                   ">{{ statement?.mainsnak?.datavalue?.value?.label }}</a>
             </strong>
+
+            <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">
+                {{ statement?.mainsnak?.datavalue?.value }}
+            </pre>
+
             <strong *ngIf="statement.mainsnak.datatype == 'string'">
               {{ statement?.mainsnak?.datavalue?.value }}
             </strong>
@@ -288,44 +275,26 @@
       <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
-            <div
-              (click)="preview(image)"
-              class="thumbnail"
-              style="background-image: url('http://localhost:9000/kgms/{{
+            <div (click)="preview(image)" class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{
                 image
-              }}')"
-            ></div>
+              }}')"></div>
           </div>
         </div>
       </div>
       <div *ngFor="let video of videos">
         <video width="100%" controls>
-          <source
-            [src]="'http://localhost:9000/kgms/' + video"
-            type="video/mp4"
-          />
+          <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
           <p>
-            你的浏览器不支持 HTML5 视频。这里有一个<a
-              href="myVideo.mp4"
-              download="myVideo.mp4"
-              >视频</a
-            >链接。
+            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
           </p>
         </video>
       </div>
       <div *ngFor="let pdf of pdfs">
-        <iframe
-          id="inlineFrameExample"
-          title="Inline Frame Example"
-          frameborder="0"
-          width="100%"
-          height="1500"
-          [src]="
+        <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500" [src]="
             trustUrl(
               'http://localhost:7777/web/viewer.html?file=/pdf/kgms/' + pdf
             )
-          "
-        >
+          ">
         </iframe>
       </div>
     </div>
