@@ -25,6 +25,7 @@ import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
 import { QualifiesDialogComponent } from '../qualifies/qualifies.component'
+import { latLng, marker, Marker, tileLayer } from 'leaflet';
 
 @Component({
   selector: 'app-entity-detail',
@@ -116,7 +117,26 @@ export class EntityDetailComponent implements OnInit {
     { id: 'actions', label: '操作', width: 100 },
   ];
 
+  options = {
+    layers: [
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { maxZoom: 5, minZoom: 1, attribution: '...' })
+    ],
+    zoom: 1,
+    center: latLng(46.879966, -121.726909)
+  };
+  // 用于存储所有标记
+  markers: Marker[] = [];
 
+  // 地图点击事件处理函数
+  onMapClick(event: any) {
+    const { lat, lng } = event.latlng;
+    const newMarker = marker([lat, lng]);
+
+    // 添加新的标记到标记数组
+    this.markers = [newMarker];
+    this.item.location = { "lat": lat, "lon": lng };
+    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -147,8 +167,11 @@ export class EntityDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.action(this.type);
   }
+
+
   add() {
     this.statements = [
       ...this.statements,
@@ -307,7 +330,7 @@ export class EntityDetailComponent implements OnInit {
 
   uploadSuccess($event: any) {
     console.log(this.imgs);
-    if(!this.form.formGroup.value.label){
+    if (!this.form.formGroup.value.label) {
       this.form.formGroup.patchValue({
         label: $event.body.name,
         description: $event.body.name,
@@ -344,6 +367,8 @@ export class EntityDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x) => {
+          console.log(x)
+
           this.entity = signal(x);
           this.item = x._source;
           this.imgs = [];
@@ -351,6 +376,16 @@ export class EntityDetailComponent implements OnInit {
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` });
           });
+
+          console.log(this.item)
+          if (this.item.location) {
+            const newMarker = marker([this.item.location.lat, this.item.location.lon]);
+
+            // 添加新的标记到标记数组
+            this.markers = [newMarker];
+
+          }
+
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
 
             if (this.type == 'edit') {
@@ -463,7 +498,9 @@ export class EntityDetailComponent implements OnInit {
           images: this.imgs?.map(
             (i: any) => i.url.split('/')[i.url.split('/').length - 1]
           ),
+          location: this.item.location
         };
+        console.log(item)
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');

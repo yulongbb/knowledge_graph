@@ -156,7 +156,7 @@ export class KnowledgeController {
   }
 
 
-  
+
   @Post('graph/:id/:size/:index')
   async graph(
     @Param('id') id: XIdType,

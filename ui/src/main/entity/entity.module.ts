@@ -15,6 +15,7 @@ import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XRadioModule } from '@ng-nest/ui/radio';
 import { XPaginationModule } from '@ng-nest/ui/pagination';
 import { XDialogModule } from '@ng-nest/ui/dialog';
+import { LeafletModule } from '@bluehalo/ngx-leaflet';
 
 
 
@@ -50,7 +51,8 @@ import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
     XCollapseModule,
     XDatePickerModule,
     XInputNumberModule,
-    EntityRoutesModule
+    EntityRoutesModule,
+    LeafletModule
   ],
   declarations: [EntityComponent, EntityDetailComponent, ]
 })
