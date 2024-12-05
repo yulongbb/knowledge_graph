@@ -6,7 +6,7 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { XAutoCompleteModule, XCheckboxModule, XDialogModule, XInputModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
+import { XAutoCompleteModule, XCheckboxModule, XDialogModule, XInputModule, XTextRetractModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
@@ -15,6 +15,7 @@ import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { XTagModule } from '@ng-nest/ui/tag';
 import { XMessageBoxService } from '@ng-nest/ui/message-box';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 
 
@@ -36,11 +37,13 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
     XCardModule,
     XCrumbModule,
     XTagModule,
+    XTextRetractModule,
     XDialogModule,
     XUploadModule,
     XCheckboxModule,
     XAutoCompleteModule,
     LeafletModule,
+    InfiniteScrollDirective,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),

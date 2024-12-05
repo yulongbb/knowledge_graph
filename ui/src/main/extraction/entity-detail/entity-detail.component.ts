@@ -101,7 +101,7 @@ export class EntityDetailComponent implements OnInit {
   ngOnInit(): void {
     let query = { "must": [{ "term": { "labels.zh.value.keyword": this.name} },] }
 
-    this.esService.searchEntity(1,10,query).subscribe((data: any) => {
+    this.esService.searchEntity(1,10, {bool:query}).subscribe((data: any) => {
       console.log(data);
       if (data.list[0]) {
         this.item = data.list[0]._source;

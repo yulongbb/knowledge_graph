@@ -67,7 +67,7 @@ export class EntityComponent extends PageBase {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.data = (index: number, size: number, query: Query) => this.esService
-        .searchEntity(index, size, {})
+        .searchEntity(index, size, {bool:{}})
         .pipe(
           tap((data: any) => {
             let menu: any = []
@@ -133,7 +133,7 @@ export class EntityComponent extends PageBase {
       this.query = {}
     }
     this.data = (index: number, size: number, query: Query) =>
-      this.esService.searchEntity(index, this.size, this.query).pipe(
+      this.esService.searchEntity(index, this.size, {bool:this.query}).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -146,7 +146,7 @@ export class EntityComponent extends PageBase {
       this.query = {}
     }
     this.data = (index: number, size: number, query: Query) =>
-      this.esService.searchEntity(index, this.size, this.query).pipe(
+      this.esService.searchEntity(index, this.size, {bool:this.query}).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );

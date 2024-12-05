@@ -28,7 +28,7 @@ export class SearchComponent implements OnInit {
   videos!: any;
   pdfs!: any;
 
-  query: any = {};
+  query: any = {bool:{}};
   types: any;
   type: any;
   tags: any;
@@ -222,7 +222,7 @@ export class SearchComponent implements OnInit {
         break;
     }
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool: this.query})
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -359,7 +359,7 @@ export class SearchComponent implements OnInit {
     console.log(this.query)
     this.index = 1;
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool: this.query})
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -661,7 +661,7 @@ export class SearchComponent implements OnInit {
 
 
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {"bool": this.query})
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -785,7 +785,7 @@ export class SearchComponent implements OnInit {
     this.index++;
     console.log(this.index);
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool: this.query})
       .subscribe((data: any) => {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {

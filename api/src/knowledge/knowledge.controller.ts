@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
 import { EdgeService } from './edge.service';
+import { query } from 'express';
 
 @Controller('knowledge')
 @ApiTags('知识融合') // 分组
@@ -51,9 +52,7 @@ export class KnowledgeController {
       {
         size: size,
         from: (index - 1) * size,
-        query: {
-          bool: bool
-        },
+        query: bool,
         sort: [
           {
             modified: {

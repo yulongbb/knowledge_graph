@@ -1,4 +1,38 @@
-<div style="height: 100%;"
-     leaflet 
-     [leafletOptions]="options">
+<div style="height: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+    [leafletLayers]="markers">
 </div>
+<x-card  style="z-index: 1000; width:100%; max-height: 50%; position: absolute; bottom: 0;">
+    <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()" [scrollWindow]="false">
+    <div class="row" *ngFor="let entity of entities">
+        <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+            <ng-template #header>
+                <x-link type="primary" *ngIf="!entity['highlight']">{{entity['_source']?.labels?.zh?.value}}</x-link>
+    
+                <x-link *ngIf="entity['highlight']"
+                    [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
+            </ng-template>
+            <div class="bottom">
+    
+                <p>
+                    <x-text-retract *ngIf="!entity['highlight']" max="100"
+                        [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
+                </p>
+    
+                <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
+    
+                <div class="row">
+                    <x-tag *ngFor="let tag of entity['_source']?.tags"
+                        [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
+                        size="mini">{{tag}}</x-tag>
+                </div>
+                <div class="time">
+                    <span>{{entity['_source']?.modified}}</span>
+                    <span>{{entity['_source']?.items}}</span>
+                </div>
+            </div>
+        </x-card>
+    </div>
+    </div>
+</x-card>
+

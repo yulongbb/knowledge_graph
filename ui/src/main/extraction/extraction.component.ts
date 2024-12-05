@@ -172,7 +172,7 @@ export class ExtractionComponent extends PageBase {
               let query = { "must": [{ "term": { "labels.zh.value.keyword": this.checkedRows[0]['subject'] } },] }
 
               console.log(query)
-              this.esService.searchEntity(1, 10, query).subscribe((e: any) => {
+              this.esService.searchEntity(1, 10, {bool:query}).subscribe((e: any) => {
                 console.log(e.list[0]._source);
                 let edges: any = []
                 this.checkedRows.forEach((row: any) => {

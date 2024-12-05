@@ -319,7 +319,7 @@ export class ApplicationComponent implements OnInit {
         break;
     }
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool: this.query})
       .subscribe((data: any) => {
         console.log(data);
         this.images = [];
@@ -454,7 +454,7 @@ export class ApplicationComponent implements OnInit {
     console.log(this.query)
     this.index = 1;
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool:this.query})
       .subscribe((data: any) => {
         console.log(data);
 
@@ -753,7 +753,7 @@ export class ApplicationComponent implements OnInit {
 
 
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool:this.query})
       .subscribe((data: any) => {
         this.images = [];
         this.videos = [];
@@ -869,7 +869,7 @@ export class ApplicationComponent implements OnInit {
     this.index++;
     console.log(this.index);
     this.service
-      .searchEntity(this.index, this.size, this.query)
+      .searchEntity(this.index, this.size, {bool: this.query})
       .subscribe((data: any) => {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {

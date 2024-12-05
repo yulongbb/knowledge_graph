@@ -85,7 +85,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.esService.searchEntity(1, 1, {}).subscribe((data: any) => {
+    this.esService.searchEntity(1, 1, {bool: {}}).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
         console.log(data);
         cytoscape.use(cxtmenu);
@@ -540,7 +540,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         query = { must: [{ match: { 'labels.zh.value': keyword } }] };
       }
     }
-    this.esService.searchEntity(1, 10, query).subscribe((data: any) => { });
+    this.esService.searchEntity(1, 10, {bool:query } ).subscribe((data: any) => { });
   }
   modelAsync = signal('');
   dataAsync = signal(
@@ -568,7 +568,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             query = { must: [{ match: { 'labels.zh.value': str } }] };
           }
         }
-        this.esService.searchEntity(1, 10, query).subscribe((data: any) => {
+        this.esService.searchEntity(1, 10, {bool:query}).subscribe((data: any) => {
           x.next(data.list);
           x.complete();
         });

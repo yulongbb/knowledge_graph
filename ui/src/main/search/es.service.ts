@@ -12,6 +12,7 @@ export class EsService extends RepositoryService<any> {
 
   searchEntity( index?: number,
     size?: number, query?: any): Observable<any> {
+      console.log(query)
     return this.http.post(`${this.option.controller?.name}/search/${size}/${index}`,query);
   }
 
