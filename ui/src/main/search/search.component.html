@@ -40,7 +40,6 @@
       <div class="bottom">
         <x-row>
           <x-col span="3">
-
             <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="100px"
               [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
           </x-col>
@@ -289,10 +288,7 @@
           [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
       </ng-template>
       <div class="bottom">
-        <p>
-          <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="50%"
-            [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-        </p>
+       
         <p>
           <x-text-retract *ngIf="!entity['highlight']" max="100"
             [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>

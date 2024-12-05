@@ -54,6 +54,16 @@ export const layoutRoutes: Routes = [
       title: "dashboard"
     }
   },
+    // 仪表盘
+    {
+      path: "map",
+      loadChildren: () =>
+        import("../main/map/map.module").then(x => x.MapModule),
+      canLoad: [AuthGuard],
+      data: {
+        title: "map"
+      }
+    },
   // 用户管理
   {
     path: "users",
