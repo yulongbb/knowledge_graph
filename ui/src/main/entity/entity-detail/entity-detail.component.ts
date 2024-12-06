@@ -26,6 +26,7 @@ import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
 import { QualifiesDialogComponent } from '../qualifies/qualifies.component'
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-entity-detail',
@@ -119,9 +120,9 @@ export class EntityDetailComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
     ],
-    zoom: 1,
+    zoom: 3,
     center: latLng(46.879966, -121.726909)
   };
   // 用于存储所有标记
@@ -136,6 +137,17 @@ export class EntityDetailComponent implements OnInit {
     this.markers = [newMarker];
     this.item.location = { "lat": lat, "lon": lng };
     console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
+
+  onMapReady(map: any) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds)
+
   }
 
   constructor(
@@ -498,7 +510,7 @@ export class EntityDetailComponent implements OnInit {
           images: this.imgs?.map(
             (i: any) => i.url.split('/')[i.url.split('/').length - 1]
           ),
-          location: this.item.location
+          location: this.item?.location
         };
         console.log(item)
         if (this.type === 'add') {

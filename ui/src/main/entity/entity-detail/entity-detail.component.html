@@ -260,7 +260,7 @@
     <x-collapse>
       <x-collapse-panel label="位置标注">
         <div style="height: 300px;" leaflet [leafletOptions]="options"  (leafletClick)="onMapClick($event)"
-        [leafletLayers]="markers">
+        [leafletLayers]="markers"   (leafletMapReady)="onMapReady($event)">
         </div>
       </x-collapse-panel>
     </x-collapse>

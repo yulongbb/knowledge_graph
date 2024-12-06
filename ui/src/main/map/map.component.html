@@ -1,5 +1,6 @@
 <div style="height: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
-    [leafletLayers]="markers">
+    [leafletLayers]="markers"       (leafletMapReady)="onMapReady($event)" 
+    >
 </div>
 <x-card  style="z-index: 1000; width:100%; max-height: 50%; position: absolute; top: 0;">
 <x-menu *ngIf="types" size="small" [data]="types" (nodeClick)="selectType($event)"> </x-menu>

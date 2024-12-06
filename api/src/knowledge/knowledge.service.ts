@@ -229,7 +229,7 @@ export class KnowledgeService {
     );
   }
   async updateEntity(entity: any): Promise<any> {
-    console.log(entity)
+    console.log(entity?.location)
     // Fetch the existing document
     await this.elasticsearchService.bulk({
       id: entity.id,

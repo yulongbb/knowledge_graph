@@ -18,10 +18,11 @@ import {
   XMessageService,
   XPlace,
 } from '@ng-nest/ui';
-import { latLng, marker, Marker, tileLayer } from 'leaflet';
+import { latLng, marker, Marker, Map , tileLayer } from 'leaflet';
 import { EsService } from '../search/es.service';
 import { forkJoin } from 'rxjs';
 import { OntologyService } from '../ontology/ontology/ontology.service';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-map',
@@ -31,7 +32,7 @@ import { OntologyService } from '../ontology/ontology/ontology.service';
 export class MapComponent implements OnInit, OnDestroy {
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 2, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
@@ -120,4 +121,15 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void { }
+  
+  onMapReady(map: Map) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds)
+
+  }
 }
