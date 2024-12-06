@@ -164,6 +164,11 @@ export class EntityComponent extends PageBase {
           relativeTo: this.activatedRoute,
         });
         break;
+      case 'import':
+        this.router.navigate([`./grid`], {
+            relativeTo: this.activatedRoute,
+          });
+        break;
       case 'info':
         console.log(item);
         this.router.navigate(
