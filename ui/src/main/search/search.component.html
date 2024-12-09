@@ -1,13 +1,13 @@
 <!-- 搜索栏 -->
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-  <x-menu size="big" [data]="data()" (nodeClick)="selectMenu($event)"> </x-menu>
+  <x-menu size="big" [data]="menus()" (nodeClick)="selectMenu($event)"> </x-menu>
 
 </div>
 
 
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
   <x-input-group compact size="big">
-    <x-select [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="20"></x-select>
+    <x-select [(ngModel)]="way" [data]="waies()" [style.width.%]="20"></x-select>
 
     <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
     <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
@@ -22,13 +22,11 @@
 </div>
 
 
+@switch (menu()) {
+@case ('知识') {
 <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
   (scrolled)="onScroll()" [scrollWindow]="false">
-  @switch (menu()) {
-  @case ('知识') {
   <div class="row" *ngFor="let entity of entities">
-    @switch (entity._source.type) {
-    @case ('Q5') {
     <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
         <x-link type="primary" *ngIf="!entity['highlight']"
@@ -38,257 +36,7 @@
           [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
       </ng-template>
       <div class="bottom">
-        <x-row>
-          <x-col span="3">
-            <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="100px"
-              [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-          </x-col>
-          <x-col span="21">
-            <dl>
-              <dd>
-                <p *ngFor="let statement of entity.claims">
-                  <span>{{statement.mainsnak.label}}:</span>
-                  <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a target="_blank"
-                      [href]="'http://localhost:4200/index/search/info/'+statement?.mainsnak?.datavalue?.value?.id">{{statement.mainsnak.datavalue.value.label}}</a>
-                  </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='string'">
-                    {{statement.mainsnak.datavalue.value}}
-                  </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='commonsMedia'">
-                    <img
-                      *ngIf="statement?.mainsnak?.datavalue?.value?.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] != 'mp4'"
-                      width="100px" [src]="'http://localhost:9000/kgms/'+statement?.mainsnak?.datavalue.value" />
-                    <video
-                      *ngIf="statement?.mainsnak.datavalue.value.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] == 'mp4'"
-                      width="100px" controls>
-                      <source [src]="'http://localhost:9000/kgms/'+statement?.mainsnak.datavalue.value"
-                        type="video/mp4" />
-                      <p>
-                        你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                      </p>
-                    </video> </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='url'"><a target="_blank"
-                      [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
-                    }}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
-                </p>
-              </dd>
-            </dl>
-          </x-col>
-        </x-row>
-        <x-text-retract *ngIf="!entity['highlight']" max="100"
-          [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-        <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
-        <div class="row">
-          <x-tag *ngFor="let tag of entity['_source']?.tags"
-            [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
-            size="mini">{{tag}}</x-tag>
-        </div>
-        <div class="time">
-          <span>{{entity['_source']?.modified}}</span>
-          <span>{{entity['_source']?.items}}</span>
-        </div>
-      </div>
-    </x-card>
-    }
-    @case ('Q891723') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
-      <ng-template #header>
-        <x-link type="primary" *ngIf="!entity['highlight']"
-          (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link>
 
-        <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
-          [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
-      </ng-template>
-      <div class="bottom">
-        <x-row>
-          <x-col span="3">
-
-            <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="100px"
-              [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-          </x-col>
-          <x-col span="21">
-            <dl>
-              <dd>
-                <p *ngFor="let statement of entity.claims">
-                  <span>{{statement.mainsnak.label}}:</span>
-                  <strong *ngIf="statement.mainsnak.datatype=='wikibase-item'"><a target="_blank"
-                      [href]="'http://localhost:4200/index/search/info/'+statement?.mainsnak?.datavalue?.value?.id">{{statement.mainsnak.datavalue.value.label}}</a>
-                  </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='string'">
-                    {{statement.mainsnak.datavalue.value}}
-                  </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='commonsMedia'">
-                    <img
-                      *ngIf="statement?.mainsnak?.datavalue?.value?.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] != 'mp4'"
-                      width="100px" [src]="'http://localhost:9000/kgms/'+statement?.mainsnak?.datavalue.value" />
-                    <video
-                      *ngIf="statement?.mainsnak.datavalue.value.split('.')[statement?.mainsnak.datavalue.value.split('.').length-1] == 'mp4'"
-                      width="100px" controls>
-                      <source [src]="'http://localhost:9000/kgms/'+statement?.mainsnak.datavalue.value"
-                        type="video/mp4" />
-                      <p>
-                        你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                      </p>
-                    </video> </strong>
-                  <strong *ngIf="statement.mainsnak.datatype=='url'"><a target="_blank"
-                      [href]="statement?.mainsnak.datavalue.value">{{statement?.mainsnak.datavalue.value}}</a></strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='quantity'">{{statement.mainsnak.datavalue.value.amount}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='monolingualtext'">{{statement.mainsnak.datavalue.value.text
-                    }}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='geo-shape'">{{statement.mainsnak.datavalue.value}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='globe-coordinate'">{{statement.mainsnak.datavalue.value.latitude}},{{statement.mainsnak.datavalue.value.longitude}}</strong>
-                  <strong
-                    *ngIf="statement.mainsnak.datatype=='time'">{{statement.mainsnak.datavalue.value.time}}</strong>
-                </p>
-              </dd>
-            </dl>
-          </x-col>
-        </x-row>
-        <x-text-retract *ngIf="!entity['highlight']" max="100"
-          [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-        <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
-        <div class="row">
-          <x-tag *ngFor="let tag of entity['_source']?.tags"
-            [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
-            size="mini">{{tag}}</x-tag>
-        </div>
-        <div class="time">
-          <span>{{entity['_source']?.modified}}</span>
-          <span>{{entity['_source']?.items}}</span>
-        </div>
-      </div>
-    </x-card>
-    }
-    @case ('Q1914636') {
-    <div class="row">
-      <x-timeline [data]="[entity]" [wrapper]="wrapperTpl"></x-timeline>
-      <ng-template #wrapperTpl let-node="$node">
-        <div class="custom-wrapper">
-          <span>{{ node['_source']?.modified }}</span>
-          <x-card [header]="header2" [bodyStyle]="{ padding: 10, }">
-            <ng-template #header2>
-              <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="100px"
-                [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-              <span>{{entity['_type']}}</span>
-            </ng-template>
-            <h4 (click)="action('info', entity)">{{ node['_source']?.labels?.zh?.value }}</h4>
-            <p>{{ node['_source']?.descriptions?.zh?.value }}</p>
-          </x-card>
-        </div>
-      </ng-template>
-    </div>
-    }
-    @case ('Q10273457') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
-      <ng-template #header>
-        <x-link type="primary" *ngIf="!entity['highlight']"
-          (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link>
-
-        <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
-          [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
-      </ng-template>
-      <div class="bottom">
-        <x-text-retract *ngIf="!entity['highlight']" max="100"
-          [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-        <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
-        <x-row>
-          <x-col span="12">
-
-            <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="80%"
-              [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-          </x-col>
-          <x-col span="12">
-            <x-statistic *ngFor="let statement of entity.claims" [label]="statement.mainsnak.label"
-              [value]="(statement?.mainsnak?.datavalue?.value?.amount?? '暂无')!"> </x-statistic>
-
-          </x-col>
-        </x-row>
-
-        <div class="row">
-          <x-tag *ngFor="let tag of entity['_source']?.tags"
-            [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
-            size="mini">{{tag}}</x-tag>
-        </div>
-        <div class="time">
-          <span>{{entity['_source']?.modified}}</span>
-          <span>{{entity['_source']?.items}}</span>
-        </div>
-      </div>
-    </x-card>
-    }
-    @case ('bdi8885693') {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
-      <ng-template #header>
-        <span> <x-avatar *ngIf="entity['_source']?.images && entity['_source']?.images.length>0"
-            [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]"></x-avatar>
-
-          <x-link type="primary" *ngIf="!entity['highlight']"
-            (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link>
-
-          <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
-            [innerHTML]="entity['highlight']['labels.zh.value']"></x-link>
-        </span>
-
-        <span>{{entity['_type']}}</span>
-      </ng-template>
-      <div class="bottom">
-        <x-text-retract *ngIf="!entity['highlight']" max="100"
-          [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
-        <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
-        <div *ngFor="let image of entity['_source']?.images?.slice(0,8)">
-
-          <video *ngIf="image.split('.')[image.split('.').length - 1] == 'mp4'" height="350px" controls>
-            <source [src]="'http://localhost:9000/kgms/' + image" type="video/mp4" />
-            <p>
-              你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-            </p>
-          </video>
-        </div>
-        <div class="gallery" *ngIf="entity['_source']?.images && entity['_source']?.images.length>0">
-          <div class="warp">
-            <div *ngFor="let image of entity['_source']?.images.slice(0,8)">
-              <div (click)="preview(image)" *ngIf="image?.split('.')[image.split('.').length - 1] != 'mp4'"
-                class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{image}}')"></div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <x-tag *ngFor="let tag of entity['_source']?.tags"
-            [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
-            size="mini">{{tag}}</x-tag>
-        </div>
-        <div class="time">
-          <span>{{entity['_source']?.modified}}</span>
-          <span>{{entity['_source']?.items}}</span>
-        </div>
-      </div>
-    </x-card>
-    }
-    @default {
-    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
-      <ng-template #header>
-        <x-link type="primary" *ngIf="!entity['highlight']"
-          (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link>
-
-        <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
-          [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
-      </ng-template>
-      <div class="bottom">
-       
         <p>
           <x-text-retract *ngIf="!entity['highlight']" max="100"
             [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
@@ -307,11 +55,12 @@
         </div>
       </div>
     </x-card>
-    }
-    }
   </div>
-  }
-  @case ('图片') {
+</div>
+}
+@case ('图片') {
+<div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()" [scrollWindow]="false">
   <div class="gallery">
     <div class="warp">
       <div *ngFor="let image of images">
@@ -321,9 +70,26 @@
       </div>
     </div>
   </div>
-  }
-  @case ('视频') {
-  <div class="gallery">
+</div>
+}
+@case ('视频') {
+<!-- 视频组件模板 -->
+<div *ngIf="videos" class="video-container">
+  <div class="video-wrapper">
+    <video [src]="'http://localhost:9000/kgms/' + videos[2].image" autoplay muted loop></video>
+  </div>
+</div>
+
+
+
+
+<!-- <div *ngIf="videos" class="video-container" (swipe)="onSwipe($event)">
+    <video #videoPlayer controls autoplay >
+      <source  [src]="'http://localhost:9000/kgms/' + videos[0].image" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div> -->
+<!-- <div class="gallery">
     <div class="warp">
       <div *ngFor="let video of videos">
         <video width="100%">
@@ -332,13 +98,14 @@
             你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
           </p>
         </video>
-        <x-link (click)="action('info', video)" type="info">{{video.label}}</x-link>
 
       </div>
     </div>
-  </div>
-  }
-  @case ('文件') {
+  </div> -->
+}
+@case ('文件') {
+<div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()" [scrollWindow]="false">
   <div *ngFor="let pdf of pdfs">
     <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
@@ -346,12 +113,15 @@
       </ng-template>
       <div class="bottom">
         <x-text-retract max="100" [content]="pdf?.description"></x-text-retract>
-
       </div>
     </x-card>
   </div>
-  }
-  }
-
-
 </div>
+}
+
+@case ('地图') {
+<div style="height: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+  [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)">
+</div>
+}
+}

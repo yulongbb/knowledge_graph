@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import {
   XDialogService,
   XImagePreviewComponent,
@@ -10,6 +10,8 @@ import { PropertyService } from '../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { latLng, marker, Marker, tileLayer } from 'leaflet';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-search',
@@ -17,23 +19,51 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
+  waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '默认检索';
+
+  menus = signal(['知识', '图片', '视频', '文件', '地图']);
   menu: any = signal('知识');
 
+  query: any = {bool:{}};
+
+
   keyword = '';
+
+
   size = 10;
   index = 1;
+
+  types: any;
+  type: any;
+  tags: any;
+  tag: any;
+
   entities: any;
   images!: any;
   videos!: any;
   pdfs!: any;
 
-  query: any = {bool:{}};
-  types: any;
-  type: any;
-  tags: any;
-  tag: any;
-  data = signal(['知识', '图片', '视频', '文件']);
+  options = {
+    layers: [
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
+    ],
+    zoom: 3,
+    center: latLng(46.879966, -121.726909)
+  };
+
+  markers: Marker[] = [];
+
+  currentIndex = 0;
+
+  onVideoScroll(event: WheelEvent) {
+    if (event.deltaY > 0 && this.currentIndex < this.videos.length - 1) {
+      this.currentIndex++;
+    } else if (event.deltaY < 0 && this.currentIndex > 0) {
+      this.currentIndex--;
+    }
+  }
+
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -48,6 +78,69 @@ export class SearchComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  onMapReady(map: any) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds)
+
+  }
+  // 地图点击事件处理函数
+  onMapClick(event: any) {
+    this.markers = [];
+    const { lat, lng } = event.latlng;
+
+    this.service
+      .searchEntity(1, 10, {
+        "geo_distance": {
+          "distance": "500km",
+          "location": {
+            "lat": lat,
+            "lon": lng
+          }
+        }
+      })
+      .subscribe((data: any) => {
+        console.log(data.list);
+        this.entities = data.list;
+        this.entities = data.list;
+        let menu: any = [];
+        let arr: any = [];
+        data.types.forEach((m: any) => {
+          arr.push(this.ontologyService.get(m.key));
+        });
+        forkJoin(arr).subscribe((properties: any) => {
+          data.types.forEach((m: any) => {
+            menu.push({
+              id: m.key,
+              label: properties.filter((p: any) => p.id == m.key)[0].name,
+            });
+          });
+          let menuMerge = [];
+          menuMerge = data.types.map((m: any, index: any) => {
+            return { ...m, ...menu[index] };
+          });
+          menuMerge.forEach((m: any) => {
+            m.label = m.label + '(' + m.doc_count + ')';
+          });
+          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          this.types = menuMerge;
+          console.log(menuMerge);
+        });
+       
+        data.list.forEach((entity: any) => {
+          const newMarker = marker([entity._source.location.lat, entity._source.location.lon]);
+          this.markers.push(newMarker);
+        });
+      });
+    // 添加新的标记到标记数组
+    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
+
 
   selectMenu(menu: any) {
     this.entities = null;
@@ -768,6 +861,7 @@ export class SearchComponent implements OnInit {
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',

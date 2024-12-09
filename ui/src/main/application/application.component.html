@@ -18,8 +18,7 @@
 
 <div style="display: block; width: 100%; overflow: scroll">
   <div *ngFor="let t of tags | keyvalue">
-    <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-      tag></x-checkbox>
+    <x-checkbox (ngModelChange)="selectTag($event)" [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false" tag></x-checkbox>
   </div>
 </div>
 
@@ -49,10 +48,10 @@
         <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
         <p>
           <img *ngIf="entity['_source']?.images && entity['_source']?.images.length>0" width="50%"
-          [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
-    
+            [src]="'http://localhost:9000/kgms/'+entity['_source']?.images[0]" />
+
         </p>
-     
+
         <div class="row">
           <x-tag *ngFor="let tag of entity['_source']?.tags"
             [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
@@ -97,15 +96,13 @@
   <div *ngFor="let pdf of pdfs">
     <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
-        <x-link type="primary"
-          (click)="action('info', pdf)">{{pdf.label}}</x-link>
+        <x-link type="primary" (click)="action('info', pdf)">{{pdf.label}}</x-link>
       </ng-template>
       <div class="bottom">
-        <x-text-retract  max="100"
-          [content]="pdf?.description"></x-text-retract>
+        <x-text-retract max="100" [content]="pdf?.description"></x-text-retract>
 
-        
-      
+
+
       </div>
     </x-card>
   </div>

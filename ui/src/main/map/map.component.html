@@ -2,9 +2,9 @@
     [leafletLayers]="markers"       (leafletMapReady)="onMapReady($event)" 
     >
 </div>
-<x-card  style="z-index: 1000; width:100%; max-height: 50%; position: absolute; top: 0;">
+<!-- <x-card  style="z-index: 1000; width:100%; max-height: 50%; position: absolute; top: 0;">
 <x-menu *ngIf="types" size="small" [data]="types" (nodeClick)="selectType($event)"> </x-menu>
-</x-card>
+</x-card> -->
 <x-card  style="z-index: 1000; width:100%; max-height: 50%; position: absolute; bottom: 0;">
     <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
   (scrolled)="onScroll()" [scrollWindow]="false">

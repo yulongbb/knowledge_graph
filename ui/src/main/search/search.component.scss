@@ -156,6 +156,30 @@
     display: none;
   }
 
+  .video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px; /* Use viewport height for full screen */
+    height: 800px; /* Use viewport height for full screen */
+    background-color: aquamarine;
+    overflow: hidden;
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .video-wrapper {
+    width: 100%;
+    height: 100%; /* Make sure it takes up all available space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Keep aspect ratio and fill container */
+  }
 
 
 }
