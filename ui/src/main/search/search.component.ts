@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import {
   XDialogService,
   XImagePreviewComponent,
@@ -10,6 +10,8 @@ import { PropertyService } from '../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { latLng, marker, Marker, tileLayer } from 'leaflet';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-search',
@@ -17,23 +19,81 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
+  waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '默认检索';
+
+  menus = signal(['知识', '图片', '视频', '文件', '地图']);
   menu: any = signal('知识');
 
+  query: any = { bool: {} };
+
+
   keyword = '';
+
+
   size = 10;
   index = 1;
+
+  types: any;
+  type: any;
+  tags: any;
+  tag: any;
+
   entities: any;
   images!: any;
   videos!: any;
   pdfs!: any;
 
-  query: any = {bool:{}};
-  types: any;
-  type: any;
-  tags: any;
-  tag: any;
-  data = signal(['知识', '图片', '视频', '文件']);
+  options = {
+    layers: [
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
+    ],
+    zoom: 3,
+    center: latLng(46.879966, -121.726909)
+  };
+
+  markers: Marker[] = [];
+  currentVideoIndex = 0; // 当前视频索引
+  currentVideoSrc: any; // 当前视频路径
+  scrollTimeout: any; // 防止快速滚动
+
+  // 处理鼠标滚动事件
+  videoScroll(event: WheelEvent): void {
+    console.log(123)
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout); // 避免重复触发
+    }
+
+    this.scrollTimeout = setTimeout(() => {
+      if (event.deltaY > 0) {
+        this.nextVideo(); // 向下滚动，切换到下一视频
+      } else if (event.deltaY < 0) {
+        this.prevVideo(); // 向上滚动，切换到上一视频
+      }
+    }, 200); // 设置防抖时间
+  }
+
+  // 切换到下一视频
+  nextVideo(): void {
+    if (this.currentVideoIndex < this.videos.length - 1) {
+      this.currentVideoIndex++;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 切换到上一视频
+  prevVideo(): void {
+    if (this.currentVideoIndex > 0) {
+      this.currentVideoIndex--;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 更新视频源
+  updateVideoSrc(): void {
+    this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+  }
+
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -48,6 +108,69 @@ export class SearchComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  onMapReady(map: any) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds)
+
+  }
+  // 地图点击事件处理函数
+  onMapClick(event: any) {
+    this.markers = [];
+    const { lat, lng } = event.latlng;
+
+    this.service
+      .searchEntity(1, 10, {
+        "geo_distance": {
+          "distance": "500km",
+          "location": {
+            "lat": lat,
+            "lon": lng
+          }
+        }
+      })
+      .subscribe((data: any) => {
+        console.log(data.list);
+        this.entities = data.list;
+        this.entities = data.list;
+        let menu: any = [];
+        let arr: any = [];
+        data.types.forEach((m: any) => {
+          arr.push(this.ontologyService.get(m.key));
+        });
+        forkJoin(arr).subscribe((properties: any) => {
+          data.types.forEach((m: any) => {
+            menu.push({
+              id: m.key,
+              label: properties.filter((p: any) => p.id == m.key)[0].name,
+            });
+          });
+          let menuMerge = [];
+          menuMerge = data.types.map((m: any, index: any) => {
+            return { ...m, ...menu[index] };
+          });
+          menuMerge.forEach((m: any) => {
+            m.label = m.label + '(' + m.doc_count + ')';
+          });
+          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          this.types = menuMerge;
+          console.log(menuMerge);
+        });
+
+        data.list.forEach((entity: any) => {
+          const newMarker = marker([entity._source.location.lat, entity._source.location.lon]);
+          this.markers.push(newMarker);
+        });
+      });
+    // 添加新的标记到标记数组
+    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
+
 
   selectMenu(menu: any) {
     this.entities = null;
@@ -222,7 +345,7 @@ export class SearchComponent implements OnInit {
         break;
     }
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -253,6 +376,7 @@ export class SearchComponent implements OnInit {
               this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService
@@ -359,7 +483,7 @@ export class SearchComponent implements OnInit {
     console.log(this.query)
     this.index = 1;
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -587,14 +711,14 @@ export class SearchComponent implements OnInit {
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } },
-                { "wildcard": { "images": "*mp4" } }
+              { "wildcard": { "images": "*mp4" } }
               ],
             };
           }
         } else {
           if (type.id != '') {
             this.query = {
-              must: [{ term: { 'type.keyword': type.id } },{ "wildcard": { "images": "*mp4" } }],
+              must: [{ term: { 'type.keyword': type.id } }, { "wildcard": { "images": "*mp4" } }],
 
             };
           } else {
@@ -661,7 +785,7 @@ export class SearchComponent implements OnInit {
 
 
     this.service
-      .searchEntity(this.index, this.size, {"bool": this.query})
+      .searchEntity(this.index, this.size, { "bool": this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -768,6 +892,7 @@ export class SearchComponent implements OnInit {
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
   preview(image: any) {
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
@@ -785,7 +910,7 @@ export class SearchComponent implements OnInit {
     this.index++;
     console.log(this.index);
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {

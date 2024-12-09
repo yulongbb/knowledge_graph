@@ -16,6 +16,7 @@ import { XPageHeaderModule } from '@ng-nest/ui/page-header';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XSelectModule } from '@ng-nest/ui/select';
+import { LeafletModule } from '@bluehalo/ngx-leaflet';
 
 @NgModule({
   declarations: [SearchComponent, SearchDetailComponent],
@@ -41,6 +42,8 @@ import { XSelectModule } from '@ng-nest/ui/select';
     XCheckboxModule,
     XTagModule,
     XLinkModule,
+    LeafletModule,
+
     InfiniteScrollDirective,
     RouterModule.forChild([
       {

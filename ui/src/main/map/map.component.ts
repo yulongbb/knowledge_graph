@@ -32,13 +32,16 @@ import * as L from 'leaflet';
 export class MapComponent implements OnInit, OnDestroy {
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
   };
 
   markers: Marker[] = [];
+
+
+
   entities:any;
   types: any;
   type: any;
@@ -51,7 +54,16 @@ export class MapComponent implements OnInit, OnDestroy {
   ) {
 
   }
+  onMapReady(map: Map) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
 
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds)
+
+  }
   // 地图点击事件处理函数
   onMapClick(event: any) {
     this.markers = [];
@@ -122,14 +134,5 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { }
   
-  onMapReady(map: Map) {
-    // 设置拖动边界（限制地图范围）
-    const southWest = latLng(-90, -180); // 西南角坐标
-    const northEast = latLng(90, 180); // 东北角坐标
-    const bounds = L.latLngBounds(southWest, northEast);
 
-    map.setMaxBounds(bounds);
-    map.fitBounds(bounds)
-
-  }
 }
