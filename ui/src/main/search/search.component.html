@@ -73,14 +73,18 @@
 </div>
 }
 @case ('视频') {
-<!-- 视频组件模板 -->
-<div *ngIf="videos" class="video-container">
-  <div class="video-wrapper">
-    <video [src]="'http://localhost:9000/kgms/' + videos[2].image" autoplay muted loop></video>
-  </div>
+
+{{currentVideoSrc}}
+<div *ngIf="videos" class="video-scroll-container" (wheel)="videoScroll($event)">
+  <video 
+    #videoPlayer
+    controls
+    [src]="currentVideoSrc" 
+    class="video-element"
+    autoplay
+    muted
+  ></video>
 </div>
-
-
 
 
 <!-- <div *ngIf="videos" class="video-container" (swipe)="onSwipe($event)">

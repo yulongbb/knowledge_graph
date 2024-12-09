@@ -25,7 +25,7 @@ export class SearchComponent implements OnInit {
   menus = signal(['知识', '图片', '视频', '文件', '地图']);
   menu: any = signal('知识');
 
-  query: any = {bool:{}};
+  query: any = { bool: {} };
 
 
   keyword = '';
@@ -46,22 +46,52 @@ export class SearchComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
   };
 
   markers: Marker[] = [];
+  currentVideoIndex = 0; // 当前视频索引
+  currentVideoSrc: any; // 当前视频路径
+  scrollTimeout: any; // 防止快速滚动
 
-  currentIndex = 0;
-
-  onVideoScroll(event: WheelEvent) {
-    if (event.deltaY > 0 && this.currentIndex < this.videos.length - 1) {
-      this.currentIndex++;
-    } else if (event.deltaY < 0 && this.currentIndex > 0) {
-      this.currentIndex--;
+  // 处理鼠标滚动事件
+  videoScroll(event: WheelEvent): void {
+    console.log(123)
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout); // 避免重复触发
     }
+
+    this.scrollTimeout = setTimeout(() => {
+      if (event.deltaY > 0) {
+        this.nextVideo(); // 向下滚动，切换到下一视频
+      } else if (event.deltaY < 0) {
+        this.prevVideo(); // 向上滚动，切换到上一视频
+      }
+    }, 200); // 设置防抖时间
+  }
+
+  // 切换到下一视频
+  nextVideo(): void {
+    if (this.currentVideoIndex < this.videos.length - 1) {
+      this.currentVideoIndex++;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 切换到上一视频
+  prevVideo(): void {
+    if (this.currentVideoIndex > 0) {
+      this.currentVideoIndex--;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 更新视频源
+  updateVideoSrc(): void {
+    this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
 
@@ -131,7 +161,7 @@ export class SearchComponent implements OnInit {
           this.types = menuMerge;
           console.log(menuMerge);
         });
-       
+
         data.list.forEach((entity: any) => {
           const newMarker = marker([entity._source.location.lat, entity._source.location.lon]);
           this.markers.push(newMarker);
@@ -315,7 +345,7 @@ export class SearchComponent implements OnInit {
         break;
     }
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -346,6 +376,7 @@ export class SearchComponent implements OnInit {
               this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService
@@ -452,7 +483,7 @@ export class SearchComponent implements OnInit {
     console.log(this.query)
     this.index = 1;
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -680,14 +711,14 @@ export class SearchComponent implements OnInit {
           } else {
             this.query = {
               must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } },
-                { "wildcard": { "images": "*mp4" } }
+              { "wildcard": { "images": "*mp4" } }
               ],
             };
           }
         } else {
           if (type.id != '') {
             this.query = {
-              must: [{ term: { 'type.keyword': type.id } },{ "wildcard": { "images": "*mp4" } }],
+              must: [{ term: { 'type.keyword': type.id } }, { "wildcard": { "images": "*mp4" } }],
 
             };
           } else {
@@ -754,7 +785,7 @@ export class SearchComponent implements OnInit {
 
 
     this.service
-      .searchEntity(this.index, this.size, {"bool": this.query})
+      .searchEntity(this.index, this.size, { "bool": this.query })
       .subscribe((data: any) => {
         console.log(data);
         this.tags = null;
@@ -879,7 +910,7 @@ export class SearchComponent implements OnInit {
     this.index++;
     console.log(this.index);
     this.service
-      .searchEntity(this.index, this.size, {bool: this.query})
+      .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
         data.list.forEach((item: any) => {
           item?._source?.images?.forEach((image: any) => {
