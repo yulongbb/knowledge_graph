@@ -23,7 +23,6 @@ export class DatasetDetailComponent implements OnInit {
   predicate: any;
   @ViewChild('form') form!: XFormComponent;
   controls: XControl[] = [
- 
     {
       control: 'input',
       id: 'name',
@@ -39,16 +38,16 @@ export class DatasetDetailComponent implements OnInit {
       label: '描述',
     },
     {
-      control: 'input',
+      control: 'select',
       id: 'type',
       label: '类型',
-      maxlength: 16
+      data: ['常识','城市','金融','农业','地理','气象','社交','物联网','医疗','娱乐','生活','商业','出行','科教','其它',]
     },
-    {
-      control: 'textarea',
-      id: 'tags',
-      label: '标签',
-    }
+    // {
+    //   control: 'textarea',
+    //   id: 'tags',
+    //   label: '标签',
+    // }
   ];
   title = '';
   get formInvalid() {
@@ -102,6 +101,7 @@ export class DatasetDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
+        console.log(this.form.formGroup.value)
         if (this.type === 'add') {
           this.datasetService
           .post(this.form.formGroup.value)
@@ -109,8 +109,6 @@ export class DatasetDetailComponent implements OnInit {
             this.message.success('新增成功！');
             this.router.navigate(['/index/dataset']);
           });
-
-
         } else if (this.type === 'edit') {
           this.form.formGroup.value['id'] = Number.parseInt(this.id);
           console.log(this.form.formGroup.value);
@@ -126,5 +124,12 @@ export class DatasetDetailComponent implements OnInit {
         this.router.navigate(['/index/dataset']);
         break;
     }
+  }
+
+  uploadSuccess($event: any) {
+    console.log($event.body.name)
+    this.form.formGroup.value['files'] = [$event.body.name]
+    console.log(this.form.formGroup.value)
+
   }
 }

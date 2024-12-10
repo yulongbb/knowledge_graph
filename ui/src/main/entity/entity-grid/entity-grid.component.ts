@@ -15,23 +15,67 @@ declare const canvasDatagrid: any;
 export class EntityGridComponent extends PageBase implements OnInit {
     grid: any;
     @ViewChild('datagridContainer', { static: true }) datagridContainer!: ElementRef;
-    @ViewChild('treeCom') treeCom!: XTreeComponent;
 
     data = [
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
-        { 标签: '', 描述: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
+        { 名称: '', 描述: '', 别名: '', 标签: '' },
     ];
 
-    type:any;
+    type: any;
+
 
     tree = () =>
         this.service
@@ -59,20 +103,21 @@ export class EntityGridComponent extends PageBase implements OnInit {
 
     ngOnInit(): void {
         this.grid = canvasDatagrid();
-        this.grid.style.height = '400px';
+        this.grid.style.height = '800px';
         this.grid.style.width = '100%';
         this.grid.data = this.data;
         this.datagridContainer.nativeElement.appendChild(this.grid);
+    }
 
+    uploadReady($event: any) {
+        console.log('uploadReady', $event);
+      }
+
+    uploadData(){
 
     }
 
-    selectType(type:any){
-        console.log(type)
-        this.type = type;
-    }
-
-    uploadData() {
+    submitData() {
         let data: any = []
         this.data.forEach((d: any) => {
             if (d['标签'] != '') {
@@ -81,7 +126,7 @@ export class EntityGridComponent extends PageBase implements OnInit {
                     "labels": {
                         "zh": {
                             "language": "zh",
-                            "value": d['标签']
+                            "value": d['名称']
                         }
                     },
                     "descriptions": {
@@ -96,18 +141,18 @@ export class EntityGridComponent extends PageBase implements OnInit {
         })
         console.log('上传数据:', data);
 
-        let arr:any = [];
+        let arr: any = [];
 
-        data.forEach((item:any) => {
+        data.forEach((item: any) => {
             arr.push(this.nodeService.post(item))
         });
 
-        forkJoin(arr).subscribe((items:any)=>{
+        forkJoin(arr).subscribe((items: any) => {
             console.log(items)
         })
 
 
-      
+
         // 在这里实现批量入库逻辑，例如通过 HTTP 提交数据
     }
 }

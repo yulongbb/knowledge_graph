@@ -1,18 +1,21 @@
-
-
-
-
-
 <x-inner class="au-inner">
-    <div class="au-panel au-tree-left" style="width: 10rem;">
-        <x-tree #treeCom au-adaption [outerHeight]="100" [data]="tree" expandedLevel="0" [nodeHeight]="1.875"   (activatedChange)="selectType($event)"></x-tree>
-    </div>
-    <div class="au-form-right">
-      <au-tool>
-        <x-buttons [space]="0.5">
-            <button (click)="uploadData()">上传数据</button>
-        </x-buttons>
-      </au-tool>
-      <div #datagridContainer style="height: 400px; width: 100%;"></div>
-    </div>
-  </x-inner>
+  <div class="au-form-right">
+    <au-tool>
+      <div class="row">
+        <x-find label="树单选" [(ngModel)]="type" [treeData]="tree"></x-find>
+      </div>
+      <x-buttons [space]="0.5">
+        <!-- <x-upload  action="http://localhost:3000/api/minio-client/uploadFile" (uploadReady)="uploadReady($event)" [filesTpl]="filesTpl"></x-upload>
+        <ng-template #filesTpl let-files="$files">
+          <ul>
+            @for (file of files; track file.name + file.state) {
+            <li>{{ file.name }} - {{ file.state }}</li>
+            }
+          </ul>
+        </ng-template> -->
+        <!-- <button (click)="submitData()">提交</button> -->
+      </x-buttons>
+    </au-tool>
+    <div #datagridContainer></div>
+  </div>
+</x-inner>

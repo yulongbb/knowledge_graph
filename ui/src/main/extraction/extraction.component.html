@@ -1,62 +1,15 @@
 <au-tool>
-  <div>
-    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
-    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
-  </div>
-  <div>
+  <x-find label="树单选" [(ngModel)]="type" [treeData]="tree"></x-find>
+  <x-select [data]="datasets" [(ngModel)]="dataset" [nodeTpl]="nodeTpl" (ngModelChange)="change($event)"></x-select>
 
-    <x-button type="success" icon="fto-upload" (click)="action('parse')">解析</x-button>
-    <x-button type="success" icon="fto-upload" (click)="action('upload')">上传</x-button>
-  </div>
+  <ng-template #nodeTpl let-node="$node">
+    @if (node) {
+    <span class="select-item"> {{ node.label  }} </span>
+    }
+  </ng-template>
 </au-tool>
 <div class="row">
-  <x-steps [data]="steps()" [activatedIndex]="activated()"> </x-steps>
+  <div #datagridContainer></div>
 </div>
-<div class="row">
-  <x-tabs sliderHidden [activatedIndex]="activated()">
-    <x-tab>
-      <div class="custom-steps-content">
-        <div style="width: 100%; display: flex; align-items: center; justify-content: center">
-          <x-input-group compact>
-            <x-textarea height="200px" [style.width.%]="100" placeholder="数据解析" [(ngModel)]="keyword"></x-textarea>
-          </x-input-group>
-        </div>
 
-        <x-table #tableCom [columns]="columns" [rowHeight]="35" [data]="data" [size]="100" [(index)]="index"
-          [query]="query" [bodyColumnTpl]="{ actions: actionsTpl, icon: iconTpl }" loading [allowSelectRow]="true"
-          (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)"></x-table>
 
-        <ng-template #actionsTpl let-column="$column" let-row="$row">
-          <div class="au-table-actions">
-            <x-link icon="fto-eye" (click)="action('info', row)" title="查看"></x-link>
-            <x-link icon="fto-edit" (click)="action('edit', row)" title="修改"></x-link>
-            <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除"></x-link>
-          </div>
-        </ng-template>
-
-        <ng-template #iconTpl let-column="$column" let-row="$row">
-          <x-icon *ngIf="row.icon" [type]="row.icon"></x-icon>
-        </ng-template>
-
-      </div>
-    </x-tab>
-    <x-tab>
-      <div class="custom-steps-content">
-        <app-entity-detail *ngFor="let i of items()" [name]="i"></app-entity-detail>
-      </div>
-    </x-tab>
-    <x-tab>
-      <div class="custom-steps-content">
-        <app-property-detail *ngFor="let p of properties2()" [name]="p"></app-property-detail>
-      </div>
-    </x-tab>
-    
-  </x-tabs>
-</div>
-<div class="row">
-  <x-buttons space="1">
-    <x-button (click)="pre()">Previous</x-button>
-    <x-button (click)="next()">Next step</x-button>
-    <x-button type="primary" (click)="done()">Submit</x-button>
-  </x-buttons>
-</div>
