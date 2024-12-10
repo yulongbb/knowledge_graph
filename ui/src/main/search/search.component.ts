@@ -376,7 +376,7 @@ export class SearchComponent implements OnInit {
               this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
-          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService
