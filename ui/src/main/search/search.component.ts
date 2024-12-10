@@ -46,7 +46,7 @@ export class SearchComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 10, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 6, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
@@ -57,9 +57,24 @@ export class SearchComponent implements OnInit {
   currentVideoSrc: any; // 当前视频路径
   scrollTimeout: any; // 防止快速滚动
 
+
+  constructor(
+    private sanitizer: DomSanitizer,
+    private service: EsService,
+    private ontologyService: OntologyService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    public propertyService: PropertyService,
+    private entityService: EntityService,
+    private dialogSewrvice: XDialogService
+  ) { }
+
+  ngOnInit(): void {
+  }
+
+
   // 处理鼠标滚动事件
   videoScroll(event: WheelEvent): void {
-    console.log(123)
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout); // 避免重复触发
     }
@@ -73,8 +88,6 @@ export class SearchComponent implements OnInit {
     }, 200); // 设置防抖时间
   }
 
-
-  
 
   // 切换到下一视频
   nextVideo(): void {
@@ -100,19 +113,6 @@ export class SearchComponent implements OnInit {
   get transitionStyle(): string {
     return `translateY(-${this.currentVideoIndex * 100}%)`;
   }
-  constructor(
-    private sanitizer: DomSanitizer,
-    private service: EsService,
-    private ontologyService: OntologyService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    public propertyService: PropertyService,
-    private entityService: EntityService,
-    private dialogSewrvice: XDialogService
-  ) { }
-
-  ngOnInit(): void {
-  }
 
   onMapReady(map: any) {
     // 设置拖动边界（限制地图范围）
@@ -121,8 +121,6 @@ export class SearchComponent implements OnInit {
     const bounds = L.latLngBounds(southWest, northEast);
 
     map.setMaxBounds(bounds);
-    map.fitBounds(bounds)
-
   }
   // 地图点击事件处理函数
   onMapClick(event: any) {
@@ -140,7 +138,6 @@ export class SearchComponent implements OnInit {
         }
       })
       .subscribe((data: any) => {
-        console.log(data.list);
         this.entities = data.list;
         this.entities = data.list;
         let menu: any = [];
@@ -164,7 +161,6 @@ export class SearchComponent implements OnInit {
           });
           menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
           this.types = menuMerge;
-          console.log(menuMerge);
         });
 
         data.list.forEach((entity: any) => {
@@ -172,8 +168,6 @@ export class SearchComponent implements OnInit {
           this.markers.push(newMarker);
         });
       });
-    // 添加新的标记到标记数组
-    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
   }
 
 
@@ -187,7 +181,126 @@ export class SearchComponent implements OnInit {
     this.menu = signal(menu.label);
   }
 
-  search(keyword: any) {
+
+
+  search() {
+    this.service
+      .searchEntity(this.index, this.size, { bool: this.query })
+      .subscribe((data: any) => {
+        this.tags = null;
+        this.types = null;
+        this.images = [];
+        this.videos = [];
+        this.pdfs = [];
+        this.markers = [];
+
+        data.list.forEach((item: any) => {
+          if (item._source.location) {
+            const newMarker = marker([item._source.location.lat, item._source.location.lon]);
+            this.markers.push(newMarker);
+          }
+
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'pdf'
+            ) {
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
+            }
+          });
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
+          this.ontologyService.get(item._source.type).subscribe((t: any) => {
+            item._type = t.label;
+            this.ontologyService
+              .getAllParentIds(item['_source'].type)
+              .subscribe((parents: any) => {
+                parents.push(item['_source'].type);
+                this.propertyService
+                  .getList(1, 50, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                      { field: 'isPrimary', value: true, operation: '=' },
+                    ],
+                  })
+                  .subscribe((p: any) => {
+                    this.entityService
+                      .getLinks(1, 20, item['_id'], {})
+                      .subscribe((c: any) => {
+                        let statements: any = [];
+                        c.list.forEach((path: any) => {
+                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                            path.edges[0].mainsnak.datavalue.value.id =
+                              path?.vertices[1]?.id;
+                            path.edges[0].mainsnak.datavalue.value.label =
+                              path?.vertices[1]?.labels?.zh?.value;
+                          }
+                          if (
+                            p.list?.filter(
+                              (property: any) =>
+                                path.edges[0].mainsnak.property ==
+                                `P${property.id}`
+                            ).length > 0
+                          ) {
+                            statements.push(path.edges[0]);
+                          }
+                        });
+                        item.claims = statements;
+                      });
+                  });
+              });
+          });
+        });
+        this.entities = data.list;
+        let menu: any = [];
+        let arr: any = [];
+        data.types.forEach((m: any) => {
+          arr.push(this.ontologyService.get(m.key));
+        });
+        forkJoin(arr).subscribe((properties: any) => {
+          data.types.forEach((m: any) => {
+            menu.push({
+              id: m.key,
+              label: properties.filter((p: any) => p.id == m.key)[0].name,
+            });
+          });
+          let menuMerge = [];
+          menuMerge = data.types.map((m: any, index: any) => {
+            return { ...m, ...menu[index] };
+          });
+          menuMerge.forEach((m: any) => {
+            m.label = m.label + '(' + m.doc_count + ')';
+          });
+          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          this.types = menuMerge;
+        });
+        let tags: any = [];
+        data.tags.forEach((t: any) => {
+          tags.push(t.key);
+        });
+        this.tags = tags;
+      });
+  }
+
+  selectKeyword(keyword: any) {
     this.keyword = keyword;
     this.index = 1;
     switch (this.menu()) {
@@ -345,121 +458,48 @@ export class SearchComponent implements OnInit {
           };
         }
         break;
+      case '地图':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': keyword } }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': keyword } },],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          }
+        } else {
+          this.query = {
+            should: [{ "exists": { "field": "location" } }],
+          };
+        }
+        break;
       default:
         this.query = {};
         break;
     }
-    this.service
-      .searchEntity(this.index, this.size, { bool: this.query })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.tags = null;
-        this.types = null;
-        this.images = [];
-        this.videos = [];
-        this.pdfs = [];
-        data.list.forEach((item: any) => {
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
+    this.search();
 
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            console.log(path);
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                        console.log(item);
-                      });
-                  });
-              });
-          });
-        });
-        this.entities = data.list;
-        let menu: any = [];
-        let arr: any = [];
-        data.types.forEach((m: any) => {
-          arr.push(this.ontologyService.get(m.key));
-        });
-        forkJoin(arr).subscribe((properties: any) => {
-          data.types.forEach((m: any) => {
-            menu.push({
-              id: m.key,
-              label: properties.filter((p: any) => p.id == m.key)[0].name,
-            });
-          });
-          let menuMerge = [];
-          menuMerge = data.types.map((m: any, index: any) => {
-            return { ...m, ...menu[index] };
-          });
-          menuMerge.forEach((m: any) => {
-            m.label = m.label + '(' + m.doc_count + ')';
-          });
-          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
-          this.types = menuMerge;
-          console.log(menuMerge);
-        });
-        let tags: any = [];
-        data.tags.forEach((t: any) => {
-          tags.push(t.key);
-        });
-        this.tags = tags;
-      });
   }
 
   selectTag(tag: any) {
@@ -483,106 +523,13 @@ export class SearchComponent implements OnInit {
       } else {
         this.query = {};
       }
-
     }
-    console.log(this.query)
-    this.index = 1;
-    this.service
-      .searchEntity(this.index, this.size, { bool: this.query })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.tags = null;
-
-        this.images = [];
-        this.videos = [];
-        this.pdfs = [];
-        data.list.forEach((item: any) => {
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            console.log(path);
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                        console.log(item);
-                      });
-                  });
-              });
-          });
-        });
-        this.entities = data.list;
-
-        let tags: any = [];
-        data.tags.forEach((t: any) => {
-          tags.push(t.key);
-        });
-        this.tags = tags;
-      });
+    this.search();
   }
 
   selectType(type: any) {
     this.type = type;
     this.index = 1;
-    console.log(type)
-
     switch (this.menu()) {
       case '知识':
         if (this.keyword != '') {
@@ -729,10 +676,8 @@ export class SearchComponent implements OnInit {
           } else {
             this.query = {
               must: [{ "wildcard": { "images": "*mp4" } }],
-
             };
           }
-
         }
         break;
       case '文件':
@@ -781,108 +726,61 @@ export class SearchComponent implements OnInit {
           }
         }
         break;
+      case '地图':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          }
+        } else {
+
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [{ "exists": { "field": "location" } }],
+
+            };
+          } else {
+            this.query = {
+              should: [{ "exists": { "field": "location" } }],
+
+            };
+          }
+        }
+        break;
       default:
         this.query = {};
         break;
     }
 
-    console.log(this.query);
-
-
-    this.service
-      .searchEntity(this.index, this.size, { "bool": this.query })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.tags = null;
-
-        this.images = [];
-        this.videos = [];
-        this.pdfs = [];
-        data.list.forEach((item: any) => {
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            console.log(path);
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                        console.log(item);
-                      });
-                  });
-              });
-          });
-        });
-        this.entities = data.list;
-
-        let tags: any = [];
-        data.tags.forEach((t: any) => {
-          tags.push(t.key);
-        });
-        this.tags = tags;
-      });
+    this.search();
   }
 
   action(type: string, item?: any) {
-    console.log(item);
-
     switch (type) {
       case 'info':
         this.router
@@ -913,7 +811,6 @@ export class SearchComponent implements OnInit {
 
   onScroll() {
     this.index++;
-    console.log(this.index);
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
@@ -927,7 +824,6 @@ export class SearchComponent implements OnInit {
             ) {
               this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             }
-
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
@@ -965,7 +861,6 @@ export class SearchComponent implements OnInit {
                         let statements: any = [];
                         c.list.forEach((path: any) => {
                           if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            console.log(path);
                             path.edges[0].mainsnak.datavalue.value.id =
                               path?.vertices[1]?.id;
                             path.edges[0].mainsnak.datavalue.value.label =
@@ -982,7 +877,6 @@ export class SearchComponent implements OnInit {
                           }
                         });
                         item.claims = statements;
-                        console.log(item);
                       });
                   });
               });
