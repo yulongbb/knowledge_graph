@@ -73,6 +73,9 @@ export class SearchComponent implements OnInit {
     }, 200); // 设置防抖时间
   }
 
+
+  
+
   // 切换到下一视频
   nextVideo(): void {
     if (this.currentVideoIndex < this.videos.length - 1) {
@@ -94,7 +97,9 @@ export class SearchComponent implements OnInit {
     this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
-
+  get transitionStyle(): string {
+    return `translateY(-${this.currentVideoIndex * 100}%)`;
+  }
   constructor(
     private sanitizer: DomSanitizer,
     private service: EsService,
@@ -376,7 +381,7 @@ export class SearchComponent implements OnInit {
               this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
             }
           });
-          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
           this.ontologyService.get(item._source.type).subscribe((t: any) => {
             item._type = t.label;
             this.ontologyService

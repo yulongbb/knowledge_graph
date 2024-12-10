@@ -74,7 +74,6 @@
 }
 @case ('视频') {
 
-{{currentVideoSrc}}
 <div *ngIf="videos" class="video-scroll-container" (wheel)="videoScroll($event)">
   <video 
     #videoPlayer
