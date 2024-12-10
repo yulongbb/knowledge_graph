@@ -56,8 +56,8 @@ export class DatasetComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'actions', label: '操作', width: 100, left: 0 },
-    { id: 'name', label: '名称', flex: 0.5, sort: true },
-    { id: 'content', label: '描述', flex: 2.5, sort: true },
+    { id: 'label', label: '名称', flex: 0.5, sort: true },
+    { id: 'description', label: '描述', flex: 2.5, sort: true },
   ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
 

@@ -6,7 +6,7 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { XButtonModule, XInputModule, XTagModule, XTreeModule } from '@ng-nest/ui';
+import { XButtonModule, XInputModule, XTagModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
@@ -32,6 +32,7 @@ import { DatasetDetailComponent } from './dataset-detail/dataset-detail.componen
     XListModule,
     XTableModule,
     XCardModule,
+    XUploadModule,
     XCrumbModule,
     XTagModule,
     XButtonModule,

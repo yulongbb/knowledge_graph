@@ -1,14 +1,17 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
 import { XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
 import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, map, tap } from 'rxjs';
+import { forkJoin, map, Observable, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
 import { EsService } from '../search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { DatasetService } from '../dataset/dataset.sevice';
+declare const canvasDatagrid: any;
 
 
 @Component({
@@ -17,6 +20,29 @@ import { EntityService } from 'src/main/entity/entity.service';
   styleUrls: ['./extraction.component.scss'],
 })
 export class ExtractionComponent extends PageBase {
+  grid: any;
+  @ViewChild('datagridContainer', { static: true }) datagridContainer!: ElementRef;
+
+  data = [
+
+  ];
+
+
+  type: any;
+
+
+  tree = () =>
+    this.ontologyService
+      .getList(1, Number.MAX_SAFE_INTEGER, {
+        sort: [
+          { field: 'pid', value: 'asc' },
+          { field: 'sort', value: 'asc' },
+        ],
+      })
+      .pipe(
+        tap((x) => (console.log(x))),
+        map((x) => x.list)
+      );
 
   index = 1;
   keyword: any = '';
@@ -38,38 +64,47 @@ export class ExtractionComponent extends PageBase {
 
   done() { }
 
-  data = (index: number, size: number, query: any) =>
-    this.service.getList(index, size, query).pipe(
-      tap((x) => {
-        console.log(x.list)
 
-        let result: any = []
-        let properties = new Set();
-        let items = new Set();
-        x.list?.forEach((e: any) => {
-          properties.add(e.property);
-          items.add(e.subject);
-        })
-        let arr: any = [];
-        properties.forEach((p: any) => {
-          arr.push(this.propertyService.getPropertyByName(p))
-        })
-        forkJoin(arr).subscribe((data: any) => {
-          data.forEach((ds: any) => {
-            ds.forEach((d: any) => {
-              result.push(d);
-            })
-          })
-          console.log(items)
-          this.properties = result;
-          this.properties2 = signal(properties);
-          this.items = signal(items);
-        })
-
-      }),
-      map((x) => x)
-
+  dataset: any;
+  datasets = (index: number, size: number, query: any) =>
+    this.datasetService.getList(index, size, query).pipe(
+      tap((x: any) => console.log(x.list)),
+      map((x: any) => x.list)
     );
+
+  // data = (index: number, size: number, query: any) =>
+  //   this.service.getList(index, size, query).pipe(
+  //     tap((x) => {
+  //       console.log(x.list)
+
+  //       let result: any = []
+  //       let properties = new Set();
+  //       let items = new Set();
+  //       x.list?.forEach((e: any) => {
+  //         properties.add(e.property);
+  //         items.add(e.subject);
+  //       })
+  //       let arr: any = [];
+  //       properties.forEach((p: any) => {
+  //         arr.push(this.propertyService.getPropertyByName(p))
+  //       })
+  //       forkJoin(arr).subscribe((data: any) => {
+  //         data.forEach((ds: any) => {
+  //           ds.forEach((d: any) => {
+  //             result.push(d);
+  //           })
+  //         })
+  //         console.log(items)
+  //         this.properties = result;
+  //         this.properties2 = signal(properties);
+  //         this.items = signal(items);
+  //       })
+
+  //     }),
+  //     map((x) => x)
+  //   );
+
+
   checkedRows: XTableRow[] = [];
 
   columns: XTableColumn[] = [
@@ -84,6 +119,9 @@ export class ExtractionComponent extends PageBase {
 
   constructor(
     public override indexService: IndexService,
+    private ontologyService: OntologyService,
+    private datasetService: DatasetService,
+
     private service: ExtractionService,
     private propertyService: PropertyService,
     private esService: EsService,
@@ -95,6 +133,49 @@ export class ExtractionComponent extends PageBase {
   ) {
     super(indexService);
   }
+
+  ngOnInit(): void {
+    this.grid = canvasDatagrid();
+    this.grid.style.height = '800px';
+    this.grid.style.width = '100%';
+    this.grid.data = this.data;
+    this.datagridContainer.nativeElement.appendChild(this.grid);
+  }
+
+  change(value: string) {
+    console.log(value);
+    this.datasetService.get(value).subscribe((x: any) => {
+      console.log('http://localhost:9000/kgms/' + x.files[0])
+      this.fetchJson('http://localhost:9000/kgms/' + x.files[0]).then((data: Array<any>) => {
+        this.grid.data = data.slice(0, 100).map(item => {
+          const { _id, ...rest } = item; // 解构赋值，排除 _id
+          return rest;
+      });
+      }).catch(error => {
+        console.error('Error fetching JSON:', error);
+      });
+    });
+  }
+
+  async fetchJson(url: string): Promise<any> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text(); // 获取整个文件的文本内容
+      const lines = text.split('\n').filter(line => line.trim() !== ''); // 按行分割，并去除空行
+
+      return lines.map(line => JSON.parse(line)); // 解析每一行作为一个独立的JSON对象
+    } catch (error) {
+      console.error('Failed to fetch or parse JSONL:', error);
+      throw error;
+    }
+  }
+
+  // 使用方法
+
 
 
   setCheckedRows(checked: boolean, row: XTableRow) {
@@ -172,7 +253,7 @@ export class ExtractionComponent extends PageBase {
               let query = { "must": [{ "term": { "labels.zh.value.keyword": this.checkedRows[0]['subject'] } },] }
 
               console.log(query)
-              this.esService.searchEntity(1, 10, {bool:query}).subscribe((e: any) => {
+              this.esService.searchEntity(1, 10, { bool: query }).subscribe((e: any) => {
                 console.log(e.list[0]._source);
                 let edges: any = []
                 this.checkedRows.forEach((row: any) => {

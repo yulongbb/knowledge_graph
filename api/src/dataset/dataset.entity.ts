@@ -6,10 +6,10 @@ export class Dataset {
   id: number;
 
   @Column('text', { nullable: true })
-  name: string;
+  label: string;
 
   @Column('text', { nullable: true })
-  content: string;
+  description: string;
 
   @Column('text', { nullable: true })
   type: string;

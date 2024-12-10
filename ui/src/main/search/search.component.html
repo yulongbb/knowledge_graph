@@ -9,8 +9,8 @@
   <x-input-group compact size="big">
     <x-select [(ngModel)]="way" [data]="waies()" [style.width.%]="20"></x-select>
 
-    <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
-    <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
+    <x-input [style.width.%]="100" placeholder="搜索知识" [(ngModel)]="keyword" (keyup.enter)="selectKeyword(keyword)"></x-input>
+    <x-button size="big" icon="fto-search" (click)="selectKeyword(keyword)"></x-button>
   </x-input-group>
 </div>
 <x-menu *ngIf="types" size="small" [data]="types" (nodeClick)="selectType($event)"> </x-menu>
@@ -74,7 +74,6 @@
 }
 @case ('视频') {
 
-{{currentVideoSrc}}
 <div *ngIf="videos" class="video-scroll-container" (wheel)="videoScroll($event)">
   <video 
     #videoPlayer
@@ -124,7 +123,7 @@
 }
 
 @case ('地图') {
-<div style="height: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+<div style="height: 100%; width: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
   [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)">
 </div>
 }

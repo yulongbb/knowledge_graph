@@ -157,7 +157,9 @@
   }
 
   .video-scroll-container {
-    height: 100vh;
+    margin: 0 auto;;
+    width: 500px;
+    height: 800px;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -170,6 +172,8 @@
     max-height: 100%;
     outline: none;
     border-radius: 8px;
+    object-fit: cover;
+
   }
   
 
