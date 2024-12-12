@@ -1,10 +1,13 @@
 <au-tool>
-  <x-select [data]="datasets" [(ngModel)]="dataset" (ngModelChange)="change($event)"></x-select>
-  <x-button type="success" icon="fto-upload" (click)="action('upload')">导入</x-button>
+  <x-select [data]="datasets" [(ngModel)]="dataset" (ngModelChange)="selectDataset($event)"></x-select>
+  <x-button type="success" icon="fto-upload" (click)="import()">导入</x-button>
 </au-tool>
-<div class="row">
-  <au-tool>
-    <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
+
+<x-row>
+  <x-col span="4">
+    
+    <div class="row" *ngIf="properties">
+      <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
       [tableData]="grid.schema"></x-find>
     <x-find label="描述" columnLabel="name" direction="row" [(ngModel)]="description" [tableColumns]="tableColumns()"
       [tableData]="grid.schema"></x-find>
@@ -16,18 +19,8 @@
       [tableData]="grid.schema"></x-find>
     <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
       [tableData]="grid.schema"></x-find>
-  </au-tool>
-
-
-
-</div>
-<x-row>
-  <x-col span="4">
-    <div class="row">
-      <x-checkbox [data]="checkAllData()" [(ngModel)]="checkAll" (ngModelChange)="change2($event)"
+      <x-checkbox [data]="checkAllData()" [(ngModel)]="checkAll" (ngModelChange)="change($event)"
         [indeterminate]="indeterminate()" single></x-checkbox>
-    </div>
-    <div class="row">
       <x-checkbox vertical [data]="properties" [(ngModel)]="model" (ngModelChange)="itemChange($event)"></x-checkbox>
     </div>
   </x-col>

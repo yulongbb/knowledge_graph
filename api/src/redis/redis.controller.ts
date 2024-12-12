@@ -17,7 +17,6 @@ export class RedisController {
     return await this.redisService.getValue(key);
   }
 
-
   @Post('number')
   async getNumber(@Body() ids: any,) {
     return await this.redisService.getNumber(ids);

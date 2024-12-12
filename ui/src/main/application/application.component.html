@@ -36,11 +36,11 @@
   <div class="row" *ngFor="let entity of entities">
     <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
       <ng-template #header>
-        <x-link type="primary" *ngIf="!entity['highlight']"
-          (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link>
+        <!-- <x-link type="primary" *ngIf="!entity['highlight']"
+          (click)="action('info', entity)">{{entity['_source']?.labels?.zh?.value}}</x-link> -->
 
-        <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
-          [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
+        <!-- <x-link *ngIf="entity['highlight']" (click)="action('info', entity)"
+          [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span> -->
       </ng-template>
       <div class="bottom">
         <x-text-retract *ngIf="!entity['highlight']" max="100"

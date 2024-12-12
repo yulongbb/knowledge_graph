@@ -54,7 +54,7 @@ export class ApplicationComponent extends PageBase {
           })
           .subscribe((p: any) => {
             console.log(p.list[0].id);
-            item.ontologies = p.list.map((o:any)=> o.id);
+            item.ontologies = p?.list?.map((o:any)=> o?.id);
           });
 
         })

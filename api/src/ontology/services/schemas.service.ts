@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SchemasService extends XRepositoryService<Schema, XQuery> {
+
   constructor(
     @InjectRepository(Schema)
     public readonly schemasRepository: Repository<Schema>,
@@ -21,6 +22,10 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     return parentIds;
   }
 
+  async getByName(type: any): Promise<Schema> {
+    const schema = await this.schemasRepository.findOneBy({ name: type });
+    return schema;
+  }
 
   async getChildren(schemaId: string): Promise<string[]> {
     const children: any = [];

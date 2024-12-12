@@ -3,6 +3,7 @@ import { Database, aql } from 'arangojs';
 import { XIdType } from 'src/core';
 import { EsService } from './es.service';
 import { PropertiesService } from 'src/ontology/services/properties.service';
+import { SchemasService } from 'src/ontology/services/schemas.service';
 
 @Injectable()
 export class KnowledgeService {
@@ -11,6 +12,7 @@ export class KnowledgeService {
 
     private elasticsearchService: EsService,
     private propertiesService: PropertiesService,
+    private readonly schemasService: SchemasService
 
   ) { }
 
@@ -141,6 +143,15 @@ export class KnowledgeService {
           modified: new Date().toISOString(),
           id: entity.type.id,
         };
+
+        if(!entity.type.id){
+          const schema = await this.schemasService.getByName(entity.type);
+          entity.type = {id: schema.id, name: schema.name };
+          console.log(entity.type)
+
+        }
+
+        
 
         document.document(entity.type.id).then(
           (updatedDocument) => {
