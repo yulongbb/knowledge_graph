@@ -2,7 +2,7 @@ import { PageBase } from 'src/share/base/base-page';
 import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
-import { XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow } from '@ng-nest/ui';
+import { XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow, XTransferNode } from '@ng-nest/ui';
 import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -23,26 +23,11 @@ export class ExtractionComponent extends PageBase {
   grid: any;
   @ViewChild('datagridContainer', { static: true }) datagridContainer!: ElementRef;
 
-  data = [
-
-  ];
-
-
+  data = [];
   type: any;
 
 
-  tree = () =>
-    this.ontologyService
-      .getList(1, Number.MAX_SAFE_INTEGER, {
-        sort: [
-          { field: 'pid', value: 'asc' },
-          { field: 'sort', value: 'asc' },
-        ],
-      })
-      .pipe(
-        tap((x) => (console.log(x))),
-        map((x) => x.list)
-      );
+
 
   index = 1;
   keyword: any = '';
@@ -72,6 +57,20 @@ export class ExtractionComponent extends PageBase {
       map((x: any) => x.list)
     );
 
+
+  value = signal([1, 3, 7]);
+
+  tableColumns = signal<XTableColumn[]>([
+    { id: 'id', label: '序号', type: 'index', width: 80 },
+    { id: 'name', label: '用户', flex: 1, sort: true },
+  ]);
+
+  label: any;
+  description: any;
+  aliase: any;
+  category: any;
+  tags: any;
+  images:any;
   // data = (index: number, size: number, query: any) =>
   //   this.service.getList(index, size, query).pipe(
   //     tap((x) => {
@@ -109,13 +108,18 @@ export class ExtractionComponent extends PageBase {
 
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-    { id: 'index', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'actions', label: '操作', width: 100 },
+    { id: 'name', label: '序号', flex: 0.5, left: 0, type: 'index' },
+    { id: 'title', label: '操作', width: 100 },
     { id: 'subject', label: '实体', flex: 1, sort: true },
     { id: 'property', label: '属性', flex: 0.5, sort: true },
     { id: 'object', label: '值', flex: 1 },
   ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
+
+  model: any;
+  checkAllData = signal(['全选']);
+  checkAll = signal(false);
+  indeterminate = signal(true);
 
   constructor(
     public override indexService: IndexService,
@@ -142,15 +146,26 @@ export class ExtractionComponent extends PageBase {
     this.datagridContainer.nativeElement.appendChild(this.grid);
   }
 
+  change2(value: boolean) {
+    this.model.set(value ? this.properties.map((x: any) => x) : []);
+    this.indeterminate.set(false);
+  }
+
+  itemChange(value: string[]) {
+    this.checkAll.set(value.length === this.properties.length);
+    this.indeterminate.set(value.length > 0 && value.length < this.properties.length);
+  }
+
   change(value: string) {
     console.log(value);
     this.datasetService.get(value).subscribe((x: any) => {
-      console.log('http://localhost:9000/kgms/' + x.files[0])
       this.fetchJson('http://localhost:9000/kgms/' + x.files[0]).then((data: Array<any>) => {
-        this.grid.data = data.slice(0, 100).map(item => {
+        this.grid.data = data.map(item => {
           const { _id, ...rest } = item; // 解构赋值，排除 _id
           return rest;
-      });
+        });
+        console.log(this.grid.schema)
+        this.properties = this.grid.schema.map((p: any) => p.name);
       }).catch(error => {
         console.error('Error fetching JSON:', error);
       });
