@@ -128,7 +128,7 @@ export class ExtractionComponent extends PageBase {
     console.log(value);
     this.datasetService.get(value).subscribe((x: any) => {
       this.fetchJson('http://localhost:9000/kgms/' + x.files[0]).then((data: Array<any>) => {
-        this.grid.data = data.slice(0,10).map(item => {
+        this.grid.data = data.map(item => {
           const { _id, ...rest } = item; // 解构赋值，排除 _id
           return rest;
         });
@@ -158,20 +158,34 @@ export class ExtractionComponent extends PageBase {
   }
 
   import() {
-    // console.log(this.label.name)
-    // console.log(this.description.name)
-    // console.log(this.aliase.name)
-    // console.log(this.category.name)
-    // console.log(this.tags.name)
-    // console.log(this.images.name)
-    // console.log(this.model().filter((p: string) => [
-    //   this.label.name,
-    //   this.description.name,
-    //   this.aliase.name,
-    //   this.category.name,
-    //   this.tags.name,
-    //   this.images.name,
-    // ].indexOf(p) <0))
+
+    let props = this.model().filter((p: string) => [
+      this.label?.name,
+      this.description?.name,
+      this.aliase?.name,
+      this.category?.name,
+      this.tags?.name,
+      this.images?.name,
+    ].indexOf(p) < 0)
+    console.log(props);
+    // let link = {
+    //   "mainsnak": {
+    //     "snaktype": "value",
+    //     "property": "P31",
+    //     "datavalue": {
+    //       "value": {
+    //         "entity-type": "item",
+    //         "numeric-id": 52288878,
+    //         "id": "52288878"
+    //       },
+    //       "type": "wikibase-entityid"
+    //     },
+    //     "datatype": "wikibase-item"
+    //   },
+    //   "type": "statement",
+    //   "rank": "normal"
+    // }
+
     let data: any = []
     this.grid.data.forEach((row: any) => {
       let entity: any = {};
@@ -219,44 +233,44 @@ export class ExtractionComponent extends PageBase {
           entity["type"] = row[this.category.name]
         }
       }
-      if (this.tags?.name) {
-        if (row[this.tags.name] != '') {
-          entity["tags"] = [row[this.tags.name]]
+      entity["tags"] = []
+      this.tags?.forEach((tag: any) => {
+        if (tag.name) {
+          if (row[tag.name] != '') {
+            entity["tags"].push(row[tag.name])
+          }
         }
-      }
+      });
+
       if (this.images?.name) {
         if (row[this.images.name] != '') {
           entity["images"] = [row[this.images.name]]
         }
       }
+      entity['claims'] = {}
+      props.forEach((prop: any) => {
+        if (row[prop]) {
+          entity['claims'][prop] = [];
+          entity['claims'][prop].push(
+            {
+              "mainsnak": {
+                "snaktype": "value",
+                "property": prop,
+                "datavalue": {
+                  "value": row[prop],
+                  "type": "wikibase-entityid"
+                },
+                "datatype": "wikibase-item"
+              },
+              "type": "statement",
+              "rank": "normal"
+            }
+          )
+        }
 
+      })
+      console.log(entity)
       data.push(entity)
-
-      // let entity = {
-      //   "labels": {
-      //     "zh": {
-      //       "language": "zh",
-      //       "value": data[this.label.name]
-      //     }
-      //   },
-      //   "descriptions": {
-      //     "zh": {
-      //       "language": "zh",
-      //       "value": "通货"
-      //     }
-      //   },
-      //   "aliases": {
-      //     "zh": [
-      //       {
-      //         "language": "zh",
-      //         "value": "通货"
-      //       }
-      //     ]
-      //   },
-      // };
-
-
-
     });
 
     this.nodeService.import(data).subscribe((res: any) => {

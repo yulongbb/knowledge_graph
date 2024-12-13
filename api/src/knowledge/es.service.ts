@@ -19,6 +19,12 @@ export class EsService {
       index: this.defaultIndex, body: params})
     return { total: data['hits']['total']['value'], list: data['hits']['hits'], types: data['aggregations']['types']['buckets'],tags: data['aggregations']['tags']['buckets'] };
   }
+  
+  async query(params: any) {
+    let data = await this.elasticsearchService.search({
+      index: this.defaultIndex, body: params})
+    return data.hits.hits[0];
+  }
 
   async bulk(doc: any) {
     return await this.elasticsearchService.bulk({

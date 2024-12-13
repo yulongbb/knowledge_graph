@@ -15,6 +15,7 @@ import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { XTagModule } from '@ng-nest/ui/tag';
 import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { XMessageBoxService } from '@ng-nest/ui/message-box';
+import { LeafletModule } from '@bluehalo/ngx-leaflet';
 
 
 
@@ -40,6 +41,8 @@ import { XMessageBoxService } from '@ng-nest/ui/message-box';
     XUploadModule,
     XCheckboxModule,
     XAutoCompleteModule,
+    LeafletModule,
+
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),

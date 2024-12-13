@@ -4,7 +4,7 @@
 </au-tool>
 
 <x-row>
-  <x-col span="4">
+  <x-col span="8">
     
     <div class="row" *ngIf="properties">
       <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
@@ -16,7 +16,7 @@
     <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
       [tableData]="grid.schema"></x-find>
     <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
+      [tableData]="grid.schema" multiple></x-find>
     <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
       [tableData]="grid.schema"></x-find>
       <x-checkbox [data]="checkAllData()" [(ngModel)]="checkAll" (ngModelChange)="change($event)"
@@ -24,7 +24,7 @@
       <x-checkbox vertical [data]="properties" [(ngModel)]="model" (ngModelChange)="itemChange($event)"></x-checkbox>
     </div>
   </x-col>
-  <x-col span="20">
+  <x-col span="16">
     <div #datagridContainer></div>
   </x-col>
 </x-row>

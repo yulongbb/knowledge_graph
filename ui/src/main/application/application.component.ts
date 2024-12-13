@@ -10,6 +10,9 @@ import { PropertyService } from '../ontology/property/property.service';
 import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
+import { forkJoin } from 'rxjs';
+import { latLng, marker, Marker, tileLayer } from 'leaflet';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-application',
@@ -18,24 +21,43 @@ import { TagService } from 'src/main/ontology/tag/tag.sevice';
 })
 export class ApplicationComponent implements OnInit {
   way = '默认检索';
+
+  menus = signal(['知识', '图片', '视频', '文件', '地图']);
   menu: any = signal('知识');
+
+  query: any = {};
+
+
   keyword = '';
+
+
   size = 10;
   index = 1;
+
+  types: any;
+  type: any;
+  tags!: Map<string, Array<string>>;
+  tag: any;
+
   entities: any;
   images!: any;
   videos!: any;
   pdfs!: any;
-  query: any = {};
-  types: any;
-  type: any;
-  tags: Map<string, Array<string>> | undefined;
-  tag: any;
-  data = signal(['知识', '图片', '视频', '文件']);
-  category: any;
 
-  ts= [];
+  options = {
+    layers: [
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 6, minZoom: 1, attribution: '...' })
+    ],
+    zoom: 3,
+    center: latLng(46.879966, -121.726909)
+  };
 
+  markers: Marker[] = [];
+  currentVideoIndex = 0; // 当前视频索引
+  currentVideoSrc: any; // 当前视频路径
+  scrollTimeout: any; // 防止快速滚动
+
+  category:any;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -55,30 +77,7 @@ export class ApplicationComponent implements OnInit {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
       let id = x.get('id') as string;
       console.log(id)
-      this.ontologyService
-        .getAllParentIds(id)
-        .subscribe((parents: any) => {
-          parents.push(id);
-          this.tagService
-            .getList(1, 500, {
-              filter: [
-                {
-                  field: 'id',
-                  value: parents as string[],
-                  relation: 'schemas',
-                  operation: 'IN',
-                },
-              ],
-            })
-            .subscribe((data: any) => {
-              let tags: any = {};
-              data.list.forEach((tag: any) => {
-                tags[tag.type] = tags[tag.type] ?? [];
-                tags[tag.type].push(tag.name);
-              });
-              this.tags = tags;
-            });
-        });
+      
       this.ontologyService
         .getChildren(id).subscribe((data: any) => {
           console.log(data);
@@ -92,18 +91,99 @@ export class ApplicationComponent implements OnInit {
               }
             }
           })
-          this.category = menu.map((m: any) => m.id);
-          this.category.unshift(id)
-
-          menu.unshift({ id: '', label: '全部' });
-          this.types = signal(menu)
-          this.search(this.keyword);
+          console.log(menu)
+          // this.category = menu.map((m: any) => m.id);
+          // this.category.unshift(id)
+          this.types = menu
+        
+          this.selectType(menu[0]);
         })
     });
   }
 
+  
+
+  // 处理鼠标滚动事件
+  videoScroll(event: WheelEvent): void {
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout); // 避免重复触发
+    }
+
+    this.scrollTimeout = setTimeout(() => {
+      if (event.deltaY > 0) {
+        this.nextVideo(); // 向下滚动，切换到下一视频
+      } else if (event.deltaY < 0) {
+        this.prevVideo(); // 向上滚动，切换到上一视频
+      }
+    }, 200); // 设置防抖时间
+  }
+
+
+  // 切换到下一视频
+  nextVideo(): void {
+    if (this.currentVideoIndex < this.videos.length - 1) {
+      this.currentVideoIndex++;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 切换到上一视频
+  prevVideo(): void {
+    if (this.currentVideoIndex > 0) {
+      this.currentVideoIndex--;
+      this.updateVideoSrc();
+    }
+  }
+
+  // 更新视频源
+  updateVideoSrc(): void {
+    this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+  }
+
+  get transitionStyle(): string {
+    return `translateY(-${this.currentVideoIndex * 100}%)`;
+  }
+
+  onMapReady(map: any) {
+    // 设置拖动边界（限制地图范围）
+    const southWest = latLng(-90, -180); // 西南角坐标
+    const northEast = latLng(90, 180); // 东北角坐标
+    const bounds = L.latLngBounds(southWest, northEast);
+
+    map.setMaxBounds(bounds);
+  }
+  // 地图点击事件处理函数
+  onMapClick(event: any) {
+    this.markers = [];
+    const { lat, lng } = event.latlng;
+
+    this.service
+      .searchEntity(1, 10, {
+        "geo_distance": {
+          "distance": "500km",
+          "location": {
+            "lat": lat,
+            "lon": lng
+          }
+        }
+      })
+      .subscribe((data: any) => {
+        this.entities = data.list;
+        this.entities = data.list;
+       
+      
+        data.list.forEach((entity: any) => {
+          const newMarker = marker([entity._source.location.lat, entity._source.location.lon]);
+          this.markers.push(newMarker);
+        });
+      });
+  }
+
+
   selectMenu(menu: any) {
     this.entities = null;
+    this.types = null;
+    this.tags = new Map<string, Array<string>>();
     this.images = null;
     this.videos = null;
     this.pdfs = null;
@@ -111,7 +191,96 @@ export class ApplicationComponent implements OnInit {
   }
 
 
-  search(keyword: any) {
+  search() {
+    this.service
+      .searchEntity(this.index, this.size, { bool: this.query })
+      .subscribe((data: any) => {
+        this.images = [];
+        this.videos = [];
+        this.pdfs = [];
+        this.markers = [];
+
+        data.list.forEach((item: any) => {
+          if (item._source.location) {
+            const newMarker = marker([item._source.location.lat, item._source.location.lon]);
+            this.markers.push(newMarker);
+          }
+
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'mp4'
+            ) {
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+            }
+
+            if (
+              image.split('.')[image.split('.').length - 1] == 'pdf'
+            ) {
+              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
+            }
+          });
+          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
+          this.ontologyService.get(item._source.type).subscribe((t: any) => {
+            item._type = t.label;
+            this.ontologyService
+              .getAllParentIds(item['_source'].type)
+              .subscribe((parents: any) => {
+                parents.push(item['_source'].type);
+                this.propertyService
+                  .getList(1, 50, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                      { field: 'isPrimary', value: true, operation: '=' },
+                    ],
+                  })
+                  .subscribe((p: any) => {
+                    this.entityService
+                      .getLinks(1, 20, item['_id'], {})
+                      .subscribe((c: any) => {
+                        let statements: any = [];
+                        c.list.forEach((path: any) => {
+                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                            path.edges[0].mainsnak.datavalue.value.id =
+                              path?.vertices[1]?.id;
+                            path.edges[0].mainsnak.datavalue.value.label =
+                              path?.vertices[1]?.labels?.zh?.value;
+                          }
+                          if (
+                            p.list?.filter(
+                              (property: any) =>
+                                path.edges[0].mainsnak.property ==
+                                `P${property.id}`
+                            ).length > 0
+                          ) {
+                            statements.push(path.edges[0]);
+                          }
+                        });
+                        item.claims = statements;
+                      });
+                  });
+              });
+          });
+        });
+        this.entities = data.list;
+
+      });
+  }
+
+  selectKeyword(keyword: any) {
     this.keyword = keyword;
     this.index = 1;
     switch (this.menu()) {
@@ -120,11 +289,6 @@ export class ApplicationComponent implements OnInit {
           if (this.way == '默认检索') {
             this.query = {
               must: [
-                {
-                  "terms": {
-                    "type": this.category
-                  }
-                },
                 {
                   match: {
                     'labels.zh.value': {
@@ -143,15 +307,7 @@ export class ApplicationComponent implements OnInit {
             this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
           }
         } else {
-          this.query = {
-            must: [
-              {
-                terms: {
-                  'type.keyword': this.category
-                }
-              },
-            ]
-          };
+          this.query = { must: [] };
         }
         break;
       case '图片':
@@ -201,13 +357,6 @@ export class ApplicationComponent implements OnInit {
           }
         } else {
           this.query = {
-            must: [
-              {
-                terms: {
-                  'type.keyword': this.category
-                }
-              },
-            ],
             should: [
               { "wildcard": { "images": "*jpeg" } },
               { "wildcard": { "images": "*jpg" } },
@@ -249,13 +398,6 @@ export class ApplicationComponent implements OnInit {
           }
         } else {
           this.query = {
-            must: [
-              {
-                terms: {
-                  'type.keyword': this.category
-                }
-              },
-            ],
             should: [{ "wildcard": { "images": "*mp4" } }],
           };
         }
@@ -292,117 +434,352 @@ export class ApplicationComponent implements OnInit {
           }
         } else {
           this.query = {
-            must: [
-              {
-                terms: {
-                  'type.keyword': this.category
-                }
-              },
-            ],
             should: [{ "wildcard": { "images": "*pdf" } }],
           };
         }
         break;
+      case '地图':
+        if (keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': keyword } }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': keyword } },],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          }
+        } else {
+          this.query = {
+            should: [{ "exists": { "field": "location" } }],
+          };
+        }
+        break;
       default:
-        this.query = {
-          must: [
-            {
-              terms: {
-                'type.keyword': this.category
-              }
-            },
-          ],
-        };
+        this.query = {};
         break;
     }
+    this.search();
 
-    console.log(this.ts)
-
-    this.service
-      .searchEntity(this.index, this.size, { bool: this.query })
-      .subscribe((data: any) => {
-        this.images = [];
-        this.videos = [];
-        this.pdfs = [];
-        data.list.forEach((item: any) => {
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                      });
-                  });
-              });
-          });
-        });
-        this.entities = data.list;
-   
-      });
   }
 
   selectTag(tag: any) {
-   this.ts =tag;
-    this.search('');
+    if (this.type && this.type.id) {
+      if (tag.length > 0) {
+        let values: any = [];
+        tag.forEach((t: any) => {
+          values.push({ term: { 'tags.keyword': t } });
+        })
+        this.query = { must: [{ term: { 'type.keyword': this.type.id } }].concat(values) };
+      } else {
+        this.query = { must: [{ term: { 'type.keyword': this.type.id } }] };
+      }
+    } else {
+      if (tag.length > 0) {
+        let values: any = [];
+        tag.forEach((t: any) => {
+          values.push({ term: { 'tags.keyword': t } });
+        })
+        this.query = { must: values };
+      } else {
+        this.query = {};
+      }
+    }
+    this.search();
   }
 
+  selectType(type: any) {
+    this.tagService
+    .getList(1, 500, {
+      filter: [
+        {
+          field: 'id',
+          value: type.id,
+          relation: 'schemas',
+          operation: '=',
+        },
+      ],
+    })
+    .subscribe((data: any) => {
+      console.log(data)
+      let tags: any = {};
+      data.list.forEach((tag: any) => {
+        tags[tag.type] = tags[tag.type] ?? [];
+        tags[tag.type].push(tag.name);
+      });
+      this.tags = tags;
+      console.log(this.tags)
+    });
+    this.type = type;
+    this.index = 1;
+    switch (this.menu()) {
+      case '知识':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } }
+              ],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [{ term: { 'labels.zh.value.keyword': this.keyword } }, { term: { 'type.keyword': type.id } }],
+            };
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } }
+              ]
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = { must: [{ term: { 'type.keyword': type.id } }] };
+          } else {
+            this.query = {};
+          }
+        }
+        break;
+      case '图片':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } },
+                { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },
+              { term: { 'type.keyword': type.id } }
+              ],
+              should: [
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }],
+            };
+          } else {
+            this.query = {
+              should: [
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*jpg" } },
+                { "wildcard": { "images": "*jpeg" } },
+                { "wildcard": { "images": "*png" } },
+                { "wildcard": { "images": "*webp" } }]
+            };
+          }
+        }
+        break;
+      case '视频':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                },
+                { term: { 'type.keyword': type.id } },
+                { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } },
+                { term: { 'type.keyword': type.id } },
+                { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } },
+              { "wildcard": { "images": "*mp4" } }
+              ],
+            };
+          }
+        } else {
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }, { "wildcard": { "images": "*mp4" } }],
+
+            };
+          } else {
+            this.query = {
+              must: [{ "wildcard": { "images": "*mp4" } }],
+            };
+          }
+        }
+        break;
+      case '文件':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } }
+              ],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+            };
+          }
+        } else {
+
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [{ "wildcard": { "images": "*pdf" } }],
+
+            };
+          } else {
+            this.query = {
+              should: [{ "wildcard": { "images": "*pdf" } }],
+
+            };
+          }
+        }
+        break;
+      case '地图':
+        if (this.keyword != '') {
+          if (this.way == '默认检索') {
+            this.query = {
+              must: [
+                {
+                  match: {
+                    'labels.zh.value': {
+                      query: this.keyword,
+                      operator: 'and',
+                    },
+                  },
+                }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          } else if (this.way == '精确检索') {
+            this.query = {
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } }
+              ],
+              should: [{ "exists": { "field": "location" } }],
+            };
+
+          } else {
+            this.query = {
+              must: [{ match: { 'labels.zh.value': this.keyword } },],
+              should: [{ "exists": { "field": "location" } }],
+            };
+          }
+        } else {
+
+          if (type.id != '') {
+            this.query = {
+              must: [{ term: { 'type.keyword': type.id } }],
+              should: [{ "exists": { "field": "location" } }],
+
+            };
+          } else {
+            this.query = {
+              should: [{ "exists": { "field": "location" } }],
+
+            };
+          }
+        }
+        break;
+      default:
+        this.query = {};
+        break;
+    }
+
+    this.search();
+  }
 
   action(type: string, item?: any) {
     console.log(item);

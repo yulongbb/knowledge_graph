@@ -114,6 +114,7 @@ export class KnowledgeService {
         labels: entity?.labels,
         descriptions: entity?.descriptions,
         aliases: entity?.aliases,
+        tags: entity?.tags,
         modified: new Date().toISOString(),
       };
     } else {
@@ -122,6 +123,7 @@ export class KnowledgeService {
         labels: entity?.labels,
         descriptions: entity?.descriptions,
         aliases: entity?.aliases,
+        tags: entity?.tags,
         modified: new Date().toISOString(),
       };
     }
@@ -129,105 +131,103 @@ export class KnowledgeService {
     return document.save(item).then(
       async (doc) => {
         // 插入关系
-        const edge = this.db.collection('link');
+        // const edge = this.db.collection('link');
 
         // 插入类型节点
-        const type = {
-          _key: entity.type.id,
-          type: 'item',
-          labels: { zh: { language: 'zh', value: entity.type.label } },
-          descriptions: {
-            zh: { language: 'zh', value: entity.type.description },
-          },
-          aliases: { zh: [{ language: 'zh', value: entity.type.label }] },
-          modified: new Date().toISOString(),
-          id: entity.type.id,
-        };
+        // const type = {
+        //   _key: entity.type.id,
+        //   type: 'item',
+        //   labels: { zh: { language: 'zh', value: entity.type.label } },
+        //   descriptions: {
+        //     zh: { language: 'zh', value: entity.type.description },
+        //   },
+        //   aliases: { zh: [{ language: 'zh', value: entity.type.label }] },
+        //   modified: new Date().toISOString(),
+        //   id: entity.type.id,
+        // };
 
         if(!entity.type.id){
           const schema = await this.schemasService.getByName(entity.type);
           entity.type = {id: schema.id, name: schema.name };
           console.log(entity.type)
-
         }
 
         
 
-        document.document(entity.type.id).then(
-          (updatedDocument) => {
-            edge
-              .save({
-                _from: doc['_id'],
-                _to: updatedDocument['_id'],
-                id: entity.id,
-                mainsnak: {
-                  snaktype: 'value',
-                  property: 'P31',
-                  hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-                  datavalue: {
-                    value: {
-                      'entity-type': 'item',
-                      'numeric-id': Number.parseInt(
-                        updatedDocument['_key'].replace('Q', ''),
-                      ),
-                      id: type['_key'],
-                    },
-                    type: 'wikibase-entityid',
-                  },
-                  datatype: 'wikibase-item',
-                },
-                type: 'statement',
-                rank: 'normal',
-              })
-              .then(
-                (doc) => console.log('Document saved:', doc),
-                (err) => console.error('Failed to save document:', err),
-              );
-          },
-          (err) => {
-            document.save(type).then((t: any) => {
-              edge
-                .save({
-                  _from: doc['_id'],
-                  _to: t['_id'],
-                  id: entity.id,
-                  mainsnak: {
-                    snaktype: 'value',
-                    property: 'P31',
-                    hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
-                    datavalue: {
-                      value: {
-                        'entity-type': 'item',
-                        'numeric-id': Number.parseInt(
-                          t['_key'].replace('Q', ''),
-                        ),
-                        id: t['_key'],
-                      },
-                      type: 'wikibase-entityid',
-                    },
-                    datatype: 'wikibase-item',
-                  },
-                  type: 'statement',
-                  rank: 'normal',
-                })
-                .then(
-                  (doc) => console.log('Document saved:', doc),
-                  (err) => console.error('Failed to save document:', err),
-                );
-            });
-          },
-        );
-
+        // document.document(entity.type.id).then(
+        //   (updatedDocument) => {
+        //     edge
+        //       .save({
+        //         _from: doc['_id'],
+        //         _to: updatedDocument['_id'],
+        //         id: entity.id,
+        //         mainsnak: {
+        //           snaktype: 'value',
+        //           property: 'P31',
+        //           hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+        //           datavalue: {
+        //             value: {
+        //               'entity-type': 'item',
+        //               'numeric-id': Number.parseInt(
+        //                 updatedDocument['_key'].replace('Q', ''),
+        //               ),
+        //               id: type['_key'],
+        //             },
+        //             type: 'wikibase-entityid',
+        //           },
+        //           datatype: 'wikibase-item',
+        //         },
+        //         type: 'statement',
+        //         rank: 'normal',
+        //       })
+        //       .then(
+        //         (doc) => console.log('Document saved:', doc),
+        //         (err) => console.error('Failed to save document:', err),
+        //       );
+        //   },
+        //   (err) => {
+        //     document.save(type).then((t: any) => {
+        //       edge
+        //         .save({
+        //           _from: doc['_id'],
+        //           _to: t['_id'],
+        //           id: entity.id,
+        //           mainsnak: {
+        //             snaktype: 'value',
+        //             property: 'P31',
+        //             hash: '8f7599319c8f07055134a500cf67fc22d1b3142d',
+        //             datavalue: {
+        //               value: {
+        //                 'entity-type': 'item',
+        //                 'numeric-id': Number.parseInt(
+        //                   t['_key'].replace('Q', ''),
+        //                 ),
+        //                 id: t['_key'],
+        //               },
+        //               type: 'wikibase-entityid',
+        //             },
+        //             datatype: 'wikibase-item',
+        //           },
+        //           type: 'statement',
+        //           rank: 'normal',
+        //         })
+        //         .then(
+        //           (doc) => console.log('Document saved:', doc),
+        //           (err) => console.error('Failed to save document:', err),
+        //         );
+        //     });
+        //   },
+        // );
         let data = await this.elasticsearchService.bulk({
           type: entity.type.id,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
           aliases: entity?.aliases,
+          tags: entity?.tags,
           modified: new Date().toISOString(),
           items: ['entity/' + doc['_key']],
           images: entity?.images,
           location: entity?.location,
-
         });
         console.log(JSON.stringify(data));
         document.document(doc['_key']).then((existingDocument) => {
@@ -255,7 +255,6 @@ export class KnowledgeService {
       location: entity?.location,
     });
     console.log(entity);
-
     const myCollection = this.db.collection('entity');
     myCollection.document(entity['_key']).then((existingDocument) => {
       console.log(existingDocument);
