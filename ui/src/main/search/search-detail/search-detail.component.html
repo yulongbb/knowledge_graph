@@ -24,123 +24,67 @@
             entity()?._source?.entities
           )
         "></p>
-      <div *ngFor="let claim of claims()| keyvalue">
-        <dl *ngFor="let statement of getClaim(claim)">
-          <dt>
-            <span *ngIf="getClaim(claim).indexOf(statement)==0">{{statement.mainsnak.label}}</span>
-          </dt>
-
-          <dd>
-            <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
-                    'http://localhost:4200/index/search/info/' +
-                    statement.mainsnak.datavalue.value.id
-                  ">{{ statement?.mainsnak?.datavalue?.value?.label }}</a>
-            </strong>
-
-            <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">
-                {{ statement?.mainsnak?.datavalue?.value }}
-            </pre>
-
-            <strong *ngIf="statement.mainsnak.datatype == 'string'">
-              {{ statement?.mainsnak?.datavalue?.value }}
-            </strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-              <img *ngIf="
-                    statement?.mainsnak?.datavalue?.value?.split('.')[
-                      statement?.mainsnak.datavalue.value.split('.').length - 1
-                    ] != 'mp4'
-                  " width="200px" [src]="
-                    'http://localhost:9000/kgms/' +
-                    statement?.mainsnak?.datavalue.value
-                  " />
-              <video *ngIf="
-                    statement?.mainsnak.datavalue.value.split('.')[
-                      statement?.mainsnak.datavalue.value.split('.').length - 1
-                    ] == 'mp4'
-                  " width="200px" controls>
-                <source [src]="
-                      'http://localhost:9000/kgms/' +
-                      statement?.mainsnak.datavalue.value
-                    " type="video/mp4" />
-                <p>
-                  你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                </p>
-              </video>
-            </strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak?.datavalue?.value }}</a></strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
-              statement?.mainsnak?.datavalue?.value?.amount
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-              statement?.mainsnak?.datavalue?.value?.text }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
-              statement?.mainsnak?.datavalue?.value
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-              statement?.mainsnak?.datavalue?.value?.latitude }},{{
-              statement?.mainsnak?.datavalue?.value?.longitude
-              }}</strong>
-            <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-              statement?.mainsnak?.datavalue?.value?.time | date:'yyyy年MM月dd日'
-              }}</strong>
-            <p *ngFor="let qualify  of statement.mainsnak.qualifiers  | keyvalue">
-              <small *ngFor="let qlf of getQualify(qualify)">
-                <i>{{qlf?.mainsnak?.label}}:</i>
-                <strong *ngIf="qlf.mainsnak.datatype == 'wikibase-item'"><a [href]="
-                        'http://localhost:4200/index/search/info/' +
-                        qlf.mainsnak.datavalue.value.id
-                      ">{{ qlf?.mainsnak?.datavalue?.value?.label }}</a>
+        <dl *ngFor="let property of propertyData()">
+          <dl *ngIf="getStatement(property).length > 0">
+            <dt>
+              {{ property.name }}
+            </dt>
+            <dd>
+              <i *ngFor="let statement of getStatement(property)">
+                <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+                      'http://localhost:4200/index/search/info/' +
+                      statement.mainsnak.datavalue.value.id
+                    ">{{ statement.mainsnak.datavalue.value.label }}</a>
                 </strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'string'">
-                  {{ qlf?.mainsnak?.datavalue?.value }}
+                <strong *ngIf="statement.mainsnak.datatype == 'string'">
+                  {{ statement.mainsnak.datavalue.value }}
                 </strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'commonsMedia'">
+                <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
                   <img *ngIf="
-                    qlf?.mainsnak?.datavalue?.value?.split('.')[
-                    qlf?.mainsnak.datavalue.value.split('.').length - 1
-                        ] != 'mp4'
-                      " width="200px" [src]="
-                        'http://localhost:9000/kgms/' +
-                        qlf?.mainsnak?.datavalue.value
-                      " />
+                      statement?.mainsnak?.datavalue?.value?.split('.')[
+                        statement?.mainsnak.datavalue.value.split('.').length -
+                          1
+                      ] != 'mp4'
+                    " width="200px" [src]="
+                      'http://localhost:9000/kgms/' +
+                      statement?.mainsnak?.datavalue.value
+                    " />
                   <video *ngIf="
-                    qlf?.mainsnak.datavalue.value.split('.')[
-                    qlf?.mainsnak.datavalue.value.split('.').length - 1
-                        ] == 'mp4'
-                      " width="200px" controls>
+                      statement?.mainsnak.datavalue.value.split('.')[
+                        statement?.mainsnak.datavalue.value.split('.').length -
+                          1
+                      ] == 'mp4'
+                    " width="200px" controls>
                     <source [src]="
-                          'http://localhost:9000/kgms/' +
-                          qlf?.mainsnak.datavalue.value
-                        " type="video/mp4" />
+                        'http://localhost:9000/kgms/' +
+                        statement?.mainsnak.datavalue.value
+                      " type="video/mp4" />
                     <p>
                       你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
                     </p>
                   </video>
                 </strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'url'"><a target="_blank"
-                    [href]="qlf?.mainsnak.datavalue.value">{{ statement?.mainsnak?.datavalue?.value }}</a></strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'quantity'">{{
-                  qlf?.mainsnak?.datavalue?.value?.amount
+                <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+                    [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+                  statement.mainsnak.datavalue.value.amount
                   }}</strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'monolingualtext'">{{
-                  qlf.mainsnak.datavalue.value.text }}</strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'geo-shape'">{{
-                  qlf?.mainsnak?.datavalue?.value
+                <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                  statement.mainsnak.datavalue.value.text }}</strong>
+                <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+                  statement.mainsnak.datavalue.value
                   }}</strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'globe-coordinate'">{{
-                  qlf?.mainsnak?.datavalue?.value?.latitude }},{{
-                  qlf?.mainsnak?.datavalue?.value?.longitude
+                <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+                  statement.mainsnak.datavalue.value.latitude }},{{
+                  statement.mainsnak.datavalue.value.longitude
                   }}</strong>
-                <strong *ngIf="qlf.mainsnak.datatype == 'time'">{{
-                  qlf?.mainsnak?.datavalue?.value?.time | date:'yyyy年MM月dd日'
+                <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+                  statement.mainsnak.datavalue.value.time
                   }}</strong>
-              </small>
-            </p>
-          </dd>
+              </i>
+            </dd>
+          </dl>
         </dl>
-
-      </div>
       <!-- <dl *ngFor="let property of properties()">
         <dl *ngIf="getStatement(property).length > 0">
           <dt>
