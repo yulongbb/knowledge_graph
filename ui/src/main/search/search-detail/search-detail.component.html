@@ -69,8 +69,8 @@
                 <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
                   statement.mainsnak.datavalue.value.amount
                   }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                  statement.mainsnak.datavalue.value.text }}</strong>
+                <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                  statement.mainsnak.datavalue.value }}</pre>
                 <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
                   statement.mainsnak.datavalue.value
                   }}</strong>

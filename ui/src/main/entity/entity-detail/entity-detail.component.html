@@ -11,6 +11,7 @@
                 <x-button type="primary" *ngFor="let item of entity()?._source?.items">{{item}}</x-button>
               </x-buttons> --> </span><span>{{ entity()?._type }}</span>
       </ng-template>
+      <span *ngFor="let aliase of entity()?._source?.aliases?.zh">{{aliase.value}}</span>
       <div class="bottom">
         <h2>简介</h2>
         <p *ngIf="entity()._source.descriptions" [innerHTML]="
@@ -65,8 +66,10 @@
                 <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
                   statement.mainsnak.datavalue.value.amount
                   }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                  statement.mainsnak.datavalue.value.text }}</strong>
+                  <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                    statement.mainsnak.datavalue.value.text }}</strong>
+                <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                  statement.mainsnak.datavalue.value }}</pre>
                 <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
                   statement.mainsnak.datavalue.value
                   }}</strong>
