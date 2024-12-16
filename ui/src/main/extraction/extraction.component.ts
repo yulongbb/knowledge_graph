@@ -147,7 +147,7 @@ export class ExtractionComponent extends PageBase {
     this.datasetService.get(value).subscribe((x: any) => {
       console.log('http://localhost:9000/kgms/' + x.files[0])
       this.fetchJson('http://localhost:9000/kgms/' + x.files[0]).then((data: Array<any>) => {
-        this.grid.data = data.slice(0, 100).map(item => {
+        this.grid.data = data.map(item => {
           const { _id, ...rest } = item; // 解构赋值，排除 _id
           return rest;
       });
