@@ -57,6 +57,12 @@ export class EntityDetailComponent implements OnInit {
       required: true,
     },
     {
+      control: 'input',
+      id: 'aliases',
+      label: '别名',
+      required: true,
+    },
+    {
       control: 'find',
       id: 'type',
       label: '类型',
@@ -120,7 +126,7 @@ export class EntityDetailComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
@@ -404,6 +410,7 @@ export class EntityDetailComponent implements OnInit {
               this.form.formGroup.patchValue({
                 _key: x?._id,
                 label: this.item?.labels?.zh?.value,
+                aliases: this.item?.aliases?.zh?.map((aliase: any) => aliase.value).toString(),
                 type: { id: type?.id, label: type?.name },
                 description: this.item.descriptions?.zh?.value,
               });
@@ -490,7 +497,7 @@ export class EntityDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
-        console.log(this.tag());
+        console.log(this.form.formGroup.value.aliases);
         let item: any = {
           _key: this.form.formGroup.value._key,
           tags: this.tag(),
@@ -499,6 +506,15 @@ export class EntityDetailComponent implements OnInit {
               language: 'zh',
               value: this.form.formGroup.value.label,
             },
+          },
+          aliases: {
+            zh:
+              this.form.formGroup.value.aliases.split(',').map((aliase: any) => {
+                return {
+                  language: 'zh',
+                  value: aliase,
+                };
+              }),
           },
           descriptions: {
             zh: {

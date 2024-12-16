@@ -59,6 +59,8 @@ export class ApplicationComponent implements OnInit {
 
   category:any;
 
+  total:any;
+
   constructor(
     private sanitizer: DomSanitizer,
     private service: EsService,
@@ -195,6 +197,7 @@ export class ApplicationComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
+        console.log(data);
         this.images = [];
         this.videos = [];
         this.pdfs = [];
@@ -276,6 +279,7 @@ export class ApplicationComponent implements OnInit {
           });
         });
         this.entities = data.list;
+        this.total = data.total;
 
       });
   }

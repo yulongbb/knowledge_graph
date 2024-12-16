@@ -67,7 +67,7 @@ export class EntityComponent extends PageBase {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.data = (index: number, size: number, query: Query) => this.esService
-        .searchEntity(index, size, {bool:{}})
+        .searchEntity(index, size, { bool: {} })
         .pipe(
           tap((data: any) => {
             console.log(data)
@@ -103,7 +103,7 @@ export class EntityComponent extends PageBase {
   detail(row: XTableRow, column: XTableColumn) {
     this.id = row.id[0].split('/')[1];
   }
-  
+
   setCheckedRows(checked: boolean, row: XTableRow) {
     if (checked) {
       if (!this.checkedRows.some((x) => x.id === row.id)) {
@@ -131,12 +131,23 @@ export class EntityComponent extends PageBase {
 
   search(keyword: any) {
     if (keyword != '') {
-      this.query = { "must": [{ "match": { "labels.zh.value": keyword } }, { "match": { "descriptions.zh.value": keyword } }] }
+      this.query = {
+        must: [
+          {
+            match: {
+              'labels.zh.value': {
+                query: keyword,
+                operator: 'and',
+              },
+            },
+          },
+        ],
+      };
     } else {
       this.query = {}
     }
     this.data = (index: number, size: number, query: Query) =>
-      this.esService.searchEntity(index, this.size, {bool:this.query}).pipe(
+      this.esService.searchEntity(index, this.size, { bool: this.query }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -149,7 +160,7 @@ export class EntityComponent extends PageBase {
       this.query = {}
     }
     this.data = (index: number, size: number, query: Query) =>
-      this.esService.searchEntity(index, this.size, {bool:this.query}).pipe(
+      this.esService.searchEntity(index, this.size, { bool: this.query }).pipe(
         tap((x: any) => console.log(x)),
         map((x: any) => x)
       );
@@ -169,8 +180,8 @@ export class EntityComponent extends PageBase {
         break;
       case 'import':
         this.router.navigate([`./grid`], {
-            relativeTo: this.activatedRoute,
-          });
+          relativeTo: this.activatedRoute,
+        });
         break;
       case 'info':
         console.log(item);
