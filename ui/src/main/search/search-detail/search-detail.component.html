@@ -33,7 +33,7 @@
               <i *ngFor="let statement of getStatement(property)">
                 <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                       'http://localhost:4200/index/search/info/' +
-                      statement.mainsnak.datavalue.value.id
+                      statement·2.mainsnak.datavalue.value.id
                     ">{{ statement.mainsnak.datavalue.value.label }}</a>
                 </strong>
                 <strong *ngIf="statement.mainsnak.datatype == 'string'">
