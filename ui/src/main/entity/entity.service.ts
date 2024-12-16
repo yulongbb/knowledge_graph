@@ -74,6 +74,16 @@ export class EntityService extends RepositoryService<Item> {
       query
     );
   }
+
+
+  import(
+    data: any
+  ): Observable<Array<any>> {
+    return this.http.post(
+      `${this.option.controller?.name}/import`,
+      data
+    );
+  }
 }
 
 export interface Item extends XId {

@@ -15,9 +15,22 @@ import { EsService } from './es.service';
 import { Database } from 'arangojs';
 import { KnowledgeController } from './knowledge.controller';
 import { NLPService } from './nlp.service';
+import { BullModule } from '@nestjs/bullmq';
+import { DataImportService } from './data-import.queue';
 
 @Module({
-  imports: [ConfigModule.forRoot(),
+  imports: [
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
+     // 注册队列
+     BullModule.registerQueue({
+      name: 'data-import-queue',
+    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Schema, Property]), ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,9 +41,13 @@ import { NLPService } from './nlp.service';
         //   password: configService.get('ELASTICSEARCH_PASSWORD'),
         // },
       }),
-    }),],
+    }),
+
+   
+
+  ],
   controllers: [KnowledgeController],
-  exports: [EsService],
+  exports: [EsService,DataImportService],
   providers: [
     {
       provide: 'ARANGODB',
@@ -49,7 +66,7 @@ import { NLPService } from './nlp.service';
       provide: 'DEFAULT_INDEX',
       useFactory: (configService: ConfigService) => configService.get('ELASTICSEARCH_INDEX', 'entity'),
       inject: [ConfigService],
-    },
+    },DataImportService,
     NodeService, EdgeService, EsService, NLPService, KnowledgeService, PropertiesService, EsService, SchemasService],
 
 })

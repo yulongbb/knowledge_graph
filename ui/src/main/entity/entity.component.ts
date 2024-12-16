@@ -70,14 +70,17 @@ export class EntityComponent extends PageBase {
         .searchEntity(index, size, {bool:{}})
         .pipe(
           tap((data: any) => {
+            console.log(data)
             let menu: any = []
             let arr: any = [];
             data.types.forEach((m: any) => {
               arr.push(this.ontologyService.get(m.key));
             })
             forkJoin(arr).subscribe((properties: any) => {
+              console.log(properties)
+
               data.types.forEach((m: any) => {
-                menu.push({ id: m.key, label: properties.filter((p: any) => p.id == m.key)[0].name })
+                menu.push({ id: m.key, label: properties?.filter((p: any) => p?.id == m.key)[0]?.name })
               })
               let menuMerge = [];
               menuMerge = data.types.map((m: any, index: any) => {
@@ -153,7 +156,7 @@ export class EntityComponent extends PageBase {
   }
 
   getType(type: any) {
-    return this.menus.filter((m: any) => m.key == type)[0].label.split('(')[0];
+    return this.menus?.filter((m: any) => m.key == type)[0].label.split('(')[0];
   }
 
   action(type: string, item?: any) {

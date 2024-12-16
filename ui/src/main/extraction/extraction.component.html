@@ -1,15 +1,30 @@
 <au-tool>
-  <x-find label="树单选" [(ngModel)]="type" [treeData]="tree"></x-find>
-  <x-select [data]="datasets" [(ngModel)]="dataset" [nodeTpl]="nodeTpl" (ngModelChange)="change($event)"></x-select>
-
-  <ng-template #nodeTpl let-node="$node">
-    @if (node) {
-    <span class="select-item"> {{ node.label  }} </span>
-    }
-  </ng-template>
+  <x-select [data]="datasets" [(ngModel)]="dataset" (ngModelChange)="selectDataset($event)"></x-select>
+  <x-button type="success" icon="fto-upload" (click)="import()">导入</x-button>
 </au-tool>
-<div class="row">
-  <div #datagridContainer></div>
-</div>
 
-
+<x-row>
+  <x-col span="8">
+    
+    <div class="row" *ngIf="properties">
+      <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema"></x-find>
+    <x-find label="描述" columnLabel="name" direction="row" [(ngModel)]="description" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema"></x-find>
+    <x-find label="别名" columnLabel="name" direction="row" [(ngModel)]="aliase" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema"></x-find>
+    <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema"></x-find>
+    <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema" multiple></x-find>
+    <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
+      [tableData]="grid.schema"></x-find>
+      <x-checkbox [data]="checkAllData()" [(ngModel)]="checkAll" (ngModelChange)="change($event)"
+        [indeterminate]="indeterminate()" single></x-checkbox>
+      <x-checkbox vertical [data]="properties" [(ngModel)]="model" (ngModelChange)="itemChange($event)"></x-checkbox>
+    </div>
+  </x-col>
+  <x-col span="16">
+    <div #datagridContainer></div>
+  </x-col>
+</x-row>

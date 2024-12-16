@@ -7,6 +7,8 @@ import {
   Body,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { KnowledgeService } from './knowledge.service';
 import { XIdType } from 'src/core';
@@ -15,6 +17,9 @@ import { EsService } from './es.service';
 import { NLPService } from './nlp.service';
 import { EdgeService } from './edge.service';
 import { query } from 'express';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { DataImportService } from './data-import.queue';
 
 @Controller('knowledge')
 @ApiTags('知识融合') // 分组
@@ -24,7 +29,9 @@ export class KnowledgeController {
     private readonly knowledgeService: KnowledgeService,
     private readonly elasticsearchService: EsService,
     private readonly nlpSevice: NLPService,
-    private readonly edgeService: EdgeService
+    private readonly edgeService: EdgeService,
+    private readonly dataImportService: DataImportService,
+    @InjectQueue('data-import-queue') private queue: Queue
   ) { }
 
   @Post('')
@@ -167,5 +174,31 @@ export class KnowledgeController {
   ): Promise<any> {
     console.log(id);
     return this.knowledgeService.graph(id, index, size, query);
+  }
+
+
+  @Get('jobs')
+  async getQueueStatus() {
+    const jobs = await this.queue.getJobs(['waiting', 'active', 'completed', 'failed']);
+    return jobs.map(job => ({
+      id: job.id,
+      name: job.name,
+      status: job.status,
+      progress: job.progress,
+    }));
+  }
+
+  @Post('import')
+  async importData(@Body() data: any) {
+    if (!data || Object.keys(data).length === 0) {
+      throw new HttpException('No data provided', HttpStatus.BAD_REQUEST);
+    }
+
+    // 将数据添加到队列中
+    await this.dataImportService.addDataToQueue(data);
+
+
+
+    return { message: 'Data import request has been submitted successfully.' };
   }
 }
