@@ -17,30 +17,34 @@
             color: 'white'
           }" bordered="false" size="mini">{{ tag }}</x-tag>
       </div>
+
       <h2>简介</h2>
+      <div *ngFor="let image of images">
+        <img [src]="image.startsWith('http') ? image : 'http://localhost:9000/kgms/' + image">
+      </div>
       <p *ngIf="entity()._source.descriptions" [innerHTML]="
           linkifyText(
             entity()?._source?.descriptions?.zh?.value,
             entity()?._source?.entities
           )
         "></p>
-        <dl *ngFor="let property of propertyData()">
-          <dl *ngIf="getStatement(property).length > 0">
-            <dt>
-              {{ property.name }}
-            </dt>
-            <dd>
-              <i *ngFor="let statement of getStatement(property)">
-                <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+      <dl *ngFor="let property of propertyData()">
+        <dl *ngIf="getStatement(property).length > 0">
+          <dt>
+            {{ property.name }}
+          </dt>
+          <dd>
+            <i *ngFor="let statement of getStatement(property)">
+              <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                       'http://localhost:4200/index/search/info/' +
                       statement.mainsnak.datavalue.value.id
                     ">{{ statement.mainsnak.datavalue.value.label }}</a>
-                </strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'string'">
-                  {{ statement.mainsnak.datavalue.value }}
-                </strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-                  <img *ngIf="
+              </strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'string'">
+                {{ statement.mainsnak.datavalue.value }}
+              </strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
+                <img *ngIf="
                       statement?.mainsnak?.datavalue?.value?.split('.')[
                         statement?.mainsnak.datavalue.value.split('.').length -
                           1
@@ -49,42 +53,42 @@
                       'http://localhost:9000/kgms/' +
                       statement?.mainsnak?.datavalue.value
                     " />
-                  <video *ngIf="
+                <video *ngIf="
                       statement?.mainsnak.datavalue.value.split('.')[
                         statement?.mainsnak.datavalue.value.split('.').length -
                           1
                       ] == 'mp4'
                     " width="200px" controls>
-                    <source [src]="
+                  <source [src]="
                         'http://localhost:9000/kgms/' +
                         statement?.mainsnak.datavalue.value
                       " type="video/mp4" />
-                    <p>
-                      你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                    </p>
-                  </video>
-                </strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                    [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
-                  statement.mainsnak.datavalue.value.amount
-                  }}</strong>
-                <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+                  <p>
+                    你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                  </p>
+                </video>
+              </strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+                  [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+                statement.mainsnak.datavalue.value.amount
+                }}</strong>
+              <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
                   statement.mainsnak.datavalue.value }}</pre>
-                <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
-                  statement.mainsnak.datavalue.value
-                  }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-                  statement.mainsnak.datavalue.value.latitude }},{{
-                  statement.mainsnak.datavalue.value.longitude
-                  }}</strong>
-                <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                  statement.mainsnak.datavalue.value.time
-                  }}</strong>
-              </i>
-            </dd>
-          </dl>
+              <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+                statement.mainsnak.datavalue.value
+                }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+                statement.mainsnak.datavalue.value.latitude }},{{
+                statement.mainsnak.datavalue.value.longitude
+                }}</strong>
+              <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+                statement.mainsnak.datavalue.value.time
+                }}</strong>
+            </i>
+          </dd>
         </dl>
+      </dl>
       <!-- <dl *ngFor="let property of properties()">
         <dl *ngIf="getStatement(property).length > 0">
           <dt>
@@ -219,9 +223,9 @@
       <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
-            <div (click)="preview(image)" class="thumbnail" style="background-image: url('http://localhost:9000/kgms/{{
-                image
-              }}')"></div>
+            <div [style.background-image]="'url(http://localhost:9000/kgms/' + image + ')' " (click)="preview(image)"
+              class="thumbnail">
+            </div>
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ export class DatasetDetailComponent implements OnInit {
   controls: XControl[] = [
     {
       control: 'input',
-      id: 'name',
+      id: 'label',
       label: '名称',
       required: true,
       maxlength: 160,
@@ -34,7 +34,7 @@ export class DatasetDetailComponent implements OnInit {
     },
     {
       control: 'textarea',
-      id: 'content',
+      id: 'description',
       label: '描述',
     },
     {

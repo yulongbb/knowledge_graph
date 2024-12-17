@@ -70,7 +70,7 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
                         statement['mainsnak']['property'] = 'P' + prop[0]?.id;
 
-                        if (prop[0].type == 'wikibase-item') {
+                        if (prop[0]?.type == 'wikibase-item') {
                             let to: any;
                             let knowledge: any = await this.elasticsearchService.query(
                                 {

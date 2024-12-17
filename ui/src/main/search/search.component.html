@@ -36,7 +36,9 @@
           [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
       </ng-template>
       <div class="bottom">
-
+        <div *ngFor="let image of entity['_source']?.images">
+          <img [src]="image.startsWith('http') ? image : 'http://localhost:9000/kgms/' + image">
+        </div>
         <p>
           <x-text-retract *ngIf="!entity['highlight']" max="100"
             [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
