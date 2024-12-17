@@ -12,8 +12,6 @@ MINIO_ACCESS_KEY= 'hvUvKv8zj2LXPmqzWbVn'
 MINIO_SECRET_KEY= '6c3EJJ92e40t1bZqwqAvw0U3cQDtWMH1UirbNlno'
 MINIO_BUCKET_NAME = "kgms"
 
-# 目标URL
-list_url = 'https://junshi.china.com/wuqi/so/130002592_0_0_1.html'
 
 # 设置请求头
 headers = {
@@ -92,7 +90,7 @@ def upload_to_minio(file_path, object_name=None):
         return None
 
 
-def fetch_list_page():
+def fetch_list_page(list_url):
     response = requests.get(list_url, headers=headers)
     if response.status_code == 200:
         return response.content
@@ -114,8 +112,8 @@ def parse_list_page(content):
         country = country_tag.text.strip() if country_tag else 'N/A'        # 将 img_url 的协议从 http 改为 https（仅当以 http:// 开头时）
         secure_img_url = img_url.replace("http://", "https://", 1) if img_url.startswith("http://") else img_url
         # 下载图片到本地
-        local_image_path = download_image(secure_img_url)
-        image = ''
+        # local_image_path = download_image(secure_img_url)
+        # image = ''
         # if local_image_path:
         #     # 上传图片到MinIO
         #    image = upload_to_minio(local_image_path)
@@ -123,7 +121,7 @@ def parse_list_page(content):
         # 添加详情链接和图片链接到 detail_urls 列表中
         detail_urls.append({
             'url': full_detail_url,
-            'image': image,  # 使用安全的图片链接
+            'image': secure_img_url,  # 使用安全的图片链接
             'country': country  # 使用安全的图片链接
         })
     return detail_urls
@@ -233,27 +231,55 @@ def export_to_jsonl(data_list, file_name='all_details'):
         print(f"An error occurred while writing to file: {e}")
 
 
-# 主程序逻辑
-if __name__ == "__main__":
-    all_details = []  # 用于存储所有详情信息的列表
-    list_content = fetch_list_page()
-    if list_content:
-        detail_urls = parse_list_page(list_content)
-        for entry in detail_urls:
-            url = entry['url']
-            img_url = entry['image']
-            country = entry['country']
-            print(f"Fetching details from: {url}")
-            # detail_content = fetch_detail_page(url)
-            # if detail_content:
-            #     detail_info = parse_detail_page(detail_content, img_url, country)
-            #     # 将字典转换为JSON字符串，并打印出来
-            #     json_output = json.dumps(detail_info, ensure_ascii=False, indent=4)
-                # print(json_output)
-                
-                # # 将详情信息添加到集合中
-                # all_details.append(detail_info)
+def write_to_jsonl(file_name, record):
+    """
+    将单个记录作为一行JSON字符串写入到指定的JSON Lines文件中。
+    
+    参数:
+    file_name (str): JSON Lines文件的名称（含路径）。
+    record (dict): 要写入文件的记录，应该是一个字典。
+    """
+    # 确保记录是字典类型
+    if not isinstance(record, dict):
+        raise ValueError("Record must be a dictionary.")
 
-                # if all_details:
-                #     # 导出所有详情信息到一个 JSON 文件
-                #     export_to_jsonl(all_details, file_name='all_details')
+    # 将记录转换为JSON字符串，并保证中文字符不被转义
+    json_record = json.dumps(record, ensure_ascii=False)
+
+    # 使用'a'模式打开文件以追加内容
+    with open(file_name, 'a', encoding='utf-8') as f:
+        f.write(json_record + '\n') 
+
+def fetch_and_parse_pages(base_url, page_range):
+    all_details = []
+    for page_num in page_range:
+        # 构建当前页的URL
+        list_url = f"{base_url}{page_num}.html"
+        print(f"Fetching page: {list_url}")
+        
+        # 获取列表页面内容
+        list_content = fetch_list_page(list_url)
+        if list_content:
+            detail_urls = parse_list_page(list_content)
+            for entry in detail_urls:
+                url = entry['url']
+                img_url = entry['image']
+                country = entry['country']
+                print(f"Fetching details from: {url}")
+                
+                # 获取详情页面内容
+                detail_content = fetch_detail_page(url)
+                if detail_content:
+                    detail_info = parse_detail_page(detail_content, img_url, country)
+                    json_output = json.dumps(detail_info, ensure_ascii=False, indent=4)
+                    print(json_output)
+                    
+                    # 添加到所有详情信息集合中
+                    write_to_jsonl('all_details.jsonl', detail_info)
+
+
+
+# 调用函数，传入基础URL和你想要抓取的页码范围
+if __name__ == "__main__":
+    base_url = 'https://junshi.china.com/wuqi/so/130002592_0_0_'  # 基础URL，不包括页码部分
+    fetch_and_parse_pages(base_url, range(1, 3))  # 抓取第1页到第2页
