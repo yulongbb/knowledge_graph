@@ -188,7 +188,7 @@ def parse_detail_page(content, img_url,country):
         '描述': description,
         '图片': img_url,  # 添加图片链接到返回的结果中
         '国家': country,  # 添加图片链接到返回的结果中
-        '大类': '飞行器',  # 添加图片链接到返回的结果中
+        '大类': '枪械与单兵',  # 添加图片链接到返回的结果中
         '小类': attack_aircraft_category  # 添加图片链接到返回的结果中
     }, **params, **related_sections}
 
@@ -251,7 +251,6 @@ def write_to_jsonl(file_name, record):
         f.write(json_record + '\n') 
 
 def fetch_and_parse_pages(base_url, page_range):
-    all_details = []
     for page_num in page_range:
         # 构建当前页的URL
         list_url = f"{base_url}{page_num}.html"
@@ -281,5 +280,5 @@ def fetch_and_parse_pages(base_url, page_range):
 
 # 调用函数，传入基础URL和你想要抓取的页码范围
 if __name__ == "__main__":
-    base_url = 'https://junshi.china.com/wuqi/so/130002592_0_0_'  # 基础URL，不包括页码部分
-    fetch_and_parse_pages(base_url, range(1, 3))  # 抓取第1页到第2页
+    base_url = 'https://junshi.china.com/wuqi/so/130002594_0_0_'  # 基础URL，不包括页码部分
+    fetch_and_parse_pages(base_url, range(1, 34))  # 抓取第1页到第2页

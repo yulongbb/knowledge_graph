@@ -66,10 +66,12 @@
   <div class="gallery">
     <div class="warp">
       <div *ngFor="let image of images">
-        <div (click)="preview(image.image)" class="thumbnail"
-          style="background-image: url('http://localhost:9000/kgms/{{image.image}}')"></div>
+        <div (click)="preview(image.image)" 
+             class="thumbnail"
+             [style.background-image]="'url(' + getFullImageUrl(image.image) + ')'" 
+        ></div>
         <x-link (click)="action('info', image)" type="info">{{image.label}}</x-link>
-      </div>
+    </div>
     </div>
   </div>
 </div>
