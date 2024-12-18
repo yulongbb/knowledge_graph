@@ -28,3 +28,6 @@
     <div #datagridContainer></div>
   </x-col>
 </x-row>
+
+
+<x-progress  *ngFor="let job of jobs" [percent]="job.progress"></x-progress>

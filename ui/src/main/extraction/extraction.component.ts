@@ -89,6 +89,8 @@ export class ExtractionComponent extends PageBase {
   checkAll = signal(false);
   indeterminate = signal(true);
 
+  jobs:any;
+
   constructor(
     public override indexService: IndexService,
     private ontologyService: OntologyService,
@@ -112,6 +114,9 @@ export class ExtractionComponent extends PageBase {
     this.grid.style.width = '100%';
     this.grid.data = this.data;
     this.datagridContainer.nativeElement.appendChild(this.grid);
+    this.nodeService.jobs().subscribe((data:any)=>{
+      this.jobs = data;
+    })
   }
 
   change(value: boolean) {
