@@ -19,9 +19,7 @@
       </div>
 
       <h2>简介</h2>
-      <div *ngFor="let image of images">
-        <img [src]="image.startsWith('http') ? image : 'http://localhost:9000/kgms/' + image">
-      </div>
+   
       <p *ngIf="entity()._source.descriptions" [innerHTML]="
           linkifyText(
             entity()?._source?.descriptions?.zh?.value,
@@ -220,7 +218,7 @@
         <span>{{ entity()?._source?.modified }}</span>
         <span>{{ entity()?._id }}</span>
       </div>
-      <!-- <div class="gallery" *ngIf="images">
+      <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
             <div [style.background-image]="'url(http://localhost:9000/kgms/' + image + ')' " (click)="preview(image)"
@@ -244,7 +242,7 @@
             )
           ">
         </iframe>
-      </div> -->
+      </div>
     </div>
   </x-card>
 </div>
