@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit, OnApplicationShutdown } from '@nestjs/common'
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, Worker, Job } from 'bullmq';
 import { KnowledgeService } from './knowledge.service';
-import { SchemasService } from 'src/ontology/services/schemas.service';
 import { EdgeService } from './edge.service';
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { EsService } from './es.service';

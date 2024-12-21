@@ -84,6 +84,13 @@ export class EntityService extends RepositoryService<Item> {
       data
     );
   }
+
+
+  jobs(): Observable<Array<any>> {
+    return this.http.get(
+      `${this.option.controller?.name}/jobs`,
+    );
+  }
 }
 
 export interface Item extends XId {
