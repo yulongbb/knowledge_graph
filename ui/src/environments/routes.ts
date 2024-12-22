@@ -162,6 +162,18 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
+  // 数据集
+  {
+    path: "algorithm",
+    loadChildren: () =>
+      import("../main/algorithm/algorithm.module").then(
+        x => x.AlgorithmModule
+      ),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
   // 抽取
   {
     path: "extraction",

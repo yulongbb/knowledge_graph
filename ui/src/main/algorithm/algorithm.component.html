@@ -1,0 +1,73 @@
+<div class="container">
+  <x-card title="知识图谱展示">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <x-textarea formControlName="text" placeholder="请输入文本..."></x-textarea>
+      <button type="submit">抽取实体</button>
+    </form>
+  </x-card>
+
+  <div class="results" *ngIf="words.length || entities || relations">
+    <x-card title="分词结果" *ngIf="words.length">
+      <div class="result-item">
+        <strong>分词算法:</strong> Jieba 分词
+        <p>Jieba 是一种基于 Trie 树结构和动态规划的分词算法，能够有效地处理中文文本的分词任务。</p>
+        <button (click)="toggleSegmentApi()">API 接口说明</button>
+        <div *ngIf="showSegmentApi">
+          <strong>API 接口:</strong> <code>POST /segment</code>
+          <p>请求参数: <code>{{ '{' }}"text": "输入文本"{{ '}' }}</code></p>
+          <p>响应参数: <code>{{ '{' }}"words": ["分词结果"]{{ '}' }}</code></p>
+          <button (click)="testSegment()">测试分词</button>
+        </div>
+        <strong>分词结果:</strong>
+        <div class="words">
+          <span *ngFor="let word of words" class="word">{{ word }}</span>
+        </div>
+      </div>
+    </x-card>
+
+    <x-card title="实体抽取结果" *ngIf="entities">
+      <div class="result-item">
+        <strong>实体识别算法:</strong> BERT 序列标注
+        <p>BERT（Bidirectional Encoder Representations from Transformers）是一种基于 Transformer 架构的预训练语言模型，通过在大规模语料上进行预训练，能够捕捉上下文信息，从而在下游任务中表现出色。</p>
+        <button (click)="toggleRecognizeApi()">API 接口说明</button>
+        <div *ngIf="showRecognizeApi">
+          <strong>API 接口:</strong> <code>POST /recognize</code>
+          <p>请求参数: <code>{{ '{' }}"words": ["分词结果"]{{ '}' }}</code></p>
+          <p>响应参数: <code>{{ '{' }}"entities": {{ '{' }}"人名": ["人名"], "地名": ["地名"]{{ '}' }}{{ '}' }}</code></p>
+          <button (click)="testRecognize()">测试实体识别</button>
+        </div>
+        <strong>人名:</strong>
+        <div class="entities">
+          <span *ngFor="let entity of entities['人名']" class="entity">{{ entity }}</span>
+        </div>
+      </div>
+      <div class="result-item">
+        <strong>地名:</strong>
+        <div class="entities">
+          <span *ngFor="let entity of entities['地名']" class="entity">{{ entity }}</span>
+        </div>
+      </div>
+    </x-card>
+
+    <x-card title="关系抽取结果" *ngIf="relations">
+      <div class="result-item">
+        <strong>关系抽取算法:</strong> 基于规则的关系抽取
+        <p>通过定义特定的规则来抽取关系，例如“人名-动词-地点”的模式，并确保动词是“工作”。</p>
+        <button (click)="toggleExtractApi()">API 接口说明</button>
+        <div *ngIf="showExtractApi">
+          <strong>API 接口:</strong> <code>POST /extract</code>
+          <p>请求参数: <code>{{ '{' }}"entities": {{ '{' }}"人名": ["人名"], "地名": ["地名"]{{ '}' }}{{ '}' }}</code></p>
+          <p>响应参数: <code>{{ '{' }}"relations": [["人名", "工作", "地名"]]{{ '}' }}</code></p>
+          <button (click)="testExtract()">测试关系抽取</button>
+
+        </div>
+        <strong>关系抽取结果:</strong>
+        <div class="relations">
+          <div *ngFor="let relation of relations" class="relation">
+            {{ relation[0] }} - {{ relation[1] }} - {{ relation[2] }}
+          </div>
+        </div>
+      </div>
+    </x-card>
+  </div>
+</div>
