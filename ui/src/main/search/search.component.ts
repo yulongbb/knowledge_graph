@@ -808,13 +808,21 @@ export class SearchComponent implements OnInit {
   }
 
   preview(image: any) {
+    let img;
+    // 检查 imagePath 是否已经是完整的 URL
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      img = image;
+    } else {
+      // 如果不是完整的 URL，则添加前缀
+      img = 'http://localhost:9000/kgms/' + image;
+    }
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
       data: [
         {
-          src: 'http://localhost:9000/kgms/' + image,
+          src: 'http://localhost:9000/kgms/' + img,
         },
       ],
     });

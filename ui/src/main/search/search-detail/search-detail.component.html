@@ -27,7 +27,7 @@
           )
         "></p>
       <dl *ngFor="let property of propertyData()">
-        <dl *ngIf="getStatement(property).length > 0">
+        <dl *ngIf="getStatement(property)?.length > 0">
           <dt>
             {{ property.name }}
           </dt>
@@ -218,12 +218,14 @@
         <span>{{ entity()?._source?.modified }}</span>
         <span>{{ entity()?._id }}</span>
       </div>
+      {{images |json}}
       <div class="gallery" *ngIf="images">
         <div class="warp">
           <div *ngFor="let image of images">
-            <div [style.background-image]="'url(http://localhost:9000/kgms/' + image + ')' " (click)="preview(image)"
-              class="thumbnail">
-            </div>
+            <div (click)="preview(image)" 
+            class="thumbnail"
+            [style.background-image]="'url(' + getFullImageUrl(image) + ')'" 
+       ></div>
           </div>
         </div>
       </div>

@@ -64,7 +64,7 @@
   <div class="gallery">
     <div class="warp">
       <div *ngFor="let image of images">
-        <div (click)="preview(image.image)" 
+        <div (click)="preview(getFullImageUrl(image.image))" 
              class="thumbnail"
              [style.background-image]="'url(' + getFullImageUrl(image.image) + ')'" 
         ></div>

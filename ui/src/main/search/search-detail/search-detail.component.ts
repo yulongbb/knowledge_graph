@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Query, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Query, Signal, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { XGuid } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
@@ -95,7 +95,7 @@ export class SearchDetailComponent implements OnInit {
   claims: any;
 
   properties: any;
-  propertyData: any;
+  propertyData: Signal<any[]> = signal([]);
 
   statements: any;
 
@@ -110,7 +110,7 @@ export class SearchDetailComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {  noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
@@ -241,13 +241,21 @@ export class SearchDetailComponent implements OnInit {
 
 
   preview(image: any) {
+    let img;
+    // 检查 imagePath 是否已经是完整的 URL
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      img = image;
+    } else {
+      // 如果不是完整的 URL，则添加前缀
+      img = 'http://localhost:9000/kgms/' + image;
+    }
     this.dialogService.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
       data: [
         {
-          src: 'http://localhost:9000/kgms/' + image,
+          src: img,
         },
       ],
     });
@@ -373,11 +381,8 @@ export class SearchDetailComponent implements OnInit {
 
           this.entity = signal(x);
           this.item = x._source;
-          this.imgs = [];
           this.tag = signal(this.item?.tags);
-          this.item?.images?.forEach((image: any) => {
-            this.imgs.push({ url: `http://localhost:9000/kgms/${image}` });
-          });
+       
 
           console.log(this.item)
           if (this.item.location) {
@@ -550,9 +555,20 @@ export class SearchDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-    return this.claims.filter(
+    return this.claims?.filter(
       (c: any) => c.mainsnak.property == `P${property.id}`
     );
+  }
+
+  // 在你的组件类中添加此方法
+  getFullImageUrl(imagePath: string): string {
+    // 检查 imagePath 是否已经是完整的 URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    } else {
+      // 如果不是完整的 URL，则添加前缀
+      return 'http://localhost:9000/kgms/' + imagePath;
+    }
   }
 
   back() {
