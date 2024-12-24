@@ -67,7 +67,12 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
 
 
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
-                        statement['mainsnak']['property'] = 'P' + prop[0]?.id;
+
+                        if (!prop) {
+                            prop = this.propertiesService.post({schemas:[{id: from.type}], name: statement.mainsnak.property, type: 'string' });
+                        }
+
+                        statement['mainsnak']['property'] = 'P' + prop?.id;
 
                         if (prop[0]?.type == 'wikibase-item') {
                             let to: any;
@@ -92,13 +97,20 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             }
                             // 创建关系
                             statement['_from'] = from['_id']
-                          
+
                             statement.mainsnak.datatype = 'wikibase-item';
                             statement.mainsnak.datavalue.type = "wikibase-entityid"
                             statement.mainsnak.datavalue.value = {
                                 "entity-type": "item",
                                 "id": to['_key']
                             }
+                        } else if (prop?.type == 'monolingualtext') {
+                            // 创建关系
+                            statement['_from'] = from['_id']
+                            statement['_to'] = from['_id']
+                            statement.mainsnak.datatype = 'monolingualtext';
+                            statement.mainsnak.datavalue.type = "string"
+                            statement.mainsnak.datavalue.value = statement.mainsnak.datavalue.value
                         } else {
                             // 创建关系
                             statement['_from'] = from['_id']

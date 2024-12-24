@@ -12,7 +12,7 @@
     [tableData]="grid.schema" multiple></x-find>
   <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
     [tableData]="grid.schema"></x-find>
-  <x-button type="success" icon="fto-upload" (click)="importData()">导入</x-button>
+    <x-button type="success" icon="fto-upload" (click)="importData()">导入</x-button>
 </au-tool>
 <x-progress *ngFor="let job of jobs" [percent]="job.progress"></x-progress>
 <x-row>

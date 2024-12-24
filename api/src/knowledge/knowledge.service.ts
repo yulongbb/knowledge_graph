@@ -4,6 +4,8 @@ import { XIdType } from 'src/core';
 import { EsService } from './es.service';
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { SchemasService } from 'src/ontology/services/schemas.service';
+import { Schema } from 'src/ontology/entities/schema.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class KnowledgeService {
@@ -147,7 +149,14 @@ export class KnowledgeService {
         // };
 
         if(!entity.type.id){
-          const schema = await this.schemasService.getByName(entity.type);
+          let schema = await this.schemasService.getByName(entity.type);
+          if(!schema){
+            let s= new Schema();
+            s.id = uuidv4();;
+            s.name = entity.type;
+            s.label = entity.type;
+            schema = await this.schemasService.post(s);
+          }
           entity.type = {id: schema.id, name: schema.name };
           console.log(entity.type)
         }
@@ -218,7 +227,7 @@ export class KnowledgeService {
         //     });
         //   },
         // );
-        let data = await this.elasticsearchService.bulk({
+        let source = {
           type: entity.type.id,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
@@ -228,13 +237,15 @@ export class KnowledgeService {
           items: ['entity/' + doc['_key']],
           images: entity?.images,
           location: entity?.location,
-        });
+        };
+        let data = await this.elasticsearchService.bulk(source);
+        
         console.log(JSON.stringify(data));
         document.document(doc['_key']).then((existingDocument) => {
           existingDocument.id = data['items'][0]['index']['_id'];
           document.update(doc['_key'], existingDocument);
         });
-        return doc;
+        return  { ...doc, ...source };;
       },
       (err) => console.error('Failed to save document:', err),
     );

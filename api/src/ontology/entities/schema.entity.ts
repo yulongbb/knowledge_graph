@@ -17,9 +17,9 @@ export class Schema {
   id: string;
 
   @Column({ name: 'name' }) name: string;
+  @Column({ type: 'text' }) label: string;
 
-  @Column({ default: 1 }) value: number;
-  @Column({ nullable: true, type: 'text' }) label: string;
+  @Column({ nullable: true, default: 1 }) value: number;
   @Column({ nullable: true, type: 'text' }) description: string;
   @Column({ nullable: true, type: 'text' }) collection: string;
 

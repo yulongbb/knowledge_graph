@@ -8,7 +8,7 @@ import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
 import { XTextareaModule } from '@ng-nest/ui/textarea';
-import { XCheckboxModule, XInputModule, XProgressModule, XTransferModule } from "@ng-nest/ui";
+import { XCheckboxModule, XDialogModule, XInputModule, XProgressModule, XTransferModule } from "@ng-nest/ui";
 import { XStepsModule } from '@ng-nest/ui/steps';
 import { XTabsModule } from '@ng-nest/ui/tabs';
 
@@ -28,10 +28,11 @@ import { XTabsModule } from '@ng-nest/ui/tabs';
     XTransferModule,
     XStepsModule,
     XTabsModule,
+    XDialogModule,
     XCheckboxModule,
     XProgressModule,
     ExtractionRoutesModule
   ],
-  declarations: [ExtractionComponent, ]
+  declarations: [ExtractionComponent ]
 })
 export class ExtractionModule {}

@@ -2,7 +2,7 @@ import { PageBase } from 'src/share/base/base-page';
 import { Component, ElementRef, signal, ViewChild } from '@angular/core';
 import { XMessageService } from '@ng-nest/ui/message';
 import { IndexService } from 'src/layout/index/index.service';
-import { XGuid, XMessageBoxAction, XMessageBoxService, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow, XTransferNode } from '@ng-nest/ui';
+import { XDialogService, XGuid, XMessageBoxAction, XMessageBoxService, XPlace, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow, XTransferNode } from '@ng-nest/ui';
 import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, map, Observable, tap } from 'rxjs';
@@ -37,7 +37,6 @@ export class ExtractionComponent extends PageBase {
       map((x: any) => x.list)
     );
   dataset: any;
-  value = signal([1, 3, 7]);
   tableColumns = signal<XTableColumn[]>([
     { id: 'id', label: '序号', type: 'index', width: 80 },
     { id: 'name', label: '用户', flex: 1, sort: true },
@@ -52,9 +51,7 @@ export class ExtractionComponent extends PageBase {
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model = signal([]);
-  checkAllData = signal(['全选']);
-  checkAll = signal(false);
-  indeterminate = signal(true);
+  ;
   jobs: any;
 
   constructor(
@@ -68,7 +65,9 @@ export class ExtractionComponent extends PageBase {
     private message: XMessageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private msgBox: XMessageBoxService
+    private msgBox: XMessageBoxService,
+    private dialogService: XDialogService,
+
   ) {
     super(indexService);
   }
@@ -78,7 +77,9 @@ export class ExtractionComponent extends PageBase {
     this.fetchJobs();
   }
 
-   // 初始化网格组件
+
+
+  // 初始化网格组件
   setupGrid() {
     this.grid = canvasDatagrid();
     this.grid.style.height = '1100px';
@@ -111,7 +112,6 @@ export class ExtractionComponent extends PageBase {
 
   // 选择数据集并加载其数据
   selectDataset(value: string) {
-    console.log(value);
     this.datasetService.get(value).subscribe((dataset: any) => {
       this.loadDataset(dataset.files[0]);
     });
@@ -121,7 +121,6 @@ export class ExtractionComponent extends PageBase {
   loadDataset(file: string) {
     this.fetchJson(`http://localhost:9000/kgms/${file}`).then((data: Array<any>) => {
       this.grid.data = data.map(({ _id, ...rest }) => rest);
-      console.log(this.grid.schema);
       this.properties = this.grid.schema.map((p: any) => p.name);
     }).catch(error => {
       console.error('Error fetching JSON:', error);
@@ -147,22 +146,29 @@ export class ExtractionComponent extends PageBase {
   // 将数据导入节点服务
   importData() {
     const props = this.getFilteredProperties();
+
     const data = this.grid.data.map((row: any) => this.createEntity(row, props));
+
     this.nodeService.import(data).subscribe((res: any) => {
       console.log(res);
     });
   }
 
+
+
+
+
   // 获取过滤后的属性
   getFilteredProperties() {
-    return this.model().filter((p: string) => ![
+    console.log(this.tags)
+    console.log(this.images)
+    return this.grid.schema.filter((p: any) => ![
       this.label?.name,
       this.description?.name,
       this.aliase?.name,
       this.category?.name,
-      this.tags?.name,
       this.images?.name,
-    ].includes(p));
+    ].concat(this.tags?.map((t: any) => t.name)).includes(p.name)).map((p: any) => p.name);
   }
 
   // 从数据行创建实体

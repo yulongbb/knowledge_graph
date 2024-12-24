@@ -19,7 +19,7 @@ export class PropertiesService extends XRepositoryService<Property, XQuery> {
 
   getPropertyByName(name: string): Promise<any> {
     console.log(name);
-    return this.propertiesRepository.find( {where: {name: name }})
+    return this.propertiesRepository.findOneBy({name: name })
   }
  
 
