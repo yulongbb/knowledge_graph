@@ -1,5 +1,5 @@
 .container {
-  max-width: 600px;
+  max-width: 100%;
   margin: auto;
   padding: 20px;
 }
@@ -18,4 +18,9 @@ x-card {
   border-radius: 4px;
   padding: 5px 10px;
   margin: 5px;
+}
+
+.full-width {
+  width: 100%;
+  box-sizing: border-box;
 }

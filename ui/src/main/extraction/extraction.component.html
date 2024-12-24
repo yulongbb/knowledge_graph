@@ -1,33 +1,19 @@
 <au-tool>
   <x-select [data]="datasets" [(ngModel)]="dataset" (ngModelChange)="selectDataset($event)"></x-select>
-  <x-button type="success" icon="fto-upload" (click)="import()">导入</x-button>
+  <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema"></x-find>
+  <x-find label="描述" columnLabel="name" direction="row" [(ngModel)]="description" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema"></x-find>
+  <x-find label="别名" columnLabel="name" direction="row" [(ngModel)]="aliase" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema"></x-find>
+  <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema"></x-find>
+  <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema" multiple></x-find>
+  <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
+    [tableData]="grid.schema"></x-find>
+  <x-button type="success" icon="fto-upload" (click)="importData()">导入</x-button>
 </au-tool>
-
+<x-progress *ngFor="let job of jobs" [percent]="job.progress"></x-progress>
 <x-row>
-  <x-col span="8">
-    
-    <div class="row" *ngIf="properties">
-      <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
-    <x-find label="描述" columnLabel="name" direction="row" [(ngModel)]="description" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
-    <x-find label="别名" columnLabel="name" direction="row" [(ngModel)]="aliase" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
-    <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
-    <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema" multiple></x-find>
-    <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
-      [tableData]="grid.schema"></x-find>
-      <x-checkbox [data]="checkAllData()" [(ngModel)]="checkAll" (ngModelChange)="change($event)"
-        [indeterminate]="indeterminate()" single></x-checkbox>
-      <x-checkbox vertical [data]="properties" [(ngModel)]="model" (ngModelChange)="itemChange($event)"></x-checkbox>
-    </div>
-  </x-col>
-  <x-col span="16">
-    <div #datagridContainer></div>
-  </x-col>
-</x-row>
-
-
-<x-progress  *ngFor="let job of jobs" [percent]="job.progress"></x-progress>
+  <div #datagridContainer class="canvas-datagrid-container"></div></x-row>

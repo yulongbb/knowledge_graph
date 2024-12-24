@@ -12,19 +12,14 @@ export class AlgorithmComponent {
   words: string[] = [];
   entities: any;
   relations: any;
-  segmentText: string = '';
-  recognizeText: string = '';
-  extractText: string = '';
-  showSegmentApi: boolean = false;
-  showRecognizeApi: boolean = false;
-  showExtractApi: boolean = false;
+  entityTypes: string[] = [];
 
   constructor(
     private fb: FormBuilder,
     private knowledgeGraphService: AlgorithmService
   ) {
     this.form = this.fb.group({
-      text: ['孙玉龙在北京上学']
+      text: ['70-1式自行榴弹炮是中国北方工业公司研制生产的。第一型未依靠俄国协助自行设计的履带式自行火炮，使用63式装甲运兵车的底盘为基础设计，是类似二战自行火炮的敞开式设计，是用装甲车加榴炮弹的结合体。工厂产品型号WZ302，共生产126辆。']
     });
   }
 
@@ -32,44 +27,15 @@ export class AlgorithmComponent {
     const text = this.form.get('text')?.value;
     this.knowledgeGraphService.segmentText(text).subscribe(data => {
       this.words = data.words;
-      this.knowledgeGraphService.recognizeEntities(this.words).subscribe(data => {
-        this.entities = data.entities;
-        this.knowledgeGraphService.extractRelations(this.entities).subscribe(data => {
-          this.relations = data.relations;
-        });
-      });
+     
     });
-  }
-
-  testSegment() {
-    this.knowledgeGraphService.segmentText(this.segmentText).subscribe(data => {
-      this.words = data.words;
-    });
-  }
-
-  testRecognize() {
-    const words = this.recognizeText.split(' ');
-    this.knowledgeGraphService.recognizeEntities(words).subscribe(data => {
+    this.knowledgeGraphService.recognizeEntities(text).subscribe(data => {
       this.entities = data.entities;
+      this.entityTypes = Object.keys(this.entities);
     });
-  }
-
-  testExtract() {
-    const entities = JSON.parse(this.extractText);
-    this.knowledgeGraphService.extractRelations(entities).subscribe(data => {
+    this.knowledgeGraphService.extractRelations(text).subscribe(data => {
       this.relations = data.relations;
     });
   }
 
-  toggleSegmentApi() {
-    this.showSegmentApi = !this.showSegmentApi;
-  }
-
-  toggleRecognizeApi() {
-    this.showRecognizeApi = !this.showRecognizeApi;
-  }
-
-  toggleExtractApi() {
-    this.showExtractApi = !this.showExtractApi;
-  }
 }

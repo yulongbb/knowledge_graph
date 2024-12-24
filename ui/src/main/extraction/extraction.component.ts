@@ -13,7 +13,6 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DatasetService } from '../dataset/dataset.sevice';
 declare const canvasDatagrid: any;
 
-
 @Component({
   selector: 'app-extraction',
   templateUrl: 'extraction.component.html',
@@ -25,77 +24,43 @@ export class ExtractionComponent extends PageBase {
 
   data = [];
   type: any;
-
-
-
-
   index = 1;
   keyword: any = '';
   query: XQuery = { filter: [] };
   properties: any;
   properties2: any = signal([]);
   items: any = signal([]);
-
   activated = signal(0);
-  steps = signal(['数据解析', '知识录入', '属性配置']);
-
-  pre() {
-    this.activated.update((x) => --x);
-  }
-
-  next() {
-    this.activated.update((x) => ++x);
-  }
-
-  done() { }
-
-
-  dataset: any;
   datasets = (index: number, size: number, query: any) =>
     this.datasetService.getList(index, size, query).pipe(
       tap((x: any) => console.log(x.list)),
       map((x: any) => x.list)
     );
-
-
+  dataset: any;
   value = signal([1, 3, 7]);
-
   tableColumns = signal<XTableColumn[]>([
     { id: 'id', label: '序号', type: 'index', width: 80 },
     { id: 'name', label: '用户', flex: 1, sort: true },
   ]);
-
   label: any;
   description: any;
   aliase: any;
   category: any;
   tags: any;
   images: any;
-
   checkedRows: XTableRow[] = [];
 
-  columns: XTableColumn[] = [
-    { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
-    { id: 'name', label: '序号', flex: 0.5, left: 0, type: 'index' },
-    { id: 'title', label: '操作', width: 100 },
-    { id: 'subject', label: '实体', flex: 1, sort: true },
-    { id: 'property', label: '属性', flex: 0.5, sort: true },
-    { id: 'object', label: '值', flex: 1 },
-  ];
   @ViewChild('tableCom') tableCom!: XTableComponent;
-
   model = signal([]);
   checkAllData = signal(['全选']);
   checkAll = signal(false);
   indeterminate = signal(true);
-
-  jobs:any;
+  jobs: any;
 
   constructor(
     public override indexService: IndexService,
     private ontologyService: OntologyService,
     private datasetService: DatasetService,
-
     private service: ExtractionService,
     private propertyService: PropertyService,
     private esService: EsService,
@@ -109,179 +74,155 @@ export class ExtractionComponent extends PageBase {
   }
 
   ngOnInit(): void {
+    this.setupGrid();
+    this.fetchJobs();
+  }
+
+   // 初始化网格组件
+  setupGrid() {
     this.grid = canvasDatagrid();
-    this.grid.style.height = '800px';
-    this.grid.style.width = '100%';
+    this.grid.style.height = '1100px';
+    this.grid.style.width = '10000px'; // 设置一个足够大的宽度以启用水平滚动
+    this.grid.style.overflowX = 'auto'; // 添加水平滚动条
+    this.grid.style.whiteSpace = 'nowrap'; // 防止内容换行
     this.grid.data = this.data;
+    this.optimizeGridStyles();
     this.datagridContainer.nativeElement.appendChild(this.grid);
-    this.nodeService.jobs().subscribe((data:any)=>{
+  }
+  // 优化网格样式
+  optimizeGridStyles() {
+    this.grid.style.border = '1px solid #ccc';
+    this.grid.style.fontFamily = 'Arial, sans-serif';
+    this.grid.style.fontSize = '14px';
+    this.grid.style.backgroundColor = '#f9f9f9';
+    this.grid.style.color = '#333';
+    this.grid.style.borderRadius = '4px';
+    this.grid.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+  }
+
+  // 从节点服务加载作业
+  fetchJobs() {
+    this.nodeService.jobs().subscribe((data: any) => {
       this.jobs = data;
-    })
-  }
-
-  change(value: boolean) {
-    this.model.set(value ? this.properties.map((x: any) => x) : []);
-    this.indeterminate.set(false);
-  }
-
-  itemChange(value: string[]) {
-    this.checkAll.set(value.length === this.properties.length);
-    this.indeterminate.set(value.length > 0 && value.length < this.properties.length);
-  }
-
-  selectDataset(value: string) {
-    console.log(value);
-    this.datasetService.get(value).subscribe((x: any) => {
-      this.fetchJson('http://localhost:9000/kgms/' + x.files[0]).then((data: Array<any>) => {
-        this.grid.data = data.map(item => {
-          const { _id, ...rest } = item; // 解构赋值，排除 _id
-          return rest;
-        });
-        console.log(this.grid.schema)
-        this.properties = this.grid.schema.map((p: any) => p.name);
-      }).catch(error => {
-        console.error('Error fetching JSON:', error);
-      });
     });
   }
 
+
+
+  // 选择数据集并加载其数据
+  selectDataset(value: string) {
+    console.log(value);
+    this.datasetService.get(value).subscribe((dataset: any) => {
+      this.loadDataset(dataset.files[0]);
+    });
+  }
+
+  // 从文件加载数据集数据
+  loadDataset(file: string) {
+    this.fetchJson(`http://localhost:9000/kgms/${file}`).then((data: Array<any>) => {
+      this.grid.data = data.map(({ _id, ...rest }) => rest);
+      console.log(this.grid.schema);
+      this.properties = this.grid.schema.map((p: any) => p.name);
+    }).catch(error => {
+      console.error('Error fetching JSON:', error);
+    });
+  }
+
+  // 从URL获取JSON数据
   async fetchJson(url: string): Promise<any> {
     try {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      const text = await response.text(); // 获取整个文件的文本内容
-      const lines = text.split('\n').filter(line => line.trim() !== ''); // 按行分割，并去除空行
-
-      return lines.map(line => JSON.parse(line)); // 解析每一行作为一个独立的JSON对象
+      const text = await response.text();
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      return lines.map(line => JSON.parse(line));
     } catch (error) {
       console.error('Failed to fetch or parse JSONL:', error);
       throw error;
     }
   }
 
-  import() {
+  // 将数据导入节点服务
+  importData() {
+    const props = this.getFilteredProperties();
+    const data = this.grid.data.map((row: any) => this.createEntity(row, props));
+    this.nodeService.import(data).subscribe((res: any) => {
+      console.log(res);
+    });
+  }
 
-    let props = this.model().filter((p: string) => [
+  // 获取过滤后的属性
+  getFilteredProperties() {
+    return this.model().filter((p: string) => ![
       this.label?.name,
       this.description?.name,
       this.aliase?.name,
       this.category?.name,
       this.tags?.name,
       this.images?.name,
-    ].indexOf(p) < 0)
-    console.log(props);
-    // let link = {
-    //   "mainsnak": {
-    //     "snaktype": "value",
-    //     "property": "P31",
-    //     "datavalue": {
-    //       "value": {
-    //         "entity-type": "item",
-    //         "numeric-id": 52288878,
-    //         "id": "52288878"
-    //       },
-    //       "type": "wikibase-entityid"
-    //     },
-    //     "datatype": "wikibase-item"
-    //   },
-    //   "type": "statement",
-    //   "rank": "normal"
-    // }
+    ].includes(p));
+  }
 
-    let data: any = []
-    this.grid.data.forEach((row: any) => {
-      let entity: any = {};
-      if (this.label?.name) {
-        if (row[this.label.name] != '') {
-          entity["labels"] = {
-            "zh": {
-              "language": "zh",
-              "value": row[this.label.name]
-            }
-          };
-        }
+  // 从数据行创建实体
+  createEntity(row: any, props: string[]) {
+    const entity: any = {};
+    this.addBasicProperties(entity, row);
+    this.addTags(entity, row);
+    this.addClaims(entity, row, props);
+    return entity;
+  }
 
-      }
-      if (this.description?.name) {
-        if (row[this.description.name] != '') {
-          entity["descriptions"] = {
-            "zh": {
-              "language": "zh",
-              "value": row[this.description.name]
-            }
-          };
-        }
+  // 向实体添加基本属性
+  addBasicProperties(entity: any, row: any) {
+    if (this.label?.name && row[this.label.name]) {
+      entity["labels"] = { "zh": { "language": "zh", "value": row[this.label.name] } };
+    }
+    if (this.description?.name && row[this.description.name]) {
+      entity["descriptions"] = { "zh": { "language": "zh", "value": row[this.description.name] } };
+    }
+    if (this.aliase?.name && row[this.aliase.name]) {
+      entity["aliases"] = { "zh": [{ "language": "zh", "value": row[this.aliase.name] }] };
+    }
+    if (this.category?.name && row[this.category.name]) {
+      entity["category"] = row[this.category.name];
+      entity["type"] = row[this.category.name];
+    }
+    if (this.images?.name && row[this.images.name]) {
+      entity["images"] = [row[this.images.name]];
+    }
+  }
 
+  // 向实体添加标签
+  addTags(entity: any, row: any) {
+    entity["tags"] = [];
+    this.tags?.forEach((tag: any) => {
+      if (tag.name && row[tag.name]) {
+        entity["tags"].push(row[tag.name]);
       }
-      if (this.aliase?.name) {
-        if (row[this.aliase.name] != '') {
-          entity["aliases"] = {
-            "zh": [
-              {
-                "language": "zh",
-                "value": row[this.aliase.name]
-              }
-            ]
-          };
-        }
-      }
-      if (this.category?.name) {
-        if (row[this.category.name] != '') {
-          entity["category"] = row[this.category.name]
-        }
-      }
-      if (this.category?.name) {
-        if (row[this.category.name] != '') {
-          entity["type"] = row[this.category.name]
-        }
-      }
-      entity["tags"] = []
-      this.tags?.forEach((tag: any) => {
-        if (tag.name) {
-          if (row[tag.name] != '') {
-            entity["tags"].push(row[tag.name])
-          }
-        }
-      });
-
-      if (this.images?.name) {
-        if (row[this.images.name] != '') {
-          entity["images"] = [row[this.images.name]]
-        }
-      }
-      entity['claims'] = {}
-      props.forEach((prop: any) => {
-        if (row[prop]) {
-          entity['claims'][prop] = [];
-          entity['claims'][prop].push(
-            {
-              "mainsnak": {
-                "snaktype": "value",
-                "property": prop,
-                "datavalue": {
-                  "value": row[prop],
-                  "type": "wikibase-entityid"
-                },
-                "datatype": "wikibase-item"
-              },
-              "type": "statement",
-              "rank": "normal"
-            }
-          )
-        }
-
-      })
-      console.log(entity)
-      data.push(entity)
     });
+  }
 
-    this.nodeService.import(data).subscribe((res: any) => {
-      console.log(res)
-    })
-
-
+  // 向实体添加声明
+  addClaims(entity: any, row: any, props: string[]) {
+    entity['claims'] = {};
+    props.forEach((prop: any) => {
+      if (row[prop]) {
+        entity['claims'][prop] = [{
+          "mainsnak": {
+            "snaktype": "value",
+            "property": prop,
+            "datavalue": {
+              "value": row[prop],
+              "type": "wikibase-entityid"
+            },
+            "datatype": "wikibase-item"
+          },
+          "type": "statement",
+          "rank": "normal"
+        }];
+      }
+    });
   }
 }

@@ -6,9 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AlgorithmService {
-  private segmentApiUrl = 'http://localhost:5555/segment';
-  private recognizeApiUrl = 'http://localhost:5555/recognize';
-  private extractApiUrl = 'http://localhost:5555/extract';
+  private segmentApiUrl = 'http://10.117.1.238:5555/segment';
+  private recognizeApiUrl = 'http://10.117.1.238:5555/recognize';
+  private extractApiUrl = 'http://10.117.1.238:5555/extract';
 
   constructor(private http: HttpClient) { }
 
@@ -16,11 +16,11 @@ export class AlgorithmService {
     return this.http.post<any>(this.segmentApiUrl, { text });
   }
 
-  recognizeEntities(words: string[]): Observable<any> {
-    return this.http.post<any>(this.recognizeApiUrl, { words });
+  recognizeEntities(text: string[]): Observable<any> {
+    return this.http.post<any>(this.recognizeApiUrl, { text });
   }
 
-  extractRelations(entities: any): Observable<any> {
-    return this.http.post<any>(this.extractApiUrl, { entities });
+  extractRelations(text: any): Observable<any> {
+    return this.http.post<any>(this.extractApiUrl, { text });
   }
 }
