@@ -64,12 +64,10 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             aliases: { zh: [{ language: 'zh', value: statement.mainsnak.datavalue.value }] },
                         };
 
-
-
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
 
                         if (!prop) {
-                            prop = this.propertiesService.post({schemas:[{id: from.type}], name: statement.mainsnak.property, type: 'string' });
+                            prop = this.propertiesService.post({ schemas: [{ id: from.type }], name: statement.mainsnak.property, type: 'string' });
                         }
 
                         statement['mainsnak']['property'] = 'P' + prop?.id;

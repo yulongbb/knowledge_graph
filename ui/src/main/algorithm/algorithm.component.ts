@@ -19,7 +19,7 @@ export class AlgorithmComponent {
     private knowledgeGraphService: AlgorithmService
   ) {
     this.form = this.fb.group({
-      text: ['70-1式自行榴弹炮是中国北方工业公司研制生产的。第一型未依靠俄国协助自行设计的履带式自行火炮，使用63式装甲运兵车的底盘为基础设计，是类似二战自行火炮的敞开式设计，是用装甲车加榴炮弹的结合体。工厂产品型号WZ302，共生产126辆。']
+      text: ['肖特360由330发展而来，对机身作了加长，以便利用美国撤销管制规定后产生的容积增长空间。360与330最明显的不同在于用常规尾翼替换了330的双尾翼。肖特360机型于1981年6月1日首飞，1982年12月1日在美国SuburbanAirlines航空公司开始服役。该机型共计交付了164架。']
     });
   }
 
@@ -27,7 +27,6 @@ export class AlgorithmComponent {
     const text = this.form.get('text')?.value;
     this.knowledgeGraphService.segmentText(text).subscribe(data => {
       this.words = data.words;
-     
     });
     this.knowledgeGraphService.recognizeEntities(text).subscribe(data => {
       this.entities = data.entities;
