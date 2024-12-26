@@ -67,7 +67,15 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
 
                         if (!prop) {
-                            prop = this.propertiesService.post({ schemas: [{ id: from.type }], name: statement.mainsnak.property, type: 'string' });
+                            prop = await this.propertiesService.post({ schemas: [{ id: from.type }], name: statement.mainsnak.property, type: 'string' });
+                        } else {
+                            const hasType = prop.schemas.some(schema => schema.id === from.type);
+
+                            if (!hasType) {
+                                prop.schemas.push({ id: from.type })
+                                prop = await this.propertiesService.put(prop);
+                            }
+
                         }
 
                         statement['mainsnak']['property'] = 'P' + prop?.id;
@@ -117,17 +125,13 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             statement.mainsnak.datavalue.type = "string"
                             statement.mainsnak.datavalue.value = statement.mainsnak.datavalue.value
                         }
-
-
                         await this.edgeService.addEdge(statement); // 确保这是个异步操作
                     });
                 });
-
                 completedItems++;
                 // 更新进度，假设每个数据项完成都增加相同的进度比例
                 job.updateProgress(Math.round((completedItems / totalItems) * 100));
             }
-
             // 如果所有项目都成功处理，则设置进度为100%
             job.updateProgress(100);
         } catch (error) {
