@@ -5,7 +5,7 @@ import { IndexService } from 'src/layout/index/index.service';
 import { XDialogService, XGuid, XMessageBoxAction, XMessageBoxService, XPlace, XQuery, XTableColumn, XTableComponent, XTableHeadCheckbox, XTableRow, XTransferNode } from '@ng-nest/ui';
 import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, map, Observable, tap } from 'rxjs';
+import { forkJoin, map, Observable, Subscription, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
 import { EsService } from '../search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
@@ -27,8 +27,6 @@ export class ExtractionComponent extends PageBase {
   index = 1;
   keyword: any = '';
   query: XQuery = { filter: [] };
-  properties: any;
-  properties2: any = signal([]);
   items: any = signal([]);
   activated = signal(0);
   datasets = (index: number, size: number, query: any) =>
@@ -39,20 +37,28 @@ export class ExtractionComponent extends PageBase {
   dataset: any;
   tableColumns = signal<XTableColumn[]>([
     { id: 'id', label: '序号', type: 'index', width: 80 },
-    { id: 'name', label: '用户', flex: 1, sort: true },
+    { id: 'name', label: '字段名', flex: 1, sort: true },
   ]);
   label: any;
   description: any;
-  aliase: any;
   category: any;
+
+  aliases: any;
   tags: any;
   images: any;
+
+
   checkedRows: XTableRow[] = [];
 
   @ViewChild('tableCom') tableCom!: XTableComponent;
   model = signal([]);
-  ;
-  jobs: any;
+
+  latestJob: any = null;
+  showProgress: any = false;
+  isImporting = false;
+
+  private intervalId: any;
+  private subscription: Subscription = new Subscription;
 
   constructor(
     public override indexService: IndexService,
@@ -74,9 +80,7 @@ export class ExtractionComponent extends PageBase {
 
   ngOnInit(): void {
     this.setupGrid();
-    this.fetchJobs();
   }
-
 
 
   // 初始化网格组件
@@ -86,10 +90,93 @@ export class ExtractionComponent extends PageBase {
     this.grid.style.width = '10000px'; // 设置一个足够大的宽度以启用水平滚动
     this.grid.style.overflowX = 'auto'; // 添加水平滚动条
     this.grid.style.whiteSpace = 'nowrap'; // 防止内容换行
-    this.grid.data = this.data;
+    // 设置初始列定义
+    this.grid.columns = [
+      { label: '名称', property: '名称' },
+      { label: '描述', property: '描述' },
+      { label: '别名', property: '别名' },
+      { label: '类型', property: '类型' },
+      { label: '标签', property: '标签' },
+      { label: '文件', property: '文件' }
+    ];
+    // 绑定数据到网格，默认加载100条空数据
+    // 绑定数据到网格，默认加载100条空数据
+    this.grid.data = this.generateDefaultData();    // 自定义上下文菜单
+    this.grid.addEventListener('contextmenu', (e: any) => {
+      e.items.push({
+        title: '添加行',
+        click: () => this.addCustomRows(1) // 默认添加一行
+      });
+      e.items.push({
+        title: '添加列',
+        click: () => this.addCustomColumn() // 默认添加一行
+      });
+    });
     this.optimizeGridStyles();
     this.datagridContainer.nativeElement.appendChild(this.grid);
   }
+
+  generateDefaultData(): any[] {
+    return Array.from({ length: 10 }, (_, i) => ({
+      名称: '',
+      描述: '',
+      别名: '',
+      类型: '',
+      标签: '',
+      文件: ''
+    }));
+  }
+
+  addCustomColumn() {
+    console.log('请输入新列名');
+    const columnName = prompt('请输入新列名');
+    if (columnName && columnName.trim()) {
+      const lowerColumnName = columnName.toLowerCase();
+      // 检查是否已经存在该列
+      if (!this.grid.columns?.some((col: any) => col.property === lowerColumnName)) {
+        this.grid.addColumn({
+          defaultValue: (e: any) => {
+            return '';
+          },
+          title: lowerColumnName,
+          name: lowerColumnName,
+        });
+      } else {
+        alert(`列名 "${columnName}" 已经存在`);
+      }
+    } else {
+      alert('列名不能为空');
+    }
+  }
+
+
+  addCustomRows(rowCount: number = 1) {
+    console.log('请输入有效的行数');
+
+    if (isNaN(rowCount) || rowCount < 1) {
+      alert('请输入有效的行数');
+      return;
+    }
+
+    // 获取当前最大ID
+    let maxId = Math.max(...this.grid.data.map((item: any) => item.id), 0);
+
+    console.log(this.grid.columns)
+
+    // 创建新的行数据
+    const newData = Array.from({ length: rowCount }, (_, index) => ({
+      id: maxId + index + 1,
+      ...Object.fromEntries(this.grid.columns.map((col: any) => [col.property, '']))
+    }));
+
+    // 将新行添加到现有数据中
+    this.grid.data.push(...newData);
+
+    // 刷新表格视图以反映更改
+    this.grid.refresh();
+    console.log(`Added ${rowCount} rows.`);
+  }
+
   // 优化网格样式
   optimizeGridStyles() {
     this.grid.style.border = '1px solid #ccc';
@@ -101,14 +188,32 @@ export class ExtractionComponent extends PageBase {
     this.grid.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
   }
 
-  // 从节点服务加载作业
-  fetchJobs() {
-    this.nodeService.jobs().subscribe((data: any) => {
-      this.jobs = data;
-    });
+  startPolling() {
+    this.showProgress = true;
+    this.intervalId = setInterval(() => this.fetchLatestJob(), 5000); // 每5秒轮询一次
   }
 
+  stopPolling() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+  }
 
+  fetchLatestJob() {
+    this.subscription = this.nodeService.jobs().subscribe(
+      (data: any[]) => {
+        // 假设作业按照创建时间排序，最新的在最后
+        const unfinishedJobs = data.filter(job => job.progress < 100);
+        if (unfinishedJobs.length > 0) {
+          this.latestJob = unfinishedJobs[unfinishedJobs.length - 1]; // 获取最新的未完成作业
+        } else {
+          this.showProgress = false; // 如果没有进行中的作业，隐藏进度条并停止轮询
+          this.stopPolling();
+        }
+      },
+      (error) => console.error('Error fetching jobs:', error)
+    );
+  }
 
   // 选择数据集并加载其数据
   selectDataset(value: string) {
@@ -121,7 +226,6 @@ export class ExtractionComponent extends PageBase {
   loadDataset(file: string) {
     this.fetchJson(`http://localhost:9000/kgms/${file}`).then((data: Array<any>) => {
       this.grid.data = data.map(({ _id, ...rest }) => rest);
-      this.properties = this.grid.schema.map((p: any) => p.name);
     }).catch(error => {
       console.error('Error fetching JSON:', error);
     });
@@ -145,30 +249,35 @@ export class ExtractionComponent extends PageBase {
 
   // 将数据导入节点服务
   importData() {
+    this.isImporting = true;
+    this.showProgress = false; // 确保进度条不立即显示
+
+    // 模拟启动导入任务的过程，实际应用中应替换为真实逻辑
+    setTimeout(() => {
+      this.fetchLatestJob();
+      this.startPolling();
+      this.isImporting = false;
+    }, 2000); // 假设导入任务需要2秒准备时间
     const props = this.getFilteredProperties();
-
     const data = this.grid.data.map((row: any) => this.createEntity(row, props));
-
     this.nodeService.import(data).subscribe((res: any) => {
       console.log(res);
     });
   }
 
 
-
-
-
   // 获取过滤后的属性
   getFilteredProperties() {
     console.log(this.tags)
     console.log(this.images)
+    console.log(this.aliases)
     return this.grid.schema.filter((p: any) => ![
       this.label?.name,
       this.description?.name,
-      this.aliase?.name,
       this.category?.name,
-      this.images?.name,
-    ].concat(this.tags?.map((t: any) => t.name)).includes(p.name)).map((p: any) => p.name);
+    ].concat(this.tags?.map((t: any) => t.name))
+      .concat(this.aliases?.map((a: any) => a.name))
+      .concat(this.images?.map((i: any) => i.name)).includes(p.name)).map((p: any) => p.name);
   }
 
   // 从数据行创建实体
@@ -176,6 +285,8 @@ export class ExtractionComponent extends PageBase {
     const entity: any = {};
     this.addBasicProperties(entity, row);
     this.addTags(entity, row);
+    this.addAliases(entity, row);
+    this.addImages(entity, row);
     this.addClaims(entity, row, props);
     return entity;
   }
@@ -188,9 +299,7 @@ export class ExtractionComponent extends PageBase {
     if (this.description?.name && row[this.description.name]) {
       entity["descriptions"] = { "zh": { "language": "zh", "value": row[this.description.name] } };
     }
-    if (this.aliase?.name && row[this.aliase.name]) {
-      entity["aliases"] = { "zh": [{ "language": "zh", "value": row[this.aliase.name] }] };
-    }
+
     if (this.category?.name && row[this.category.name]) {
       entity["category"] = row[this.category.name];
       entity["type"] = row[this.category.name];
@@ -209,6 +318,29 @@ export class ExtractionComponent extends PageBase {
       }
     });
   }
+
+  // 向实体添加别名
+  addAliases(entity: any, row: any) {
+    entity["aliases"] = {};
+    entity["aliases"]['zh'] = [];
+    this.aliases?.forEach((aliase: any) => {
+      if (aliase.name && row[aliase.name]) {
+        entity["aliases"]['zh'].push({ "language": "zh", "value": row[aliase.name] });
+      }
+    });
+  }
+
+
+  // 向实体添加文件
+  addImages(entity: any, row: any) {
+    entity["images"] = [];
+    this.images?.forEach((image: any) => {
+      if (image.name && row[image.name]) {
+        entity["images"].push(row[image.name]);
+      }
+    });
+  }
+
 
   // 向实体添加声明
   addClaims(entity: any, row: any, props: string[]) {
