@@ -11,14 +11,14 @@ CORS(app)  # 启用CORS
 # 加载本地文本文件中的实体标签和 ID 到分词器中
 knowledge_entities = {}
 
-# def load_knowledge_entities_from_file():
-#     with open('entities.txt', 'r', encoding='utf-8') as file:
-#         for line in file:
-#             entity_name, entity_id = line.strip().split('\t')
-#             jieba.add_word(entity_name)
-#             knowledge_entities[entity_name] = entity_id
+def load_knowledge_entities_from_file():
+    with open('entities.txt', 'r', encoding='utf-8') as file:
+        for line in file:
+            entity_name, entity_id = line.strip().split('\t')
+            jieba.add_word(entity_name)
+            knowledge_entities[entity_name] = entity_id
 
-# load_knowledge_entities_from_file()
+load_knowledge_entities_from_file()
 
 # 检查是否有可用的GPU
 device = 0 if torch.cuda.is_available() else -1
