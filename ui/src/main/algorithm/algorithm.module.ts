@@ -5,7 +5,7 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { XAutoCompleteModule, XButtonModule, XCheckboxModule, XDialogModule, XInputModule, XTextareaModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
+import { XAutoCompleteModule, XButtonModule, XCheckboxModule, XDialogModule, XInputModule, XSliderModule, XTextareaModule, XTreeModule, XUploadModule } from '@ng-nest/ui';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
@@ -43,6 +43,7 @@ import { AlgorithmComponent } from './algorithm.component';
     XTextareaModule,
     XAutoCompleteModule,
     LeafletModule,
+    XSliderModule,
 
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
