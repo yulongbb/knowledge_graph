@@ -26,8 +26,10 @@ tokenizer = BertTokenizerFast.from_pretrained('bert-base-chinese')
 
 # 加载并预处理单个条目
 def process_entry(entry):
-    text = entry.get('名称', '') + '。' + entry.get('描述', '')
+    text = entry.get('标签', '') + '。' + entry.get('别名', '') + '。' +entry.get('名称', '') + '。' +entry.get('描述', '')
     entities = [
+        ('AIRCRAFT', entry.get('标签', '')),
+        ('AIRCRAFT', entry.get('别名', '')),
         ('AIRCRAFT', entry.get('名称', '')),
         ('COUNTRY', entry.get('国家', '')),
         ('ORGANIZATION', entry.get('研发单位', ''))
@@ -185,13 +187,3 @@ grouped_predictions = group_entities(predictions_mapped)
 for entity in grouped_predictions:
     print(f"Entity Type: {entity['entity']}, Word: '{entity['word']}', Confidence: {entity['score']:.2f}")
 
-# 如果需要评估模型性能，可以使用evaluate库加载评估指标
-metric = load("seqeval")  # 加载seqeval评估指标，适用于序列标注任务如NER
-
-# 假设我们有一个真实的标签列表和一个预测的标签列表
-real_labels = [[1, 0, 2, 3, 3, 0]]  # 示例真实标签
-pred_labels = [[1, 0, 2, 3, 3, 0]]  # 示例预测标签
-
-# 计算评估结果
-results = metric.compute(predictions=[pred_labels], references=[real_labels])
-print(results)
