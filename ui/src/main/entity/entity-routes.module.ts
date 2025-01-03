@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { EntityComponent } from './entity.component';
-import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { EntityGridComponent } from './entity-grid/entity-grid.component';
+import { EntityDetailComponent } from 'src/share/entity/entity-detail.component';
 
 const routes: Routes = [
   { path: '', component: EntityComponent },

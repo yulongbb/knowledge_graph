@@ -22,7 +22,6 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
 
 
 
-import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
 import { EntityGridComponent } from "./entity-grid/entity-grid.component";
 
 
@@ -55,6 +54,6 @@ import { EntityGridComponent } from "./entity-grid/entity-grid.component";
     EntityRoutesModule,
     LeafletModule
   ],
-  declarations: [EntityComponent, EntityDetailComponent, EntityGridComponent]
+  declarations: [EntityComponent,  EntityGridComponent]
 })
 export class EntityModule { }
