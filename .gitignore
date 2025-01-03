@@ -10,7 +10,7 @@ db/arangodb/data
 db/minio/data
 db/elasticsearch/data
 db/nginx/html/gis
-model/custom_ner_model
+python/model
 python/dicts
 python/results
 
