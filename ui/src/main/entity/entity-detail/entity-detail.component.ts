@@ -581,6 +581,17 @@ export class EntityDetailComponent implements OnInit {
     );
   }
 
+  // 在你的组件类中添加此方法
+  getFullImageUrl(imagePath: string): string {
+    // 检查 imagePath 是否已经是完整的 URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    } else {
+      // 如果不是完整的 URL，则添加前缀
+      return 'http://localhost:9000/kgms/' + imagePath;
+    }
+  }
+
   back() {
     this.nav.back();
   }
