@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { NodeService } from './node.service';
 
-
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
@@ -26,12 +25,13 @@ import { DataImportService } from './data-import.queue';
         port: 6379,
       },
     }),
-     // 注册队列
-     BullModule.registerQueue({
+    // 注册队列
+    BullModule.registerQueue({
       name: 'data-import-queue',
     }),
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([Schema, Property]), ElasticsearchModule.registerAsync({
+    TypeOrmModule.forFeature([Schema, Property]),
+    ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -42,12 +42,9 @@ import { DataImportService } from './data-import.queue';
         // },
       }),
     }),
-
-   
-
   ],
   controllers: [KnowledgeController],
-  exports: [EsService,DataImportService],
+  exports: [EsService, DataImportService],
   providers: [
     {
       provide: 'ARANGODB',
@@ -64,10 +61,19 @@ import { DataImportService } from './data-import.queue';
     },
     {
       provide: 'DEFAULT_INDEX',
-      useFactory: (configService: ConfigService) => configService.get('ELASTICSEARCH_INDEX', 'entity'),
+      useFactory: (configService: ConfigService) =>
+        configService.get('ELASTICSEARCH_INDEX', 'entity'),
       inject: [ConfigService],
-    },DataImportService,
-    NodeService, EdgeService, EsService, NLPService, KnowledgeService, PropertiesService, EsService, SchemasService],
-
+    },
+    DataImportService,
+    NodeService,
+    EdgeService,
+    EsService,
+    NLPService,
+    KnowledgeService,
+    PropertiesService,
+    EsService,
+    SchemasService,
+  ],
 })
-export class KnowledgeModule { }
+export class KnowledgeModule {}
