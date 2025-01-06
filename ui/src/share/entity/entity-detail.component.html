@@ -2,9 +2,9 @@
   <div [ngSwitch]="type">
     <div *ngSwitchCase="'info'">
       <div class="row">
-        <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
+        <!-- <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
           [subTitle]="entity()?.value?._id" (backClick)="back()">
-        </x-page-header>
+        </x-page-header> -->
         <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
           <ng-template #header>
             <span class="label">{{ entity()?.value?._source?.labels?.zh?.value }}
@@ -189,8 +189,9 @@
         <x-collapse>
           <x-collapse-panel label="属性信息" active="true">
             <x-button [style.marginBottom.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
-            <x-table [columns]="columns2" [data]="statements()" loading [showPagination]="false" [allowSelectRow]="false"
-              [bodyColumnTpl]="{ qualify: qualifyTpl, actions: actionsTpl }" [bodyTdTpl]="bodyTdTpl">
+            <x-table [columns]="columns2" [data]="statements()" loading [showPagination]="false"
+              [allowSelectRow]="false" [bodyColumnTpl]="{ qualify: qualifyTpl, actions: actionsTpl }"
+              [bodyTdTpl]="bodyTdTpl">
             </x-table>
 
             <ng-template #qualifyTpl let-column="$column" let-row="$row">

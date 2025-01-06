@@ -12,6 +12,8 @@ import { EntityService } from '../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-search',
@@ -19,8 +21,11 @@ import * as L from 'leaflet';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
+  entities: any;
+  knowledge: any;
+
   waies = signal(['默认检索', '精确检索', '模糊检索']);
-  way = '默认检索';
+  way = '模糊检索';
 
   menus = signal(['知识', '图片', '视频', '文件', '地图']);
   menu: any = signal('知识');
@@ -39,7 +44,6 @@ export class SearchComponent implements OnInit {
   tags: any;
   tag: any;
 
-  entities: any;
   images!: any;
   videos!: any;
   pdfs!: any;
@@ -56,6 +60,7 @@ export class SearchComponent implements OnInit {
   currentVideoIndex = 0; // 当前视频索引
   currentVideoSrc: any; // 当前视频路径
   scrollTimeout: any; // 防止快速滚动
+  faSearch = faSearch;
 
 
   constructor(
@@ -67,8 +72,9 @@ export class SearchComponent implements OnInit {
     public propertyService: PropertyService,
     private entityService: EntityService,
     private dialogSewrvice: XDialogService
-  ) { }
+  ) {
 
+  }
   ngOnInit(): void {
   }
 
@@ -138,7 +144,6 @@ export class SearchComponent implements OnInit {
         }
       })
       .subscribe((data: any) => {
-        this.entities = data.list;
         this.entities = data.list;
         let menu: any = [];
         let arr: any = [];
@@ -223,53 +228,62 @@ export class SearchComponent implements OnInit {
             }
           });
           this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                      });
-                  });
-              });
-          });
+
         });
         this.entities = data.list;
+        this.knowledge = data.list[0]
+        console.log(this.knowledge)
+        this.ontologyService.get(this.knowledge._source.type).subscribe((t: any) => {
+          console.log(t)
+          this.knowledge._type = t.label;
+          this.ontologyService
+            .getAllParentIds(this.knowledge['_source'].type)
+            .subscribe((parents: any) => {
+              parents.push(this.knowledge['_source'].type);
+              this.propertyService
+                .getList(1, 50, {
+                  filter: [
+                    {
+                      field: 'id',
+                      value: parents as string[],
+                      relation: 'schemas',
+                      operation: 'IN',
+                    },
+                    // { field: 'isPrimary', value: true, operation: '=' },
+                  ],
+                })
+                .subscribe((p: any) => {
+                  this.entityService
+                    .getLinks(1, 20, this.knowledge['_id'], {})
+                    .subscribe((c: any) => {
+                      let statements: any = [];
+                      c.list.forEach((path: any) => {
+
+                        path.edges[0].mainsnak.label = p.list.filter(
+                          (p2: any) =>
+                            path.edges[0].mainsnak.property == `P${p2.id}`
+                        )[0]?.name;
+                        if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                          path.edges[0].mainsnak.datavalue.value.id =
+                            path?.vertices[1]?.id;
+                          path.edges[0].mainsnak.datavalue.value.label =
+                            path?.vertices[1]?.labels?.zh?.value;
+                        }
+                        if (
+                          p.list?.filter(
+                            (property: any) =>
+                              path.edges[0].mainsnak.property ==
+                              `P${property.id}`
+                          ).length > 0
+                        ) {
+                          statements.push(path.edges[0]);
+                        }
+                      });
+                      this.knowledge.claims = statements;
+                    });
+                });
+            });
+        });
         let menu: any = [];
         let arr: any = [];
         data.types.forEach((m: any) => {
@@ -799,7 +813,7 @@ export class SearchComponent implements OnInit {
   // 在你的组件类中添加此方法
   getFullImageUrl(imagePath: string): string {
     // 检查 imagePath 是否已经是完整的 URL
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    if (imagePath?.startsWith('http://') || imagePath?.startsWith('https://')) {
       return imagePath;
     } else {
       // 如果不是完整的 URL，则添加前缀

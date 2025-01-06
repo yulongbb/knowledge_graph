@@ -394,7 +394,6 @@ export class SearchDetailComponent implements OnInit {
           }
 
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
-
             if (this.type == 'edit') {
               this.form.formGroup.patchValue({
                 _key: x?._id,
@@ -460,8 +459,9 @@ export class SearchDetailComponent implements OnInit {
                             }
                             this.statements.push(p.edges[0]);
                           }
-                          this.claims = this.statements;
                         });
+                        this.claims = this.statements;
+
                       });
                   });
               });

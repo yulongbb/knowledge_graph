@@ -1,4 +1,166 @@
-<!-- 搜索栏 -->
+<div class="search-container">
+  <!-- 搜索框 -->
+  <div class="search-box">
+    <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="selectKeyword(keyword)" />
+    <button (click)="selectKeyword(keyword)">
+      <fa-icon [icon]="faSearch"></fa-icon>
+    </button>
+  </div>
+
+  <!-- 筛选和排序选项 -->
+  <div class="filters">
+    <span>筛选：</span>
+    <select>
+      <option>全部</option>
+      <option>图片</option>
+      <option>视频</option>
+      <option>新闻</option>
+    </select>
+    <span>排序：</span>
+    <select>
+      <option>相关性</option>
+      <option>最新</option>
+      <option>最旧</option>
+    </select>
+  </div>
+
+  <!-- 搜索结果列表 -->
+  <div class="search-results">
+    <!-- 知识面板（调整到搜索列表的第一个位置） -->
+    <div *ngIf="knowledge" class="knowledge-panel">
+      <h3>{{knowledge['_source']?.labels?.zh?.value}}</h3>
+      <img [src]="getFullImageUrl(knowledge['_source']?.images[0])" alt="AI Icon" />
+      <p>{{knowledge['_source']?.descriptions?.zh?.value}}</p>
+      <ul *ngIf="knowledge.claims">
+        <li *ngFor="let statement of knowledge.claims"><strong>{{statement.mainsnak.label}}：</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+            'http://localhost:4200/index/search/info/' +
+            statement.mainsnak.datavalue.value.id
+          ">{{ statement.mainsnak.datavalue.value.label }}</a>
+          </strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'string'">
+            {{ statement.mainsnak.datavalue.value }}
+          </strong>
+
+          <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+              [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+            statement.mainsnak.datavalue.value.amount
+            }}</strong>
+          <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+        statement.mainsnak.datavalue.value }}</pre>
+          <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+            statement.mainsnak.datavalue.value
+            }}</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+            statement.mainsnak.datavalue.value.latitude }},{{
+            statement.mainsnak.datavalue.value.longitude
+            }}</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+            statement.mainsnak.datavalue.value.time
+            }}</strong>
+        </li>
+      </ul>
+      <a href="#" class="see-more">了解更多</a>
+    </div>
+
+    <!-- 图片预览 -->
+    <div class="result-item image-preview" *ngIf="images">
+      <div class="image-grid">
+        <img *ngFor="let image of images" [src]="getFullImageUrl(image.image)" [alt]="image" />
+      </div>
+      <a href="#" class="see-more">查看更多图片</a>
+    </div>
+
+    <!-- 广告 -->
+    <!-- <div class="result-item ad">
+      <div class="ad-label">广告</div>
+      <a href="#" class="result-title">人工智能培训课程 - 限时优惠</a>
+      <div class="result-url">https://www.ai-course.com</div>
+      <div class="result-snippet">加入我们的 AI 培训课程，掌握最新技术，立即注册享受 50% 折扣！</div>
+    </div> -->
+
+    <!-- 普通搜索结果 -->
+    <div class="result-item" *ngFor="let entity of entities">
+      <a (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
+      <div class="result-url">https://zh.wikipedia.org/人工智能</div>
+      <div class="result-snippet">{{entity['_source']?.descriptions?.zh?.value}}</div>
+    </div>
+
+
+
+    <!-- 视频预览 -->
+    <!-- <div class="result-item video-preview">
+      <div class="video-thumbnail">
+        <img src="https://via.placeholder.com/250x150" alt="AI Video" />
+        <span class="play-icon">▶</span>
+      </div>
+      <div class="video-info">
+        <a href="#" class="result-title">人工智能的未来 - TED 演讲</a>
+        <div class="result-url">https://www.ted.com/talks/ai-future</div>
+        <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
+      </div>
+    </div>
+  </div> -->
+
+    <!-- 分页导航 -->
+    <div class="pagination">
+      <a href="#" class="active">1</a>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <span>...</span>
+      <a href="#">10</a>
+      <a href="#">下一页</a>
+    </div>
+
+    <!-- 相关搜索 -->
+    <div class="related-searches">
+      <h3>相关搜索</h3>
+      <div class="related-links">
+        <a href="#">机器学习</a>
+        <a href="#">深度学习</a>
+        <a href="#">神经网络</a>
+        <a href="#">自然语言处理</a>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- 
+
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">
   <x-menu size="big" [data]="menus()" (nodeClick)="selectMenu($event)"> </x-menu>
 
@@ -88,13 +250,13 @@
 </div>
 
 
-<!-- <div *ngIf="videos" class="video-container" (swipe)="onSwipe($event)">
+<div *ngIf="videos" class="video-container" (swipe)="onSwipe($event)">
     <video #videoPlayer controls autoplay >
       <source  [src]="'http://localhost:9000/kgms/' + videos[0].image" type="video/mp4">
       Your browser does not support the video tag.
     </video>
-  </div> -->
-<!-- <div class="gallery">
+  </div>
+<div class="gallery">
     <div class="warp">
       <div *ngFor="let video of videos">
         <video width="100%">
@@ -106,7 +268,7 @@
 
       </div>
     </div>
-  </div> -->
+  </div>
 }
 @case ('文件') {
 <div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
@@ -129,4 +291,4 @@
   [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)">
 </div>
 }
-}
+} -->

@@ -17,6 +17,8 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XSelectModule } from '@ng-nest/ui/select';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 
 @NgModule({
   declarations: [SearchComponent, SearchDetailComponent],
@@ -43,7 +45,7 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
     XTagModule,
     XLinkModule,
     LeafletModule,
-
+    FontAwesomeModule,
     InfiniteScrollDirective,
     RouterModule.forChild([
       {
@@ -58,4 +60,6 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
   providers: [EsService]
 
 })
-export class SearchModule {}
+export class SearchModule {
+
+}
