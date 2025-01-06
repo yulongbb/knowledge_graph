@@ -3,7 +3,7 @@ from flask_cors import CORS
 import jieba
 from transformers import BertTokenizer, BertForTokenClassification, pipeline
 import torch
-import os
+import csv
 
 app = Flask(__name__)
 CORS(app)  # 启用CORS
@@ -24,8 +24,8 @@ load_knowledge_entities_from_file()
 device = 0 if torch.cuda.is_available() else -1
 
 # 加载预训练的BERT模型和分词器
-tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
-model = BertForTokenClassification.from_pretrained("bert-base-chinese-ner")
+tokenizer = BertTokenizer.from_pretrained("model/bert-base-chinese")
+model = BertForTokenClassification.from_pretrained("model/bert-base-chinese-ner")
 
 # 创建一个实体识别的pipeline
 nlp = pipeline("ner", model=model, tokenizer=tokenizer, device=device)
@@ -36,6 +36,46 @@ def preprocess(text):
     # 仅返回知识库中的词
     knowledge_words = list(set(word for word in words if word in knowledge_entities))
     return knowledge_words
+
+
+
+
+
+# 全局变量，存储属性数据
+properties = {}
+
+# 加载 CSV 文件到字典
+def load_properties(file_path):
+    with open(file_path, mode='r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            name = row['name']
+            if name:  # 确保 name 不为空
+                properties[name] = {
+                    '_key': row['_key'],
+                    'datatype': row['datatype']
+                }
+
+load_properties('property.csv')
+
+# Flask 路由
+@app.route('/property', methods=['GET'])
+def get_property():
+    # 获取查询参数
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'error': 'Missing parameter: name'}), 400
+
+    # 查找属性
+    if name in properties:
+        prop_data = properties[name]
+        return jsonify({
+            'name': name,
+            '_key': prop_data['_key'],
+            'datatype': prop_data['datatype']
+        })
+    else:
+        return jsonify({'error': f'Property not found: {name}'}), 404
 
 @app.route('/segment', methods=['POST'])
 def segment():
