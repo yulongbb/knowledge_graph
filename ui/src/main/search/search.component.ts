@@ -228,7 +228,6 @@ export class SearchComponent implements OnInit {
             }
           });
           this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
-
         });
         this.entities = data.list;
         this.knowledge = data.list[0]

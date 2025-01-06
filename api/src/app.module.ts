@@ -20,7 +20,7 @@ import { DatasetModule } from './dataset/dataset.module';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'weapon',
+      database: 'rbac',
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: ['query', 'error'],
