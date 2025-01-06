@@ -1,180 +1,389 @@
-:host {
+// :host {
 
-  x-input-group {
-    display: block;
-    width: 100%;
-  }
+//   x-input-group {
+//     display: block;
+//     width: 100%;
+//   }
 
-  x-input-group:not(:first-child) {
-    margin-top: 1rem;
-  }
+//   x-input-group:not(:first-child) {
+//     margin-top: 1rem;
+//   }
 
-  .row:not(:first-child) {
-    margin-top: 1rem;
-  }
+//   .row:not(:first-child) {
+//     margin-top: 1rem;
+//   }
 
-  .row x-card:not(:first-child) {
-    margin-left: 2rem;
-  }
+//   .row x-card:not(:first-child) {
+//     margin-left: 2rem;
+//   }
 
-  .row .card #header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-
-
-  .row:not(:first-child) {
-    margin-top: 1rem;
-  }
-
-  .row x-card:not(:first-child) {
-    margin-left: 2rem;
-  }
+//   .row .card #header {
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//   }
 
 
-  .row .card .bottom {
-    padding: 0.625rem;
-  }
 
-  .row .card .bottom>p {
-    margin: 0;
-    font-size: 1rem;
-  }
+//   .row:not(:first-child) {
+//     margin-top: 1rem;
+//   }
 
-  .row .card .bottom>.time {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .row .card .bottom>.time>span {
-    color: var(--x-text-400);
-  }
-
-  ::ng-deep strong {
-    color: brown;
-  }
-
-  // x-row {
-  //   margin: 1rem 0;
-
-  //   >x-col {
-  //     margin: 0.5rem 0;
-
-  //     >div {
-  //       height: 300px;
-  //       padding: 1rem;
-  //       text-align: center;
-  //       border-radius: 0.125rem;
-  //       background-color: var(--x-info-400);
-  //     }
-  //   }
-
-  //   &:first-child {
-  //     margin-top: 0;
-  //   }
-
-  //   &:last-child {
-  //     margin-bottom: 0;
-  //   }
-  // }
+//   .row x-card:not(:first-child) {
+//     margin-left: 2rem;
+//   }
 
 
-  .gallery {
-    width: 100%;
-    display: flex;
-  }
+//   .row .card .bottom {
+//     padding: 0.625rem;
+//   }
 
-  .gallery .warp {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 33% 33% auto;
-    grid-gap: 10px;
-    padding: 5px;
-    flex: none;
-  }
+//   .row .card .bottom>p {
+//     margin: 0;
+//     font-size: 1rem;
+//   }
 
-  .gallery .thumbnail {
-    border: 1px solid #CCC;
-    width: 100%;
-    height: 250px;
-    background-repeat: no-repeat;
-    /*background-size: contain;*/
-    background-size: cover;
-    background-position: center center;
-  }
+//   .row .card .bottom>.time {
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//   }
 
-  .search-results {
-    height: 90%;
-    overflow: scroll;
-  }
+//   .row .card .bottom>.time>span {
+//     color: var(--x-text-400);
+//   }
+
+//   ::ng-deep strong {
+//     color: brown;
+//   }
+
+//   // x-row {
+//   //   margin: 1rem 0;
+
+//   //   >x-col {
+//   //     margin: 0.5rem 0;
+
+//   //     >div {
+//   //       height: 300px;
+//   //       padding: 1rem;
+//   //       text-align: center;
+//   //       border-radius: 0.125rem;
+//   //       background-color: var(--x-info-400);
+//   //     }
+//   //   }
+
+//   //   &:first-child {
+//   //     margin-top: 0;
+//   //   }
+
+//   //   &:last-child {
+//   //     margin-bottom: 0;
+//   //   }
+//   // }
 
 
-  //全屏按钮
-  video::-webkit-media-controls-fullscreen-button {
-    display: none;
-  }
+//   .gallery {
+//     width: 100%;
+//     display: flex;
+//   }
 
-  //播放按钮
-  video::-webkit-media-controls-play-button {
-    display: none;
-  }
+//   .gallery .warp {
+//     width: 100%;
+//     display: grid;
+//     grid-template-columns: 33% 33% auto;
+//     grid-gap: 10px;
+//     padding: 5px;
+//     flex: none;
+//   }
 
-  //进度条
-  video::-webkit-media-controls-timeline {
-    display: none;
-  }
+//   .gallery .thumbnail {
+//     border: 1px solid #CCC;
+//     width: 100%;
+//     height: 250px;
+//     background-repeat: no-repeat;
+//     /*background-size: contain;*/
+//     background-size: cover;
+//     background-position: center center;
+//   }
 
-  //观看的当前时间
-  video::-webkit-media-controls-current-time-display {
-    display: none;
-  }
+//   .search-results {
+//     height: 90%;
+//     overflow: scroll;
+//   }
 
-  //剩余时间
-  video::-webkit-media-controls-time-remaining-display {
-    display: none;
-  }
 
-  //音量按钮
-  video::-webkit-media-controls-mute-button {
-    display: none;
-  }
+//   //全屏按钮
+//   video::-webkit-media-controls-fullscreen-button {
+//     display: none;
+//   }
 
-  video::-webkit-media-controls-toggle-closed-captions-button {
-    display: none;
-  }
+//   //播放按钮
+//   video::-webkit-media-controls-play-button {
+//     display: none;
+//   }
 
-  //音量的控制条
-  video::-webkit-media-controls-volume-slider {
-    display: none;
-  }
+//   //进度条
+//   video::-webkit-media-controls-timeline {
+//     display: none;
+//   }
 
-  //所有控件
-  video::-webkit-media-controls-enclosure {
-    display: none;
-  }
+//   //观看的当前时间
+//   video::-webkit-media-controls-current-time-display {
+//     display: none;
+//   }
 
-  .video-scroll-container {
-    margin: 0 auto;;
-    width: 500px;
-    height: 800px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #000;
-  }
+//   //剩余时间
+//   video::-webkit-media-controls-time-remaining-display {
+//     display: none;
+//   }
+
+//   //音量按钮
+//   video::-webkit-media-controls-mute-button {
+//     display: none;
+//   }
+
+//   video::-webkit-media-controls-toggle-closed-captions-button {
+//     display: none;
+//   }
+
+//   //音量的控制条
+//   video::-webkit-media-controls-volume-slider {
+//     display: none;
+//   }
+
+//   //所有控件
+//   video::-webkit-media-controls-enclosure {
+//     display: none;
+//   }
+
+//   .video-scroll-container {
+//     margin: 0 auto;;
+//     width: 500px;
+//     height: 800px;
+//     overflow: hidden;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     background-color: #000;
+//   }
   
-  .video-element {
-    max-width: 100%;
-    max-height: 100%;
-    outline: none;
-    border-radius: 8px;
-    object-fit: cover;
+//   .video-element {
+//     max-width: 100%;
+//     max-height: 100%;
+//     outline: none;
+//     border-radius: 8px;
+//     object-fit: cover;
 
-  }
+//   }
   
 
+// }
+
+
+
+/* 基础样式 */
+.search-container {
+  width: 80%;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 搜索框 */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-box input {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-box button {
+  padding: 10px 20px;
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* 筛选选项 */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.filters select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* 搜索结果 */
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-item {
+  background-color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.result-title {
+  color: #1a0dab;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.result-url {
+  color: #0d652d;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.result-snippet {
+  color: #555;
+  font-size: 14px;
+}
+
+/* 广告 */
+.ad {
+  border-left: 3px solid #ffc107;
+}
+
+.ad-label {
+  color: #666;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+/* 图片预览 */
+.image-preview .image-grid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.image-preview img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.see-more {
+  color: #1a0dab;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* 视频预览 */
+.video-preview {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.video-thumbnail {
+  position: relative;
+}
+
+.video-thumbnail video {
+  width: 250px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 50%;
+}
+
+/* 分页导航 */
+.pagination {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination a {
+  color: #1a0dab;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.pagination a.active {
+  background-color: #1a0dab;
+  color: white;
+}
+
+/* 知识面板 */
+.knowledge-panel {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.knowledge-panel h3 {
+  margin-top: 0;
+}
+
+.knowledge-panel img {
+  width: 100px;
+  height: auto;
+  border-radius: 5px;
+}
+
+.knowledge-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.knowledge-panel ul li {
+  margin-bottom: 10px;
+}
+
+/* 相关搜索 */
+.related-searches {
+  margin-top: 20px;
+}
+
+.related-searches h3 {
+  margin-bottom: 10px;
+}
+
+.related-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.related-links a {
+  color: #1a0dab;
+  text-decoration: none;
+  font-size: 14px;
 }

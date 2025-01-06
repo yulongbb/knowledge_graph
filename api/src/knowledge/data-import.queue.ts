@@ -5,6 +5,7 @@ import { KnowledgeService } from './knowledge.service';
 import { EdgeService } from './edge.service';
 import { PropertiesService } from 'src/ontology/services/properties.service';
 import { EsService } from './es.service';
+const axios = require('axios');
 
 @Injectable()
 export class DataImportService implements OnModuleInit, OnApplicationShutdown {
@@ -67,20 +68,55 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
 
                         if (!prop) {
-                            prop = await this.propertiesService.post({ schemas: [{ id: from.type }], name: statement.mainsnak.property, type: 'string' });
-                        } else {
-                            const hasType = prop.schemas.some(schema => schema.id === from.type);
-
-                            if (!hasType) {
-                                prop.schemas.push({ id: from.type })
-                                prop = await this.propertiesService.put(prop);
+                            try {
+                                // 调用外部接口查询属性
+                                const url = `http://127.0.0.1:5555/property?name=${encodeURIComponent(statement.mainsnak.property)}`;
+                                const response = await axios.get(url);
+                    
+                                if (response.status === 200 && response.data && response.data._key && response.data.datatype) {
+                                    // 如果外部接口返回有效数据，创建新属性
+                                    prop = await this.propertiesService.post({
+                                        schemas: [{ id: from.type }],
+                                        name: statement.mainsnak.property,
+                                        type: response.data.datatype
+                                    });
+                                    console.log('Property created from external API:', prop);
+                                } else {
+                                    // 如果外部接口返回无效数据，创建默认属性
+                                    prop = await this.propertiesService.post({
+                                        schemas: [{ id: from.type }],
+                                        name: statement.mainsnak.property,
+                                        type: 'string'
+                                    });
+                                    console.log('Default property created:', prop);
+                                }
+                            } catch (error) {
+                                // 如果调用外部接口失败，创建默认属性
+                                console.error('Error calling external API:', error.message);
+                                prop = await this.propertiesService.post({
+                                    schemas: [{ id: from.type }],
+                                    name: statement.mainsnak.property,
+                                    type: 'string'
+                                });
+                                console.log('Default property created due to error:', prop);
                             }
-
+                        } else {
+                            // 如果属性存在，检查当前类型是否在 schemas 中
+                            const hasType = prop.schemas.some(schema => schema.id === from.type);
+                    
+                            if (!hasType) {
+                                // 如果当前类型不在 schemas 中，添加到 schemas 并更新属性
+                                prop.schemas.push({ id: from.type });
+                                prop = await this.propertiesService.put(prop);
+                                console.log('Property updated with new schema:', prop);
+                            }
                         }
+
+
 
                         statement['mainsnak']['property'] = 'P' + prop?.id;
 
-                        if (prop[0]?.type == 'wikibase-item') {
+                        if (prop?.type == 'wikibase-item') {
                             let to: any;
                             let knowledge: any = await this.elasticsearchService.query(
                                 {
@@ -109,6 +145,16 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             statement.mainsnak.datavalue.value = {
                                 "entity-type": "item",
                                 "id": to['_key']
+                            }
+                        } else if (prop?.type == 'quantity') {
+                            // 创建关系
+                            statement['_from'] = from['_id']
+                            statement['_to'] = from['_id']
+                            statement.mainsnak.datatype = 'quantity';
+                            statement.mainsnak.datavalue.type = "quantity"
+                            statement.mainsnak.datavalue.value = {
+                                "amount": statement.mainsnak.datavalue.value,
+                                "unit": "1"
                             }
                         } else if (prop?.type == 'monolingualtext') {
                             // 创建关系

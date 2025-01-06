@@ -1,7 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Input,
+  OnChanges,
   OnInit,
+  Signal,
+  SimpleChanges,
   ViewChild,
   signal,
 } from '@angular/core';
@@ -21,12 +25,11 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { EsService } from 'src/main/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
-import { EntityService } from '../entity.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';
-import { QualifiesDialogComponent } from '../qualifies/qualifies.component'
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
+import { EntityService } from 'src/main/entity/entity.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -34,10 +37,10 @@ import * as L from 'leaflet';
   styleUrls: ['./entity-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntityDetailComponent implements OnInit {
-  id: string = '';
+export class EntityDetailComponent implements OnInit, OnChanges {
+  @Input() id: string = '';
+  @Input() type: string = '';
   knowledge: string = '';
-  type: string = '';
   schema: string = '';
   item: any;
 
@@ -82,7 +85,6 @@ export class EntityDetailComponent implements OnInit {
       label: '描述',
       required: true,
     },
-
   ];
 
   query: any;
@@ -113,8 +115,7 @@ export class EntityDetailComponent implements OnInit {
   properties: any;
   propertyData: any;
 
-  statements: any;
-
+  statements: any = signal([]);
 
   columns2: XTableColumn[] = [
     { id: 'index', label: '序号', width: 40, left: 0, type: 'index' },
@@ -131,29 +132,22 @@ export class EntityDetailComponent implements OnInit {
     zoom: 3,
     center: latLng(46.879966, -121.726909)
   };
-  // 用于存储所有标记
   markers: Marker[] = [];
 
-  // 地图点击事件处理函数
   onMapClick(event: any) {
     const { lat, lng } = event.latlng;
     const newMarker = marker([lat, lng]);
-
-    // 添加新的标记到标记数组
     this.markers = [newMarker];
     this.item.location = { "lat": lat, "lon": lng };
     console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
   }
 
   onMapReady(map: any) {
-    // 设置拖动边界（限制地图范围）
-    const southWest = latLng(-90, -180); // 西南角坐标
-    const northEast = latLng(90, 180); // 东北角坐标
+    const southWest = latLng(-90, -180);
+    const northEast = latLng(90, 180);
     const bounds = L.latLngBounds(southWest, northEast);
-
     map.setMaxBounds(bounds);
-    map.fitBounds(bounds)
-
+    map.fitBounds(bounds);
   }
 
   constructor(
@@ -169,7 +163,6 @@ export class EntityDetailComponent implements OnInit {
     public tagService: TagService,
     private nodeService: EntityService,
   ) {
-    // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
@@ -184,18 +177,27 @@ export class EntityDetailComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['id'] && changes['id'].currentValue) {
+      this.id = changes['id'].currentValue;
+      this.action(this.type);
+    }
+  }
 
+  ngOnInit(): void {
+    console.log(123)
     this.action(this.type);
   }
 
+  trackByFn(index: number, item: any): any {
+    return item;
+  }
 
   add() {
     this.statements = [
       ...this.statements,
       {
         _from: this.item.items[0],
-
         mainsnak: {
           snaktype: 'value',
           property: '',
@@ -214,25 +216,20 @@ export class EntityDetailComponent implements OnInit {
 
   save(row: any) {
     if (row.mainsnak.datavalue.type != 'wikibase-entityid') {
-      row['_to'] = this.item.items[0]
+      row['_to'] = this.item.items[0];
     }
     if (row._key) {
-      // 更新
       this.nodeService.updateEdge(row).subscribe(() => {
         this.message.success('更新成功！');
-      })
+      });
     } else {
-      // 新增
       this.nodeService.addEdge(row).subscribe((data) => {
         console.log(data);
         const index = this.statements.findIndex((x: any) => x.id === row.id);
         this.statements[index]['_key'] = data['_key'];
         this.message.success('新增成功！');
-      })
+      });
     }
-
-
-
   }
 
   del(row: any) {
@@ -242,19 +239,17 @@ export class EntityDetailComponent implements OnInit {
       this.statements.splice(index, 1);
     }
     this.nodeService.deleteEdge(row._key).subscribe(() => {
-
       this.message.success('删除成功！');
-    })
-  }
-
-  dialog(row: any) {
-    this.dialogService.create(QualifiesDialogComponent, {
-      draggable: true,
-      resizable: true,
-      data: row
     });
   }
 
+  dialog(row: any) {
+    // this.dialogService.create(QualifiesDialogComponent, {
+    //   draggable: true,
+    //   resizable: true,
+    //   data: row
+    // });
+  }
 
   preview(image: any) {
     this.dialogService.create(XImagePreviewComponent, {
@@ -279,28 +274,27 @@ export class EntityDetailComponent implements OnInit {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
-        }
+        };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
             longitude: 0,
             altitude: null,
             precision: 0,
-            globe: 'http://www.wikidata.org/entity/Q2', // Default to Earth
+            globe: 'http://www.wikidata.org/entity/Q2',
           },
           type: 'globecoordinate',
-        }
+        };
         break;
-
       case 'quantity':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -309,10 +303,10 @@ export class EntityDetailComponent implements OnInit {
             lowerBound: null,
           },
           type: 'quantity',
-        }
+        };
         break;
       case 'time':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -320,29 +314,27 @@ export class EntityDetailComponent implements OnInit {
             before: 0,
             after: 0,
             precision: 0,
-            calendarmodel: 'http://www.wikidata.org/entity/Q1985727', // Default to Gregorian calendar
+            calendarmodel: 'http://www.wikidata.org/entity/Q1985727',
           },
-          type: 'time'
-        }
+          type: 'time',
+        };
         break;
       case 'wikibase-item':
       case 'wikibase-property':
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
+        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             'entity-type': statements.mainsnak.datatype.replace('wikibase-', ''),
             'numeric-id': 0,
             id: '',
           },
-          type: 'wikibase-entityid'
-        }
+          type: 'wikibase-entityid',
+        };
         break;
     }
-
-    statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`
     console.log(statements);
   }
 
@@ -380,32 +372,24 @@ export class EntityDetailComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-
   action(type: string) {
     switch (type) {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x) => {
-          console.log(x)
-
-          this.entity = signal(x);
+          console.log(x);
+          this.entity = signal({ value: x });
           this.item = x._source;
           this.imgs = [];
           this.tag = signal(this.item?.tags);
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` });
           });
-
-          console.log(this.item)
+          console.log(this.item);
           if (this.item.location) {
             const newMarker = marker([this.item.location.lat, this.item.location.lon]);
-
-            // 添加新的标记到标记数组
             this.markers = [newMarker];
-
           }
-
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
-
             if (this.type == 'edit') {
               this.form.formGroup.patchValue({
                 _key: x?._id,
@@ -415,68 +399,59 @@ export class EntityDetailComponent implements OnInit {
                 description: this.item.descriptions?.zh?.value,
               });
             }
-            this.ontologyService
-              .getAllParentIds(this.item.type)
-              .subscribe((parents: any) => {
-                parents.push(this.item.type);
-                this.tagService
-                  .getList(1, 500, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                    ],
-                  })
-                  .subscribe((data: any) => {
-                    let tags: any = {};
-                    data.list.forEach((tag: any) => {
-                      tags[tag.type] = tags[tag.type] ?? [];
-                      tags[tag.type].push(tag.name);
-                    });
-                    this.tags = tags;
-                  });
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                    ],
-                  })
-                  .subscribe((x: any) => {
-                    console.log(x.list)
-                    this.propertyData = signal(x.list);
-                    this.properties = x.list.map((p: any) => p.name);
-                    this.nodeService
-                      .getLinks(1, 50, this.id, {})
-                      .subscribe((c: any) => {
-                        this.statements = [];
-                        c.list.forEach((p: any) => {
-                          if (p.edges[0].mainsnak.property != 'P31') {
-                            p.edges[0].mainsnak.label = x.list.filter(
-                              (p2: any) =>
-                                p.edges[0].mainsnak.property == `P${p2.id}`
-                            )[0]?.name;
-                            if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                              console.log(p.edges[0].mainsnak.property);
-                              p.edges[0].mainsnak.datavalue.value.id =
-                                p.vertices[1]?.id;
-                              p.edges[0].mainsnak.datavalue.value.label =
-                                p.vertices[1]?.labels?.zh?.value;
-                            }
-                            this.statements.push(p.edges[0]);
-                          }
-                          this.claims = this.statements;
-                        });
-                      });
-                  });
+            this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
+              parents.push(this.item.type);
+              this.tagService.getList(1, 500, {
+                filter: [
+                  {
+                    field: 'id',
+                    value: parents as string[],
+                    relation: 'schemas',
+                    operation: 'IN',
+                  },
+                ],
+              }).subscribe((data: any) => {
+                let tags: any = {};
+                data.list.forEach((tag: any) => {
+                  tags[tag.type] = tags[tag.type] ?? [];
+                  tags[tag.type].push(tag.name);
+                });
+                this.tags = tags;
               });
+              this.propertyService.getList(1, 50, {
+                filter: [
+                  {
+                    field: 'id',
+                    value: parents as string[],
+                    relation: 'schemas',
+                    operation: 'IN',
+                  },
+                ],
+              }).subscribe((x: any) => {
+                console.log(x.list);
+                this.propertyData = signal(x.list);
+                this.properties = x.list.map((p: any) => p.name);
+                this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
+                  let statements: any = [];
+                  c.list.forEach((p: any) => {
+                    if (p.edges[0].mainsnak.property != 'P31') {
+                      p.edges[0].mainsnak.label = x.list.filter(
+                        (p2: any) => p.edges[0].mainsnak.property == `P${p2.id}`
+                      )[0]?.name;
+                      if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                        console.log(p.edges[0].mainsnak.property);
+                        p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                        p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
+                      }
+                      statements.push(p.edges[0]);
+                    }
+                    console.log(this.statements)
+                    this.statements = signal(statements);
+                    this.claims = signal(statements);
+                  });
+                });
+              });
+            });
           });
           this.images = x?._source?.images.filter(
             (image: any) =>
@@ -508,13 +483,12 @@ export class EntityDetailComponent implements OnInit {
             },
           },
           aliases: {
-            zh:
-              this.form.formGroup.value.aliases.split(',').map((aliase: any) => {
-                return {
-                  language: 'zh',
-                  value: aliase,
-                };
-              }),
+            zh: this.form.formGroup.value.aliases.split(',').map((aliase: any) => {
+              return {
+                language: 'zh',
+                value: aliase,
+              };
+            }),
           },
           descriptions: {
             zh: {
@@ -526,9 +500,9 @@ export class EntityDetailComponent implements OnInit {
           images: this.imgs?.map(
             (i: any) => i.url.split('/')[i.url.split('/').length - 1]
           ),
-          location: this.item?.location
+          location: this.item?.location,
         };
-        console.log(item)
+        console.log(item);
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
@@ -541,8 +515,7 @@ export class EntityDetailComponent implements OnInit {
               p.edges[0].state = 'info';
               if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                 p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                p.edges[0].mainsnak.datavalue.value.label =
-                  p.vertices[1].labels.zh.value;
+                p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
               }
               statements.push(p.edges[0]);
             });
@@ -576,9 +549,17 @@ export class EntityDetailComponent implements OnInit {
   }
 
   getStatement(property: any): any {
-    return this.claims.filter(
+    return this.claims().filter(
       (c: any) => c.mainsnak.property == `P${property.id}`
     );
+  }
+
+  getFullImageUrl(imagePath: string): string {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    } else {
+      return 'http://localhost:9000/kgms/' + imagePath;
+    }
   }
 
   back() {

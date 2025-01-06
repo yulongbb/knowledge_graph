@@ -17,16 +17,6 @@ import { XPaginationModule } from '@ng-nest/ui/pagination';
 import { XDialogModule } from '@ng-nest/ui/dialog';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 
-
-
-
-
-
-import { EntityDetailComponent } from "./entity-detail/entity-detail.component";
-import { EntityGridComponent } from "./entity-grid/entity-grid.component";
-
-
-
 @NgModule({
   imports: [
     CommonModule,
@@ -55,6 +45,6 @@ import { EntityGridComponent } from "./entity-grid/entity-grid.component";
     EntityRoutesModule,
     LeafletModule
   ],
-  declarations: [EntityComponent, EntityDetailComponent, EntityGridComponent]
+  declarations: [EntityComponent]
 })
 export class EntityModule { }

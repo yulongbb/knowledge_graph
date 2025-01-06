@@ -28,7 +28,6 @@ import {
   XMessageService,
   XPlace,
 } from '@ng-nest/ui';
-import { EntityDetailComponent } from './entity-detail/entity-detail.component';
 import { animate, animation } from '@angular/animations';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
@@ -51,16 +50,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cy: any;
   visible = signal(false);
   placement = signal<XPlace>('center');
-  id: any;
   data: any;
+
+
+  id: any;
   type: any;
 
-  dialog(data: any, type: any, place: XPlace) {
-    this.dialogService.create(EntityDetailComponent, {
-      placement: place, // 默认center
-      data: { id: data.id, type: type, cy: this.cy },
-    });
-  }
+
+
 
   close() {
     this.visible.set(false);
@@ -78,20 +75,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public propertyService: PropertyService,
     private esService: EsService,
     private message: XMessageService,
-    private dialogService: XDialogService,
     private msgBox: XMessageBoxService
   ) {
 
   }
 
   ngOnInit(): void {
-    this.esService.searchEntity(1, 1, {bool: {"must_not": [
-        {
-          "term": {
-            "type.keyword": "E4"
+    this.esService.searchEntity(1, 1, {
+      bool: {
+        "must_not": [
+          {
+            "term": {
+              "type.keyword": "E4"
+            }
           }
-        }
-      ]}}).subscribe((data: any) => {
+        ]
+      }
+    }).subscribe((data: any) => {
       this.service.graph(1, 100, data.list[0]._id).subscribe((data: any) => {
         console.log(data);
         cytoscape.use(cxtmenu);
@@ -233,14 +233,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '浏览',
                 select: (ele: any) => {
-                  this.dialog(ele.data(), 'info', 'center');
+                  console.log(ele.data)
+                  this.visible.set(true)
+                  this.id = ele.data().id;
+                  this.type = 'info';
+                  // this.dialog(ele.data(), 'info', 'center');
                 },
               },
 
               {
                 content: '编辑',
                 select: (ele: any) => {
-                  this.dialog(ele.data(), 'edit', 'center');
+                  console.log(ele.data())
+                  this.visible.set(true)
+                  this.id = ele.data().id;
+                  this.type = 'edit';
+                  // this.dialog(ele.data(), 'edit', 'center');
                 },
               },
               {
@@ -314,7 +322,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
               {
                 content: '创建知识',
                 select: (ele: any) => {
-                  this.dialog(ele.data(), 'add', 'center');
+                  this.visible.set(true)
+                  console.log(ele.data())
+                  // this.dialog(ele.data(), 'add', 'center');
                 },
               },
             ],
@@ -329,6 +339,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               ele.target.trigger('doubleTap', ele);
             }
             previousTapStamp = currentTapStamp;
+      
           });
           this.cy.on('doubleTap', (ele: any) => {
             var target: any = ele.target;
@@ -341,7 +352,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 .graph(1, 100, target.data().id)
                 .subscribe((data: any) => {
                   console.log(data);
-
+           
                   this.initializeCytoscape(data);
                 });
             } else if (target.isEdge()) {
@@ -546,7 +557,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         query = { must: [{ match: { 'labels.zh.value': keyword } }] };
       }
     }
-    this.esService.searchEntity(1, 10, {bool:query } ).subscribe((data: any) => { });
+    this.esService.searchEntity(1, 10, { bool: query }).subscribe((data: any) => { });
   }
   modelAsync = signal('');
   dataAsync = signal(
@@ -574,7 +585,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             query = { must: [{ match: { 'labels.zh.value': str } }] };
           }
         }
-        this.esService.searchEntity(1, 10, {bool:query}).subscribe((data: any) => {
+        this.esService.searchEntity(1, 10, { bool: query }).subscribe((data: any) => {
           x.next(data.list);
           x.complete();
         });
