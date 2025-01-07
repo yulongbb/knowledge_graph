@@ -491,7 +491,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             },
           },
           aliases: {
-            zh: this.form.formGroup.value.aliases.split(',').map((aliase: any) => {
+            zh: this.form.formGroup.value.aliases?.split(',').map((aliase: any) => {
               return {
                 language: 'zh',
                 value: aliase,

@@ -1,8 +1,13 @@
-import { Component, ElementRef, OnInit, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import {
-  XDialogService,
-  XImagePreviewComponent,
-} from '@ng-nest/ui';
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  signal,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
+import { XDialogService, XImagePreviewComponent } from '@ng-nest/ui';
 import { EsService } from './es.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { OntologyService } from '../../ontology/ontology/ontology.service';
@@ -26,21 +31,24 @@ export class ImageComponent implements OnInit {
   waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '模糊检索';
 
-  navItems = signal([{ link: '/search', label: '知识' }, { link: '/image', label: '图片' }, { link: '/video', label: '视频' }, { link: '/file', label: '文件' }, { link: '/map', label: '地图' }]);
+  navItems = signal([
+    { link: '/search', label: '知识' },
+    { link: '/image', label: '图片' },
+    { link: '/video', label: '视频' },
+    { link: '/file', label: '文件' },
+    { link: '/map', label: '地图' },
+  ]);
   menu: any = signal('知识');
 
   query: any = { bool: {} };
 
-
   keyword = '';
 
-
-  size: number = 20;
+  size: number = 10;
   index: number = 1;
   total: number = 0; // 总条数
   visiblePages: number[] = []; // 显示的页码
   showEllipsis: boolean = false; // 是否显示省略号
-
 
   types: any;
   type: any;
@@ -53,10 +61,15 @@ export class ImageComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 6, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
+        noWrap: true,
+        maxZoom: 6,
+        minZoom: 1,
+        attribution: '...',
+      }),
     ],
     zoom: 3,
-    center: latLng(46.879966, -121.726909)
+    center: latLng(46.879966, -121.726909),
   };
 
   markers: Marker[] = [];
@@ -64,7 +77,6 @@ export class ImageComponent implements OnInit {
   currentVideoSrc: any; // 当前视频路径
   scrollTimeout: any; // 防止快速滚动
   faImage = faImage;
-
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -77,23 +89,21 @@ export class ImageComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      console.log(x.get('q'));
-      if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
-        this.keyword = x.get('q') as string;
-        this.selectKeyword(this.keyword);
-      } else {
-        this.router.navigate(['/']);
-      }
+      // console.log(x.get('q'));
+      // if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
+      this.keyword = x.get('q') as string;
+      this.selectKeyword(this.keyword);
+      // } else {
+      //   this.router.navigate(['/']);
+      // }
     });
   }
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   // 计算总页数
   get totalPages(): number {
     return Math.ceil(this.total / this.size);
   }
-
 
   // 更新显示的页码
   updateVisiblePages(): void {
@@ -114,16 +124,13 @@ export class ImageComponent implements OnInit {
     this.showEllipsis = end < this.totalPages; // 是否显示省略号
   }
 
-
   // 处理页码变化
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.index = page;
       this.search();
-
     }
   }
-
 
   // 处理鼠标滚动事件
   videoScroll(event: WheelEvent): void {
@@ -139,7 +146,6 @@ export class ImageComponent implements OnInit {
       }
     }, 200); // 设置防抖时间
   }
-
 
   // 切换到下一视频
   nextVideo(): void {
@@ -159,7 +165,8 @@ export class ImageComponent implements OnInit {
 
   // 更新视频源
   updateVideoSrc(): void {
-    this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+    this.currentVideoSrc =
+      'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -181,13 +188,13 @@ export class ImageComponent implements OnInit {
 
     this.service
       .searchEntity(1, 10, {
-        "geo_distance": {
-          "distance": "500km",
-          "location": {
-            "lat": lat,
-            "lon": lng
-          }
-        }
+        geo_distance: {
+          distance: '500km',
+          location: {
+            lat: lat,
+            lon: lng,
+          },
+        },
       })
       .subscribe((data: any) => {
         this.entities = data.list;
@@ -212,23 +219,26 @@ export class ImageComponent implements OnInit {
         });
 
         data.list.forEach((entity: any) => {
-          const newMarker = marker([entity._source.location.lat, entity._source.location.lon]);
+          const newMarker = marker([
+            entity._source.location.lat,
+            entity._source.location.lon,
+          ]);
           this.markers.push(newMarker);
         });
       });
   }
 
-
   selectMenu(menu: any) {
-    this.router.navigate(['/' + menu.name], { queryParams: { q: this.keyword } });
+    this.router.navigate(['/' + menu.name], {
+      queryParams: { q: this.keyword },
+    });
   }
-
-
 
   search() {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
+        console.log(this.index);
         console.log(data);
 
         this.total = data.total;
@@ -237,98 +247,32 @@ export class ImageComponent implements OnInit {
         this.tags = null;
         this.types = null;
         this.images = [];
-        this.videos = [];
-        this.pdfs = [];
-        this.markers = [];
-        this.knowledge = null;
 
         this.entities = data.list;
-        if (this.index == 1) {
-          data.list.forEach((item: any) => {
-            if (item._source.location) {
-              const newMarker = marker([item._source.location.lat, item._source.location.lon]);
-              this.markers.push(newMarker);
-            }
+        data.list.forEach((item: any) => {
+          if (item._source.location) {
+            const newMarker = marker([
+              item._source.location.lat,
+              item._source.location.lon,
+            ]);
+            this.markers.push(newMarker);
+          }
 
-            item?._source?.images?.forEach((image: any) => {
-              if (
-                image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-                image.split('.')[image.split('.').length - 1] == 'jpg' ||
-                image.split('.')[image.split('.').length - 1] == 'png' ||
-                image.split('.')[image.split('.').length - 1] == 'webp'
-              ) {
-                this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              }
-
-              if (
-                image.split('.')[image.split('.').length - 1] == 'mp4'
-              ) {
-                this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              }
-
-              if (
-                image.split('.')[image.split('.').length - 1] == 'pdf'
-              ) {
-                this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-              }
-            });
-            this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
-          });
-          this.ontologyService.get(data.list[0]._source.type).subscribe((t: any) => {
-            console.log(t)
-            data.list[0]._type = t.label;
-            this.ontologyService
-              .getAllParentIds(data.list[0]['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(data.list[0]['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      // { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, data.list[0]['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-
-                          path.edges[0].mainsnak.label = p.list.filter(
-                            (p2: any) =>
-                              path.edges[0].mainsnak.property == `P${p2.id}`
-                          )[0]?.name;
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        data.list[0].claims = statements;
-                        if (data.list[0].claims.length > 0) {
-                          this.knowledge = data.list[0];
-                        }
-                      });
-                  });
+          item?._source?.images?.forEach((image: any) => {
+            if (
+              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
+              image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              image.split('.')[image.split('.').length - 1] == 'png' ||
+              image.split('.')[image.split('.').length - 1] == 'webp'
+            ) {
+              this.images.push({
+                _id: item._id,
+                image: image,
+                label: item?._source.labels.zh.value,
               });
+            }
           });
-        }
+        });
 
         let menu: any = [];
         let arr: any = [];
@@ -359,7 +303,6 @@ export class ImageComponent implements OnInit {
 
   queryKeyword(keyword: any) {
     this.router.navigate(['/search'], { queryParams: { q: keyword } });
-
   }
 
   selectKeyword(keyword: any) {
@@ -376,51 +319,51 @@ export class ImageComponent implements OnInit {
                   operator: 'and',
                 },
               },
-            }
+            },
           ],
           should: [
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*jpg" } },
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*png" } },
-            { "wildcard": { "images": "*webp" } }],
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*jpg' } },
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*png' } },
+            { wildcard: { images: '*webp' } },
+          ],
         };
       } else if (this.way == '精确检索') {
         this.query = {
-          must: [
-            { term: { 'labels.zh.value.keyword': keyword } }
-          ],
+          must: [{ term: { 'labels.zh.value.keyword': keyword } }],
           should: [
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*jpg" } },
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*png" } },
-            { "wildcard": { "images": "*webp" } }],
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*jpg' } },
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*png' } },
+            { wildcard: { images: '*webp' } },
+          ],
         };
-
       } else {
         this.query = {
-          must: [{ match: { 'labels.zh.value': keyword } },],
+          must: [{ match: { 'labels.zh.value': keyword } }],
           should: [
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*jpg" } },
-            { "wildcard": { "images": "*jpeg" } },
-            { "wildcard": { "images": "*png" } },
-            { "wildcard": { "images": "*webp" } }],
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*jpg' } },
+            { wildcard: { images: '*jpeg' } },
+            { wildcard: { images: '*png' } },
+            { wildcard: { images: '*webp' } },
+          ],
         };
       }
     } else {
       this.query = {
         should: [
-          { "wildcard": { "images": "*jpeg" } },
-          { "wildcard": { "images": "*jpg" } },
-          { "wildcard": { "images": "*jpeg" } },
-          { "wildcard": { "images": "*png" } },
-          { "wildcard": { "images": "*webp" } }],
+          { wildcard: { images: '*jpeg' } },
+          { wildcard: { images: '*jpg' } },
+          { wildcard: { images: '*jpeg' } },
+          { wildcard: { images: '*png' } },
+          { wildcard: { images: '*webp' } },
+        ],
       };
     }
     this.search();
-
   }
 
   selectTag(tag: any) {
@@ -429,8 +372,10 @@ export class ImageComponent implements OnInit {
         let values: any = [];
         tag.forEach((t: any) => {
           values.push({ term: { 'tags.keyword': t } });
-        })
-        this.query = { must: [{ term: { 'type.keyword': this.type.id } }].concat(values) };
+        });
+        this.query = {
+          must: [{ term: { 'type.keyword': this.type.id } }].concat(values),
+        };
       } else {
         this.query = { must: [{ term: { 'type.keyword': this.type.id } }] };
       }
@@ -439,7 +384,7 @@ export class ImageComponent implements OnInit {
         let values: any = [];
         tag.forEach((t: any) => {
           values.push({ term: { 'tags.keyword': t } });
-        })
+        });
         this.query = { must: values };
       } else {
         this.query = {};
@@ -465,17 +410,22 @@ export class ImageComponent implements OnInit {
                     },
                   },
                 },
-                { term: { 'type.keyword': type.id } }
+                { term: { 'type.keyword': type.id } },
               ],
             };
           } else if (this.way == '精确检索') {
             this.query = {
-              must: [{ term: { 'labels.zh.value.keyword': this.keyword } }, { term: { 'type.keyword': type.id } }],
+              must: [
+                { term: { 'labels.zh.value.keyword': this.keyword } },
+                { term: { 'type.keyword': type.id } },
+              ],
             };
           } else {
             this.query = {
-              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } }
-              ]
+              must: [
+                { match: { 'labels.zh.value': this.keyword } },
+                { term: { 'type.keyword': type.id } },
+              ],
             };
           }
         } else {
@@ -499,37 +449,40 @@ export class ImageComponent implements OnInit {
                     },
                   },
                 },
-                { term: { 'type.keyword': type.id } }
+                { term: { 'type.keyword': type.id } },
               ],
               should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*jpg' } },
+                { wildcard: { images: '*png' } },
+                { wildcard: { images: '*webp' } },
+              ],
             };
           } else if (this.way == '精确检索') {
             this.query = {
               must: [
                 { term: { 'labels.zh.value.keyword': this.keyword } },
-                { term: { 'type.keyword': type.id } }
+                { term: { 'type.keyword': type.id } },
               ],
               should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*jpg' } },
+                { wildcard: { images: '*png' } },
+                { wildcard: { images: '*webp' } },
+              ],
             };
-
           } else {
             this.query = {
-              must: [{ match: { 'labels.zh.value': this.keyword } },
-              { term: { 'type.keyword': type.id } }
+              must: [
+                { match: { 'labels.zh.value': this.keyword } },
+                { term: { 'type.keyword': type.id } },
               ],
               should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*jpg' } },
+                { wildcard: { images: '*png' } },
+                { wildcard: { images: '*webp' } },
+              ],
             };
           }
         } else {
@@ -537,20 +490,22 @@ export class ImageComponent implements OnInit {
             this.query = {
               must: [{ term: { 'type.keyword': type.id } }],
               should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*jpg' } },
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*png' } },
+                { wildcard: { images: '*webp' } },
+              ],
             };
           } else {
             this.query = {
               should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }]
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*jpg' } },
+                { wildcard: { images: '*jpeg' } },
+                { wildcard: { images: '*png' } },
+                { wildcard: { images: '*webp' } },
+              ],
             };
           }
         }
@@ -569,7 +524,7 @@ export class ImageComponent implements OnInit {
                   },
                 },
                 { term: { 'type.keyword': type.id } },
-                { "wildcard": { "images": "*mp4" } }
+                { wildcard: { images: '*mp4' } },
               ],
             };
           } else if (this.way == '精确检索') {
@@ -577,26 +532,29 @@ export class ImageComponent implements OnInit {
               must: [
                 { term: { 'labels.zh.value.keyword': this.keyword } },
                 { term: { 'type.keyword': type.id } },
-                { "wildcard": { "images": "*mp4" } }
+                { wildcard: { images: '*mp4' } },
               ],
             };
-
           } else {
             this.query = {
-              must: [{ match: { 'labels.zh.value': this.keyword } }, { term: { 'type.keyword': type.id } },
-              { "wildcard": { "images": "*mp4" } }
+              must: [
+                { match: { 'labels.zh.value': this.keyword } },
+                { term: { 'type.keyword': type.id } },
+                { wildcard: { images: '*mp4' } },
               ],
             };
           }
         } else {
           if (type.id != '') {
             this.query = {
-              must: [{ term: { 'type.keyword': type.id } }, { "wildcard": { "images": "*mp4" } }],
-
+              must: [
+                { term: { 'type.keyword': type.id } },
+                { wildcard: { images: '*mp4' } },
+              ],
             };
           } else {
             this.query = {
-              must: [{ "wildcard": { "images": "*mp4" } }],
+              must: [{ wildcard: { images: '*mp4' } }],
             };
           }
         }
@@ -613,36 +571,30 @@ export class ImageComponent implements OnInit {
                       operator: 'and',
                     },
                   },
-                }
+                },
               ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
+              should: [{ wildcard: { images: '*pdf' } }],
             };
           } else if (this.way == '精确检索') {
             this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': this.keyword } }
-              ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
+              must: [{ term: { 'labels.zh.value.keyword': this.keyword } }],
+              should: [{ wildcard: { images: '*pdf' } }],
             };
-
           } else {
             this.query = {
-              must: [{ match: { 'labels.zh.value': this.keyword } },],
-              should: [{ "wildcard": { "images": "*pdf" } }],
+              must: [{ match: { 'labels.zh.value': this.keyword } }],
+              should: [{ wildcard: { images: '*pdf' } }],
             };
           }
         } else {
-
           if (type.id != '') {
             this.query = {
               must: [{ term: { 'type.keyword': type.id } }],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-
+              should: [{ wildcard: { images: '*pdf' } }],
             };
           } else {
             this.query = {
-              should: [{ "wildcard": { "images": "*pdf" } }],
-
+              should: [{ wildcard: { images: '*pdf' } }],
             };
           }
         }
@@ -659,36 +611,30 @@ export class ImageComponent implements OnInit {
                       operator: 'and',
                     },
                   },
-                }
+                },
               ],
-              should: [{ "exists": { "field": "location" } }],
+              should: [{ exists: { field: 'location' } }],
             };
           } else if (this.way == '精确检索') {
             this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': this.keyword } }
-              ],
-              should: [{ "exists": { "field": "location" } }],
+              must: [{ term: { 'labels.zh.value.keyword': this.keyword } }],
+              should: [{ exists: { field: 'location' } }],
             };
-
           } else {
             this.query = {
-              must: [{ match: { 'labels.zh.value': this.keyword } },],
-              should: [{ "exists": { "field": "location" } }],
+              must: [{ match: { 'labels.zh.value': this.keyword } }],
+              should: [{ exists: { field: 'location' } }],
             };
           }
         } else {
-
           if (type.id != '') {
             this.query = {
               must: [{ term: { 'type.keyword': type.id } }],
-              should: [{ "exists": { "field": "location" } }],
-
+              should: [{ exists: { field: 'location' } }],
             };
           } else {
             this.query = {
-              should: [{ "exists": { "field": "location" } }],
-
+              should: [{ exists: { field: 'location' } }],
             };
           }
         }
@@ -708,7 +654,7 @@ export class ImageComponent implements OnInit {
           .navigate([`/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
-          .then(() => { });
+          .then(() => {});
         break;
     }
   }
@@ -748,6 +694,4 @@ export class ImageComponent implements OnInit {
       ],
     });
   }
-
-
 }

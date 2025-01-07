@@ -25,7 +25,7 @@ export class SearchComponent implements OnInit {
   knowledge: any;
 
   waies = signal(['默认检索', '精确检索', '模糊检索']);
-  way = '默认检索';
+  way = '模糊检索';
 
   navItems = signal([{ link: '/search', label: '知识' }, { link: '/image', label: '图片' }, { link: '/video', label: '视频' }, { link: '/file', label: '文件' }, { link: '/map', label: '地图' }]);
 
@@ -80,12 +80,12 @@ export class SearchComponent implements OnInit {
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
       console.log(x.get('q'));
-      if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
+      // if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
         this.keyword = x.get('q') as string;
         this.selectKeyword(this.keyword);
-      } else {
-        this.router.navigate(['/']);
-      }
+      // } else {
+      //   this.router.navigate(['/']);
+      // }
 
     });
   }

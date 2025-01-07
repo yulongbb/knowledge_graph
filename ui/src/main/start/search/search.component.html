@@ -48,7 +48,7 @@
     <div *ngIf="knowledge" class="knowledge-panel ad">
       <h3 (click)="action('info', knowledge)">{{knowledge['_source']?.labels?.zh?.value}}</h3>
       <div *ngIf="knowledge['_source']?.images">
-        <div *ngFor="let image of knowledge['_source']?.images">
+        <div *ngFor="let image of knowledge['_source']?.images?.slice(0,1)">
           <img *ngIf="image.split('.')[image.split('.').length-1]!='mp4'" [src]="getFullImageUrl(image)"
             alt="AI Icon" />
         </div>
@@ -119,18 +119,18 @@
 
     <!-- 普通搜索结果 -->
     <div class="result-item" *ngFor="let entity of entities">
-      <div *ngIf="!entity['highlight']['labels.zh.value']" (click)="action('info', entity)"
+      <div *ngIf="!entity['highlight']" (click)="action('info', entity)"
         class="result-title">{{entity['_source']?.labels?.zh?.value}}</div>
-      <div *ngIf="entity['highlight']['labels.zh.value']" [innerHTML]="entity['highlight']['labels.zh.value']"
-        (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</div>
+      <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']"
+        (click)="action('info', entity)" class="result-title"></div>
       <div>
         <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
           class="result-url">{{entity['_source']?.sources[0].slice(0,50)}}</a>
       </div>
 
-      <div  *ngIf="!entity['highlight']['descriptions.zh.value']"  class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
+      <div  *ngIf="!entity['highlight']"  class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
 
-      <div  *ngIf="entity['highlight']['descriptions.zh.value']" [innerHTML]="entity['highlight']['descriptions.zh.value']"  class="result-snippet" ></div>
+      <div  *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"  class="result-snippet" ></div>
     </div>
   </div>
 
