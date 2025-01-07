@@ -316,23 +316,32 @@ video::-webkit-media-controls-enclosure {
 /* 分页导航 */
 .pagination {
   display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+  gap: 5px;
+  margin-bottom: 20px;
 }
 
 .pagination a {
-  color: #1a0dab;
-  text-decoration: none;
   padding: 5px 10px;
-  border-radius: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #007bff;
+  cursor: pointer;
 }
 
 .pagination a.active {
-  background-color: #1a0dab;
+  background-color: #007bff;
   color: white;
 }
 
+.pagination a.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination span {
+  padding: 5px 10px;
+}
 /* 知识面板 */
 .knowledge-panel {
   background-color: white;

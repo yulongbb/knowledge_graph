@@ -36,8 +36,12 @@ export class SearchComponent implements OnInit {
   keyword = '';
 
 
-  size = 10;
-  index = 1;
+  size: number = 10;
+  index: number = 1;
+  total: number = 0; // 总条数
+  visiblePages: number[] = []; // 显示的页码
+  showEllipsis: boolean = false; // 是否显示省略号
+
 
   types: any;
   type: any;
@@ -76,6 +80,41 @@ export class SearchComponent implements OnInit {
 
   }
   ngOnInit(): void {
+  }
+
+  // 计算总页数
+  get totalPages(): number {
+    return Math.ceil(this.total / this.size);
+  }
+
+
+  // 更新显示的页码
+  updateVisiblePages(): void {
+    const pages = [];
+    const maxVisible = 5; // 最多显示 5 个页码
+    let start = Math.max(1, this.index - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    this.visiblePages = pages;
+    this.showEllipsis = end < this.totalPages; // 是否显示省略号
+  }
+
+
+  // 处理页码变化
+  onPageChange(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.index = page;
+      this.search();
+
+    }
   }
 
 
@@ -189,6 +228,10 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
+        this.total = data.total;
+        this.updateVisiblePages();
+
+        console.log(data)
         this.tags = null;
         this.types = null;
         this.images = [];
