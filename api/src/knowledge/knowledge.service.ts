@@ -148,20 +148,20 @@ export class KnowledgeService {
         //   id: entity.type.id,
         // };
 
-        if(!entity.type.id){
+        if (!entity.type.id) {
           let schema = await this.schemasService.getByName(entity.type);
-          if(!schema){
-            let s= new Schema();
+          if (!schema) {
+            let s = new Schema();
             s.id = uuidv4();;
             s.name = entity.type;
             s.label = entity.type;
             schema = await this.schemasService.post(s);
           }
-          entity.type = {id: schema.id, name: schema.name };
+          entity.type = { id: schema.id, name: schema.name };
           console.log(entity.type)
         }
 
-        
+
 
         // document.document(entity.type.id).then(
         //   (updatedDocument) => {
@@ -237,15 +237,16 @@ export class KnowledgeService {
           items: ['entity/' + doc['_key']],
           images: entity?.images,
           location: entity?.location,
+          sources: entity?.sources,
         };
         let data = await this.elasticsearchService.bulk(source);
-        
+
         console.log(JSON.stringify(data));
         document.document(doc['_key']).then((existingDocument) => {
           existingDocument.id = data['items'][0]['index']['_id'];
           document.update(doc['_key'], existingDocument);
         });
-        return  { ...doc, ...source };;
+        return { ...doc, ...source };;
       },
       (err) => console.error('Failed to save document:', err),
     );
@@ -264,6 +265,7 @@ export class KnowledgeService {
       items: entity?.items,
       images: entity?.images,
       location: entity?.location,
+      sources: entity?.sources,
     });
     console.log(entity);
     const myCollection = this.db.collection('entity');
@@ -379,11 +381,11 @@ export class KnowledgeService {
         cytoscapeData.elements.nodes.push({
           data: {
             _id: result[0]?.start?.id['_id'] ?? items[0],
-            images: entity['_source']['images']?.map((image)=> 'http://localhost:9000/kgms/'+image),
+            images: entity['_source']['images']?.map((image) => 'http://localhost:9000/kgms/' + image),
             type: entity['_source']['type'],
             id: result[0]?.start?.id ?? id,
             base: [],
-            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value ,
+            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value,
             description: result[0]?.start?.descriptions?.zh?.value || entity['_source']?.descriptions?.zh?.value // 根据你的字段结构选择合适的label
           }
         });
@@ -395,7 +397,7 @@ export class KnowledgeService {
             cytoscapeData.elements.nodes.push({
               data: {
                 _id: vertex['_id'],
-                images: data['_source']['images']?.map((image)=> 'http://localhost:9000/kgms/'+image),
+                images: data['_source']['images']?.map((image) => 'http://localhost:9000/kgms/' + image),
                 type: data['_source']['type'],
                 id: vertex.id,
                 base: [],

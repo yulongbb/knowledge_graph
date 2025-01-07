@@ -54,21 +54,10 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       required: false,
     },
     {
-      control: 'input',
-      id: 'label',
-      label: '标签',
-      required: true,
-    },
-    {
-      control: 'input',
-      id: 'aliases',
-      label: '别名',
-      required: true,
-    },
-    {
       control: 'find',
       id: 'type',
       label: '类型',
+      required: false,
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
@@ -80,10 +69,29 @@ export class EntityDetailComponent implements OnInit, OnChanges {
           .pipe(map((x) => x.list)),
     },
     {
+      control: 'input',
+      id: 'label',
+      label: '标签',
+      required: true,
+    },
+    {
+      control: 'input',
+      id: 'aliases',
+      label: '别名',
+      required: false,
+    },
+
+    {
       control: 'textarea',
       id: 'description',
       label: '描述',
-      required: true,
+      required: false,
+    },
+    {
+      control: 'input',
+      id: 'source',
+      label: 'url',
+      required: false,
     },
   ];
 
@@ -501,6 +509,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             (i: any) => i.url.split('/')[i.url.split('/').length - 1]
           ),
           location: this.item?.location,
+          sources: [this.form.formGroup.value.source]
         };
         console.log(item);
         if (this.type === 'add') {
