@@ -4,7 +4,7 @@
   </div>
   <!-- 搜索框 -->
   <div class="search-box">
-    <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="selectKeyword(keyword)" />
+    <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
   </div>
 
   <!-- 筛选和排序选项 -->
@@ -70,22 +70,24 @@
     </div>
 
     <!-- 图片预览 -->
-    <div class="result-item image-preview" *ngIf="images">
+    <div class="result-item image-preview" *ngIf="knowledge&&images.length>0">
       <div class="image-grid">
-        <img *ngFor="let image of images.slice(0,4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
+        <img *ngFor="let image of images?.slice(0,4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
       </div>
       <a href="#" class="see-more">查看更多图片</a>
     </div>
 
     <!-- 视频预览 -->
-    <div class="result-item video-preview" *ngFor="let video of videos.slice(0,4)">
-      <div class="video-thumbnail">
-        <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element"></video>
-      </div>
-      <div class="video-info">
-        <a href="#" class="result-title">{{video.label}}</a>
-        <div class="result-url">https://www.ted.com/talks/ai-future</div>
-        <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
+    <div *ngIf="knowledge&&videos.length>0">
+      <div class="result-item video-preview" *ngFor="let video of videos?.slice(0,4)">
+        <div class="video-thumbnail">
+          <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element"></video>
+        </div>
+        <div class="video-info">
+          <a href="#" class="result-title">{{video.label}}</a>
+          <div class="result-url">https://www.ted.com/talks/ai-future</div>
+          <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
+        </div>
       </div>
     </div>
 
@@ -150,43 +152,32 @@
 
 <div class="search-container">
   <!-- 分页导航 -->
-  <div class="pagination">
+  <div *ngIf="total>0" class="pagination">
     <!-- 上一页 -->
     <a (click)="onPageChange(index - 1)" [class.disabled]="index === 1">上一页</a>
-  
+
     <!-- 页码 -->
-    <a
-      *ngFor="let page of visiblePages"
-      (click)="onPageChange(page)"
-      [class.active]="page === index"
-    >
+    <a *ngFor="let page of visiblePages" (click)="onPageChange(page)" [class.active]="page === index">
       {{ page }}
     </a>
-  
+
     <!-- 省略号 -->
     <span *ngIf="showEllipsis">...</span>
-  
+
     <!-- 最后一页 -->
-    <a
-      *ngIf="totalPages > 1"
-      (click)="onPageChange(totalPages)"
-      [class.active]="index === totalPages"
-    >
+    <a *ngIf="totalPages > 1" (click)="onPageChange(totalPages)" [class.active]="index === totalPages">
       {{ totalPages }}
     </a>
-  
+
     <!-- 下一页 -->
     <a (click)="onPageChange(index + 1)" [class.disabled]="index === totalPages">下一页</a>
   </div>
 
   <!-- 相关搜索 -->
-  <div class="related-searches">
+  <div class="related-searches" *ngIf="tags">
     <h3>相关搜索</h3>
     <div class="related-links">
-      <a href="#">机器学习</a>
-      <a href="#">深度学习</a>
-      <a href="#">神经网络</a>
-      <a href="#">自然语言处理</a>
+      <a *ngFor="let tag of tags?.slice(0,4)" href="#">{{tag}}</a>
     </div>
   </div>
 </div>

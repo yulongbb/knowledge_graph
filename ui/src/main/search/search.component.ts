@@ -4,7 +4,7 @@ import {
   XImagePreviewComponent,
 } from '@ng-nest/ui';
 import { EsService } from './es.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
@@ -77,7 +77,10 @@ export class SearchComponent implements OnInit {
     private entityService: EntityService,
     private dialogSewrvice: XDialogService
   ) {
-
+    this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
+      this.keyword = x.get('q') as string;
+      this.selectKeyword(this.keyword);
+    });
   }
   ngOnInit(): void {
   }
@@ -99,7 +102,7 @@ export class SearchComponent implements OnInit {
       start = Math.max(1, end - maxVisible + 1);
     }
 
-    for (let i = start; i <= end; i++) {
+    for (let i = start; i < end; i++) {
       pages.push(i);
     }
 
@@ -228,101 +231,108 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
+        console.log(data);
+
         this.total = data.total;
         this.updateVisiblePages();
 
-        console.log(data)
         this.tags = null;
         this.types = null;
         this.images = [];
         this.videos = [];
         this.pdfs = [];
         this.markers = [];
+        this.knowledge = null;
 
-        data.list.forEach((item: any) => {
-          if (item._source.location) {
-            const newMarker = marker([item._source.location.lat, item._source.location.lon]);
-            this.markers.push(newMarker);
-          }
 
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
-        });
         this.entities = data.list;
-        this.knowledge = data.list[0]
-        console.log(this.knowledge)
-        this.ontologyService.get(this.knowledge._source.type).subscribe((t: any) => {
-          console.log(t)
-          this.knowledge._type = t.label;
-          this.ontologyService
-            .getAllParentIds(this.knowledge['_source'].type)
-            .subscribe((parents: any) => {
-              parents.push(this.knowledge['_source'].type);
-              this.propertyService
-                .getList(1, 50, {
-                  filter: [
-                    {
-                      field: 'id',
-                      value: parents as string[],
-                      relation: 'schemas',
-                      operation: 'IN',
-                    },
-                    // { field: 'isPrimary', value: true, operation: '=' },
-                  ],
-                })
-                .subscribe((p: any) => {
-                  this.entityService
-                    .getLinks(1, 20, this.knowledge['_id'], {})
-                    .subscribe((c: any) => {
-                      let statements: any = [];
-                      c.list.forEach((path: any) => {
+        if (this.index == 1) {
+          data.list.forEach((item: any) => {
+            if (item._source.location) {
+              const newMarker = marker([item._source.location.lat, item._source.location.lon]);
+              this.markers.push(newMarker);
+            }
 
-                        path.edges[0].mainsnak.label = p.list.filter(
-                          (p2: any) =>
-                            path.edges[0].mainsnak.property == `P${p2.id}`
-                        )[0]?.name;
-                        if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                          path.edges[0].mainsnak.datavalue.value.id =
-                            path?.vertices[1]?.id;
-                          path.edges[0].mainsnak.datavalue.value.label =
-                            path?.vertices[1]?.labels?.zh?.value;
-                        }
-                        if (
-                          p.list?.filter(
-                            (property: any) =>
-                              path.edges[0].mainsnak.property ==
-                              `P${property.id}`
-                          ).length > 0
-                        ) {
-                          statements.push(path.edges[0]);
+            item?._source?.images?.forEach((image: any) => {
+              if (
+                image.split('.')[image.split('.').length - 1] == 'jpeg' ||
+                image.split('.')[image.split('.').length - 1] == 'jpg' ||
+                image.split('.')[image.split('.').length - 1] == 'png' ||
+                image.split('.')[image.split('.').length - 1] == 'webp'
+              ) {
+                this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+              }
+
+              if (
+                image.split('.')[image.split('.').length - 1] == 'mp4'
+              ) {
+                this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+              }
+
+              if (
+                image.split('.')[image.split('.').length - 1] == 'pdf'
+              ) {
+                this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
+              }
+            });
+            this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
+          });
+          this.ontologyService.get(data.list[0]._source.type).subscribe((t: any) => {
+            console.log(t)
+            data.list[0]._type = t.label;
+            this.ontologyService
+              .getAllParentIds(data.list[0]['_source'].type)
+              .subscribe((parents: any) => {
+                parents.push(data.list[0]['_source'].type);
+                this.propertyService
+                  .getList(1, 50, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                      // { field: 'isPrimary', value: true, operation: '=' },
+                    ],
+                  })
+                  .subscribe((p: any) => {
+                    this.entityService
+                      .getLinks(1, 20, data.list[0]['_id'], {})
+                      .subscribe((c: any) => {
+                        let statements: any = [];
+                        c.list.forEach((path: any) => {
+
+                          path.edges[0].mainsnak.label = p.list.filter(
+                            (p2: any) =>
+                              path.edges[0].mainsnak.property == `P${p2.id}`
+                          )[0]?.name;
+                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
+                            path.edges[0].mainsnak.datavalue.value.id =
+                              path?.vertices[1]?.id;
+                            path.edges[0].mainsnak.datavalue.value.label =
+                              path?.vertices[1]?.labels?.zh?.value;
+                          }
+                          if (
+                            p.list?.filter(
+                              (property: any) =>
+                                path.edges[0].mainsnak.property ==
+                                `P${property.id}`
+                            ).length > 0
+                          ) {
+                            statements.push(path.edges[0]);
+                          }
+                        });
+                        data.list[0].claims = statements;
+                        if (data.list[0].claims.length > 0) {
+                          this.knowledge = data.list[0];
                         }
                       });
-                      this.knowledge.claims = statements;
-                    });
-                });
-            });
-        });
+                  });
+              });
+          });
+        }
+
         let menu: any = [];
         let arr: any = [];
         data.types.forEach((m: any) => {
@@ -348,6 +358,11 @@ export class SearchComponent implements OnInit {
         });
         this.tags = tags;
       });
+  }
+
+  queryKeyword(keyword: any) {
+    this.router.navigate(['/index/search'], { queryParams: { q: keyword } });
+
   }
 
   selectKeyword(keyword: any) {
