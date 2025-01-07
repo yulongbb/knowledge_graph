@@ -13,22 +13,21 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faImage } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-search',
-  styleUrls: ['./search.component.scss'],
-  templateUrl: './search.component.html',
+  selector: 'app-image',
+  styleUrls: ['./image.component.scss'],
+  templateUrl: './image.component.html',
 })
-export class SearchComponent implements OnInit {
+export class ImageComponent implements OnInit {
   entities: any;
   knowledge: any;
 
   waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '模糊检索';
 
-  navItems = signal([{link: '/index/search', label: '知识'}, {link: '/index/image', label: '图片'}, {link: '/index/video', label: '视频'}, {link: '/index/file', label: '文件'}, {link: '/index/map', label: '地图'}]);
-  
+  navItems = signal([{ link: '/index/search', label: '知识' }, { link: '/index/image', label: '图片' }, { link: '/index/video', label: '视频' }, { link: '/index/file', label: '文件' }, { link: '/index/map', label: '地图' }]);
   menu: any = signal('知识');
 
   query: any = { bool: {} };
@@ -37,7 +36,7 @@ export class SearchComponent implements OnInit {
   keyword = '';
 
 
-  size: number = 10;
+  size: number = 20;
   index: number = 1;
   total: number = 0; // 总条数
   visiblePages: number[] = []; // 显示的页码
@@ -65,7 +64,7 @@ export class SearchComponent implements OnInit {
   currentVideoIndex = 0; // 当前视频索引
   currentVideoSrc: any; // 当前视频路径
   scrollTimeout: any; // 防止快速滚动
-  faSearch = faSearch;
+  faImage = faImage;
 
 
   constructor(
@@ -79,11 +78,11 @@ export class SearchComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      if( x.get('q')!=null){
+      if (x.get('q') != null) {
         this.keyword = x.get('q') as string;
         this.selectKeyword(this.keyword);
       }
-  
+
     });
   }
   ngOnInit(): void {
@@ -220,7 +219,7 @@ export class SearchComponent implements OnInit {
 
 
   selectMenu(menu: any) {
-    this.router.navigate(['/index/'+menu.name], { queryParams: { q: this.keyword } });
+    this.router.navigate(['/index/' + menu.name], { queryParams: { q: this.keyword } });
   }
 
 
@@ -241,7 +240,6 @@ export class SearchComponent implements OnInit {
         this.pdfs = [];
         this.markers = [];
         this.knowledge = null;
-
 
         this.entities = data.list;
         if (this.index == 1) {
@@ -366,200 +364,59 @@ export class SearchComponent implements OnInit {
   selectKeyword(keyword: any) {
     this.keyword = keyword;
     this.index = 1;
-    switch (this.menu()) {
-      case '知识':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
+    if (keyword != '') {
+      if (this.way == '默认检索') {
+        this.query = {
+          must: [
+            {
+              match: {
+                'labels.zh.value': {
+                  query: keyword,
+                  operator: 'and',
                 },
-              ],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              should: [{ term: { 'labels.zh.value.keyword': keyword } }],
-            };
-          } else {
-            this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
-          }
-        } else {
-          this.query = { must: [] };
-        }
-        break;
-      case '图片':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
+              },
+            }
+          ],
+          should: [
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*jpg" } },
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*png" } },
+            { "wildcard": { "images": "*webp" } }],
+        };
+      } else if (this.way == '精确检索') {
+        this.query = {
+          must: [
+            { term: { 'labels.zh.value.keyword': keyword } }
+          ],
+          should: [
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*jpg" } },
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*png" } },
+            { "wildcard": { "images": "*webp" } }],
+        };
 
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [
-              { "wildcard": { "images": "*jpeg" } },
-              { "wildcard": { "images": "*jpg" } },
-              { "wildcard": { "images": "*jpeg" } },
-              { "wildcard": { "images": "*png" } },
-              { "wildcard": { "images": "*webp" } }],
-          };
-        }
-        break;
-      case '视频':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "wildcard": { "images": "*mp4" } }],
-          };
-        }
-        break;
-      case '文件':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "wildcard": { "images": "*pdf" } }],
-          };
-        }
-        break;
-      case '地图':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "exists": { "field": "location" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "exists": { "field": "location" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "exists": { "field": "location" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "exists": { "field": "location" } }],
-          };
-        }
-        break;
-      default:
-        this.query = {};
-        break;
+      } else {
+        this.query = {
+          must: [{ match: { 'labels.zh.value': keyword } },],
+          should: [
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*jpg" } },
+            { "wildcard": { "images": "*jpeg" } },
+            { "wildcard": { "images": "*png" } },
+            { "wildcard": { "images": "*webp" } }],
+        };
+      }
+    } else {
+      this.query = {
+        should: [
+          { "wildcard": { "images": "*jpeg" } },
+          { "wildcard": { "images": "*jpg" } },
+          { "wildcard": { "images": "*jpeg" } },
+          { "wildcard": { "images": "*png" } },
+          { "wildcard": { "images": "*webp" } }],
+      };
     }
     this.search();
 

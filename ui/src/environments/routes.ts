@@ -215,6 +215,15 @@ export const layoutRoutes: Routes = [
     }
   },
   {
+    path: "image",
+    loadChildren: () =>
+      import("../main/image/image.module").then(x => x.ImageModule),
+    // canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+  {
     path: "application",
     loadChildren: () =>
       import("../main/application/application.module").then(x => x.ApplicationModule),
