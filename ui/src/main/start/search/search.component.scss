@@ -1,4 +1,4 @@
-// :host {
+:host {
 
 //   x-input-group {
 //     display: block;
@@ -307,9 +307,6 @@ video::-webkit-media-controls-enclosure {
   font-size: 18px;
   cursor: pointer;
 }
-.result-title i {
-  color: red !important;
-}
 
 .result-url {
   color: #0d652d;
@@ -460,4 +457,5 @@ video::-webkit-media-controls-enclosure {
   color: #1a0dab;
   text-decoration: none;
   font-size: 14px;
+}
 }

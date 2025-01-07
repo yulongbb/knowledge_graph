@@ -119,17 +119,18 @@
 
     <!-- 普通搜索结果 -->
     <div class="result-item" *ngFor="let entity of entities">
-      <a *ngIf="!entity['highlight']" (click)="action('info', entity)"
-        class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
-      <a *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']"
-        (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
+      <div *ngIf="!entity['highlight']['labels.zh.value']" (click)="action('info', entity)"
+        class="result-title">{{entity['_source']?.labels?.zh?.value}}</div>
+      <div *ngIf="entity['highlight']['labels.zh.value']" [innerHTML]="entity['highlight']['labels.zh.value']"
+        (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</div>
       <div>
         <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
           class="result-url">{{entity['_source']?.sources[0].slice(0,50)}}</a>
       </div>
 
+      <div  *ngIf="!entity['highlight']['descriptions.zh.value']"  class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
 
-      <div class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
+      <div  *ngIf="entity['highlight']['descriptions.zh.value']" [innerHTML]="entity['highlight']['descriptions.zh.value']"  class="result-snippet" ></div>
     </div>
   </div>
 

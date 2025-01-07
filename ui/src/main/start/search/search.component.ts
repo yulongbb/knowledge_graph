@@ -25,7 +25,7 @@ export class SearchComponent implements OnInit {
   knowledge: any;
 
   waies = signal(['默认检索', '精确检索', '模糊检索']);
-  way = '模糊检索';
+  way = '默认检索';
 
   navItems = signal([{ link: '/search', label: '知识' }, { link: '/image', label: '图片' }, { link: '/video', label: '视频' }, { link: '/file', label: '文件' }, { link: '/map', label: '地图' }]);
 
@@ -377,6 +377,13 @@ export class SearchComponent implements OnInit {
                 {
                   match: {
                     'labels.zh.value': {
+                      query: keyword,
+                      operator: 'and',
+                    },
+                  },
+                },   {
+                  match: {
+                    'descriptions.zh.value': {
                       query: keyword,
                       operator: 'and',
                     },
