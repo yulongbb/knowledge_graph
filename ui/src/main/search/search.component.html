@@ -73,19 +73,18 @@
     <!-- 图片预览 -->
     <div class="result-item image-preview" *ngIf="images">
       <div class="image-grid">
-        <img *ngFor="let image of images" [src]="getFullImageUrl(image.image)" [alt]="image" />
+        <img *ngFor="let image of images.slice(0,5)" [src]="getFullImageUrl(image.image)" [alt]="image" />
       </div>
       <a href="#" class="see-more">查看更多图片</a>
     </div>
 
     <!-- 视频预览 -->
-    <div class="result-item video-preview" *ngFor="let video of videos">
+    <div class="result-item video-preview" *ngFor="let video of videos.slice(0,5)">
       <div class="video-thumbnail">
-        <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element" autoplay muted></video>
-        <span class="play-icon">▶</span>
+        <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element"></video>
       </div>
       <div class="video-info">
-        <a href="#" class="result-title">人工智能的未来 - TED 演讲</a>
+        <a href="#" class="result-title">{{video.label}}</a>
         <div class="result-url">https://www.ted.com/talks/ai-future</div>
         <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
       </div>

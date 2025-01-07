@@ -25,7 +25,6 @@ import { DatasetModule } from './dataset/dataset.module';
       synchronize: true,
       logging: ['query', 'error'],
     }),
-   
     SystemModule,
     DesignModule,
     OntologynModule,
