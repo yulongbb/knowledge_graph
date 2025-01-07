@@ -1,0 +1,29 @@
+<!-- 搜索栏 -->
+<div style="width: 100%; display: flex; align-items: center; justify-content: center">
+    <x-input-group compact size="big">
+        <x-select [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="20"></x-select>
+
+        <x-auto-complete [style.width.%]="100" (nodeEmit)="selectNode($event)" [data]="dataAsync()"
+            [(ngModel)]="modelAsync" placeholder="检索知识" [nodeTpl]="nodeTpl"></x-auto-complete>
+        <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
+    </x-input-group>
+</div>
+
+
+<ng-template #nodeTpl let-node="$node">
+    <span class="select-item">{{ node?._source?.labels.zh.value }} </span>
+</ng-template>
+
+<div #cy style="width: 100%; height: 100%;"></div>
+
+
+<ng-template #contentTpl>
+    <x-select [data]="properties()" [(ngModel)]="model1"></x-select>
+</ng-template>
+
+
+<div class="row">
+    <x-drawer title="标题" [(visible)]="visible" [placement]="'right'" (close)="close()">
+        <app-entity-detail [id]="id"  [type]="type"></app-entity-detail>
+    </x-drawer>
+</div>

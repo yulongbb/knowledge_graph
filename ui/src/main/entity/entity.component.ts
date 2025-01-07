@@ -16,7 +16,7 @@ import {
   XRadioNode,
 } from '@ng-nest/ui';
 import { EntityService } from './entity.service';
-import { EsService } from '../search/es.service';
+import { EsService } from '../start/search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 @Component({
   selector: 'app-entity',

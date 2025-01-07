@@ -35,11 +35,11 @@ import { createPopper } from '@popperjs/core';
 import { color } from 'echarts';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  selector: 'app-graph',
+  templateUrl: './graph.component.html',
+  styleUrls: ['./graph.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class GraphComponent implements OnInit, OnDestroy {
   @ViewChild('cy', { static: true }) cyContainer!: ElementRef;
   contentTpl = viewChild.required<TemplateRef<void>>('contentTpl');
   properties: any;

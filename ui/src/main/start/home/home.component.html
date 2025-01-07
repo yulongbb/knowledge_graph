@@ -1,0 +1,25 @@
+<div class="home-container">
+  <header class="header">
+    <nav class="nav">
+      <a href="#" class="nav-item">图片</a>
+      <a href="#" class="nav-item">视频</a>
+      <a href="#" class="nav-item">地图</a>
+      <a href="#" class="nav-item">新闻</a>
+    </nav>
+    <div class="header-info">
+      <span>52%</span>
+      <span>50%</span>
+      <span>88</span>
+    </div>
+  </header>
+
+  <section class="search-section">
+    <!-- <div class="logo">
+      <img src="assets/bing-logo.png" alt="Bing Logo">
+    </div> -->
+    <div class="search-box">
+      <input type="text" placeholder="搜索网页、图片、视频..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+      <button (click)="onSearch()">搜索</button>
+    </div>
+  </section>
+</div>

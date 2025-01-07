@@ -26,6 +26,21 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/login/login.module").then(x => x.LoginModule)
   },
+  {
+    path: "home",
+    loadChildren: () =>
+      import("../main/start/home/home.module").then(x => x.HomeModule)
+  },
+  {
+    path: "search",
+    loadChildren: () =>
+      import("../main/start/search/search.module").then(x => x.SearchModule)
+  },
+  {
+    path: "image",
+    loadChildren: () =>
+      import("../main/start/image/image.module").then(x => x.ImageModule)
+  },
   // index
   {
     path: "index",
@@ -54,16 +69,26 @@ export const layoutRoutes: Routes = [
       title: "dashboard"
     }
   },
-    // 仪表盘
-    {
-      path: "map",
-      loadChildren: () =>
-        import("../main/map/map.module").then(x => x.MapModule),
-      canLoad: [AuthGuard],
-      data: {
-        title: "map"
-      }
-    },
+  // 仪表盘
+  {
+    path: "graph",
+    loadChildren: () =>
+      import("../main/graph/graph.module").then(x => x.GraphModule),
+    canLoad: [AuthGuard],
+    data: {
+      title: "graph"
+    }
+  },
+  // 仪表盘
+  {
+    path: "map",
+    loadChildren: () =>
+      import("../main/map/map.module").then(x => x.MapModule),
+    canLoad: [AuthGuard],
+    data: {
+      title: "map"
+    }
+  },
   // 用户管理
   {
     path: "users",
@@ -200,24 +225,6 @@ export const layoutRoutes: Routes = [
     path: "entity",
     loadChildren: () =>
       import("../main/entity/entity.module").then(x => x.EntityModule),
-    // canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
-  {
-    path: "search",
-    loadChildren: () =>
-      import("../main/search/search.module").then(x => x.SearchModule),
-    // canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
-  {
-    path: "image",
-    loadChildren: () =>
-      import("../main/image/image.module").then(x => x.ImageModule),
     // canLoad: [AuthGuard],
     data: {
       shouldReuse: true

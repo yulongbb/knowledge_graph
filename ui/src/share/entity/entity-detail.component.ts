@@ -23,7 +23,7 @@ import {
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { EsService } from 'src/main/search/es.service';
+import { EsService } from 'src/main/start/search/es.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
 import { NavService } from 'src/services/nav.service';

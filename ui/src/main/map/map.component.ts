@@ -19,7 +19,7 @@ import {
   XPlace,
 } from '@ng-nest/ui';
 import { latLng, marker, Marker, Map , tileLayer } from 'leaflet';
-import { EsService } from '../search/es.service';
+import { EsService } from '../start/search/es.service';
 import { forkJoin } from 'rxjs';
 import { OntologyService } from '../ontology/ontology/ontology.service';
 import * as L from 'leaflet';

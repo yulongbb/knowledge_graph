@@ -5,10 +5,10 @@ import {
 } from '@ng-nest/ui';
 import { EsService } from './es.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { OntologyService } from '../ontology/ontology/ontology.service';
-import { PropertyService } from '../ontology/property/property.service';
+import { OntologyService } from '../../ontology/ontology/ontology.service';
+import { PropertyService } from '../../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
-import { EntityService } from '../entity/entity.service';
+import { EntityService } from '../../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
@@ -27,8 +27,8 @@ export class SearchComponent implements OnInit {
   waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '模糊检索';
 
-  navItems = signal([{link: '/index/search', label: '知识'}, {link: '/index/image', label: '图片'}, {link: '/index/video', label: '视频'}, {link: '/index/file', label: '文件'}, {link: '/index/map', label: '地图'}]);
-  
+  navItems = signal([{ link: '/search', label: '知识' }, { link: '/image', label: '图片' }, { link: '/video', label: '视频' }, { link: '/file', label: '文件' }, { link: '/map', label: '地图' }]);
+
   menu: any = signal('知识');
 
   query: any = { bool: {} };
@@ -79,11 +79,14 @@ export class SearchComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      if( x.get('q')!=null){
+      console.log(x.get('q'));
+      if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
         this.keyword = x.get('q') as string;
         this.selectKeyword(this.keyword);
+      } else {
+        this.router.navigate(['/']);
       }
-  
+
     });
   }
   ngOnInit(): void {
@@ -220,7 +223,7 @@ export class SearchComponent implements OnInit {
 
 
   selectMenu(menu: any) {
-    this.router.navigate(['/index/'+menu.name], { queryParams: { q: this.keyword } });
+    this.router.navigate(['/' + menu.name], { queryParams: { q: this.keyword } });
   }
 
 
@@ -359,8 +362,7 @@ export class SearchComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/index/search'], { queryParams: { q: keyword } });
-
+    this.router.navigate(['/search'], { queryParams: { q: keyword } });
   }
 
   selectKeyword(keyword: any) {
@@ -847,7 +849,7 @@ export class SearchComponent implements OnInit {
     switch (type) {
       case 'info':
         this.router
-          .navigate([`/index/search/${type}/${item._id}`], {
+          .navigate([`/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
           .then(() => { });

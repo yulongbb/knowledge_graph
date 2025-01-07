@@ -1,15 +1,28 @@
+<header class="top-nav">
+  <div class="logo">
+      <a href="#">KG</a>
+  </div>
+  <!-- <nav class="nav-links">
+      <ul>
+          <li><a href="#">首页</a></li>
+          <li><a href="#">新闻</a></li>
+          <li><a href="#">图片</a></li>
+          <li><a href="#">视频</a></li>
+          <li><a href="#">更多</a></li>
+      </ul>
+  </nav> -->
+  <div class="right-section">
+      <button class="login-button"  [routerLink]="'/login'">登录</button>
+  </div>
+</header>
 <div class="search-container">
+  
   <div class="search-nav">
-    <a
-      *ngFor="let item of navItems()"
-      [routerLink]="item.link"
-      [queryParams]="{ q: keyword }"
-      routerLinkActive="active"
-    >
+    <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ q: keyword }"
+      routerLinkActive="active">
       {{ item.label }}
     </a>
   </div>
-
   <!-- 搜索框 -->
   <div class="search-box">
     <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
@@ -28,9 +41,96 @@
       <option>最旧</option>
     </select>
   </div>
-</div>
 
-<div class="search-results">
+  <!-- 搜索结果列表 -->
+  <div class="search-results">
+    <!-- 知识面板（调整到搜索列表的第一个位置） -->
+    <div *ngIf="knowledge" class="knowledge-panel ad">
+      <h3 (click)="action('info', knowledge)">{{knowledge['_source']?.labels?.zh?.value}}</h3>
+      <div *ngIf="knowledge['_source']?.images">
+        <div *ngFor="let image of knowledge['_source']?.images">
+          <img *ngIf="image.split('.')[image.split('.').length-1]!='mp4'" [src]="getFullImageUrl(image)"
+            alt="AI Icon" />
+        </div>
+      </div>
+      <p>{{knowledge['_source']?.descriptions?.zh?.value}}</p>
+      <ul *ngIf="knowledge.claims">
+        <li *ngFor="let statement of knowledge.claims"><strong>{{statement.mainsnak.label}}：</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+          'http://localhost:4200/index/search/info/' +
+          statement.mainsnak.datavalue.value.id
+        ">{{ statement.mainsnak.datavalue.value.label }}</a>
+          </strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'string'">
+            {{ statement.mainsnak.datavalue.value }}
+          </strong>
+
+          <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+              [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+            statement.mainsnak.datavalue.value.amount
+            }}</strong>
+          <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
+      statement.mainsnak.datavalue.value }}</pre>
+          <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+            statement.mainsnak.datavalue.value
+            }}</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+            statement.mainsnak.datavalue.value.latitude }},{{
+            statement.mainsnak.datavalue.value.longitude
+            }}</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+            statement.mainsnak.datavalue.value.time
+            }}</strong>
+        </li>
+      </ul>
+      <a href="#" class="see-more">了解更多</a>
+    </div>
+
+    <!-- 图片预览 -->
+    <div class="result-item image-preview" *ngIf="knowledge&&images.length>0">
+      <div class="image-grid">
+        <img *ngFor="let image of images?.slice(0,4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
+      </div>
+      <a href="#" class="see-more">查看更多图片</a>
+    </div>
+
+    <!-- 视频预览 -->
+    <div *ngIf="knowledge&&videos.length>0">
+      <div class="result-item video-preview" *ngFor="let video of videos?.slice(0,4)">
+        <div class="video-thumbnail">
+          <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element"></video>
+        </div>
+        <div class="video-info">
+          <a href="#" class="result-title">{{video.label}}</a>
+          <div class="result-url">https://www.ted.com/talks/ai-future</div>
+          <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 广告 -->
+    <!-- <div class="result-item ad">
+    <div class="ad-label">广告</div>
+    <a href="#" class="result-title">人工智能培训课程 - 限时优惠</a>
+    <div class="result-url">https://www.ai-course.com</div>
+    <div class="result-snippet">加入我们的 AI 培训课程，掌握最新技术，立即注册享受 50% 折扣！</div>
+  </div> -->
+
+    <!-- 普通搜索结果 -->
+    <div class="result-item" *ngFor="let entity of entities">
+      <a (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
+      <div>
+        <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
+          class="result-url">{{entity['_source']?.sources[0].slice(0,50)}}</a>
+      </div>
+      <div class="result-snippet">{{entity['_source']?.descriptions?.zh?.value}}</div>
+    </div>
+  </div>
+
+  <!-- @case ('图片') {
+<div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()" [scrollWindow]="false">
   <div class="gallery">
     <div class="warp">
       <div *ngFor="let image of images">
@@ -41,9 +141,32 @@
     </div>
   </div>
 </div>
+}
+@case ('视频') {
 
+}
+@case ('文件') {
+<div class="search-results" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()" [scrollWindow]="false">
+  <div *ngFor="let pdf of pdfs">
+    <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+      <ng-template #header>
+        <x-link type="primary" (click)="action('info', pdf)">{{pdf.label}}</x-link>
+      </ng-template>
+      <div class="bottom">
+        <x-text-retract max="100" [content]="pdf?.description"></x-text-retract>
+      </div>
+    </x-card>
+  </div>
+</div>
+}
+@case ('地图') {
+<div style="height: 100%; width: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+  [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)">
+</div>
+}
+} -->
 
-<div class="search-container">
   <!-- 分页导航 -->
   <div *ngIf="total>0" class="pagination">
     <!-- 上一页 -->
@@ -74,6 +197,8 @@
     </div>
   </div>
 </div>
+
+
 <!-- 
 
 <div style="width: 100%; display: flex; align-items: center; justify-content: center">

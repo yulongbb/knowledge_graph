@@ -5,14 +5,13 @@ import {
 } from '@ng-nest/ui';
 import { EsService } from './es.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { OntologyService } from '../ontology/ontology/ontology.service';
-import { PropertyService } from '../ontology/property/property.service';
+import { OntologyService } from '../../ontology/ontology/ontology.service';
+import { PropertyService } from '../../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
-import { EntityService } from '../entity/entity.service';
+import { EntityService } from '../../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
-import { library } from '@fortawesome/fontawesome-svg-core';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -27,7 +26,7 @@ export class ImageComponent implements OnInit {
   waies = signal(['默认检索', '精确检索', '模糊检索']);
   way = '模糊检索';
 
-  navItems = signal([{ link: '/index/search', label: '知识' }, { link: '/index/image', label: '图片' }, { link: '/index/video', label: '视频' }, { link: '/index/file', label: '文件' }, { link: '/index/map', label: '地图' }]);
+  navItems = signal([{ link: '/search', label: '知识' }, { link: '/image', label: '图片' }, { link: '/video', label: '视频' }, { link: '/file', label: '文件' }, { link: '/map', label: '地图' }]);
   menu: any = signal('知识');
 
   query: any = { bool: {} };
@@ -78,11 +77,13 @@ export class ImageComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      if (x.get('q') != null) {
+      console.log(x.get('q'));
+      if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
         this.keyword = x.get('q') as string;
         this.selectKeyword(this.keyword);
+      } else {
+        this.router.navigate(['/']);
       }
-
     });
   }
   ngOnInit(): void {
@@ -219,7 +220,7 @@ export class ImageComponent implements OnInit {
 
 
   selectMenu(menu: any) {
-    this.router.navigate(['/index/' + menu.name], { queryParams: { q: this.keyword } });
+    this.router.navigate(['/' + menu.name], { queryParams: { q: this.keyword } });
   }
 
 
@@ -357,7 +358,7 @@ export class ImageComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/index/search'], { queryParams: { q: keyword } });
+    this.router.navigate(['/search'], { queryParams: { q: keyword } });
 
   }
 
@@ -704,7 +705,7 @@ export class ImageComponent implements OnInit {
     switch (type) {
       case 'info':
         this.router
-          .navigate([`/index/search/${type}/${item._id}`], {
+          .navigate([`/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
           .then(() => { });
@@ -748,84 +749,5 @@ export class ImageComponent implements OnInit {
     });
   }
 
-  onScroll() {
-    this.index++;
-    this.service
-      .searchEntity(this.index, this.size, { bool: this.query })
-      .subscribe((data: any) => {
-        data.list.forEach((item: any) => {
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              image.split('.')[image.split('.').length - 1] == 'png' ||
-              image.split('.')[image.split('.').length - 1] == 'webp'
-            ) {
-              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-            }
 
-            if (
-              image.split('.')[image.split('.').length - 1] == 'pdf'
-            ) {
-              this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-            }
-          });
-          this.ontologyService.get(item._source.type).subscribe((t: any) => {
-            item._type = t.label;
-            this.ontologyService
-              .getAllParentIds(item['_source'].type)
-              .subscribe((parents: any) => {
-                parents.push(item['_source'].type);
-                this.propertyService
-                  .getList(1, 50, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                      { field: 'isPrimary', value: true, operation: '=' },
-                    ],
-                  })
-                  .subscribe((p: any) => {
-                    this.entityService
-                      .getLinks(1, 20, item['_id'], {})
-                      .subscribe((c: any) => {
-                        let statements: any = [];
-                        c.list.forEach((path: any) => {
-                          if (path.edges[0]['_from'] != path.edges[0]['_to']) {
-                            path.edges[0].mainsnak.datavalue.value.id =
-                              path?.vertices[1]?.id;
-                            path.edges[0].mainsnak.datavalue.value.label =
-                              path?.vertices[1]?.labels?.zh?.value;
-                          }
-                          if (
-                            p.list?.filter(
-                              (property: any) =>
-                                path.edges[0].mainsnak.property ==
-                                `P${property.id}`
-                            ).length > 0
-                          ) {
-                            statements.push(path.edges[0]);
-                          }
-                        });
-                        item.claims = statements;
-                      });
-                  });
-              });
-          });
-        });
-        if (data.list.length > 0) {
-          data.list.forEach((d: any) => {
-            this.entities.push(d);
-          });
-        }
-      });
-  }
 }

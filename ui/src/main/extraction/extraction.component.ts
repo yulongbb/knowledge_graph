@@ -7,7 +7,7 @@ import { ExtractionService } from './extraction.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, map, Observable, Subscription, tap } from 'rxjs';
 import { PropertyService } from '../ontology/property/property.service';
-import { EsService } from '../search/es.service';
+import { EsService } from '../start/search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DatasetService } from '../dataset/dataset.sevice';

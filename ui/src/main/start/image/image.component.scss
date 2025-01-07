@@ -179,7 +179,58 @@ video::-webkit-media-controls-enclosure {
 
 // }
 
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 10px 20px;
+  color: #444;
+}
 
+.logo a {
+  color: #444;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: lighter;
+}
+
+.nav-links ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.nav-links ul li {
+  margin-right: 20px;
+}
+
+.nav-links ul li a {
+  color: #444;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+
+.login-button {
+  padding: 5px 15px;
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #444;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.login-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
 /* 基础样式 */
 .search-container {

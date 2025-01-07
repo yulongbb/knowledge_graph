@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   // 框架页
-  layout: 'index',
+  layout: 'home',
   // 默认的首页
-  defaultPage: 'search',
+  defaultPage: 'dashboard',
   // Api请求地址
   api: 'http://localhost:3000/',
 
