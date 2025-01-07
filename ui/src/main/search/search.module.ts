@@ -9,7 +9,6 @@ import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
 import { XCardModule } from '@ng-nest/ui/card';
 import { EsService } from './es.service';
-import { SearchDetailComponent } from './search-detail/search-detail.component';
 import { XTextRetractModule } from '@ng-nest/ui/text-retract';
 import { NgxMasonryModule } from 'ngx-masonry';
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
@@ -18,10 +17,11 @@ import { XStatisticModule } from '@ng-nest/ui/statistic';
 import { XSelectModule } from '@ng-nest/ui/select';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { EntityDetailComponent } from 'src/share/entity/entity-detail.component';
 
 
 @NgModule({
-  declarations: [SearchComponent, SearchDetailComponent],
+  declarations: [SearchComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -52,8 +52,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         path: '',
         component: SearchComponent,
       },
-      { path: ':type', component: SearchDetailComponent },
-      { path: ':type/:id', component: SearchDetailComponent }
+      { path: ':type', component: EntityDetailComponent },
+      { path: ':type/:id', component: EntityDetailComponent },
     ]),
   ],
   exports: [RouterModule],

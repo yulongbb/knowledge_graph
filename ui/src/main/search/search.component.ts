@@ -161,10 +161,7 @@ export class SearchComponent implements OnInit {
           menuMerge = data.types.map((m: any, index: any) => {
             return { ...m, ...menu[index] };
           });
-          menuMerge.forEach((m: any) => {
-            m.label = m.label + '(' + m.doc_count + ')';
-          });
-          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          menuMerge.unshift({ id: '', label: '全部' });
           this.types = menuMerge;
         });
 
@@ -299,10 +296,7 @@ export class SearchComponent implements OnInit {
           menuMerge = data.types.map((m: any, index: any) => {
             return { ...m, ...menu[index] };
           });
-          menuMerge.forEach((m: any) => {
-            m.label = m.label + '(' + m.doc_count + ')';
-          });
-          menuMerge.unshift({ id: '', label: '全部（' + data.total + ')' });
+          menuMerge.unshift({ id: '', label: '全部' });
           this.types = menuMerge;
         });
         let tags: any = [];
