@@ -84,20 +84,12 @@ export class KnowledgeController {
         highlight: {
           fields: {
             "labels.zh.value": {
-              pre_tags: [
-                "<strong>"
-              ],
-              post_tags: [
-                "</strong>"
-              ]
+              pre_tags: ["<i style='color:red'>"],
+              post_tags: ["</i>"]
             },
             "descriptions.zh.value": {
-              pre_tags: [
-                "<strong>"
-              ],
-              post_tags: [
-                "</strong>"
-              ]
+              pre_tags: ["<i style='color:red'>"],
+              post_tags: ["</i>"]
             }
           }
         }

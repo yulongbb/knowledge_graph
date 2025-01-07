@@ -1,6 +1,6 @@
 <header class="top-nav">
   <div class="logo">
-      <a href="#">KG</a>
+    <a href="#">KG</a>
   </div>
   <!-- <nav class="nav-links">
       <ul>
@@ -12,11 +12,11 @@
       </ul>
   </nav> -->
   <div class="right-section">
-      <button class="login-button"  [routerLink]="'/login'">登录</button>
+    <button class="login-button" [routerLink]="'/login'">登录</button>
   </div>
 </header>
 <div class="search-container">
-  
+
   <div class="search-nav">
     <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ q: keyword }"
       routerLinkActive="active">
@@ -119,12 +119,17 @@
 
     <!-- 普通搜索结果 -->
     <div class="result-item" *ngFor="let entity of entities">
-      <a (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
+      <a *ngIf="!entity['highlight']" (click)="action('info', entity)"
+        class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
+      <a *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']"
+        (click)="action('info', entity)" class="result-title">{{entity['_source']?.labels?.zh?.value}}</a>
       <div>
         <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
           class="result-url">{{entity['_source']?.sources[0].slice(0,50)}}</a>
       </div>
-      <div class="result-snippet">{{entity['_source']?.descriptions?.zh?.value}}</div>
+
+
+      <div class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
     </div>
   </div>
 
