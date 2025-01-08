@@ -689,7 +689,7 @@ export class ImageComponent implements OnInit {
       className: 'x-image-preview-portal',
       data: [
         {
-          src: 'http://localhost:9000/kgms/' + img,
+          src: img,
         },
       ],
     });

@@ -22,7 +22,7 @@ label_mapping = {
 }
 
 # 初始化分词器
-tokenizer = BertTokenizerFast.from_pretrained('bert-base-chinese')
+tokenizer = BertTokenizerFast.from_pretrained('./model/bert-base-chinese')
 
 # 加载并预处理单个条目
 def process_entry(entry):
@@ -114,7 +114,7 @@ dataset = load_and_process_jsonl(file_path)
 tokenized_datasets = dataset.map(tokenize_and_align_labels, batched=True)
 
 # 初始化模型
-model = BertForTokenClassification.from_pretrained('bert-base-chinese', num_labels=len(label_mapping))
+model = BertForTokenClassification.from_pretrained('./model/bert-base-chinese', num_labels=len(label_mapping))
 
 # 定义训练参数
 training_args = TrainingArguments(
@@ -140,10 +140,10 @@ trainer = Trainer(
 trainer.train()
 
 # 保存模型
-trainer.save_model("./custom_ner_model")
+trainer.save_model("./model/custom_ner_model")
 
 # 使用训练好的模型进行预测
-nlp = pipeline("ner", model="./custom_ner_model", tokenizer=tokenizer, device=0 if device == 'cuda' else -1)
+nlp = pipeline("ner", model="./model/custom_ner_model", tokenizer=tokenizer, device=0 if device == 'cuda' else -1)
 
 # 测试文本
 test_text = "Ki-109试作特殊防空战斗机是由三菱为日本陆军研发的秘密战机。"

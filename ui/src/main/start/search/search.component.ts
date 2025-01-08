@@ -278,7 +278,6 @@ export class SearchComponent implements OnInit {
             this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
           });
           this.ontologyService.get(data.list[0]._source.type).subscribe((t: any) => {
-            console.log(t)
             data.list[0]._type = t.label;
             this.ontologyService
               .getAllParentIds(data.list[0]['_source'].type)
@@ -302,7 +301,6 @@ export class SearchComponent implements OnInit {
                       .subscribe((c: any) => {
                         let statements: any = [];
                         c.list.forEach((path: any) => {
-
                           path.edges[0].mainsnak.label = p.list.filter(
                             (p2: any) =>
                               path.edges[0].mainsnak.property == `P${p2.id}`

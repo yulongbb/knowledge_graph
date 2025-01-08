@@ -1,0 +1,82 @@
+<header class="top-nav">
+  <div class="logo">
+    <a href="#">KG</a>
+  </div>
+  <div class="right-section">
+    <button class="login-button" [routerLink]="'/login'">登录</button>
+  </div>
+</header>
+<div class="search-container">
+  <div class="search-nav">
+    <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ q: keyword }"
+      routerLinkActive="active">
+      {{ item.label }}
+    </a>
+  </div>
+
+  <!-- 搜索框 -->
+  <div class="search-box">
+    <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
+  </div>
+
+  <!-- 筛选和排序选项 -->
+  <div class="filters" *ngIf="types">
+    <span>筛选：</span>
+    <select>
+      <option *ngFor="let type of types">{{type.label}}</option>
+    </select>
+    <span>排序：</span>
+    <select>
+      <option>相关性</option>
+      <option>最新</option>
+      <option>最旧</option>
+    </select>
+  </div>
+</div>
+<!-- Video Results Grid -->
+<div class="video-results-grid" *ngIf="videos.length > 0">
+  <div *ngFor="let video of videos" class="video-card">
+    <canvas #thumbnailCanvas width="300" height="200" class="video-thumbnail"></canvas>
+
+    <div class="video-metadata">
+      <h3 class="video-title">{{ video?.label }}</h3>
+      <p class="video-description">{{ video?.description }}</p>
+      <div class="video-details">
+        <span class="video-duration">{{ video?.duration }}</span>
+        <span class="video-source">{{ video?.source }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="search-container">
+  <!-- 分页导航 -->
+  <div *ngIf="total>0" class="pagination">
+    <!-- 上一页 -->
+    <a (click)="onPageChange(index - 1)" [class.disabled]="index === 1">上一页</a>
+
+    <!-- 页码 -->
+    <a *ngFor="let page of visiblePages" (click)="onPageChange(page)" [class.active]="page === index">
+      {{ page }}
+    </a>
+
+    <!-- 省略号 -->
+    <span *ngIf="showEllipsis">...</span>
+
+    <!-- 最后一页 -->
+    <a *ngIf="totalPages > 1" (click)="onPageChange(totalPages)" [class.active]="index === totalPages">
+      {{ totalPages }}
+    </a>
+
+    <!-- 下一页 -->
+    <a (click)="onPageChange(index + 1)" [class.disabled]="index === totalPages">下一页</a>
+  </div>
+
+  <!-- 相关搜索 -->
+  <div class="related-searches" *ngIf="tags">
+    <h3>相关搜索</h3>
+    <div class="related-links">
+      <a *ngFor="let tag of tags?.slice(0,4)" href="#">{{tag}}</a>
+    </div>
+  </div>
+</div>

@@ -41,6 +41,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/image/image.module").then(x => x.ImageModule)
   },
+  {
+    path: "video",
+    loadChildren: () =>
+      import("../main/start/video/video.module").then(x => x.VideoModule)
+  },
   // index
   {
     path: "index",
