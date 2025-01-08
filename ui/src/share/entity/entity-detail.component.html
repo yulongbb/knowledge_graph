@@ -12,6 +12,16 @@
           </ng-template>
           <span *ngFor="let aliase of entity()?.value?._source?.aliases?.zh">{{aliase.value}}</span>
           <div class="bottom">
+            <div *ngIf="videos.length>0">
+              <div *ngFor="let video of videos">
+                <video height="500px" controls autoplay>
+                  <source [src]="'http://localhost:9000/kgms/' + videos[0]" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+
+         
             <h2>简介</h2>
             <p *ngIf="entity()?.value?._source?.descriptions" [innerHTML]="
                 linkifyText(
@@ -20,10 +30,9 @@
                 )
               "></p>
 
-
             <div #scroll class="row scroll">
               <x-anchor [scroll]="scroll">
-                <ng-container  *ngFor="let group of propertyData()|keyvalue">
+                <ng-container *ngFor="let group of propertyData()|keyvalue">
                   <h1>{{group.key}}</h1>
                   <dl *ngFor="let property of group.value">
                     <dl *ngIf="getStatement(property).length > 0">
@@ -104,14 +113,7 @@
               </div>
             </div>
 
-            <div *ngFor="let video of videos">
-              <video width="100%" controls>
-                <source [src]="'http://localhost:9000/kgms/' + video" type="video/mp4" />
-                <p>
-                  你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                </p>
-              </video>
-            </div>
+
 
             <div *ngFor="let pdf of pdfs">
               <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"

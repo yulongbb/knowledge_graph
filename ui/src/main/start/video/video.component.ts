@@ -275,7 +275,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
             if (
               image.split('.')[image.split('.').length - 1] == 'mp4'
             ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources });
             }
           });
         });

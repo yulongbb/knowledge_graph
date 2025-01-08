@@ -39,7 +39,7 @@
     <canvas #thumbnailCanvas width="300" height="200" class="video-thumbnail"></canvas>
 
     <div class="video-metadata">
-      <h3 class="video-title">{{ video?.label }}</h3>
+      <h3 class="video-title" (click)="action('info', video)">{{ video?.label }}</h3>
       <p class="video-description">{{ video?.description }}</p>
       <div class="video-details">
         <span class="video-duration">{{ video?.duration }}</span>
