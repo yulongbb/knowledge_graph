@@ -58,6 +58,7 @@ export class NavService {
   }
 
   back(clearTo?: boolean) {
+    console.log(this.history)
     this.removeThis();
     this.clearTo = clearTo as boolean;
     let first = _.first(this.history) as NavigationEnd;

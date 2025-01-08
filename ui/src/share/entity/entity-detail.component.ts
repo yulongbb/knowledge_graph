@@ -30,6 +30,7 @@ import { NavService } from 'src/services/nav.service';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { EntityService } from 'src/main/entity/entity.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-entity-detail',
@@ -43,6 +44,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   knowledge: string = '';
   schema: string = '';
   item: any;
+  content = '<p>这是默认内容</p>';
+  labels = signal(['用户管理', '配置管理', '角色管理', '任务']);
 
   @ViewChild('form') form!: XFormComponent;
   @ViewChild('form2') form2!: XFormComponent;
@@ -121,12 +124,13 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   claims: any;
 
   properties: any;
-  propertyData: any;
+  propertyList:any;
+  propertyData!:Signal<Map<String, any>>;
 
   statements: any = signal([]);
 
   columns2: XTableColumn[] = [
-    { id: 'index', label: '序号', width: 40, left: 0, type: 'index' },
+    { id: 'index', label: '序号', width: 80, left: 0, type: 'index' },
     { id: 'property', label: '属性名', flex: 1 },
     { id: 'name', label: '属性值', flex: 1 },
     { id: 'qualify', label: '限定', width: 80 },
@@ -170,6 +174,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     public propertyService: PropertyService,
     public tagService: TagService,
     private nodeService: EntityService,
+    private location: Location
   ) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
@@ -201,9 +206,11 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     return item;
   }
 
+
   add() {
-    this.statements = [
-      ...this.statements,
+    console.log(this.statements())
+    this.statements = signal([
+      ...this.statements(),
       {
         _from: this.item.items[0],
         mainsnak: {
@@ -219,7 +226,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         type: 'statement',
         rank: 'normal',
       },
-    ];
+    ]);
   }
 
   save(row: any) {
@@ -233,8 +240,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     } else {
       this.nodeService.addEdge(row).subscribe((data) => {
         console.log(data);
-        const index = this.statements.findIndex((x: any) => x.id === row.id);
-        this.statements[index]['_key'] = data['_key'];
+        const index = this.statements().findIndex((x: any) => x.id === row.id);
+        this.statements()[index]['_key'] = data['_key'];
         this.message.success('新增成功！');
       });
     }
@@ -242,9 +249,9 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   del(row: any) {
     console.log(row);
-    const index = this.statements.findIndex((x: any) => x.id === row.id);
+    const index = this.statements().findIndex((x: any) => x.id === row.id);
     if (index >= 0) {
-      this.statements.splice(index, 1);
+      this.statements().splice(index, 1);
     }
     this.nodeService.deleteEdge(row._key).subscribe(() => {
       this.message.success('删除成功！');
@@ -273,7 +280,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   change(statements: any) {
-    statements.mainsnak.datatype = this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].type;
+    statements.mainsnak.datatype = this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].type;
     switch (statements.mainsnak.datatype) {
       case 'commonsMedia':
       case 'external-id':
@@ -282,14 +289,14 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
@@ -302,7 +309,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'quantity':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -314,7 +321,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'time':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -332,7 +339,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${this.propertyData().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
         statements.mainsnak.datavalue = {
           value: {
             'entity-type': statements.mainsnak.datatype.replace('wikibase-', ''),
@@ -437,7 +444,16 @@ export class EntityDetailComponent implements OnInit, OnChanges {
                 ],
               }).subscribe((x: any) => {
                 console.log(x.list);
-                this.propertyData = signal(x.list);
+                this.propertyList = signal(x.list);
+
+                this.propertyData = signal(x.list.reduce((acc:any, item:any) => {
+                  const key:string = item.group;
+                  if (!acc[key]) {
+                    acc[key] = [];
+                  }
+                  acc[key].push(item);
+                  return acc;
+                }, {}));
                 this.properties = x.list.map((p: any) => p.name);
                 this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
                   let statements: any = [];
@@ -506,7 +522,13 @@ export class EntityDetailComponent implements OnInit, OnChanges {
           },
           type: this.form.formGroup.value.type,
           images: this.imgs?.map(
-            (i: any) => i.url.split('/')[i.url.split('/').length - 1]
+            (i: any) => {
+              if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
+                return i.url.replace('http://localhost:9000/kgms/', '');
+              } else {
+                return i.url.split('/')[i.url.split('/').length - 1];
+              }
+            }
           ),
           location: this.item?.location,
           sources: [this.form.formGroup.value.source]
@@ -515,7 +537,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         if (this.type === 'add') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
-            this.router.navigate(['/index/entity']);
+            this.back();
+            // this.router.navigate(['/index/entity']);
           });
         } else if (this.type === 'edit') {
           this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
@@ -534,7 +557,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
           item['items'] = this.item.items;
           this.nodeService.put(item).subscribe((x) => {
             this.message.success('编辑成功！');
-            this.router.navigate(['/index/entity']);
+            this.back();
+            // this.router.navigate(['/index/entity']);
           });
         }
         break;
@@ -572,7 +596,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   back() {
-    this.nav.back();
+    this.location.back();
   }
 
   close($event: string | number) {

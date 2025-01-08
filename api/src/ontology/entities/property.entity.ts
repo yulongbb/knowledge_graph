@@ -25,7 +25,9 @@ export class Property {
   @Column('text', { nullable: true })
   type: string;
   
-
+  @Column('text', { nullable: true })
+  group: string;
+  
   @ManyToMany(() => Schema, (schema) => schema.values)
   types: Schema[];
 

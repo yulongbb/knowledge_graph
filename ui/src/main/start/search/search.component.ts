@@ -37,7 +37,7 @@ export class SearchComponent implements OnInit {
   keyword = '';
 
 
-  size: number = 10;
+  size: number = 20;
   index: number = 1;
   total: number = 0; // 总条数
   visiblePages: number[] = []; // 显示的页码
@@ -253,7 +253,6 @@ export class SearchComponent implements OnInit {
               const newMarker = marker([item._source.location.lat, item._source.location.lon]);
               this.markers.push(newMarker);
             }
-
             item?._source?.images?.forEach((image: any) => {
               if (
                 image.split('.')[image.split('.').length - 1] == 'jpeg' ||
@@ -294,7 +293,7 @@ export class SearchComponent implements OnInit {
                         relation: 'schemas',
                         operation: 'IN',
                       },
-                      // { field: 'isPrimary', value: true, operation: '=' },
+                      { field: 'isPrimary', value: true, operation: '=' },
                     ],
                   })
                   .subscribe((p: any) => {
@@ -396,7 +395,7 @@ export class SearchComponent implements OnInit {
               should: [{ term: { 'labels.zh.value.keyword': keyword } }],
             };
           } else {
-            this.query = { must: [{ match: { 'labels.zh.value': keyword } }] };
+            this.query = { must: [{ match: { 'labels.zh.value': keyword } },{ match: { 'descriptions.zh.value': keyword } }] };
           }
         } else {
           this.query = { must: [] };

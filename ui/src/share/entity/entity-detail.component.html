@@ -8,9 +8,7 @@
         <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }" [header]="header">
           <ng-template #header>
             <span class="label">{{ entity()?.value?._source?.labels?.zh?.value }}
-              <!-- <x-buttons>
-                    <x-button type="primary" *ngFor="let item of entity()?.value?._source?.items">{{item}}</x-button>
-                  </x-buttons> --> </span><span>{{ entity()?.value?._type }}</span>
+            </span><x-button [routerLink]="'/search/edit/'+id" type="primary">编辑</x-button>
           </ng-template>
           <span *ngFor="let aliase of entity()?.value?._source?.aliases?.zh">{{aliase.value}}</span>
           <div class="bottom">
@@ -22,71 +20,77 @@
                 )
               "></p>
 
-            <dl *ngFor="let property of propertyData()">
-              <dl *ngIf="getStatement(property).length > 0">
-                <dt>
-                  {{ property.name }}
-                </dt>
-                <dd>
-                  <i *ngFor="let statement of getStatement(property)">
-                    <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
+
+            <div #scroll class="row scroll">
+              <x-anchor [scroll]="scroll">
+                <ng-container  *ngFor="let group of propertyData()|keyvalue">
+                  <h1>{{group.key}}</h1>
+                  <dl *ngFor="let property of group.value">
+                    <dl *ngIf="getStatement(property).length > 0">
+                      <dt>
+                        {{ property.name }}
+                      </dt>
+                      <dd>
+                        <span *ngFor="let statement of getStatement(property)">
+                          <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
                           'http://localhost:4200/index/search/info/' +
                           statement.mainsnak.datavalue.value.id
                         ">{{ statement.mainsnak.datavalue.value.label }}</a>
-                    </strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'string'">
-                      {{ statement.mainsnak.datavalue.value }}
-                    </strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
-                      <img *ngIf="
+                          </strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'string'">
+                            {{ statement.mainsnak.datavalue.value }}
+                          </strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'commonsMedia'">
+                            <img *ngIf="
                           statement?.mainsnak?.datavalue?.value?.split('.')[
                             statement?.mainsnak.datavalue.value.split('.').length -
                               1
                           ] != 'mp4'
-                        " width="200px" [src]="
+                        " width="500px" [src]="
                           'http://localhost:9000/kgms/' +
                           statement?.mainsnak?.datavalue.value
                         " />
-                      <video *ngIf="
+                            <video *ngIf="
                           statement?.mainsnak.datavalue.value.split('.')[
                             statement?.mainsnak.datavalue.value.split('.').length -
                               1
                           ] == 'mp4'
-                        " width="200px" controls>
-                        <source [src]="
+                        " width="500px" controls>
+                              <source [src]="
                             'http://localhost:9000/kgms/' +
                             statement?.mainsnak.datavalue.value
                           " type="video/mp4" />
-                        <p>
-                          你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                        </p>
-                      </video>
-                    </strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                        [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value
-                        }}</a></strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
-                      statement.mainsnak.datavalue.value.amount
-                      }}</strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                      statement.mainsnak.datavalue.value.text }}</strong>
-                    <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-                      statement.mainsnak.datavalue.value }}</pre>
-                    <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
-                      statement.mainsnak.datavalue.value
-                      }}</strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-                      statement.mainsnak.datavalue.value.latitude }},{{
-                      statement.mainsnak.datavalue.value.longitude
-                      }}</strong>
-                    <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                      statement.mainsnak.datavalue.value.time
-                      }}</strong>
-                  </i>
-                </dd>
-              </dl>
-            </dl>
+                              <p>
+                                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                              </p>
+                            </video>
+                          </strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
+                              [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value
+                              }}</a></strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
+                            statement.mainsnak.datavalue.value.amount
+                            }}</strong>
 
+                          <div *ngIf="statement.mainsnak.datatype == 'monolingualtext'"
+                            [innerHtml]="statement.mainsnak.datavalue.value"></div>
+                          <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
+                            statement.mainsnak.datavalue.value
+                            }}</strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
+                            statement.mainsnak.datavalue.value.latitude }},{{
+                            statement.mainsnak.datavalue.value.longitude
+                            }}</strong>
+                          <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
+                            statement.mainsnak.datavalue.value.time
+                            }}</strong>
+                        </span>
+                      </dd>
+                    </dl>
+                  </dl>
+                </ng-container>
+              </x-anchor>
+            </div>
             <div class="time">
               <span>{{ entity()?.value?._source?.modified }}</span>
               <span>{{ entity()?.value?._id }}</span>
@@ -124,8 +128,6 @@
     </div>
     <div *ngSwitchCase="'add'">
       <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
-        </x-page-header>
         <x-card width="100%">
           <div class="row" *ngFor="let t of tags | keyvalue">
             <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
@@ -170,6 +172,8 @@
             </x-buttons>
           </div>
         </x-card>
+        <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
+        </x-page-header>
       </div>
     </div>
     <div *ngSwitchCase="'edit'">
@@ -188,63 +192,90 @@
 
         <x-collapse>
           <x-collapse-panel label="属性信息" active="true">
-            <x-button [style.marginBottom.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
-            <x-table [columns]="columns2" [data]="statements()" loading [showPagination]="false"
-              [allowSelectRow]="false" [bodyColumnTpl]="{ qualify: qualifyTpl, actions: actionsTpl }"
-              [bodyTdTpl]="bodyTdTpl">
-            </x-table>
+            <!-- Standard HTML Table with Optimized Styles -->
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th width="100px" class="sticky-left">序号</th>
+                  <th width="200px">属性名</th>
+                  <th>属性值</th>
+                  <th width="100px">限定</th>
+                  <th width="200px">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of statements(); let i = index">
+                  <!-- Index Column -->
+                  <td class="sticky-left">{{ i + 1 }}</td>
 
-            <ng-template #qualifyTpl let-column="$column" let-row="$row">
-              <div>
-                <x-link type="primary" (click)="dialog(row)">编辑</x-link>
-              </div>
-            </ng-template>
+                  <!-- Property Column -->
+                  <td>
+                    <x-select class="full-width" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label"
+                      [data]="properties" (ngModelChange)="change(row)"></x-select>
+                  </td>
+
+                  <!-- Name Column -->
+                  <td>
+                    <ng-container [ngSwitch]="row?.mainsnak?.datatype">
+                      <!-- Monolingual Text -->
+                      <quill-editor *ngSwitchCase="'monolingualtext'"
+                        [(ngModel)]="row.mainsnak.datavalue.value"></quill-editor>
+                      <!-- String, URL, Commons Media, Wikibase Item -->
+                      <x-input *ngSwitchCase="'string'" class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                      <x-input *ngSwitchCase="'url'" class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                      <x-input *ngSwitchCase="'commonsMedia'" class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                      <x-input *ngSwitchCase="'wikibase-item'" class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
+                      <!-- Quantity -->
+                      <x-input-number *ngSwitchCase="'quantity'" class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
+                      <!-- Time -->
+                      <x-date-picker *ngSwitchCase="'time'"
+                        [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
+                      <!-- Globe Coordinate -->
+                      <x-input-group *ngSwitchCase="'globe-coordinate'" class="full-width" compact>
+                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
+                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
+                      </x-input-group>
+                      <!-- File Upload (if needed) -->
+                      <x-upload *ngIf="row?.mainsnak?.datatype === 'commonsMedia'" (uploadSuccess)="upload($event, row)"
+                        action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
+
+                    </ng-container>
+                  </td>
+
+                  <!-- Qualify Column -->
+                  <td>
+                    <x-link type="primary" (click)="dialog(row)">编辑</x-link>
+                  </td>
+
+                  <!-- Actions Column -->
+                  <td>
+                    <x-link type="primary" (click)="save(row)">保存</x-link>
+                    <x-link type="danger" (click)="del(row)">删除</x-link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Add Button -->
+            <x-button [style.marginTop.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
 
 
-            <ng-template #actionsTpl let-column="$column" let-row="$row">
-              <div>
-                <x-link type="primary" (click)="save(row)">保存</x-link>
-                <x-link type="danger" (click)="del(row)">删除</x-link>
-              </div>
-            </ng-template>
-
-            <ng-template #bodyTdTpl let-column="$column" let-row="$row">
-              <ng-container [ngSwitch]="column.id">
-                <ng-container *ngSwitchCase="'property'">
-                  <x-select [style.width.%]="100" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label"
-                    [data]="properties" (ngModelChange)="change(row)"></x-select>
-                </ng-container>
-
-                <ng-template #nodeTpl let-node="$node">
-                  <ng-container *ngIf="node">
-                    <span class="select-item">{{ node.label }}</span>
-                  </ng-container>
-                </ng-template>
-
-                <ng-container *ngSwitchCase="'name'">
-                  <x-textarea *ngIf="row?.mainsnak?.datatype == 'monolingualtext'" [style.width.%]="100"
-                    [(ngModel)]="row.mainsnak.datavalue.value"></x-textarea>
-                  <x-input *ngIf="row?.mainsnak?.datatype == 'string'" [style.width.%]="100"
-                    [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                  <x-input *ngIf="row?.mainsnak?.datatype == 'url'" [style.width.%]="100"
-                    [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                  <x-input-number *ngIf="row?.mainsnak?.datatype == 'quantity'" [style.width.%]="100"
-                    [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
-                  <x-upload *ngIf="row?.mainsnak?.datatype == 'commonsMedia'" (uploadSuccess)="upload($event,row)"
-                    action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
-                  <x-date-picker *ngIf="row?.mainsnak?.datatype == 'time'"
-                    [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
-                  <x-input *ngIf="row?.mainsnak?.datatype == 'wikibase-item'" [style.width.%]="100"
-                    [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
-                  <x-input-group *ngIf="row?.mainsnak?.datatype == 'globe-coordinate'" [style.width.%]="100" compact>
-                    <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
-                    <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
-                  </x-input-group>
-                </ng-container>
+            <!-- Node Template for Select -->
+            <ng-template #nodeTpl let-node="$node">
+              <ng-container *ngIf="node">
+                <span class="select-item">{{ node.label }}</span>
               </ng-container>
             </ng-template>
           </x-collapse-panel>
         </x-collapse>
+
+
+
 
         <x-collapse>
           <x-collapse-panel label="标签标注" style="overflow: scroll">

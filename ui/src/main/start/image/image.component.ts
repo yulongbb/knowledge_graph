@@ -44,7 +44,7 @@ export class ImageComponent implements OnInit {
 
   keyword = '';
 
-  size: number = 10;
+  size: number = 20;
   index: number = 1;
   total: number = 0; // 总条数
   visiblePages: number[] = []; // 显示的页码

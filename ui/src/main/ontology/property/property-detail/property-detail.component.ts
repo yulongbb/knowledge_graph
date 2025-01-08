@@ -59,6 +59,14 @@ export class PropertyDetailComponent implements OnInit {
       // message: '邮箱格式不正确，admin@ngnest.com'
     },
     {
+      control: 'input',
+      id: 'group',
+      label: '分组',
+      required: false,
+      // pattern: /^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/,
+      // message: '邮箱格式不正确，admin@ngnest.com'
+    },
+    {
       control: 'select',
       id: 'type',
       label: '值类型',
