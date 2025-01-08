@@ -118,14 +118,14 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   tag: any = signal([]);
   images: any;
-  videos: any;
+  videos: any = [];
   pdfs: any;
   entity: any;
   claims: any;
 
   properties: any;
-  propertyList:any;
-  propertyData!:Signal<Map<String, any>>;
+  propertyList: any;
+  propertyData!: Signal<Map<String, any>>;
 
   statements: any = signal([]);
 
@@ -198,7 +198,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    console.log(123)
+    this.videos = []
     this.action(this.type);
   }
 
@@ -258,13 +258,6 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     });
   }
 
-  dialog(row: any) {
-    // this.dialogService.create(QualifiesDialogComponent, {
-    //   draggable: true,
-    //   resizable: true,
-    //   data: row
-    // });
-  }
 
   preview(image: any) {
     this.dialogService.create(XImagePreviewComponent, {
@@ -446,8 +439,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
                 console.log(x.list);
                 this.propertyList = signal(x.list);
 
-                this.propertyData = signal(x.list.reduce((acc:any, item:any) => {
-                  const key:string = item.group;
+                this.propertyData = signal(x.list.reduce((acc: any, item: any) => {
+                  const key: string = item.group;
                   if (!acc[key]) {
                     acc[key] = [];
                   }
