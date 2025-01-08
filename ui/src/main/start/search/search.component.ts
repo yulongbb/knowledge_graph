@@ -277,8 +277,8 @@ export class SearchComponent implements OnInit {
             });
             this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
           });
-          this.ontologyService.get(data.list[0]._source.type).subscribe((t: any) => {
-            data.list[0]._type = t.label;
+          this.ontologyService.get(data.list[0]?._source?.type).subscribe((t: any) => {
+            data.list[0]._type = t?.label;
             this.ontologyService
               .getAllParentIds(data.list[0]['_source'].type)
               .subscribe((parents: any) => {
@@ -393,7 +393,7 @@ export class SearchComponent implements OnInit {
               should: [{ term: { 'labels.zh.value.keyword': keyword } }],
             };
           } else {
-            this.query = { must: [{ match: { 'labels.zh.value': keyword } },{ match: { 'descriptions.zh.value': keyword } }] };
+            this.query = { should: [{ match: { 'labels.zh.value': keyword } },{ match: { 'descriptions.zh.value': keyword } }] };
           }
         } else {
           this.query = { must: [] };

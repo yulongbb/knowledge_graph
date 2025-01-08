@@ -217,7 +217,16 @@ video::-webkit-media-controls-enclosure {
   align-items: center;
 }
 
-
+.add-button {
+  padding: 5px 15px;
+  margin: auto 10px ;
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #444;
+  cursor: pointer;
+  font-size: 14px;
+}
 .login-button {
   padding: 5px 15px;
   background-color: transparent;

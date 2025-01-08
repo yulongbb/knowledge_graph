@@ -12,27 +12,36 @@
       </ul>
   </nav> -->
   <div class="right-section">
-    <button class="login-button" [routerLink]="'/login'">登录</button>
+    <button class="add-button" [routerLink]="'/search/add'">上传</button>
+    <button class="login-button"  [routerLink]="'/login'">登录</button>
   </div>
 </header>
 <div class="search-container">
-
   <div class="search-nav">
-    <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ q: keyword }"
-      routerLinkActive="active">
+    <a
+      *ngFor="let item of navItems()"
+      [routerLink]="item.link"
+      [queryParams]="{ q: keyword }"
+      routerLinkActive="active"
+    >
       {{ item.label }}
     </a>
   </div>
   <!-- 搜索框 -->
   <div class="search-box">
-    <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
+    <input
+      type="text"
+      placeholder="输入搜索词"
+      [(ngModel)]="keyword"
+      (keyup.enter)="queryKeyword(keyword)"
+    />
   </div>
 
   <!-- 筛选和排序选项 -->
   <div class="filters" *ngIf="types">
     <span>筛选：</span>
     <select>
-      <option *ngFor="let type of types">{{type.label}}</option>
+      <option *ngFor="let type of types">{{ type.label }}</option>
     </select>
     <span>排序：</span>
     <select>
@@ -46,63 +55,93 @@
   <div class="search-results">
     <!-- 知识面板（调整到搜索列表的第一个位置） -->
     <div *ngIf="knowledge" class="knowledge-panel ad">
-      <h3 (click)="action('info', knowledge)">{{knowledge['_source']?.labels?.zh?.value}}</h3>
+      <h3 (click)="action('info', knowledge)">
+        {{ knowledge["_source"]?.labels?.zh?.value }}
+      </h3>
       <div *ngIf="knowledge['_source']?.images">
-        <div *ngFor="let image of knowledge['_source']?.images?.slice(0,1)">
-          <img *ngIf="image.split('.')[image.split('.').length-1]!='mp4'" [src]="getFullImageUrl(image)"
-            alt="AI Icon" />
+        <div *ngFor="let image of knowledge['_source']?.images?.slice(0, 1)">
+          <img
+            *ngIf="image.split('.')[image.split('.').length - 1] != 'mp4'"
+            [src]="getFullImageUrl(image)"
+            alt="AI Icon"
+          />
         </div>
       </div>
-      <p>{{knowledge['_source']?.descriptions?.zh?.value}}</p>
+      <p>{{ knowledge["_source"]?.descriptions?.zh?.value }}</p>
       <ul *ngIf="knowledge.claims">
-        <li *ngFor="let statement of knowledge.claims"><strong>{{statement.mainsnak.label}}：</strong>
-          <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"><a [href]="
-          'http://localhost:4200/index/search/info/' +
-          statement.mainsnak.datavalue.value.id
-        ">{{ statement.mainsnak.datavalue.value.label }}</a>
+        <li *ngFor="let statement of knowledge.claims">
+          <strong>{{ statement.mainsnak.label }}：</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'wikibase-item'"
+            ><a
+              [href]="
+                'http://localhost:4200/index/search/info/' +
+                statement.mainsnak.datavalue.value.id
+              "
+              >{{ statement.mainsnak.datavalue.value.label }}</a
+            >
           </strong>
           <strong *ngIf="statement.mainsnak.datatype == 'string'">
             {{ statement.mainsnak.datavalue.value }}
           </strong>
 
-          <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-              [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value }}</a></strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'url'"
+            ><a target="_blank" [href]="statement?.mainsnak.datavalue.value">{{
+              statement?.mainsnak.datavalue.value
+            }}</a></strong
+          >
           <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
             statement.mainsnak.datavalue.value.amount
-            }}</strong>
+          }}</strong>
           <pre *ngIf="statement.mainsnak.datatype == 'monolingualtext'">{{
-      statement.mainsnak.datavalue.value }}</pre>
+            statement.mainsnak.datavalue.value
+          }}</pre>
           <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
             statement.mainsnak.datavalue.value
-            }}</strong>
-          <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'">{{
-            statement.mainsnak.datavalue.value.latitude }},{{
-            statement.mainsnak.datavalue.value.longitude
-            }}</strong>
+          }}</strong>
+          <strong *ngIf="statement.mainsnak.datatype == 'globe-coordinate'"
+            >{{ statement.mainsnak.datavalue.value.latitude }},{{
+              statement.mainsnak.datavalue.value.longitude
+            }}</strong
+          >
           <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
             statement.mainsnak.datavalue.value.time
-            }}</strong>
+          }}</strong>
         </li>
       </ul>
       <a href="#" class="see-more">了解更多</a>
     </div>
 
     <!-- 图片预览 -->
-    <div class="result-item image-preview" *ngIf="knowledge&&images.length>0">
+    <div
+      class="result-item image-preview"
+      *ngIf="images.length > 0"
+    >
       <div class="image-grid">
-        <img *ngFor="let image of images?.slice(0,4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
+        <img
+          *ngFor="let image of images?.slice(0, 4)"
+          [src]="getFullImageUrl(image.image)"
+          [alt]="image"
+        />
       </div>
       <a href="#" class="see-more">查看更多图片</a>
     </div>
 
     <!-- 视频预览 -->
-    <div *ngIf="knowledge&&videos.length>0">
-      <div class="result-item video-preview" *ngFor="let video of videos?.slice(0,4)">
+    <div *ngIf="videos.length > 0">
+      <div
+        class="result-item video-preview"
+        *ngFor="let video of videos?.slice(0, 4)"
+      >
         <div class="video-thumbnail">
-          <video #videoPlayer controls [src]="getFullImageUrl(video.image)" class="video-element"></video>
+          <video
+            #videoPlayer
+            controls
+            [src]="getFullImageUrl(video.image)"
+            class="video-element"
+          ></video>
         </div>
         <div class="video-info">
-          <a href="#" class="result-title">{{video.label}}</a>
+          <a href="#" class="result-title">{{ video.label }}</a>
           <div class="result-url">https://www.ted.com/talks/ai-future</div>
           <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
         </div>
@@ -119,18 +158,38 @@
 
     <!-- 普通搜索结果 -->
     <div class="result-item" *ngFor="let entity of entities">
-      <div *ngIf="!entity['highlight']" (click)="action('info', entity)"
-        class="result-title">{{entity['_source']?.labels?.zh?.value}}</div>
-      <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']"
-        (click)="action('info', entity)" class="result-title"></div>
+      <div
+        *ngIf="!entity['highlight']"
+        (click)="action('info', entity)"
+        class="result-title"
+      >
+        {{ entity["_source"]?.labels?.zh?.value }}
+      </div>
+      <div
+        *ngIf="entity['highlight']"
+        [innerHTML]="entity['highlight']['labels.zh.value']"
+        (click)="action('info', entity)"
+        class="result-title"
+      ></div>
       <div>
-        <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
-          class="result-url">{{entity['_source']?.sources[0].slice(0,50)}}</a>
+        <a
+          [href]="entity['_source']?.sources[0]"
+          target="_blank"
+          *ngIf="entity['_source']?.sources"
+          class="result-url"
+          >{{ entity["_source"]?.sources[0].slice(0, 50) }}</a
+        >
       </div>
 
-      <div  *ngIf="!entity['highlight']"  class="result-snippet" >{{entity['_source']?.descriptions?.zh?.value}}</div>
+      <div *ngIf="!entity['highlight']" class="result-snippet">
+        {{ entity["_source"]?.descriptions?.zh?.value }}
+      </div>
 
-      <div  *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"  class="result-snippet" ></div>
+      <div
+        *ngIf="entity['highlight']"
+        [innerHTML]="entity['highlight']['descriptions.zh.value']"
+        class="result-snippet"
+      ></div>
     </div>
   </div>
 
@@ -174,12 +233,18 @@
 } -->
 
   <!-- 分页导航 -->
-  <div *ngIf="total>0" class="pagination">
+  <div *ngIf="total > 0" class="pagination">
     <!-- 上一页 -->
-    <a (click)="onPageChange(index - 1)" [class.disabled]="index === 1">上一页</a>
+    <a (click)="onPageChange(index - 1)" [class.disabled]="index === 1"
+      >上一页</a
+    >
 
     <!-- 页码 -->
-    <a *ngFor="let page of visiblePages" (click)="onPageChange(page)" [class.active]="page === index">
+    <a
+      *ngFor="let page of visiblePages"
+      (click)="onPageChange(page)"
+      [class.active]="page === index"
+    >
       {{ page }}
     </a>
 
@@ -187,23 +252,28 @@
     <span *ngIf="showEllipsis">...</span>
 
     <!-- 最后一页 -->
-    <a *ngIf="totalPages > 1" (click)="onPageChange(totalPages)" [class.active]="index === totalPages">
+    <a
+      *ngIf="totalPages > 1"
+      (click)="onPageChange(totalPages)"
+      [class.active]="index === totalPages"
+    >
       {{ totalPages }}
     </a>
 
     <!-- 下一页 -->
-    <a (click)="onPageChange(index + 1)" [class.disabled]="index === totalPages">下一页</a>
+    <a (click)="onPageChange(index + 1)" [class.disabled]="index === totalPages"
+      >下一页</a
+    >
   </div>
 
   <!-- 相关搜索 -->
   <div class="related-searches" *ngIf="tags">
     <h3>相关搜索</h3>
     <div class="related-links">
-      <a *ngFor="let tag of tags?.slice(0,4)" href="#">{{tag}}</a>
+      <a *ngFor="let tag of tags?.slice(0, 4)" href="#">{{ tag }}</a>
     </div>
   </div>
 </div>
-
 
 <!-- 
 
