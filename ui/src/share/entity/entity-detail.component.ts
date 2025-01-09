@@ -113,12 +113,15 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   disabled = false;
 
   imgs: any;
+  videos: any;
+  files:any;
+
+
 
   tags: Map<string, Array<string>> | undefined;
 
   tag: any = signal([]);
   images: any;
-  videos: any = [];
   pdfs: any;
   entity: any;
   claims: any;

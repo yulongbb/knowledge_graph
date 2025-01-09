@@ -25,7 +25,7 @@ import { faVideo } from '@fortawesome/free-solid-svg-icons';
   styleUrls: ['./video.component.scss'],
   templateUrl: './video.component.html',
 })
-export class VideoComponent implements OnInit, AfterViewInit {
+export class VideoComponent implements OnInit {
   @ViewChildren('thumbnailCanvas')
   thumbnailCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
 
@@ -39,7 +39,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
     { link: '/search', label: '知识' },
     { link: '/image', label: '图片' },
     { link: '/video', label: '视频' },
-    { link: '/file', label: '文件' },
+    { link: '/pdf', label: '文件' },
     { link: '/map', label: '地图' },
   ]);
   menu: any = signal('知识');
@@ -104,14 +104,6 @@ export class VideoComponent implements OnInit, AfterViewInit {
   }
   ngOnInit(): void { }
 
-  ngAfterViewInit() {
-    console.log(this.thumbnailCanvases)
-    this.thumbnailCanvases.forEach((canvas, index) => {
-      console.log(this.getFullVideoUrl(this.videos[index].image))
-      this.generateThumbnail(this.getFullVideoUrl(this.videos[index].image), canvas.nativeElement);
-    });
-
-  }
 
   // 计算总页数
   get totalPages(): number {
@@ -263,25 +255,10 @@ export class VideoComponent implements OnInit, AfterViewInit {
 
         this.entities = data.list;
         data.list.forEach((item: any) => {
-          if (item._source.location) {
-            const newMarker = marker([
-              item._source.location.lat,
-              item._source.location.lon,
-            ]);
-            this.markers.push(newMarker);
-          }
-
-          item?._source?.images?.forEach((image: any) => {
-            if (
-              image.split('.')[image.split('.').length - 1] == 'mp4'
-            ) {
-              this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources });
-            }
+          item?._source?.videos?.forEach((video: any) => {
+            this.videos.push({ ...video, ...{ _id: item._id, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources } });
           });
         });
-
-
-
         let menu: any = [];
         let arr: any = [];
         data.types.forEach((m: any) => {
@@ -330,28 +307,44 @@ export class VideoComponent implements OnInit, AfterViewInit {
             },
           ],
           should: [
-            { wildcard: { images: '*mp4' } },
+            {
+              "exists": {
+                "field": "videos"  // 确保 videos 字段存在
+              }
+            },
           ],
         };
       } else if (this.way == '精确检索') {
         this.query = {
           must: [{ term: { 'labels.zh.value.keyword': keyword } }],
           should: [
-            { wildcard: { images: '*mp4' } },
+            {
+              "exists": {
+                "field": "videos"  // 确保 videos 字段存在
+              }
+            },
           ],
         };
       } else {
         this.query = {
           must: [{ match: { 'labels.zh.value': keyword } }],
           should: [
-            { wildcard: { images: '*mp4' } },
+            {
+              "exists": {
+                "field": "videos"  // 确保 videos 字段存在
+              }
+            },
           ],
         };
       }
     } else {
       this.query = {
         should: [
-          { wildcard: { images: '*mp4' } },
+          {
+            "exists": {
+              "field": "videos"  // 确保 videos 字段存在
+            }
+          },
         ],
       };
     }
@@ -375,30 +368,7 @@ export class VideoComponent implements OnInit, AfterViewInit {
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
-  generateThumbnail(videoUrl: string, canvas: HTMLCanvasElement) {
-    const video = document.createElement('video');
-    video.src = videoUrl;
-    video.crossOrigin = 'anonymous';
-    video.muted = true;
-    video.preload = 'metadata';
 
-    video.addEventListener('loadeddata', () => {
-      console.log('视频加载成功:', videoUrl);
-      video.currentTime = 0.1; // 跳转到第一帧
-    });
-
-    video.addEventListener('seeked', () => {
-      console.log('视频跳转到第一帧');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx: any = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    });
-
-    video.addEventListener('error', (err) => {
-      console.error('视频加载失败:', err);
-    });
-  }
   // 在你的组件类中添加此方法
   getFullVideoUrl(imagePath: string): string {
     // 检查 imagePath 是否已经是完整的 URL

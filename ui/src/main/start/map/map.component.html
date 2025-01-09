@@ -34,19 +34,9 @@
     </select>
   </div>
 </div>
-<!-- Video Results Grid -->
-<div class="video-results-grid" *ngIf="videos&&videos.length > 0">
-  <div *ngFor="let video of videos" class="video-card">
-    <img [src]="video.thumbnail" class="video-thumbnail">
-    <div class="video-metadata">
-      <h3 class="video-title" (click)="action('info', video)">{{ video?.label.slice(0,20) }}</h3>
-      <p class="video-description">{{ video?.description.slice(0,50) }}</p>
-      <div class="video-details">
-        <span class="video-duration">{{ video?.duration }}</span>
-        <span class="video-source">{{ video?.source }}</span>
-      </div>
-    </div>
-  </div>
+
+<div style="height: 100%; width: 100%;" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+  [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)">
 </div>
 
 <div class="search-container">

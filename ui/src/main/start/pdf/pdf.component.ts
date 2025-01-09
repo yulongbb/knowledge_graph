@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   OnInit,
@@ -17,14 +18,17 @@ import { EntityService } from '../../entity/entity.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faVideo } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-image',
-  styleUrls: ['./image.component.scss'],
-  templateUrl: './image.component.html',
+  selector: 'app-pdf',
+  styleUrls: ['./pdf.component.scss'],
+  templateUrl: './pdf.component.html',
 })
-export class ImageComponent implements OnInit {
+export class PDFComponent implements OnInit {
+  @ViewChildren('thumbnailCanvas')
+  thumbnailCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
+
   entities: any;
   knowledge: any;
 
@@ -56,7 +60,6 @@ export class ImageComponent implements OnInit {
   tag: any;
 
   images!: any;
-  videos!: any;
   pdfs!: any;
 
   options = {
@@ -76,7 +79,7 @@ export class ImageComponent implements OnInit {
   currentVideoIndex = 0; // 当前视频索引
   currentVideoSrc: any; // 当前视频路径
   scrollTimeout: any; // 防止快速滚动
-  faImage = faImage;
+  faVideo = faVideo;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -99,6 +102,8 @@ export class ImageComponent implements OnInit {
     });
   }
   ngOnInit(): void { }
+
+
 
   // 计算总页数
   get totalPages(): number {
@@ -133,7 +138,7 @@ export class ImageComponent implements OnInit {
   }
 
   // 处理鼠标滚动事件
-  videoScroll(event: WheelEvent): void {
+  pdfScroll(event: WheelEvent): void {
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout); // 避免重复触发
     }
@@ -149,7 +154,7 @@ export class ImageComponent implements OnInit {
 
   // 切换到下一视频
   nextVideo(): void {
-    if (this.currentVideoIndex < this.videos.length - 1) {
+    if (this.currentVideoIndex < this.pdfs.length - 1) {
       this.currentVideoIndex++;
       this.updateVideoSrc();
     }
@@ -166,7 +171,7 @@ export class ImageComponent implements OnInit {
   // 更新视频源
   updateVideoSrc(): void {
     this.currentVideoSrc =
-      'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+      'http://localhost:9000/kgms/' + this.pdfs[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -238,33 +243,22 @@ export class ImageComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
+        console.log(this.index);
+        console.log(data);
+
         this.total = data.total;
         this.updateVisiblePages();
 
         this.tags = null;
         this.types = null;
-        this.images = [];
+        this.pdfs = [];
 
         this.entities = data.list;
         data.list.forEach((item: any) => {
-          if (item._source.location) {
-            const newMarker = marker([
-              item._source.location.lat,
-              item._source.location.lon,
-            ]);
-            this.markers.push(newMarker);
-          }
-
-          item?._source?.images?.forEach((image: any) => {
-            this.images.push({
-              _id: item._id,
-              image: image,
-              label: item?._source.labels.zh.value,
-              description: item?._source.descriptions.zh.value,
-            });
+          item?._source?.pdfs?.forEach((pdf: any) => {
+            this.pdfs.push({ ...pdf, ...{ _id: item._id, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources } });
           });
         });
-
         let menu: any = [];
         let arr: any = [];
         data.types.forEach((m: any) => {
@@ -312,150 +306,52 @@ export class ImageComponent implements OnInit {
               },
             },
           ],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
+          should: [
+            {
+              "exists": {
+                "field": "pdfs"  // 确保 pdfs 字段存在
+              }
+            },
           ],
         };
       } else if (this.way == '精确检索') {
         this.query = {
           must: [{ term: { 'labels.zh.value.keyword': keyword } }],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
-          ],
-        };
-      } else {
-        this.query = {
-          must: [{ match: { 'labels.zh.value': keyword } }],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
-          ],
-        };
-      }
-    } else {
-      this.query = {
-        should: [{
-          "exists": {
-            "field": "images"  // 确保 videos 字段存在
-          }
-        },
-        ],
-      };
-    }
-    this.search();
-  }
-
-  selectTag(tag: any) {
-    if (this.type && this.type.id) {
-      if (tag.length > 0) {
-        let values: any = [];
-        tag.forEach((t: any) => {
-          values.push({ term: { 'tags.keyword': t } });
-        });
-        this.query = {
-          must: [{ term: { 'type.keyword': this.type.id } }].concat(values),
-        };
-      } else {
-        this.query = { must: [{ term: { 'type.keyword': this.type.id } }] };
-      }
-    } else {
-      if (tag.length > 0) {
-        let values: any = [];
-        tag.forEach((t: any) => {
-          values.push({ term: { 'tags.keyword': t } });
-        });
-        this.query = { must: values };
-      } else {
-        this.query = {};
-      }
-    }
-    this.search();
-  }
-
-  selectType(type: any) {
-    this.type = type;
-    this.index = 1;
-    if (this.keyword != '') {
-      if (this.way == '默认检索') {
-        this.query = {
-          must: [
-            {
-              match: {
-                'labels.zh.value': {
-                  query: this.keyword,
-                  operator: 'and',
-                },
-              },
-            },
-            { term: { 'type.keyword': type.id } },
-          ],
-          should: [
-            { wildcard: { images: '*jpeg' } },
-            { wildcard: { images: '*jpg' } },
-            { wildcard: { images: '*png' } },
-            { wildcard: { images: '*webp' } },
-          ],
-        };
-      } else if (this.way == '精确检索') {
-        this.query = {
-          must: [
-            { term: { 'labels.zh.value.keyword': this.keyword } },
-            { term: { 'type.keyword': type.id } },
-          ],
           should: [
             {
               "exists": {
-                "field": "images"  // 确保 videos 字段存在
+                "field": "pdfs"  // 确保 pdfs 字段存在
               }
             },
           ],
         };
       } else {
         this.query = {
-          must: [
-            { match: { 'labels.zh.value': this.keyword } },
-            { term: { 'type.keyword': type.id } },
-          ],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
+          must: [{ match: { 'labels.zh.value': keyword } }],
+          should: [
+            {
+              "exists": {
+                "field": "pdfs"  // 确保 pdfs 字段存在
+              }
+            },
           ],
         };
       }
     } else {
-      if (type.id != '') {
-        this.query = {
-          must: [{ term: { 'type.keyword': type.id } }],
-          should: [{
+      this.query = {
+        should: [
+          {
             "exists": {
-              "field": "images"  // 确保 videos 字段存在
+              "field": "pdfs"  // 确保 pdfs 字段存在
             }
           },
-          ],
-        };
-      } else {
-        this.query = {
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
-          ],
-        };
-      }
+        ],
+      };
     }
     this.search();
   }
+
+
 
   action(type: string, item?: any) {
     switch (type) {
@@ -474,7 +370,7 @@ export class ImageComponent implements OnInit {
   }
 
   // 在你的组件类中添加此方法
-  getFullImageUrl(imagePath: string): string {
+  getFullVideoUrl(imagePath: string): string {
     // 检查 imagePath 是否已经是完整的 URL
     if (imagePath?.startsWith('http://') || imagePath?.startsWith('https://')) {
       return imagePath;
@@ -484,24 +380,4 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  preview(image: any) {
-    let img;
-    // 检查 imagePath 是否已经是完整的 URL
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-      img = image;
-    } else {
-      // 如果不是完整的 URL，则添加前缀
-      img = 'http://localhost:9000/kgms/' + image;
-    }
-    this.dialogSewrvice.create(XImagePreviewComponent, {
-      width: '100%',
-      height: '100%',
-      className: 'x-image-preview-portal',
-      data: [
-        {
-          src: img,
-        },
-      ],
-    });
-  }
 }

@@ -46,6 +46,16 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/video/video.module").then(x => x.VideoModule)
   },
+  {
+    path: "pdf",
+    loadChildren: () =>
+      import("../main/start/pdf/pdf.module").then(x => x.PDFModule)
+  },
+  {
+    path: "map",
+    loadChildren: () =>
+      import("../main/start/map/map.module").then(x => x.MapModule)
+  },
   // index
   {
     path: "index",
