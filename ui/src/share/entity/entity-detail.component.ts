@@ -114,7 +114,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   imgs: any;
   videos: any;
-  files:any;
+  files: any;
 
 
 

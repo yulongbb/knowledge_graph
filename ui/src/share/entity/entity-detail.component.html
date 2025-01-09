@@ -191,6 +191,173 @@
         </x-card>
       </div>
     </div>
+    <div *ngSwitchCase="'add_image'">
+      <div class="row">
+        <x-page-header [title]="'新增'" [subTitle]="'图片'" (backClick)="back()">
+        </x-page-header>
+        <x-card width="100%">
+          <div class="row">
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+              multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+            <ng-template #textTpl>
+              <x-icon class="upload-icon" type="fto-upload"></x-icon>
+              <span>选择图片</span>
+            </ng-template>
+            <ng-template #filesTpl let-files="$files">
+              <div class="gallery">
+                <div class="warp">
+                  <div *ngFor="let file of files">
+                    <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
+                      <x-button (click)="removeFile(file, files)" icon="fto-trash" type="info" circle></x-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <h3>{{ title }}</h3>
+          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+            width="100%" labelAlign="end" span="24" space="2"></x-form>
+          <br />
+          <div class="app-footer">
+            <x-buttons space="0.5">
+              <x-button (click)="action('cancel')">取消</x-button>
+              <x-button type="primary" (click)="!formInvalid && action('save')"
+                [disabled]="formInvalid || disabled">保存</x-button>
+            </x-buttons>
+          </div>
+        </x-card>
+      </div>
+    </div>
+    <div *ngSwitchCase="'add_video'">
+      <div class="row">
+        <x-page-header [title]="'新增'" [subTitle]="'视频'" (backClick)="back()">
+        </x-page-header>
+        <x-card width="100%">
+          <div class="row">
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+              multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+            <ng-template #textTpl>
+              <x-icon class="upload-icon" type="fto-upload"></x-icon>
+              <span>选择视频</span>
+            </ng-template>
+            <ng-template #filesTpl let-files="$files">
+              <div class="gallery">
+                <div class="warp">
+                  <div *ngFor="let file of files">
+                    <video class="thumbnail" width="200px" controls>
+                      <source [src]="file?.url" type="video/mp4" />
+                      <p>
+                        你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                      </p>
+                    </video>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <h3>{{ title }}</h3>
+          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+            width="100%" labelAlign="end" span="24" space="2"></x-form>
+          <br />
+          <div class="app-footer">
+            <x-buttons space="0.5">
+              <x-button (click)="action('cancel')">取消</x-button>
+              <x-button type="primary" (click)="!formInvalid && action('save')"
+                [disabled]="formInvalid || disabled">保存</x-button>
+            </x-buttons>
+          </div>
+        </x-card>
+      </div>
+    </div>
+    <div *ngSwitchCase="'add_document'">
+      <div class="row">
+        <x-page-header [title]="'新增'" [subTitle]="'文档'" (backClick)="back()">
+        </x-page-header>
+        <x-card width="100%">
+          <div class="row">
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+              multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+            <ng-template #textTpl>
+              <x-icon class="upload-icon" type="fto-upload"></x-icon>
+              <span>选择图片</span>
+            </ng-template>
+            <ng-template #filesTpl let-files="$files">
+              <div class="gallery">
+                <div class="warp">
+                  <div *ngFor="let file of files">
+                    <a [href]="file?.url" target="_blank">
+                      {{ file?.url }}</a>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <h3>{{ title }}</h3>
+          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+            width="100%" labelAlign="end" span="24" space="2"></x-form>
+          <br />
+          <div class="app-footer">
+            <x-buttons space="0.5">
+              <x-button (click)="action('cancel')">取消</x-button>
+              <x-button type="primary" (click)="!formInvalid && action('save')"
+                [disabled]="formInvalid || disabled">保存</x-button>
+            </x-buttons>
+          </div>
+        </x-card>
+      </div>
+    </div>
+    <div *ngSwitchCase="'add_map'">
+      <div class="row">
+        <x-page-header [title]="'新增'" [subTitle]="'地理位置'" (backClick)="back()">
+        </x-page-header>
+        <x-card width="100%">
+          <div class="row">
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+              multiple [(ngModel)]="imgs" (uploadSuccess)="uploadSuccess($event)" multipleModel="add"></x-upload>
+            <ng-template #textTpl>
+              <x-icon class="upload-icon" type="fto-upload"></x-icon>
+              <span>选择图片</span>
+            </ng-template>
+            <ng-template #filesTpl let-files="$files">
+              <div class="gallery">
+                <div class="warp">
+                  <div *ngFor="let file of files">
+                    <ng-container [ngSwitch]="
+                        file?.url?.split('.')[file?.url.split('.').length - 1]
+                      ">
+                      <video *ngSwitchCase="'mp4'" class="thumbnail" width="200px" controls>
+                        <source [src]="file?.url" type="video/mp4" />
+                        <p>
+                          你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
+                        </p>
+                      </video>
+                      <a *ngSwitchCase="'pdf'" [href]="file?.url" target="_blank">
+                        {{ file?.url }}</a>
+                      <div *ngSwitchDefault class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
+                        <x-button (click)="removeFile(file, files)" icon="fto-trash" type="info" circle></x-button>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <h3>{{ title }}</h3>
+          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+            width="100%" labelAlign="end" span="24" space="2"></x-form>
+          <br />
+          <div class="app-footer">
+            <x-buttons space="0.5">
+              <x-button (click)="action('cancel')">取消</x-button>
+              <x-button type="primary" (click)="!formInvalid && action('save')"
+                [disabled]="formInvalid || disabled">保存</x-button>
+            </x-buttons>
+          </div>
+        </x-card>
+      </div>
+    </div>
+
     <div *ngSwitchCase="'edit'">
       <div class="row">
         <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"

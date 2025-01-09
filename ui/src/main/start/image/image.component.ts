@@ -89,7 +89,6 @@ export class ImageComponent implements OnInit {
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      // console.log(x.get('q'));
       // if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
       this.keyword = x.get('q') as string;
       this.selectKeyword(this.keyword);
