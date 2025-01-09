@@ -35,8 +35,8 @@
   </div>
 </div>
 <!-- Video Results Grid -->
-<div class="pdf-results-grid" *ngIf="pdfs&&pdfs.length > 0">
-  <div *ngFor="let pdf of pdfs" class="pdf-card">
+<div class="pdf-results-grid" *ngIf="documents&&documents.length > 0">
+  <div *ngFor="let pdf of documents" class="pdf-card">
     <img [src]="pdf.thumbnail" class="pdf-thumbnail">
     <div class="pdf-metadata">
       <h3 class="pdf-title" (click)="action('info', pdf)">{{ pdf?.label.slice(0,20) }}</h3>

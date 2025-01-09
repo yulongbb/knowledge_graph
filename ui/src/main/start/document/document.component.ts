@@ -21,11 +21,11 @@ import * as L from 'leaflet';
 import { faVideo } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-pdf',
-  styleUrls: ['./pdf.component.scss'],
-  templateUrl: './pdf.component.html',
+  selector: 'app-document',
+  styleUrls: ['./document.component.scss'],
+  templateUrl: './document.component.html',
 })
-export class PDFComponent implements OnInit {
+export class DocumentComponent implements OnInit {
   @ViewChildren('thumbnailCanvas')
   thumbnailCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
 
@@ -39,7 +39,7 @@ export class PDFComponent implements OnInit {
     { link: '/search', label: '知识' },
     { link: '/image', label: '图片' },
     { link: '/video', label: '视频' },
-    { link: '/pdf', label: '文件' },
+    { link: '/document', label: '文件' },
     { link: '/map', label: '地图' },
   ]);
   menu: any = signal('知识');
@@ -60,7 +60,7 @@ export class PDFComponent implements OnInit {
   tag: any;
 
   images!: any;
-  pdfs!: any;
+  documents!: any;
 
   options = {
     layers: [
@@ -154,7 +154,7 @@ export class PDFComponent implements OnInit {
 
   // 切换到下一视频
   nextVideo(): void {
-    if (this.currentVideoIndex < this.pdfs.length - 1) {
+    if (this.currentVideoIndex < this.documents.length - 1) {
       this.currentVideoIndex++;
       this.updateVideoSrc();
     }
@@ -171,7 +171,7 @@ export class PDFComponent implements OnInit {
   // 更新视频源
   updateVideoSrc(): void {
     this.currentVideoSrc =
-      'http://localhost:9000/kgms/' + this.pdfs[this.currentVideoIndex].image;
+      'http://localhost:9000/kgms/' + this.documents[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -251,12 +251,12 @@ export class PDFComponent implements OnInit {
 
         this.tags = null;
         this.types = null;
-        this.pdfs = [];
+        this.documents = [];
 
         this.entities = data.list;
         data.list.forEach((item: any) => {
-          item?._source?.pdfs?.forEach((pdf: any) => {
-            this.pdfs.push({ ...pdf, ...{ _id: item._id, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources } });
+          item?._source?.documents?.forEach((pdf: any) => {
+            this.documents.push({ ...pdf, ...{ _id: item._id, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources } });
           });
         });
         let menu: any = [];
@@ -309,7 +309,7 @@ export class PDFComponent implements OnInit {
           should: [
             {
               "exists": {
-                "field": "pdfs"  // 确保 pdfs 字段存在
+                "field": "documents"  // 确保 documents 字段存在
               }
             },
           ],
@@ -320,7 +320,7 @@ export class PDFComponent implements OnInit {
           should: [
             {
               "exists": {
-                "field": "pdfs"  // 确保 pdfs 字段存在
+                "field": "documents"  // 确保 documents 字段存在
               }
             },
           ],
@@ -331,7 +331,7 @@ export class PDFComponent implements OnInit {
           should: [
             {
               "exists": {
-                "field": "pdfs"  // 确保 pdfs 字段存在
+                "field": "documents"  // 确保 documents 字段存在
               }
             },
           ],
@@ -342,7 +342,7 @@ export class PDFComponent implements OnInit {
         should: [
           {
             "exists": {
-              "field": "pdfs"  // 确保 pdfs 字段存在
+              "field": "documents"  // 确保 documents 字段存在
             }
           },
         ],

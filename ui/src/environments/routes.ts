@@ -47,9 +47,9 @@ export const mainRoutes: Routes = [
       import("../main/start/video/video.module").then(x => x.VideoModule)
   },
   {
-    path: "pdf",
+    path: "document",
     loadChildren: () =>
-      import("../main/start/pdf/pdf.module").then(x => x.PDFModule)
+      import("../main/start/document/document.module").then(x => x.DocumentModule)
   },
   {
     path: "map",

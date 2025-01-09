@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PDFComponent } from './pdf.component';
+import { DocumentComponent } from './document.component';
 import { RouterModule } from '@angular/router';
 import { XDrawerModule } from '@ng-nest/ui/drawer';
 import { XAvatarModule, XButtonModule, XCheckboxModule, XInputModule, XLinkModule, XMenuModule, XRadioModule, XTagModule, XTextareaModule, XTimelineModule } from '@ng-nest/ui';
@@ -21,7 +21,7 @@ import { EntityDetailComponent } from 'src/share/entity/entity-detail.component'
 
 
 @NgModule({
-  declarations: [PDFComponent],
+  declarations: [DocumentComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -50,7 +50,7 @@ import { EntityDetailComponent } from 'src/share/entity/entity-detail.component'
     RouterModule.forChild([
       {
         path: '',
-        component: PDFComponent,
+        component: DocumentComponent,
       },
       { path: ':type', component: EntityDetailComponent },
       { path: ':type/:id', component: EntityDetailComponent },
@@ -60,6 +60,6 @@ import { EntityDetailComponent } from 'src/share/entity/entity-detail.component'
   providers: [EsService]
 
 })
-export class PDFModule {
+export class DocumentModule {
 
 }

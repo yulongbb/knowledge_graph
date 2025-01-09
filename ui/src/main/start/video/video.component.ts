@@ -39,7 +39,7 @@ export class VideoComponent implements OnInit {
     { link: '/search', label: '知识' },
     { link: '/image', label: '图片' },
     { link: '/video', label: '视频' },
-    { link: '/pdf', label: '文件' },
+    { link: '/document', label: '文件' },
     { link: '/map', label: '地图' },
   ]);
   menu: any = signal('知识');
@@ -256,7 +256,7 @@ export class VideoComponent implements OnInit {
         this.entities = data.list;
         data.list.forEach((item: any) => {
           item?._source?.videos?.forEach((video: any) => {
-            this.videos.push({ ...video, ...{ _id: item._id, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value, source: item?._source?.sources } });
+            this.videos.push({ ...video, ...{ _id: item._id } });
           });
         });
         let menu: any = [];

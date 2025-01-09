@@ -15,9 +15,7 @@ export class HomeComponent {
   }
 
   onSearch() {
-    if (this.searchQuery) {
-      this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
+    this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
 
-    }
   }
 }

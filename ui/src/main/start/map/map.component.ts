@@ -39,7 +39,7 @@ export class MapComponent implements OnInit {
     { link: '/search', label: '知识' },
     { link: '/image', label: '图片' },
     { link: '/video', label: '视频' },
-    { link: '/pdf', label: '文件' },
+    { link: '/document', label: '文件' },
     { link: '/map', label: '地图' },
   ]);
   menu: any = signal('知识');
