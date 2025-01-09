@@ -60,13 +60,13 @@ export class KnowledgeController {
         size: size,
         from: (index - 1) * size,
         query: bool,
-        // sort: [
-        //   {
-        //     modified: {
-        //       order: "desc"
-        //     }
-        //   }
-        // ],
+        sort: [
+          {
+            modified: {
+              order: "desc"
+            }
+          }
+        ],
         aggs: {
           types: {
             terms: {

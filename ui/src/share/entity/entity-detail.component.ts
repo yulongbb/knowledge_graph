@@ -575,7 +575,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   getStatement(property: any): any {
-    return this.claims().filter(
+    return this.claims()?.filter(
       (c: any) => c.mainsnak.property == `P${property.id}`
     );
   }
