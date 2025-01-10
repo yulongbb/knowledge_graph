@@ -5,9 +5,9 @@
     position: fixed;
     top: 0;
     width: 100%;
+    height: 60px;
     background-color: white;
     padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -25,25 +25,33 @@
       font-size: 14px;
     }
   }
+  
 
   .search-container {
+    display: block;
     width: 100%;
-    height: 50vh;
+    margin: 20vh auto;
+    padding: 0 400px;
+    transition: all 0.3s ease; // 平滑过渡
+    background-color: white;
 
     .search-box {
+      margin: 0 auto;
       display: block;
-      width: 80%;
-      margin: 200px auto 10px;
+      width: 100%;
       padding: 10px 20px;
       font-size: 18px;
       border: 1px solid #ddd;
       border-radius: 25px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease; // 平滑过渡
+
     }
-    
+
     .news-container {
       margin-top: 20px;
       padding: 0 10%;
+
       .news-item {
         margin: 10px 0;
         padding: 10px;
@@ -53,7 +61,6 @@
       }
     }
   }
-
 
   .discover-container {
     padding: 20px 10%;

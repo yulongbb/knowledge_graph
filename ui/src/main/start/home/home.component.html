@@ -1,4 +1,4 @@
-<div class="home">
+<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll;">
   <!-- 导航栏 -->
   <nav class="navbar">
     <div class="logo">Bing-like</div>
@@ -10,17 +10,21 @@
   </nav>
 
   <!-- 搜索框 -->
-  <div class="search-container">
-    <input type="text" placeholder="Search the web" class="search-box"  [(ngModel)]="keyword"  (keyup.enter)="queryKeyword(keyword)" />
+  <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
+    <input
+      type="text"
+      placeholder="Search the web"
+      class="search-box"
+      [(ngModel)]="keyword"
+      (keyup.enter)="queryKeyword(keyword)"
+    />
     <!-- 热点新闻 -->
-    <div class="news-container" *ngIf="!isScrolled">
+    <div class="news-container" *ngIf="!isFixed">
       <div class="news-item" *ngFor="let news of newsItems">
         {{ news }}
       </div>
     </div>
   </div>
-
-
 
   <!-- 无限滚动发现内容 -->
   <div class="discover-container" infiniteScroll (scrolled)="onScroll()">
