@@ -1,25 +1,31 @@
-<div class="home-container">
-  <header class="header">
-    <nav class="nav">
-      <a href="#" class="nav-item">图片</a>
-      <a href="#" class="nav-item">视频</a>
-      <a href="#" class="nav-item">地图</a>
-      <a href="#" class="nav-item">新闻</a>
-    </nav>
-    <div class="header-info">
-      <span>52%</span>
-      <span>50%</span>
-      <span>88</span>
+<div class="home">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="logo">Bing-like</div>
+    <div class="menu">
+      <a href="#">Home</a>
+      <a href="#">Discover</a>
+      <a href="#">Contact</a>
     </div>
-  </header>
+  </nav>
 
-  <section class="search-section">
-    <!-- <div class="logo">
-      <img src="assets/bing-logo.png" alt="Bing Logo">
-    </div> -->
-    <div class="search-box">
-      <input type="text" placeholder="搜索网页、图片、视频..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
-      <button (click)="onSearch()">搜索</button>
+  <!-- 搜索框 -->
+  <div class="search-container">
+    <input type="text" placeholder="Search the web" class="search-box"  [(ngModel)]="keyword"  (keyup.enter)="queryKeyword(keyword)" />
+    <!-- 热点新闻 -->
+    <div class="news-container" *ngIf="!isScrolled">
+      <div class="news-item" *ngFor="let news of newsItems">
+        {{ news }}
+      </div>
     </div>
-  </section>
+  </div>
+
+
+
+  <!-- 无限滚动发现内容 -->
+  <div class="discover-container" infiniteScroll (scrolled)="onScroll()">
+    <div class="discover-item" *ngFor="let item of discoverItems">
+      Discover content {{ item }}
+    </div>
+  </div>
 </div>

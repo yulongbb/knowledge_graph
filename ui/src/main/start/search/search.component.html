@@ -18,7 +18,7 @@
 </header>
 <div class="search-container">
   <div class="search-nav">
-    <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ q: keyword }"
+    <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ keyword: keyword }"
       routerLinkActive="active">
       {{ item.label }}
     </a>

@@ -22,7 +22,7 @@
     <a
       *ngFor="let item of navItems()"
       [routerLink]="item.link"
-      [queryParams]="{ q: keyword }"
+      [queryParams]="{ keyword: keyword }"
       routerLinkActive="active"
     >
       {{ item.label }}

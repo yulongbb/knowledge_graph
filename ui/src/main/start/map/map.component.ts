@@ -94,7 +94,7 @@ export class MapComponent implements OnInit {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
       // console.log(x.get('q'));
       // if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
-      this.keyword = x.get('q') as string;
+      this.keyword = x.get('keyword') as string;
       this.selectKeyword(this.keyword);
       // } else {
       //   this.router.navigate(['/']);
