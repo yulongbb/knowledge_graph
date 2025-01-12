@@ -60,7 +60,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       control: 'find',
       id: 'type',
       label: '类型',
-      required: false,
+      required: true,
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
@@ -114,15 +114,15 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   imgs: any;
   videos: any;
+  vids: any;
   files: any;
-
-
 
   tags: Map<string, Array<string>> | undefined;
 
   tag: any = signal([]);
   images: any;
   pdfs: any;
+  docs: any;
   entity: any;
   claims: any;
 
@@ -142,10 +142,15 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 5, minZoom: 1, attribution: '...' })
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
+        noWrap: true,
+        maxZoom: 5,
+        minZoom: 1,
+        attribution: '...',
+      }),
     ],
     zoom: 3,
-    center: latLng(46.879966, -121.726909)
+    center: latLng(46.879966, -121.726909),
   };
   markers: Marker[] = [];
 
@@ -153,7 +158,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     const { lat, lng } = event.latlng;
     const newMarker = marker([lat, lng]);
     this.markers = [newMarker];
-    this.item.location = { "lat": lat, "lon": lng };
+    this.item.location = { lat: lat, lon: lng };
     console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
   }
 
@@ -190,6 +195,9 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
+      // 新增浏览记录
+      console.log({knowledgeId: this.id});
+      this.nodeService.view({id: this.id}).subscribe();
     });
   }
 
@@ -201,7 +209,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.videos = []
+    this.videos = [];
     this.action(this.type);
   }
 
@@ -209,9 +217,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     return item;
   }
 
-
   add() {
-    console.log(this.statements())
+    console.log(this.statements());
     this.statements = signal([
       ...this.statements(),
       {
@@ -261,7 +268,6 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     });
   }
 
-
   preview(image: any) {
     this.dialogService.create(XImagePreviewComponent, {
       width: '100%',
@@ -276,7 +282,9 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   change(statements: any) {
-    statements.mainsnak.datatype = this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].type;
+    statements.mainsnak.datatype = this.propertyList().filter(
+      (p: any) => p.name == statements.mainsnak.label
+    )[0].type;
     switch (statements.mainsnak.datatype) {
       case 'commonsMedia':
       case 'external-id':
@@ -285,14 +293,22 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
@@ -305,7 +321,11 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'quantity':
-        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -317,7 +337,11 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'time':
-        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -335,10 +359,17 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${this.propertyList().filter((p: any) => p.name == statements.mainsnak.label)[0].id}`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
-            'entity-type': statements.mainsnak.datatype.replace('wikibase-', ''),
+            'entity-type': statements.mainsnak.datatype.replace(
+              'wikibase-',
+              ''
+            ),
             'numeric-id': 0,
             id: '',
           },
@@ -349,15 +380,20 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     console.log(statements);
   }
 
-  uploadSuccess($event: any) {
-    console.log(this.imgs);
-    if (!this.form.formGroup.value.label) {
-      this.form.formGroup.patchValue({
-        label: $event.body.name,
-        description: $event.body.name,
-      });
-    }
+  uploadImage($event: any) {
     this.imgs[this.imgs.length - 1] = {
+      url: `http://localhost:9000/kgms/${$event.body.name}`,
+    };
+  }
+
+  uploadVideo($event: any) {
+    this.vids[this.imgs.length - 1] = {
+      url: `http://localhost:9000/kgms/${$event.body.name}`,
+    };
+  }
+
+  uploadDocument($event: any) {
+    this.docs[this.imgs.length - 1] = {
       url: `http://localhost:9000/kgms/${$event.body.name}`,
     };
   }
@@ -397,7 +433,10 @@ export class EntityDetailComponent implements OnInit, OnChanges {
           });
           console.log(this.item);
           if (this.item.location) {
-            const newMarker = marker([this.item.location.lat, this.item.location.lon]);
+            const newMarker = marker([
+              this.item.location.lat,
+              this.item.location.lon,
+            ]);
             this.markers = [newMarker];
           }
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
@@ -405,73 +444,88 @@ export class EntityDetailComponent implements OnInit, OnChanges {
               this.form.formGroup.patchValue({
                 _key: x?._id,
                 label: this.item?.labels?.zh?.value,
-                aliases: this.item?.aliases?.zh?.map((aliase: any) => aliase.value).toString(),
+                aliases: this.item?.aliases?.zh
+                  ?.map((aliase: any) => aliase.value)
+                  .toString(),
                 type: { id: type?.id, label: type?.name },
                 description: this.item.descriptions?.zh?.value,
               });
             }
-            this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
-              parents.push(this.item.type);
-              this.tagService.getList(1, 500, {
-                filter: [
-                  {
-                    field: 'id',
-                    value: parents as string[],
-                    relation: 'schemas',
-                    operation: 'IN',
-                  },
-                ],
-              }).subscribe((data: any) => {
-                let tags: any = {};
-                data.list.forEach((tag: any) => {
-                  tags[tag.type] = tags[tag.type] ?? [];
-                  tags[tag.type].push(tag.name);
-                });
-                this.tags = tags;
-              });
-              this.propertyService.getList(1, 50, {
-                filter: [
-                  {
-                    field: 'id',
-                    value: parents as string[],
-                    relation: 'schemas',
-                    operation: 'IN',
-                  },
-                ],
-              }).subscribe((x: any) => {
-                console.log(x.list);
-                this.propertyList = signal(x.list);
-
-                this.propertyData = signal(x.list.reduce((acc: any, item: any) => {
-                  const key: string = item.group;
-                  if (!acc[key]) {
-                    acc[key] = [];
-                  }
-                  acc[key].push(item);
-                  return acc;
-                }, {}));
-                this.properties = x.list.map((p: any) => p.name);
-                this.nodeService.getLinks(1, 50, this.id, {}).subscribe((c: any) => {
-                  let statements: any = [];
-                  c.list.forEach((p: any) => {
-                    if (p.edges[0].mainsnak.property != 'P31') {
-                      p.edges[0].mainsnak.label = x.list.filter(
-                        (p2: any) => p.edges[0].mainsnak.property == `P${p2.id}`
-                      )[0]?.name;
-                      if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                        console.log(p.edges[0].mainsnak.property);
-                        p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
-                        p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
-                      }
-                      statements.push(p.edges[0]);
-                    }
-                    console.log(this.statements)
-                    this.statements = signal(statements);
-                    this.claims = signal(statements);
+            this.ontologyService
+              .getAllParentIds(this.item.type)
+              .subscribe((parents: any) => {
+                parents.push(this.item.type);
+                this.tagService
+                  .getList(1, 500, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                    ],
+                  })
+                  .subscribe((data: any) => {
+                    let tags: any = {};
+                    data.list.forEach((tag: any) => {
+                      tags[tag.type] = tags[tag.type] ?? [];
+                      tags[tag.type].push(tag.name);
+                    });
+                    this.tags = tags;
                   });
-                });
+                this.propertyService
+                  .getList(1, 50, {
+                    filter: [
+                      {
+                        field: 'id',
+                        value: parents as string[],
+                        relation: 'schemas',
+                        operation: 'IN',
+                      },
+                    ],
+                  })
+                  .subscribe((x: any) => {
+                    console.log(x.list);
+                    this.propertyList = signal(x.list);
+
+                    this.propertyData = signal(
+                      x.list.reduce((acc: any, item: any) => {
+                        const key: string = item.group;
+                        if (!acc[key]) {
+                          acc[key] = [];
+                        }
+                        acc[key].push(item);
+                        return acc;
+                      }, {})
+                    );
+                    this.properties = x.list.map((p: any) => p.name);
+                    this.nodeService
+                      .getLinks(1, 50, this.id, {})
+                      .subscribe((c: any) => {
+                        let statements: any = [];
+                        c.list.forEach((p: any) => {
+                          if (p.edges[0].mainsnak.property != 'P31') {
+                            p.edges[0].mainsnak.label = x.list.filter(
+                              (p2: any) =>
+                                p.edges[0].mainsnak.property == `P${p2.id}`
+                            )[0]?.name;
+                            if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                              console.log(p.edges[0].mainsnak.property);
+                              p.edges[0].mainsnak.datavalue.value.id =
+                                p.vertices[1]?.id;
+                              p.edges[0].mainsnak.datavalue.value.label =
+                                p.vertices[1]?.labels?.zh?.value;
+                            }
+                            statements.push(p.edges[0]);
+                          }
+                          console.log(this.statements);
+                          this.statements = signal(statements);
+                          this.claims = signal(statements);
+                        });
+                      });
+                  });
               });
-            });
           });
           this.images = x?._source?.images.filter(
             (image: any) =>
@@ -503,12 +557,14 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             },
           },
           aliases: {
-            zh: this.form.formGroup.value.aliases?.split(',').map((aliase: any) => {
-              return {
-                language: 'zh',
-                value: aliase,
-              };
-            }),
+            zh: this.form.formGroup.value.aliases
+              ?.split(',')
+              .map((aliase: any) => {
+                return {
+                  language: 'zh',
+                  value: aliase,
+                };
+              }),
           },
           descriptions: {
             zh: {
@@ -517,20 +573,18 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             },
           },
           type: this.form.formGroup.value.type,
-          images: this.imgs?.map(
-            (i: any) => {
-              if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
-                return i.url.replace('http://localhost:9000/kgms/', '');
-              } else {
-                return i.url.split('/')[i.url.split('/').length - 1];
-              }
+          images: this.imgs?.map((i: any) => {
+            if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
+              return i.url.replace('http://localhost:9000/kgms/', '');
+            } else {
+              return i.url.split('/')[i.url.split('/').length - 1];
             }
-          ),
+          }),
           location: this.item?.location,
-          sources: [this.form.formGroup.value.source]
+          sources: [this.form.formGroup.value.source],
         };
         console.log(item);
-        if (this.type === 'add') {
+        if (this.type === 'add'||this.type === 'add_image') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();
@@ -543,7 +597,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
               p.edges[0].state = 'info';
               if (p.edges[0]['_from'] != p.edges[0]['_to']) {
                 p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                p.edges[0].mainsnak.datavalue.value.label = p.vertices[1].labels.zh.value;
+                p.edges[0].mainsnak.datavalue.value.label =
+                  p.vertices[1].labels.zh.value;
               }
               statements.push(p.edges[0]);
             });

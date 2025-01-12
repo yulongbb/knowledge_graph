@@ -1,31 +1,44 @@
-<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll;">
+<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll">
   <!-- 导航栏 -->
   <nav class="navbar">
-    <div class="logo">Bing-like</div>
+    <div class="logo">知识图谱</div>
     <div class="menu">
-      <a href="#">Home</a>
-      <a href="#">Discover</a>
-      <a href="#">Contact</a>
+      <a [routerLink]="'/search'" [queryParams]="{ keyword: '' }">知识</a>
+      <a [routerLink]="'/image'" [queryParams]="{ keyword: '' }">图片</a>
+      <a [routerLink]="'/video'" [queryParams]="{ keyword: '' }">视频</a>
+      <a [routerLink]="'/document'" [queryParams]="{ keyword: '' }">文档</a>
+      <a [routerLink]="'/map'" [queryParams]="{ keyword: '' }">地图</a>
+      <a [routerLink]="'/index/login'">登录</a>
     </div>
   </nav>
 
   <!-- 搜索框 -->
-  <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
+  <div
+    class="search-container"
+    #searchContainer
+    [ngStyle]="searchContainerStyle"
+  >
     <input
       type="text"
-      placeholder="Search the web"
+      placeholder="搜索知识"
       class="search-box"
       [(ngModel)]="keyword"
       (keyup.enter)="queryKeyword(keyword)"
     />
-    <!-- 热点新闻 -->
-    <div class="news-container" *ngIf="!isFixed">
-      <div class="news-item" *ngFor="let news of newsItems">
-        {{ news }}
+
+    <div class="hot-news-container" *ngIf="!isFixed">
+      <div class="hot-news-title">热点</div>
+      <div class="hot-news-grid">
+        <div class="hot-news-item" *ngFor="let news of hots | slice:0:9; let i = index">
+          <span class="rank">{{i+1}}</span>
+          <a (click)="queryKeyword(news.id._source.labels.zh.value)"  class="news-title">{{ news['id']._source.labels.zh.value }}</a>
+          <span *ngIf="i<3" class="hot-label">热</span>
+        </div>
+    
       </div>
     </div>
   </div>
-
+ 
   <!-- 无限滚动发现内容 -->
   <div class="discover-container" infiniteScroll (scrolled)="onScroll()">
     <div class="discover-item" *ngFor="let item of discoverItems">

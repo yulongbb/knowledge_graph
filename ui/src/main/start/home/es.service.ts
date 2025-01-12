@@ -28,4 +28,13 @@ export class EsService extends RepositoryService<any> {
   }
 
 
+
+  getHot(): Observable<any> {
+    return this.http.get(`${this.option.controller?.name}/hot`);
+  }
+
+
+
+
+
 }

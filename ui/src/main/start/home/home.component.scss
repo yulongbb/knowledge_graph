@@ -25,18 +25,17 @@
       font-size: 14px;
     }
   }
-  
 
   .search-container {
     display: block;
     width: 100%;
     margin: 20vh auto;
-    padding: 0 400px;
+    padding: 0 20%;
     transition: all 0.3s ease; // 平滑过渡
     background-color: white;
 
     .search-box {
-      margin: 0 auto;
+      margin: 20px auto;
       display: block;
       width: 100%;
       padding: 10px 20px;
@@ -45,20 +44,70 @@
       border-radius: 25px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease; // 平滑过渡
-
     }
 
-    .news-container {
-      margin-top: 20px;
-      padding: 0 10%;
+    /* 容器样式 */
+    .hot-news-container {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      padding: 10px;
+    }
 
-      .news-item {
-        margin: 10px 0;
-        padding: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
+    /* 标题 */
+    .hot-news-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    /* 热点新闻网格布局 */
+    .hot-news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 三列布局 */
+      gap: 10px; /* 列与列之间的间距 */
+    }
+
+    .hot-news-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .hot-news-item:last-child {
+      border-bottom: none;
+    }
+    
+    .rank {
+      font-weight: bold;
+      color: #ff4500;
+      margin-right: 8px;
+    }
+    
+    .hot-news-item a {
+      flex: 1;
+      text-decoration: none;
+      color: #333;
+    }
+    
+    .hot-news-item a:hover {
+      text-decoration: underline;
+    }
+    
+    .hot-label {
+      background-color: #ff4500;
+      color: white;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-left: 8px;
     }
   }
 

@@ -11,7 +11,6 @@ import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { DatasetModule } from './dataset/dataset.module';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({

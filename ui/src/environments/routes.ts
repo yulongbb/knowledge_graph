@@ -26,6 +26,14 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/login/login.module").then(x => x.LoginModule)
   },
+    // index
+    {
+      path: "index",
+      loadChildren: () =>
+        import("../layout/index/index.module").then(x => x.IndexModule),
+      canActivateChild: [AuthGuard]
+      // canLoad: [AuthGuard]
+    },
   {
     path: "home",
     loadChildren: () =>
@@ -56,14 +64,7 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/map/map.module").then(x => x.MapModule)
   },
-  // index
-  {
-    path: "index",
-    loadChildren: () =>
-      import("../layout/index/index.module").then(x => x.IndexModule),
-    canActivateChild: [AuthGuard]
-    // canLoad: [AuthGuard]
-  },
+
 
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.layout, pathMatch: "full" },

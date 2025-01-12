@@ -6,17 +6,25 @@ import { PropertiesService } from 'src/ontology/services/properties.service';
 import { SchemasService } from 'src/ontology/services/schemas.service';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { v4 as uuidv4 } from 'uuid';
+import Redis from 'ioredis';
 
 @Injectable()
 export class KnowledgeService {
+  private readonly redis: Redis;
+
   constructor(
     @Inject('ARANGODB') private db: Database,
-
     private elasticsearchService: EsService,
     private propertiesService: PropertiesService,
-    private readonly schemasService: SchemasService
-
-  ) { }
+    private readonly schemasService: SchemasService,
+  ) {
+    this.redis = new Redis({
+      host: 'localhost', // Redis 服务器的主机名
+      port: 6379, // Redis 服务器的端口
+      password: 'root',
+      db: 1,
+    });
+  }
 
   async fusion({ entity }: { entity: any }): Promise<any> {
     console.log(entity);
@@ -152,16 +160,14 @@ export class KnowledgeService {
           let schema = await this.schemasService.getByName(entity.type);
           if (!schema) {
             let s = new Schema();
-            s.id = uuidv4();;
+            s.id = uuidv4();
             s.name = entity.type;
             s.label = entity.type;
             schema = await this.schemasService.post(s);
           }
           entity.type = { id: schema.id, name: schema.name };
-          console.log(entity.type)
+          console.log(entity.type);
         }
-
-
 
         // document.document(entity.type.id).then(
         //   (updatedDocument) => {
@@ -246,13 +252,13 @@ export class KnowledgeService {
           existingDocument.id = data['items'][0]['index']['_id'];
           document.update(doc['_key'], existingDocument);
         });
-        return { ...doc, ...source };;
+        return { ...doc, ...source };
       },
       (err) => console.error('Failed to save document:', err),
     );
   }
   async updateEntity(entity: any): Promise<any> {
-    console.log(entity?.location)
+    console.log(entity?.location);
     // Fetch the existing document
     await this.elasticsearchService.bulk({
       id: entity.id,
@@ -280,8 +286,6 @@ export class KnowledgeService {
     });
     console.log(myCollection);
     return null;
-
-
   }
   async deleteEntity(id: any): Promise<any> {
     return this.elasticsearchService.get(id).then((data: any) => {
@@ -343,8 +347,6 @@ export class KnowledgeService {
       console.error('Query Error:', error);
     }
   }
-
-
   async graph(
     id: XIdType,
     index: number,
@@ -381,71 +383,118 @@ export class KnowledgeService {
         cytoscapeData.elements.nodes.push({
           data: {
             _id: result[0]?.start?.id['_id'] ?? items[0],
-            images: entity['_source']['images']?.map((image) => 'http://localhost:9000/kgms/' + image),
+            images: entity['_source']['images']?.map(
+              (image) => 'http://localhost:9000/kgms/' + image,
+            ),
             type: entity['_source']['type'],
             id: result[0]?.start?.id ?? id,
             base: [],
-            label: result[0]?.start?.labels?.zh?.value || entity['_source']?.labels?.zh?.value,
-            description: result[0]?.start?.descriptions?.zh?.value || entity['_source']?.descriptions?.zh?.value // 根据你的字段结构选择合适的label
-          }
+            label:
+              result[0]?.start?.labels?.zh?.value ||
+              entity['_source']?.labels?.zh?.value,
+            description:
+              result[0]?.start?.descriptions?.zh?.value ||
+              entity['_source']?.descriptions?.zh?.value, // 根据你的字段结构选择合适的label
+          },
         });
         addedNodes.add(result[0]?.start?.id);
-        await Promise.all(result.map(async ({ vertex, edge, start, from, to }) => {
-          // 添加节点
-          if (!addedNodes.has(vertex.id)) {
-            let data = await this.elasticsearchService.get(vertex.id);
-            cytoscapeData.elements.nodes.push({
-              data: {
-                _id: vertex['_id'],
-                images: data['_source']['images']?.map((image) => 'http://localhost:9000/kgms/' + image),
-                type: data['_source']['type'],
-                id: vertex.id,
-                base: [],
-                label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
-                description: vertex.descriptions?.zh?.value || '', // 确保数据结构的安全性
-              }
-            });
-            addedNodes.add(vertex.id);
-          }
-          // 添加边
-          if (edge._from !== edge._to) {
-            const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
-            if (property?.name) {
-              cytoscapeData.elements.edges.push({
+        await Promise.all(
+          result.map(async ({ vertex, edge, start, from, to }) => {
+            // 添加节点
+            if (!addedNodes.has(vertex.id)) {
+              let data = await this.elasticsearchService.get(vertex.id);
+              cytoscapeData.elements.nodes.push({
                 data: {
-                  _id: edge['_key'],
-                  source: from.id,
-                  target: to.id,
-                  label: property.name || '' // 根据你的边数据结构选择合适的label
-                }
+                  _id: vertex['_id'],
+                  images: data['_source']['images']?.map(
+                    (image) => 'http://localhost:9000/kgms/' + image,
+                  ),
+                  type: data['_source']['type'],
+                  id: vertex.id,
+                  base: [],
+                  label: vertex.labels?.zh?.value || '', // 确保数据结构的安全性
+                  description: vertex.descriptions?.zh?.value || '', // 确保数据结构的安全性
+                },
               });
+              addedNodes.add(vertex.id);
             }
-          }
-          // 添加边
-          if (edge._from == edge._to) {
-            const property = await this.propertiesService.get(edge.mainsnak.property.replace('P', ''));
-            if (property?.name) {
-              cytoscapeData.elements.nodes.forEach((node: any) => {
-                if (node.data._id == edge._from) {
-                  if (node['data']['base'].filter((b: any) => b._id == edge._id).length == 0) {
-                    node['data']['base'].push({
-                      _id: edge._id,
-                      value: edge.mainsnak.datavalue.value,
-                      label: property.name || ''
-                    });
-
+            // 添加边
+            if (edge._from !== edge._to) {
+              const property = await this.propertiesService.get(
+                edge.mainsnak.property.replace('P', ''),
+              );
+              if (property?.name) {
+                cytoscapeData.elements.edges.push({
+                  data: {
+                    _id: edge['_key'],
+                    source: from.id,
+                    target: to.id,
+                    label: property.name || '', // 根据你的边数据结构选择合适的label
+                  },
+                });
+              }
+            }
+            // 添加边
+            if (edge._from == edge._to) {
+              const property = await this.propertiesService.get(
+                edge.mainsnak.property.replace('P', ''),
+              );
+              if (property?.name) {
+                cytoscapeData.elements.nodes.forEach((node: any) => {
+                  if (node.data._id == edge._from) {
+                    if (
+                      node['data']['base'].filter((b: any) => b._id == edge._id)
+                        .length == 0
+                    ) {
+                      node['data']['base'].push({
+                        _id: edge._id,
+                        value: edge.mainsnak.datavalue.value,
+                        label: property.name || '',
+                      });
+                    }
                   }
-                }
-              });
+                });
+              }
             }
-          }
-        }));
+          }),
+        );
         console.log(cytoscapeData);
         return cytoscapeData;
-      })
+      });
     } catch (error) {
       console.error('Query Error:', error);
     }
   }
 
+  // 更新 Redis 中的热度数据
+  async recordView(knowledge: any): Promise<void> {
+    // 增加浏览次数
+    const viewsKey = `views:${knowledge.id}`;
+    await this.redis.incr(viewsKey);
+    await this.redis.expire(viewsKey, 7 * 24 * 60 * 60); // 设置 7 天过期
+
+    // 更新热度排名
+    const hotKey = 'hot:knowledge';
+    await this.redis.zincrby(hotKey, 1, knowledge.id);
+  }
+
+  // 获取热度排名前 10 的知识
+  async getHotKnowledge(): Promise<{ id: string; score: number }[]> {
+    const hotKey = 'hot:knowledge';
+
+    // 获取前 10 热门知识
+    const hotData = await this.redis.zrevrange(hotKey, 0, 9, 'WITHSCORES');
+    const result = [];
+    for (let i = 0; i < hotData.length; i += 2) {
+      const knowledge = await this.elasticsearchService.get(hotData[i]);
+      console.log(knowledge);
+
+      result.push({
+        id: knowledge,
+        score: parseInt(hotData[i + 1], 10),
+      });
+    }
+
+    return result;
+  }
 }

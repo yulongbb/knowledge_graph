@@ -91,6 +91,14 @@ export class EntityService extends RepositoryService<Item> {
       `${this.option.controller?.name}/jobs`,
     );
   }
+
+
+  view(knowledge:any): Observable<Array<any>> {
+    return this.http.post(
+      `${this.option.controller?.name}/view`,
+      knowledge
+    );
+  }
 }
 
 export interface Item extends XId {

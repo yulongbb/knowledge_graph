@@ -232,7 +232,6 @@ export class SearchComponent implements OnInit {
     this.service
       .searchEntity(this.index, this.size, { bool: this.query })
       .subscribe((data: any) => {
-        console.log(data);
 
         this.total = data.total;
         this.updateVisiblePages();
@@ -254,28 +253,35 @@ export class SearchComponent implements OnInit {
               this.markers.push(newMarker);
             }
             item?._source?.images?.forEach((image: any) => {
-              if (
-                image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-                image.split('.')[image.split('.').length - 1] == 'jpg' ||
-                image.split('.')[image.split('.').length - 1] == 'png' ||
-                image.split('.')[image.split('.').length - 1] == 'webp'
-              ) {
-                this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              }
-
-              if (
-                image.split('.')[image.split('.').length - 1] == 'mp4'
-              ) {
-                this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              }
-
-              if (
-                image.split('.')[image.split('.').length - 1] == 'pdf'
-              ) {
-                this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-              }
+              this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
             });
-            this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex]?.image;
+
+            item?._source?.videos?.forEach((video: any) => {
+              this.videos.push(video);
+            });
+
+
+
+             // if (
+              //   image.split('.')[image.split('.').length - 1] == 'jpeg' ||
+              //   image.split('.')[image.split('.').length - 1] == 'jpg' ||
+              //   image.split('.')[image.split('.').length - 1] == 'png' ||
+              //   image.split('.')[image.split('.').length - 1] == 'webp'
+              // ) {
+              //   this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+              // }
+
+              // if (
+              //   image.split('.')[image.split('.').length - 1] == 'mp4'
+              // ) {
+              //   this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
+              // }
+
+              // if (
+              //   image.split('.')[image.split('.').length - 1] == 'pdf'
+              // ) {
+              //   this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
+              // }
           });
           this.ontologyService.get(data.list[0]?._source?.type).subscribe((t: any) => {
             data.list[0]._type = t?.label;
@@ -359,213 +365,42 @@ export class SearchComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { q: keyword } });
+    this.router.navigate(['/search'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {
     this.keyword = keyword;
     this.index = 1;
-    switch (this.menu()) {
-      case '知识':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                },   {
-                  match: {
-                    'descriptions.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
+    if (keyword != '') {
+      if (this.way == '默认检索') {
+        this.query = {
+          must: [
+            {
+              match: {
+                'labels.zh.value': {
+                  query: keyword,
+                  operator: 'and',
                 },
-              ],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              should: [{ term: { 'labels.zh.value.keyword': keyword } }],
-            };
-          } else {
-            this.query = { should: [{ match: { 'labels.zh.value': keyword } },{ match: { 'descriptions.zh.value': keyword } }] };
-          }
-        } else {
-          this.query = { must: [] };
-        }
-        break;
-      case '图片':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*jpg" } },
-                { "wildcard": { "images": "*jpeg" } },
-                { "wildcard": { "images": "*png" } },
-                { "wildcard": { "images": "*webp" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [
-              { "wildcard": { "images": "*jpeg" } },
-              { "wildcard": { "images": "*jpg" } },
-              { "wildcard": { "images": "*jpeg" } },
-              { "wildcard": { "images": "*png" } },
-              { "wildcard": { "images": "*webp" } }],
-          };
-        }
-        break;
-      case '视频':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "wildcard": { "images": "*mp4" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "wildcard": { "images": "*mp4" } }],
-          };
-        }
-        break;
-      case '文件':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "wildcard": { "images": "*pdf" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "wildcard": { "images": "*pdf" } }],
-          };
-        }
-        break;
-      case '地图':
-        if (keyword != '') {
-          if (this.way == '默认检索') {
-            this.query = {
-              must: [
-                {
-                  match: {
-                    'labels.zh.value': {
-                      query: keyword,
-                      operator: 'and',
-                    },
-                  },
-                }
-              ],
-              should: [{ "exists": { "field": "location" } }],
-            };
-          } else if (this.way == '精确检索') {
-            this.query = {
-              must: [
-                { term: { 'labels.zh.value.keyword': keyword } }
-              ],
-              should: [{ "exists": { "field": "location" } }],
-            };
-
-          } else {
-            this.query = {
-              must: [{ match: { 'labels.zh.value': keyword } },],
-              should: [{ "exists": { "field": "location" } }],
-            };
-          }
-        } else {
-          this.query = {
-            should: [{ "exists": { "field": "location" } }],
-          };
-        }
-        break;
-      default:
-        this.query = {};
-        break;
+              },
+            },   {
+              match: {
+                'descriptions.zh.value': {
+                  query: keyword,
+                  operator: 'and',
+                },
+              },
+            },
+          ],
+        };
+      } else if (this.way == '精确检索') {
+        this.query = {
+          should: [{ term: { 'labels.zh.value.keyword': keyword } }],
+        };
+      } else {
+        this.query = { should: [{ match: { 'labels.zh.value': keyword } },{ match: { 'descriptions.zh.value': keyword } }] };
+      }
+    } else {
+      this.query = { must: [] };
     }
     this.search();
 

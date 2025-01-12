@@ -1,12 +1,13 @@
-import { Component, ElementRef, HostListener, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { EsService } from './es.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit { 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   @ViewChild('searchContainer') searchContainer!: ElementRef;
 
@@ -18,10 +19,20 @@ export class HomeComponent {
   isFixed = false; // 是否固定搜索框
   initialPadding = 20; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
+  hots: any[] | undefined;
 
   private scrollListener!: () => void;
 
-  constructor(private router: Router, private renderer: Renderer2) {}
+  constructor(private router: Router, private renderer: Renderer2,
+        private service: EsService,
+    
+  ) {}
+  ngOnInit(): void {
+    this.service.getHot().subscribe((res: any) => {
+      console.log(res);
+      this.hots = res;
+    });
+  }
 
   ngAfterViewInit() {
     const container = this.scrollContainer.nativeElement;
