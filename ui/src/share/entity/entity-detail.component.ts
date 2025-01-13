@@ -195,9 +195,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-      // 新增浏览记录
-      console.log({knowledgeId: this.id});
-      this.nodeService.view({id: this.id}).subscribe();
+
     });
   }
 
@@ -293,22 +291,20 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${
-          this.propertyList().filter(
-            (p: any) => p.name == statements.mainsnak.label
-          )[0].id
-        }`;
+        statements.mainsnak.property = `P${this.propertyList().filter(
+          (p: any) => p.name == statements.mainsnak.label
+        )[0].id
+          }`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${
-          this.propertyList().filter(
-            (p: any) => p.name == statements.mainsnak.label
-          )[0].id
-        }`;
+        statements.mainsnak.property = `P${this.propertyList().filter(
+          (p: any) => p.name == statements.mainsnak.label
+        )[0].id
+          }`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
@@ -321,11 +317,10 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'quantity':
-        statements.mainsnak.property = `P${
-          this.propertyList().filter(
-            (p: any) => p.name == statements.mainsnak.label
-          )[0].id
-        }`;
+        statements.mainsnak.property = `P${this.propertyList().filter(
+          (p: any) => p.name == statements.mainsnak.label
+        )[0].id
+          }`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -337,11 +332,10 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         };
         break;
       case 'time':
-        statements.mainsnak.property = `P${
-          this.propertyList().filter(
-            (p: any) => p.name == statements.mainsnak.label
-          )[0].id
-        }`;
+        statements.mainsnak.property = `P${this.propertyList().filter(
+          (p: any) => p.name == statements.mainsnak.label
+        )[0].id
+          }`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -359,11 +353,10 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${
-          this.propertyList().filter(
-            (p: any) => p.name == statements.mainsnak.label
-          )[0].id
-        }`;
+        statements.mainsnak.property = `P${this.propertyList().filter(
+          (p: any) => p.name == statements.mainsnak.label
+        )[0].id
+          }`;
         statements.mainsnak.datavalue = {
           value: {
             'entity-type': statements.mainsnak.datatype.replace(
@@ -540,6 +533,9 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             (image: any) =>
               image?.split('.')[image.split('.').length - 1] == 'pdf'
           );
+          // 新增浏览记录
+          console.log({ knowledgeId: this.id });
+          this.nodeService.view({ id: this.id }).subscribe();
         });
         break;
       case 'edit':
@@ -584,7 +580,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
           sources: [this.form.formGroup.value.source],
         };
         console.log(item);
-        if (this.type === 'add'||this.type === 'add_image') {
+        if (this.type === 'add' || this.type === 'add_image') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();

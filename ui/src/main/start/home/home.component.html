@@ -13,32 +13,23 @@
   </nav>
 
   <!-- 搜索框 -->
-  <div
-    class="search-container"
-    #searchContainer
-    [ngStyle]="searchContainerStyle"
-  >
-    <input
-      type="text"
-      placeholder="搜索知识"
-      class="search-box"
-      [(ngModel)]="keyword"
-      (keyup.enter)="queryKeyword(keyword)"
-    />
+  <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
+    <input type="text" placeholder="搜索知识" class="search-box" [(ngModel)]="keyword"
+      (keyup.enter)="queryKeyword(keyword)" />
 
     <div class="hot-news-container" *ngIf="!isFixed">
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
         <div class="hot-news-item" *ngFor="let news of hots | slice:0:9; let i = index">
           <span class="rank">{{i+1}}</span>
-          <a (click)="queryKeyword(news.id._source.labels.zh.value)"  class="news-title">{{ news['id']._source.labels.zh.value }}</a>
-          <span *ngIf="i<3" class="hot-label">热</span>
+          <span class="news-title"><a (click)="queryKeyword(news.id._source.labels.zh.value)">{{
+              news['id']._source.labels.zh.value }}</a><span *ngIf="i<3" class="hot-label">热</span></span>
         </div>
-    
+
       </div>
     </div>
   </div>
- 
+
   <!-- 无限滚动发现内容 -->
   <div class="discover-container" infiniteScroll (scrolled)="onScroll()">
     <div class="discover-item" *ngFor="let item of discoverItems">

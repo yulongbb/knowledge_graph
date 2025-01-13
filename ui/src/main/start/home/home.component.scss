@@ -91,11 +91,16 @@
       margin-right: 8px;
     }
     
-    .hot-news-item a {
+    .hot-news-item .news-title {
       flex: 1;
+    }
+
+    .hot-news-item a {
       text-decoration: none;
       color: #333;
+      cursor: pointer;
     }
+    
     
     .hot-news-item a:hover {
       text-decoration: underline;
