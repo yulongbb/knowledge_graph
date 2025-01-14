@@ -49,6 +49,67 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   @ViewChild('form') form!: XFormComponent;
   @ViewChild('form2') form2!: XFormComponent;
+
+
+
+  query: any;
+
+
+  title = '';
+  get formInvalid() {
+    return this.form?.formGroup?.invalid;
+  }
+  disabled = false;
+
+  imgs: any;
+  videos: any;
+  vids: any;
+  files: any;
+
+  tags: Map<string, Array<string>> | undefined;
+
+  tag: any = signal([]);
+  images: any;
+  pdfs: any;
+  docs: any;
+  entity: any;
+  claims: any;
+
+  properties: any;
+  propertyList: any;
+  propertyData!: Signal<Map<String, any>>;
+
+  statements: any = signal([]);
+
+  markers: Marker[] = [];
+
+  options = {
+    layers: [
+      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
+        noWrap: true,
+        maxZoom: 5,
+        minZoom: 1,
+        attribution: '...',
+      }),
+    ],
+    zoom: 3,
+    center: latLng(46.879966, -121.726909),
+  };
+
+  columns: XTableColumn[] = [
+    { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
+    { id: 'property', label: '属性名', width: 200 },
+    { id: 'value', label: '值', flex: 1 },
+  ];
+
+  columns2: XTableColumn[] = [
+    { id: 'index', label: '序号', width: 80, left: 0, type: 'index' },
+    { id: 'property', label: '属性名', flex: 1 },
+    { id: 'name', label: '属性值', flex: 1 },
+    { id: 'qualify', label: '限定', width: 80 },
+    { id: 'actions', label: '操作', width: 100 },
+  ];
+
   controls: XControl[] = [
     {
       control: 'input',
@@ -97,79 +158,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       required: false,
     },
   ];
-
-  query: any;
-
-  columns: XTableColumn[] = [
-    { id: 'index', label: '序号', width: 85, left: 0, type: 'index' },
-    { id: 'property', label: '属性名', width: 200 },
-    { id: 'value', label: '值', flex: 1 },
-  ];
-
-  title = '';
-  get formInvalid() {
-    return this.form?.formGroup?.invalid;
-  }
-  disabled = false;
-
-  imgs: any;
-  videos: any;
-  vids: any;
-  files: any;
-
-  tags: Map<string, Array<string>> | undefined;
-
-  tag: any = signal([]);
-  images: any;
-  pdfs: any;
-  docs: any;
-  entity: any;
-  claims: any;
-
-  properties: any;
-  propertyList: any;
-  propertyData!: Signal<Map<String, any>>;
-
-  statements: any = signal([]);
-
-  columns2: XTableColumn[] = [
-    { id: 'index', label: '序号', width: 80, left: 0, type: 'index' },
-    { id: 'property', label: '属性名', flex: 1 },
-    { id: 'name', label: '属性值', flex: 1 },
-    { id: 'qualify', label: '限定', width: 80 },
-    { id: 'actions', label: '操作', width: 100 },
-  ];
-
-  options = {
-    layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
-        noWrap: true,
-        maxZoom: 5,
-        minZoom: 1,
-        attribution: '...',
-      }),
-    ],
-    zoom: 3,
-    center: latLng(46.879966, -121.726909),
-  };
-  markers: Marker[] = [];
-
-  onMapClick(event: any) {
-    const { lat, lng } = event.latlng;
-    const newMarker = marker([lat, lng]);
-    this.markers = [newMarker];
-    this.item.location = { lat: lat, lon: lng };
-    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
-  }
-
-  onMapReady(map: any) {
-    const southWest = latLng(-90, -180);
-    const northEast = latLng(90, 180);
-    const bounds = L.latLngBounds(southWest, northEast);
-    map.setMaxBounds(bounds);
-    map.fitBounds(bounds);
-  }
-
+  
   constructor(
     private sanitizer: DomSanitizer,
     private router: Router,
@@ -195,8 +184,12 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       } else if (this.type === 'update') {
         this.title = '修改实体';
       }
-
     });
+  }
+
+  ngOnInit(): void {
+    this.videos = [];
+    this.action(this.type);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -206,9 +199,20 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnInit(): void {
-    this.videos = [];
-    this.action(this.type);
+  onMapClick(event: any) {
+    const { lat, lng } = event.latlng;
+    const newMarker = marker([lat, lng]);
+    this.markers = [newMarker];
+    this.item.location = { lat: lat, lon: lng };
+    console.log(`当前坐标：纬度 ${lat}, 经度 ${lng}`);
+  }
+
+  onMapReady(map: any) {
+    const southWest = latLng(-90, -180);
+    const northEast = latLng(90, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    map.fitBounds(bounds);
   }
 
   trackByFn(index: number, item: any): any {
@@ -653,9 +657,4 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       return [...x];
     });
   }
-}
-
-interface Datavalue {
-  value: any;
-  type: string;
 }
