@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   searchContainerStyle: any = {}; // 动态样式
   isLoading = false; // 是否正在加载
   isFixed = false; // 是否固定搜索框
-  initialPadding = 40; // 初始 padding (vh)
+  initialPadding = 20; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
   hots: any[] | undefined;
   entities: any[] = [];
