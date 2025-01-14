@@ -109,8 +109,26 @@
       text-decoration: underline;
     }
 
+    .true-label {
+      background-color: #0075fa;
+      color: white;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+
     .hot-label {
       background-color: #ff4500;
+      color: white;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+
+    .new-label {
+      background-color: #00a613;
       color: white;
       font-size: 12px;
       padding: 2px 4px;
@@ -120,11 +138,12 @@
   }
 
   .news-grid {
+    width: 90%;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 严格 5 列布局 */
     gap: 16px;
-    padding: 16px;
-    width: 100%; /* 确保网格占满容器 */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-auto-flow: dense; /* 自动填充空白区域 */
   }
   
   .news-card {
@@ -132,11 +151,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 16px;
-    box-sizing: border-box;
-    height: 300px; /* 固定高度 */
-    overflow: hidden; /* 确保内容不会超出卡片 */
-    display: flex;
-    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
   .news-card h3 {
@@ -154,12 +169,20 @@
     -webkit-box-orient: vertical;
   }
   
-  .news-card img,
-  .news-card video {
+  .news-card img
+  {
     width: 100%;
     border-radius: 8px;
     margin-top: 8px;
     max-height: 150px; /* 限制图片和视频的最大高度 */
+    object-fit: cover; /* 确保图片和视频填充容器 */
+  }
+
+  .news-card video{
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 8px;
+    height: 100%; /* 限制图片和视频的最大高度 */
     object-fit: cover; /* 确保图片和视频填充容器 */
   }
   

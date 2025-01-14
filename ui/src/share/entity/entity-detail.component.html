@@ -414,40 +414,27 @@
           </x-collapse-panel>
         </x-collapse>
         <x-collapse>
-          <x-collapse-panel label="上传图片">
-            <div class="row">
+          <x-collapse-panel label="上传图片" (paste)="onImagePaste($event)">
+            <div class="row" >
 
               <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl"
-                [filesTpl]="filesTpl" multiple [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)"
+                 multiple [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)"
                 multipleModel="add"></x-upload>
 
               <ng-template #textTpl>
                 <x-icon class="upload-icon" type="fto-upload"></x-icon>
                 <span>选择图片</span>
               </ng-template>
-              <ng-template #filesTpl let-files="$files">
-                <div class="gallery">
-                  <div class="warp">
-                    <div *ngFor="let file of files">
-                      <ng-container [ngSwitch]="
-                          file?.url?.split('.')[file?.url.split('.').length - 1]
-                        ">
-                        <video *ngSwitchCase="'mp4'" class="thumbnail" width="200px" controls>
-                          <source [src]="file?.url" type="video/mp4" />
-                          <p>
-                            你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                          </p>
-                        </video>
-                        <a *ngSwitchCase="'pdf'" [href]="file?.url" target="_blank">
-                          {{ file?.url }}</a>
-                        <div *ngSwitchDefault class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
-                          <x-button (click)="removeFile(file, files)" icon="fto-trash" type="info" circle></x-button>
-                        </div>
-                      </ng-container>
+
+              <div class="gallery" *ngIf="imgs.length > 0">
+                <div class="warp">
+                  <div *ngFor="let file of imgs">
+                    <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
                     </div>
                   </div>
                 </div>
-              </ng-template>
+              </div>
+       
             </div>
           </x-collapse-panel>
         </x-collapse>

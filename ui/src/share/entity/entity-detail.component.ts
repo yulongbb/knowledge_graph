@@ -202,27 +202,41 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
   
   onImagePaste(event: ClipboardEvent) {
-    console.log('粘贴事件触发', event); // 检查是否触发
+    console.log('粘贴事件触发', event);
     const clipboardData = event.clipboardData || (window as any).clipboardData;
+  
     if (clipboardData) {
-      console.log('剪贴板数据:', clipboardData); // 检查剪贴板数据
       const items = clipboardData.items;
+  
       for (let i = 0; i < items.length; i++) {
-        if (items[i].kind === 'file') {
+        if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
           const file = items[i].getAsFile();
+  
           if (file) {
-            console.log('捕获到文件:', file); // 检查是否捕获到文件
-
-            // 创建 FormData 对象并添加文件
+            const generateUniqueFileName = (originalName: string): string => {
+              const timestamp = new Date().getTime();
+              const uniqueSuffix = Math.random().toString(36).substring(2, 10);
+              const extension = originalName.substring(originalName.lastIndexOf('.'));
+              return `${timestamp}-${uniqueSuffix}${extension}`;
+            };
+  
+            const uniqueFileName = generateUniqueFileName(file.name);
+  
+            console.log('捕获到文件:', file, '生成的新文件名:', uniqueFileName);
+  
             const formData = new FormData();
-            formData.append('file', file);
-
-            // 使用 fetch 上传文件
+            formData.append('file', file, uniqueFileName);
+  
             fetch('http://localhost:3000/api/minio-client/uploadFile', {
               method: 'POST',
               body: formData,
             })
-              .then(response => response.json())
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+              })
               .then(data => {
                 console.log('上传成功:', data);
                 this.uploadImage({ body: { name: data.name } });

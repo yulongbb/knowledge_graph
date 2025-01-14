@@ -1,11 +1,18 @@
-import { Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { EsService } from './es.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -19,6 +26,9 @@ export class HomeComponent implements OnInit {
   initialPadding = 20; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
   hots: any[] | undefined;
+  today: string = new Date().toISOString().split('T')[0]; // 当前日期
+
+
   entities: any[] = [];
   size: number = 20;
   index: number = 1;
@@ -28,16 +38,15 @@ export class HomeComponent implements OnInit {
 
   private scrollListener!: () => void;
 
-  constructor(private router: Router, private renderer: Renderer2,
-    private service: EsService,
-
-  ) { }
+  constructor(
+    private router: Router,
+    private renderer: Renderer2,
+    private service: EsService
+  ) {}
   ngOnInit(): void {
-    this.loadNews();
-
     this.service.getHot().subscribe((res: any) => {
-      console.log(res);
-      this.hots = res;
+      console.log(res); // 输出原始数据，便于调试
+      this.hots = this.processHotNews(res); // 调用处理函数，将结果存入组件变量
     });
 
     this.service
@@ -48,14 +57,60 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  processHotNews(data: any[]): any[] {
+    const today = new Date().toISOString().split('T')[0]; // 当前日期
+  
+    // 按热度分数排序
+    const sortedNews = data.sort((a, b) => b.id.score - a.id.score);
+  
+    // 添加额外字段（是否新、标记）
+    return sortedNews.map((news, index) => ({
+      ...news,
+      isNew: this.isToday(news.id._source.modified), // 判断是否为新
+      tag: this.getTag(news, index) // 获取优先级标记
+    }));
+  }
+
+  // 判断新闻是否为当天发布
+  isToday(modified: string): boolean {
+    return modified.startsWith(this.today);
+  }
+
+  // 获取新闻标记（优先级：真 > 新 > 热）
+  getTag(news: any, index: number): string {
+    const isTrue = this.isVerified(news); // 是否为真
+    const isNew = this.isToday(news.id._source.modified); // 是否为新
+    const isHot = index < 3; // 前三名标记为热
+  
+    if (isTrue) {
+      return '真';
+    } else if (isNew) {
+      return '新';
+    } else if (isHot) {
+      return '热';
+    } else {
+      return '';
+    }
+  }
+
+  // 判断新闻是否为真（示例逻辑：可根据实际需求扩展）
+  isVerified(news: any): boolean {
+    // 假设验证“真”的逻辑是类型 `type` 的特定值
+    return news.id._source.type === 'a76c0f46-01e7-c3e4-1314-ae41aa2836f4';
+  }
+
 
 
   ngAfterViewInit() {
     const container = this.scrollContainer.nativeElement;
     if (container) {
-      this.scrollListener = this.renderer.listen(container, 'scroll', (event: Event) => {
-        this.onScrollEvent(container.scrollTop);
-      });
+      this.scrollListener = this.renderer.listen(
+        container,
+        'scroll',
+        (event: Event) => {
+          this.onScrollEvent(container.scrollTop);
+        }
+      );
     } else {
       console.error('Scroll container not found!');
     }
@@ -67,34 +122,12 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // 加载新闻
-  loadNews(): void {
-    if (this.isLoading) return;
-
-    this.isLoading = true;
-
-    // 模拟 API 请求
-    setTimeout(() => {
-      const newItems: any[] = [
-        { title: '新闻 1', description: '这是纯文本新闻', image: 'https://via.placeholder.com/400x200' },
-        { title: '新闻 2', description: '这是带图片的新闻', image: 'https://via.placeholder.com/800x400' },
-        { title: '新闻 3', description: '这是带视频的新闻', video: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-        { title: '新闻 4', description: '这是纯文本新闻' },
-        { title: '新闻 5', description: '这是带图片的新闻', image: 'https://via.placeholder.com/600x300' },
-      ];
-
-      this.newsItems = [...this.newsItems, ...newItems];
-      this.isLoading = false;
-    }, 1000);
-  }
-
   // 根据新闻类型获取卡片宽度
   getCardWidth(news: any): string {
-    if (news.video) {
+    if (news?._source?.videos?.length > 0) {
       return 'span 2'; // 视频新闻占 2 列
-    } else {
-      return 'span 1'; // 不带视频的新闻占 1 列
     }
+    return 'span 1'; // 不带视频的新闻占 1 列
   }
 
   onScrollEvent(scrollTop: number) {
@@ -113,13 +146,14 @@ export class HomeComponent implements OnInit {
         background: 'white',
         marginTop: `${this.minPadding}vh`, // padding 减小到 0
         marginBottom: `${this.minPadding}vh`,
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
       };
     } else {
       // 动态调整 padding
       const padding = Math.max(
         this.minPadding,
-        this.initialPadding - (scrollTop / scrollThreshold) * this.initialPadding
+        this.initialPadding -
+          (scrollTop / scrollThreshold) * this.initialPadding
       );
       this.isFixed = false;
       this.searchContainerStyle = {
@@ -127,8 +161,7 @@ export class HomeComponent implements OnInit {
         top: 'auto',
         marginTop: `${padding}vh`, // 动态调整 padding
         marginBottom: `${padding}vh`,
-        transition: 'all 0.3s ease'
-
+        transition: 'all 0.3s ease',
       };
     }
   }
@@ -140,12 +173,14 @@ export class HomeComponent implements OnInit {
     setTimeout(() => {
       this.discoverItems = [
         ...this.discoverItems,
-        ...Array.from({ length: 10 }, (_, i) => this.discoverItems.length + i + 1),
+        ...Array.from(
+          { length: 10 },
+          (_, i) => this.discoverItems.length + i + 1
+        ),
       ];
       this.isLoading = false;
     }, 1000); // 模拟API延迟
   }
-
 
   onScrollEntity() {
     this.index++;

@@ -1,5 +1,13 @@
-<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll" infiniteScroll [infiniteScrollDistance]="2"
-  [infiniteScrollThrottle]="50" (scrolled)="onScrollEntity()" [scrollWindow]="false">
+<div
+  class="home"
+  #scrollContainer
+  style="height: 100%; overflow-y: scroll"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  (scrolled)="onScrollEntity()"
+  [scrollWindow]="false"
+>
   <!-- 导航栏 -->
   <nav class="navbar">
     <div class="logo">知识图谱</div>
@@ -14,36 +22,96 @@
   </nav>
 
   <!-- 搜索框 -->
-  <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
-    <input type="text" placeholder="搜索知识" class="search-box" [(ngModel)]="keyword"
-      (keyup.enter)="queryKeyword(keyword)" />
+  <div
+    class="search-container"
+    #searchContainer
+    [ngStyle]="searchContainerStyle"
+  >
+    <input
+      type="text"
+      placeholder="搜索知识"
+      class="search-box"
+      [(ngModel)]="keyword"
+      (keyup.enter)="queryKeyword(keyword)"
+    />
 
     <div class="hot-news-container" *ngIf="!isFixed">
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
-        <div class="hot-news-item" *ngFor="let news of hots | slice:0:9; let i = index">
-          <span class="rank">{{i+1}}</span>
-          <span class="news-title"><a (click)="queryKeyword(news.id._source.labels.zh.value)">{{
-              news['id']._source.labels.zh.value }}</a><span *ngIf="i<3" class="hot-label">热</span></span>
+        <div
+          class="hot-news-item"
+          *ngFor="let news of hots | slice : 0 : 9; let i = index"
+        >
+          <span class="rank">{{ i + 1 }}</span>
+          <span class="news-title"
+            ><a (click)="queryKeyword(news.id._source.labels.zh.value)">{{
+              news["id"]._source.labels.zh.value | slice : 0 : 10
+            }}</a
+            ><span
+              [ngClass]="{
+                'true-label': news.tag === '真',
+                'new-label': news.tag === '新',
+                'hot-label': news.tag === '热'
+              }"
+            >
+              {{ news.tag }}</span
+            ></span
+          >
         </div>
-
       </div>
     </div>
   </div>
-  <x-card [header]="header">
-    <ng-template #header>
-      <span>发现</span>
-    </ng-template>
-    <div class="news-grid">
-      <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
-        <img *ngFor="let image of entity['_source']?.images?.slice(0,1)"
-          [src]="image.startsWith('http') ? image : 'http://localhost:9000/kgms/' + image"
-          alt="{{ entity['_source']?.labels?.zh?.value  }}" loading="lazy" />
-        <h3 style="cursor: pointer;" [routerLink]="'/search/info/'+entity._id"> {{entity['_source']?.labels?.zh?.value}}
+  <div class="news-grid">
+    <div
+      *ngFor="let entity of entities"
+      class="news-card"
+      [style.grid-column]="getCardWidth(entity)"
+    >
+      <!-- 显示视频（优先） -->
+      <video
+        *ngIf="entity['_source']?.videos?.length > 0"
+        [src]="
+          entity['_source']?.videos[0].url.startsWith('http')
+            ? entity['_source']?.videos[0].url
+            : 'http://localhost:9000/kgms/' + entity['_source']?.videos[0].url
+        "
+        controls
+        preload="metadata"
+        style="
+          width: 100%;
+          height: 300px;
+          border-radius: 4px;
+          margin-bottom: 12px;
+        "
+      ></video>
+
+      <!-- 显示图片（备用） -->
+      <div *ngIf="!entity['_source']?.videos?.length">
+        <img
+          *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
+          [src]="
+            image.startsWith('http')
+              ? image
+              : 'http://localhost:9000/kgms/' + image
+          "
+          loading="lazy"
+          style="width: 100%; border-radius: 4px; margin-bottom: 12px"
+        />
+
+        <!-- 新闻标题 -->
+        <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
+          {{ entity["_source"]?.labels?.zh?.value | slice : 0 : 25
+          }}{{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
         </h3>
-        <p>{{ entity['_source']?.descriptions?.zh?.value }}</p>
+
+        <!-- 新闻描述 -->
+        <p>
+          {{
+            entity["_source"]?.descriptions?.zh?.value ||
+              "No description available."
+          }}
+        </p>
       </div>
     </div>
-  </x-card>
-
+  </div>
 </div>

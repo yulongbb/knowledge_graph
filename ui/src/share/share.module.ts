@@ -11,14 +11,13 @@ import { XAnchorModule, XButtonModule, XCardModule, XCheckboxModule, XCollapseMo
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
-import { NgxUploaderModule } from 'ngx-uploader';
 
 
 // 视图
 const declarations = [AuAuthDirective, EntityDetailComponent];
 
 // 模块
-const modules = [FormsModule, CommonModule, RouterModule, ReactiveFormsModule, HttpClientModule, XMessageModule, XMessageBoxModule, XFindModule, XButtonModule, XIconModule, XUploadModule, XCollapseModule, LeafletModule, XTagModule, XCheckboxModule, XInputModule, XSelectModule, XLinkModule, XTableModule, XFormModule, XPageHeaderModule, XCardModule, QuillModule, XTabsModule, XAnchorModule, NgxUploaderModule];
+const modules = [FormsModule, CommonModule, RouterModule, ReactiveFormsModule, HttpClientModule, XMessageModule, XMessageBoxModule, XFindModule, XButtonModule, XIconModule, XUploadModule, XCollapseModule, LeafletModule, XTagModule, XCheckboxModule, XInputModule, XSelectModule, XLinkModule, XTableModule, XFormModule, XPageHeaderModule, XCardModule, QuillModule, XTabsModule, XAnchorModule];
 
 /**
  * 共享模块
