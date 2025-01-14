@@ -1,4 +1,5 @@
-<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll">
+<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+(scrolled)="onScrollEntity()" [scrollWindow]="false" >
   <!-- 导航栏 -->
   <nav class="navbar">
     <div class="logo">知识图谱</div>
@@ -31,9 +32,36 @@
   </div>
 
   <!-- 无限滚动发现内容 -->
-  <div class="discover-container" infiniteScroll (scrolled)="onScroll()">
-    <div class="discover-item" *ngFor="let item of discoverItems">
-      Discover content {{ item }}
+  <div class="discover-container" *ngIf="entities.length > 0">
+    <div class="row" *ngFor="let entity of entities">
+      <x-card width="100%" class="card" [header]="header" [bodyStyle]="{ padding: 10, }">
+        <ng-template #header>
+          <x-link type="primary" *ngIf="!entity['highlight']">{{entity['_source']?.labels?.zh?.value}}</x-link>
+
+          <x-link *ngIf="entity['highlight']"
+            [innerHTML]="entity['highlight']['labels.zh.value']"></x-link><span>{{entity['_type']}}</span>
+        </ng-template>
+        <div class="bottom">
+          <img *ngFor="let image of entity['_source']?.images?.slice(0,3)" width="30%"
+            [src]="image.startsWith('http') ? image : 'http://localhost:9000/kgms/' + image">
+          <p>
+            <x-text-retract *ngIf="!entity['highlight']" max="100"
+              [content]="entity['_source']?.descriptions?.zh?.value"></x-text-retract>
+          </p>
+
+          <p *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"></p>
+
+          <div class="row">
+            <x-tag *ngFor="let tag of entity['_source']?.tags"
+              [style]="{ margin:'5px', backgroundColor: '#4494d5', color: 'white'}" bordered="false"
+              size="mini">{{tag}}</x-tag>
+          </div>
+          <div class="time">
+            <span>{{entity['_source']?.modified}}</span>
+            <span>{{entity['_source']?.items}}</span>
+          </div>
+        </div>
+      </x-card>
     </div>
   </div>
 </div>

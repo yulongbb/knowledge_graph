@@ -7,7 +7,7 @@ import { EsService } from './es.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit { 
+export class HomeComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   @ViewChild('searchContainer') searchContainer!: ElementRef;
 
@@ -20,18 +20,30 @@ export class HomeComponent implements OnInit {
   initialPadding = 20; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
   hots: any[] | undefined;
+  entities: any[] = [];
+  size: number = 20;
+  index: number = 1;
+  query: any = { must: [] };
+
 
   private scrollListener!: () => void;
 
   constructor(private router: Router, private renderer: Renderer2,
-        private service: EsService,
-    
-  ) {}
+    private service: EsService,
+
+  ) { }
   ngOnInit(): void {
     this.service.getHot().subscribe((res: any) => {
       console.log(res);
       this.hots = res;
     });
+
+    this.service
+      .searchEntity(1, this.size, { bool: this.query })
+      .subscribe((data: any) => {
+        console.log(data);
+        this.entities = data.list;
+      });
   }
 
   ngAfterViewInit() {
@@ -95,6 +107,20 @@ export class HomeComponent implements OnInit {
       ];
       this.isLoading = false;
     }, 1000); // 模拟API延迟
+  }
+
+
+  onScrollEntity() {
+    this.index++;
+    this.service
+      .searchEntity(this.index, this.size, { bool: this.query })
+      .subscribe((data: any) => {
+        if (data.list.length > 0) {
+          data.list.forEach((d: any) => {
+            this.entities.push(d);
+          });
+        }
+      });
   }
 
   queryKeyword(keyword: any) {

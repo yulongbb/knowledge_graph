@@ -2,15 +2,16 @@
   <div [ngSwitch]="type">
     <div *ngSwitchCase="'info'">
       <div class="row">
-        <x-page-header  *ngIf="entity()?.value?._source?.labels" [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
-          [subTitle]="entity()?.value?._id" (backClick)="back()">
+        <x-page-header *ngIf="entity()?.value?._source?.labels"
+          [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)" [subTitle]="entity()?.value?._id"
+          (backClick)="back()">
         </x-page-header>
-        <x-card  width="100%" class="card" [bodyStyle]="{ padding: 10, }" >
-          
-          <span  *ngIf="entity()?.value?._source?.labels" class="label">{{ entity()?.value?._source?.labels?.zh?.value }} </span>
+        <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }">
 
-          <x-button
-              [routerLink]="'/search/edit/' + id" type="primary">编辑</x-button>
+          <span *ngIf="entity()?.value?._source?.labels" class="label">{{ entity()?.value?._source?.labels?.zh?.value }}
+          </span>
+
+          <x-button [routerLink]="'/search/edit/' + id" type="primary">编辑</x-button>
           <span *ngFor="let aliase of entity()?.value?._source?.aliases?.zh">{{
             aliase.value
             }}</span>
@@ -282,7 +283,7 @@
         </x-page-header>
         <x-card width="100%">
           <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
-              [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
+            [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
           <h3>{{ title }}</h3>
           <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
             width="100%" labelAlign="end" span="24" space="2"></x-form>
@@ -451,8 +452,8 @@
         <x-collapse>
           <x-collapse-panel label="上传视频">
             <div class="row">
-              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple
-                [(ngModel)]="videos" (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
+              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="videos"
+                (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
               <ng-template #textTpl>
                 <x-icon class="upload-icon" type="fto-upload"></x-icon>
                 <span>选择视频</span>
@@ -463,8 +464,8 @@
         <x-collapse>
           <x-collapse-panel label="上传文件">
             <div class="row">
-              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple
-                [(ngModel)]="files" (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
+              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="files"
+                (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
               <ng-template #textTpl>
                 <x-icon class="upload-icon" type="fto-upload"></x-icon>
                 <span>选择文件</span>

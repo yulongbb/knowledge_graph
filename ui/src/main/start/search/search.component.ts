@@ -259,29 +259,6 @@ export class SearchComponent implements OnInit {
             item?._source?.videos?.forEach((video: any) => {
               this.videos.push(video);
             });
-
-
-
-             // if (
-              //   image.split('.')[image.split('.').length - 1] == 'jpeg' ||
-              //   image.split('.')[image.split('.').length - 1] == 'jpg' ||
-              //   image.split('.')[image.split('.').length - 1] == 'png' ||
-              //   image.split('.')[image.split('.').length - 1] == 'webp'
-              // ) {
-              //   this.images.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              // }
-
-              // if (
-              //   image.split('.')[image.split('.').length - 1] == 'mp4'
-              // ) {
-              //   this.videos.push({ _id: item._id, image: image, label: item?._source.labels.zh.value });
-              // }
-
-              // if (
-              //   image.split('.')[image.split('.').length - 1] == 'pdf'
-              // ) {
-              //   this.pdfs.push({ _id: item._id, image: image, label: item?._source.labels.zh.value, description: item?._source.descriptions.zh.value });
-              // }
           });
           this.ontologyService.get(data.list[0]?._source?.type).subscribe((t: any) => {
             data.list[0]._type = t?.label;
