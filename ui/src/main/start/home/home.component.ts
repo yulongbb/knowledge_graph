@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
   searchContainerStyle: any = {}; // 动态样式
   isLoading = false; // 是否正在加载
   isFixed = false; // 是否固定搜索框
-  initialPadding = 20; // 初始 padding (vh)
+  initialPadding = 40; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
   hots: any[] | undefined;
   entities: any[] = [];
@@ -104,10 +104,13 @@ export class HomeComponent implements OnInit {
     if (scrollTop >= scrollThreshold) {
       // 搜索框滚动到顶部时固定
       this.isFixed = true;
+      console.log(this.isFixed);
+
       this.searchContainerStyle = {
         position: 'fixed',
         top: '60px', // 固定在导航栏下方
         width: '100%',
+        background: 'white',
         marginTop: `${this.minPadding}vh`, // padding 减小到 0
         marginBottom: `${this.minPadding}vh`,
         transition: 'all 0.3s ease'

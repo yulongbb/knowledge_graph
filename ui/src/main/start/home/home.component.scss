@@ -29,7 +29,8 @@
   .search-container {
     display: block;
     width: 100%;
-    margin: 20vh auto;
+    z-index: 100;
+    margin: 40vh auto;
     padding: 0 20%;
     transition: all 0.3s ease; // 平滑过渡
     background-color: white;
