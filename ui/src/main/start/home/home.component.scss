@@ -68,8 +68,10 @@
     /* 热点新闻网格布局 */
     .hot-news-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 三列布局 */
-      gap: 10px; /* 列与列之间的间距 */
+      grid-template-columns: repeat(3, 1fr);
+      /* 三列布局 */
+      gap: 10px;
+      /* 列与列之间的间距 */
     }
 
     .hot-news-item {
@@ -80,17 +82,17 @@
       font-size: 14px;
       border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .hot-news-item:last-child {
       border-bottom: none;
     }
-    
+
     .rank {
       font-weight: bold;
       color: #ff4500;
       margin-right: 8px;
     }
-    
+
     .hot-news-item .news-title {
       flex: 1;
     }
@@ -100,12 +102,12 @@
       color: #333;
       cursor: pointer;
     }
-    
-    
+
+
     .hot-news-item a:hover {
       text-decoration: underline;
     }
-    
+
     .hot-label {
       background-color: #ff4500;
       color: white;
@@ -114,6 +116,57 @@
       border-radius: 4px;
       margin-left: 8px;
     }
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 严格 5 列布局 */
+    gap: 16px;
+    padding: 16px;
+    width: 100%; /* 确保网格占满容器 */
+  }
+  
+  .news-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-sizing: border-box;
+    height: 300px; /* 固定高度 */
+    overflow: hidden; /* 确保内容不会超出卡片 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .news-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.2em;
+  }
+  
+  .news-card p {
+    margin: 0;
+    flex-grow: 1; /* 描述部分填充剩余空间 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 最多显示 3 行 */
+    -webkit-box-orient: vertical;
+  }
+  
+  .news-card img,
+  .news-card video {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 8px;
+    max-height: 150px; /* 限制图片和视频的最大高度 */
+    object-fit: cover; /* 确保图片和视频填充容器 */
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 16px;
+    font-size: 1.2em;
+    color: #666;
   }
 
   .discover-container {

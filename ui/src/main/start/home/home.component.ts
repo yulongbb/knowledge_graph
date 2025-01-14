@@ -13,7 +13,6 @@ export class HomeComponent implements OnInit {
 
   keyword: string = ''; // 搜索关键字
   discoverItems = Array.from({ length: 10 }, (_, i) => i + 1); // 初始内容
-  newsItems = ['Hot news 1', 'Hot news 2', 'Hot news 3']; // 热点新闻
   searchContainerStyle: any = {}; // 动态样式
   isLoading = false; // 是否正在加载
   isFixed = false; // 是否固定搜索框
@@ -25,6 +24,7 @@ export class HomeComponent implements OnInit {
   index: number = 1;
   query: any = { must: [] };
 
+  newsItems: any[] = []; // 新闻列表
 
   private scrollListener!: () => void;
 
@@ -33,6 +33,8 @@ export class HomeComponent implements OnInit {
 
   ) { }
   ngOnInit(): void {
+    this.loadNews();
+
     this.service.getHot().subscribe((res: any) => {
       console.log(res);
       this.hots = res;
@@ -45,6 +47,8 @@ export class HomeComponent implements OnInit {
         this.entities = data.list;
       });
   }
+
+
 
   ngAfterViewInit() {
     const container = this.scrollContainer.nativeElement;
@@ -60,6 +64,36 @@ export class HomeComponent implements OnInit {
   ngOnDestroy() {
     if (this.scrollListener) {
       this.scrollListener(); // 移除滚动事件监听器
+    }
+  }
+
+  // 加载新闻
+  loadNews(): void {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+
+    // 模拟 API 请求
+    setTimeout(() => {
+      const newItems: any[] = [
+        { title: '新闻 1', description: '这是纯文本新闻', image: 'https://via.placeholder.com/400x200' },
+        { title: '新闻 2', description: '这是带图片的新闻', image: 'https://via.placeholder.com/800x400' },
+        { title: '新闻 3', description: '这是带视频的新闻', video: 'https://www.w3schools.com/html/mov_bbb.mp4' },
+        { title: '新闻 4', description: '这是纯文本新闻' },
+        { title: '新闻 5', description: '这是带图片的新闻', image: 'https://via.placeholder.com/600x300' },
+      ];
+
+      this.newsItems = [...this.newsItems, ...newItems];
+      this.isLoading = false;
+    }, 1000);
+  }
+
+  // 根据新闻类型获取卡片宽度
+  getCardWidth(news: any): string {
+    if (news.video) {
+      return 'span 2'; // 视频新闻占 2 列
+    } else {
+      return 'span 1'; // 不带视频的新闻占 1 列
     }
   }
 
