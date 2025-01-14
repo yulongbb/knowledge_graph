@@ -161,29 +161,29 @@
         </x-card>
       </div>
     </div>
-    <div *ngSwitchCase="'add_image'">
+    <div *ngSwitchCase="'add_image'"  (paste)="onImagePaste($event)">
       <div class="row">
         <x-page-header [title]="'新增'" [subTitle]="'图片'" (backClick)="back()">
         </x-page-header>
         <x-card width="100%">
           <div class="row">
-            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
-              multiple [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
+              [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
+
+
             <ng-template #textTpl>
               <x-icon class="upload-icon" type="fto-upload"></x-icon>
               <span>选择图片</span>
             </ng-template>
-            <ng-template #filesTpl let-files="$files">
-              <div class="gallery">
-                <div class="warp">
-                  <div *ngFor="let file of files">
-                    <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
-                      <x-button (click)="removeFile(file, files)" icon="fto-trash" type="info" circle></x-button>
-                    </div>
+            <div class="gallery" *ngIf="imgs.length > 0">
+              <div class="warp">
+                <div *ngFor="let file of imgs">
+                  <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'">
                   </div>
                 </div>
               </div>
-            </ng-template>
+            </div>
+
           </div>
           <h3>{{ title }}</h3>
           <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
@@ -416,9 +416,11 @@
         <x-collapse>
           <x-collapse-panel label="上传图片">
             <div class="row">
+
               <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl"
                 [filesTpl]="filesTpl" multiple [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)"
                 multipleModel="add"></x-upload>
+
               <ng-template #textTpl>
                 <x-icon class="upload-icon" type="fto-upload"></x-icon>
                 <span>选择图片</span>

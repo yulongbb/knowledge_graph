@@ -38,6 +38,7 @@
     "ngx-infinite-scroll": "^18.0.0",
     "ngx-masonry": "^14.0.1",
     "ngx-quill": "^27.0.0",
+    "ngx-uploader": "^17.0.1",
     "quill": "^2.0.3",
     "rxjs": "~7.8.0",
     "sass": "^1.67.0",

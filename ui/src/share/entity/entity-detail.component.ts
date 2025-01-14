@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  ElementRef,
   Input,
   OnChanges,
   OnInit,
@@ -61,7 +63,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
   disabled = false;
 
-  imgs: any;
+  imgs: any = [];
   videos: any;
   vids: any;
   files: any;
@@ -158,7 +160,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       required: false,
     },
   ];
-  
+
   constructor(
     private sanitizer: DomSanitizer,
     private router: Router,
@@ -171,8 +173,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     public propertyService: PropertyService,
     public tagService: TagService,
     private nodeService: EntityService,
-    private location: Location
-  ) {
+    private location: Location,
+    private cdr: ChangeDetectorRef  ) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
@@ -198,6 +200,80 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       this.action(this.type);
     }
   }
+  
+  onImagePaste(event: ClipboardEvent) {
+    console.log('粘贴事件触发', event); // 检查是否触发
+    const clipboardData = event.clipboardData || (window as any).clipboardData;
+    if (clipboardData) {
+      console.log('剪贴板数据:', clipboardData); // 检查剪贴板数据
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file') {
+          const file = items[i].getAsFile();
+          if (file) {
+            console.log('捕获到文件:', file); // 检查是否捕获到文件
+
+            // 创建 FormData 对象并添加文件
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // 使用 fetch 上传文件
+            fetch('http://localhost:3000/api/minio-client/uploadFile', {
+              method: 'POST',
+              body: formData,
+            })
+              .then(response => response.json())
+              .then(data => {
+                console.log('上传成功:', data);
+                this.uploadImage({ body: { name: data.name } });
+              })
+              .catch(error => {
+                console.error('上传失败:', error);
+              });
+          }
+        }
+      }
+    }
+  }
+
+  uploadImage($event: any) {
+    this.imgs.push({
+      url: `http://localhost:9000/kgms/${$event.body.name}`,
+    });
+    this.cdr.detectChanges(); // 手动触发变更检测
+
+    console.log(this.imgs);
+  }
+
+  uploadVideo($event: any) {
+    this.vids[this.imgs.length - 1] = {
+      url: `http://localhost:9000/kgms/${$event.body.name}`,
+    };
+  }
+
+  uploadDocument($event: any) {
+    this.docs[this.imgs.length - 1] = {
+      url: `http://localhost:9000/kgms/${$event.body.name}`,
+    };
+  }
+
+  removeFile(file: any, files: any) {
+    console.log(this.imgs);
+    console.log(file);
+    const index = files.findIndex((x: any) => x === file);
+    if (index >= 0) {
+      files.splice(index, 1);
+    }
+    const index2 = this.imgs.findIndex((x: any) => x === file);
+    if (index2 >= 0) {
+      this.imgs.splice(index2, 1);
+    }
+  }
+
+  upload($event: any, row: any) {
+    row.mainsnak.datavalue.value = $event.body.name;
+  }
+
 
   onMapClick(event: any) {
     const { lat, lng } = event.latlng;
@@ -377,40 +453,6 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     console.log(statements);
   }
 
-  uploadImage($event: any) {
-    this.imgs[this.imgs.length - 1] = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-    };
-  }
-
-  uploadVideo($event: any) {
-    this.vids[this.imgs.length - 1] = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-    };
-  }
-
-  uploadDocument($event: any) {
-    this.docs[this.imgs.length - 1] = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-    };
-  }
-
-  removeFile(file: any, files: any) {
-    console.log(this.imgs);
-    console.log(file);
-    const index = files.findIndex((x: any) => x === file);
-    if (index >= 0) {
-      files.splice(index, 1);
-    }
-    const index2 = this.imgs.findIndex((x: any) => x === file);
-    if (index2 >= 0) {
-      this.imgs.splice(index2, 1);
-    }
-  }
-
-  upload($event: any, row: any) {
-    row.mainsnak.datavalue.value = $event.body.name;
-  }
 
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
