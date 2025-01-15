@@ -8,11 +8,20 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { EsService } from './es.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      state('void', style({ opacity: 0 })), // 初始状态（隐藏时）
+      state('*', style({ opacity: 1 })), // 最终状态（显示时）
+      transition(':enter', [animate('300ms ease-in')]), // 淡入效果
+      transition(':leave', [animate('300ms ease-out')]), // 淡出效果
+    ]),
+  ],
 })
 export class HomeComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -23,6 +32,8 @@ export class HomeComponent implements OnInit {
   searchContainerStyle: any = {}; // 动态样式
   isLoading = false; // 是否正在加载
   isFixed = false; // 是否固定搜索框
+
+  isScroll = false; // 是否滚动
   initialPadding = 20; // 初始 padding (vh)
   minPadding = 0; // 最小 padding
   hots: any[] | undefined;
@@ -133,6 +144,7 @@ export class HomeComponent implements OnInit {
   onScrollEvent(scrollTop: number) {
     const searchContainer = this.searchContainer.nativeElement;
     const scrollThreshold = searchContainer.offsetTop; // 搜索框距离顶部的初始距离
+    this.isScroll = scrollTop > 0; // 是否滚动
 
     if (scrollTop >= scrollThreshold) {
       // 搜索框滚动到顶部时固定

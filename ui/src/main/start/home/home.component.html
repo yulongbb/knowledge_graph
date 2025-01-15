@@ -35,7 +35,7 @@
       (keyup.enter)="queryKeyword(keyword)"
     />
 
-    <div class="hot-news-container" *ngIf="!isFixed">
+    <div class="hot-news-container" *ngIf="!isFixed"  @fadeInOut>
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
         <div

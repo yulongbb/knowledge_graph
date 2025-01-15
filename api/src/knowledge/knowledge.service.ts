@@ -488,6 +488,16 @@ export class KnowledgeService {
     for (let i = 0; i < hotData.length; i += 2) {
       const knowledge = await this.elasticsearchService.get(hotData[i]);
       console.log(knowledge);
+      // 查询 Elasticsearch 获取知识详情
+      if (!knowledge) {
+
+        // 从 Redis 中删除该知识 ID
+        await this.redis.zrem(hotKey, hotData[i]);
+        return null; // 返回 null，表示知识不存在
+      }
+
+      console.log(knowledge);
+
 
       result.push({
         id: knowledge,
