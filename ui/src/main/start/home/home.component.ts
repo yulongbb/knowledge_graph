@@ -53,7 +53,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private renderer: Renderer2,
     private service: EsService
-  ) {}
+  ) { }
   ngOnInit(): void {
     this.service.getHot().subscribe((res: any) => {
       console.log(res); // 输出原始数据，便于调试
@@ -67,51 +67,6 @@ export class HomeComponent implements OnInit {
         this.entities = data.list;
       });
   }
-
-  processHotNews(data: any[]): any[] {
-    const today = new Date().toISOString().split('T')[0]; // 当前日期
-  
-    // 按热度分数排序
-    const sortedNews = data.sort((a, b) => b.id.score - a.id.score);
-  
-    // 添加额外字段（是否新、标记）
-    return sortedNews.map((news, index) => ({
-      ...news,
-      isNew: this.isToday(news.id._source.modified), // 判断是否为新
-      tag: this.getTag(news, index) // 获取优先级标记
-    }));
-  }
-
-  // 判断新闻是否为当天发布
-  isToday(modified: string): boolean {
-    return modified.startsWith(this.today);
-  }
-
-  // 获取新闻标记（优先级：真 > 新 > 热）
-  getTag(news: any, index: number): string {
-    const isTrue = this.isVerified(news); // 是否为真
-    const isNew = this.isToday(news.id._source.modified); // 是否为新
-    const isHot = index < 3; // 前三名标记为热
-  
-    if (isTrue) {
-      return '真';
-    } else if (isNew) {
-      return '新';
-    } else if (isHot) {
-      return '热';
-    } else {
-      return '';
-    }
-  }
-
-  // 判断新闻是否为真（示例逻辑：可根据实际需求扩展）
-  isVerified(news: any): boolean {
-    // 假设验证“真”的逻辑是类型 `type` 的特定值
-    return news.id._source.type === 'a76c0f46-01e7-c3e4-1314-ae41aa2836f4';
-  }
-
-
-
   ngAfterViewInit() {
     const container = this.scrollContainer.nativeElement;
     if (container) {
@@ -133,13 +88,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  // 根据新闻类型获取卡片宽度
-  getCardWidth(news: any): string {
-    if (news?._source?.videos?.length > 0) {
-      return 'span 2'; // 视频新闻占 2 列
-    }
-    return 'span 1'; // 不带视频的新闻占 1 列
-  }
 
   onScrollEvent(scrollTop: number) {
     const searchContainer = this.searchContainer.nativeElement;
@@ -165,7 +113,7 @@ export class HomeComponent implements OnInit {
       const padding = Math.max(
         this.minPadding,
         this.initialPadding -
-          (scrollTop / scrollThreshold) * this.initialPadding
+        (scrollTop / scrollThreshold) * this.initialPadding
       );
       this.isFixed = false;
       this.searchContainerStyle = {
@@ -205,6 +153,67 @@ export class HomeComponent implements OnInit {
           });
         }
       });
+  }
+
+
+
+
+  // 判断新闻是否为新
+  isToday(modified: string): boolean {
+    return modified.startsWith(this.today);
+  }
+
+  // 判断新闻是否为真（示例逻辑：可根据实际需求扩展）
+  isVerified(news: any, threshold: number = 3): boolean {
+    // 假设验证“真”的逻辑是类型 `type` 的特定值
+    if (!news.id._source.items || !Array.isArray(news.id._source.items)) {
+      return false;
+    }
+    return news.id._source.items.length >= threshold;
+  }
+
+  
+  // 获取新闻标记（优先级：真 > 新 > 热）
+  getTag(news: any, index: number): string {
+    const isTrue = this.isVerified(news); // 是否为真
+    const isNew = this.isToday(news.id._source.modified); // 是否为新
+    const isHot = index < 3; // 前三名标记为热
+
+    if (isTrue) {
+      return '真';
+    } else if (isNew) {
+      return '新';
+    } else if (isHot) {
+      return '热';
+    } else {
+      return '';
+    }
+  }
+
+  
+  processHotNews(data: any[]): any[] {
+    const today = new Date().toISOString().split('T')[0]; // 当前日期
+
+    // 按热度分数排序
+    const sortedNews = data.sort((a, b) => b.id.score - a.id.score);
+
+    // 添加额外字段（是否新、标记）
+    return sortedNews.map((news, index) => ({
+      ...news,
+      isNew: this.isToday(news.id._source.modified), // 判断是否为新
+      tag: this.getTag(news, index) // 获取优先级标记
+    }));
+  }
+
+
+
+
+  // 根据新闻类型获取卡片宽度
+  getCardWidth(news: any): string {
+    if (news?._source?.videos?.length > 0) {
+      return 'span 2'; // 视频新闻占 2 列
+    }
+    return 'span 1'; // 不带视频的新闻占 1 列
   }
 
   queryKeyword(keyword: any) {
