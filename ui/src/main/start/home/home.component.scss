@@ -143,9 +143,10 @@
     display: grid;
     gap: 16px;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    grid-auto-flow: dense; /* 自动填充空白区域 */
+    grid-auto-flow: dense;
+    /* 自动填充空白区域 */
   }
-  
+
   .news-card {
     background: #fff;
     border: 1px solid #ddd;
@@ -153,39 +154,80 @@
     padding: 16px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  
+
   .news-card h3 {
     margin: 0 0 8px;
     font-size: 1.2em;
   }
-  
+
   .news-card p {
     margin: 0;
-    flex-grow: 1; /* 描述部分填充剩余空间 */
+    flex-grow: 1;
+    /* 描述部分填充剩余空间 */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* 最多显示 3 行 */
+    -webkit-line-clamp: 3;
+    /* 最多显示 3 行 */
     -webkit-box-orient: vertical;
   }
-  
-  .news-card img
-  {
+
+  .news-card .image {
     width: 100%;
     border-radius: 8px;
     margin-top: 8px;
-    max-height: 150px; /* 限制图片和视频的最大高度 */
-    object-fit: cover; /* 确保图片和视频填充容器 */
+    max-height: 150px;
+    /* 限制图片和视频的最大高度 */
+    object-fit: cover;
+    /* 确保图片和视频填充容器 */
   }
 
-  .news-card video{
+  .news-card .video {
     width: 100%;
     border-radius: 8px;
     margin-top: 8px;
-    height: 100%; /* 限制图片和视频的最大高度 */
-    object-fit: cover; /* 确保图片和视频填充容器 */
+    height: 100%;
+    /* 限制图片和视频的最大高度 */
+    object-fit: cover;
+    /* 确保图片和视频填充容器 */
   }
-  
+
+  /* 缩略图容器，用于相对定位 */
+  .thumbnail-container {
+    position: relative;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    /* 确保内容不会超出容器 */
+  }
+
+  /* 叠加的文字 */
+  .overlay-text {
+    position: absolute;
+    bottom: 0;
+    /* 文字放在底部 */
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    /* 渐变背景 */
+    color: white;
+    /* 文字颜色 */
+  }
+
+  /* 标题样式 */
+  .overlay-text h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  /* 描述样式 */
+  .overlay-text p {
+    margin: 4px 0 0;
+    font-size: 14px;
+  }
+
   .loading {
     text-align: center;
     padding: 16px;
