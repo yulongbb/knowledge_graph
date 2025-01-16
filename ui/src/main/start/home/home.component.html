@@ -35,7 +35,7 @@
       (keyup.enter)="queryKeyword(keyword)"
     />
 
-    <div class="hot-news-container" *ngIf="!isFixed"  @fadeInOut>
+    <div class="hot-news-container" *ngIf="!isFixed" @fadeInOut>
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
         <div
@@ -61,6 +61,8 @@
       </div>
     </div>
   </div>
+
+  <!-- 新闻网格 -->
   <div class="news-grid">
     <div
       *ngFor="let entity of entities"

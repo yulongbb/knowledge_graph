@@ -39,7 +39,6 @@ export class HomeComponent implements OnInit {
   hots: any[] | undefined;
   today: string = new Date().toISOString().split('T')[0]; // 当前日期
 
-
   entities: any[] = [];
   size: number = 20;
   index: number = 1;
@@ -48,12 +47,14 @@ export class HomeComponent implements OnInit {
   newsItems: any[] = []; // 新闻列表
 
   private scrollListener!: () => void;
+  private lastScrollTop = 0; // 记录上一次滚动位置
 
   constructor(
     private router: Router,
     private renderer: Renderer2,
     private service: EsService
   ) { }
+
   ngOnInit(): void {
     this.service.getHot().subscribe((res: any) => {
       console.log(res); // 输出原始数据，便于调试
@@ -67,6 +68,7 @@ export class HomeComponent implements OnInit {
         this.entities = data.list;
       });
   }
+
   ngAfterViewInit() {
     const container = this.scrollContainer.nativeElement;
     if (container) {
@@ -74,7 +76,9 @@ export class HomeComponent implements OnInit {
         container,
         'scroll',
         (event: Event) => {
-          this.onScrollEvent(container.scrollTop);
+          setTimeout(() => {
+            this.onScrollEvent(container.scrollTop);
+          }, 500); // 延迟 100ms 确保布局计算完成
         }
       );
     } else {
@@ -88,8 +92,16 @@ export class HomeComponent implements OnInit {
     }
   }
 
-
   onScrollEvent(scrollTop: number) {
+    requestAnimationFrame(() => {
+      if (scrollTop !== this.lastScrollTop) {
+        this.lastScrollTop = scrollTop;
+        this.handleScroll(scrollTop);
+      }
+    });
+  }
+
+  handleScroll(scrollTop: number) {
     const searchContainer = this.searchContainer.nativeElement;
     const scrollThreshold = searchContainer.offsetTop; // 搜索框距离顶部的初始距离
     this.isScroll = scrollTop > 0; // 是否滚动
@@ -97,8 +109,6 @@ export class HomeComponent implements OnInit {
     if (scrollTop >= scrollThreshold) {
       // 搜索框滚动到顶部时固定
       this.isFixed = true;
-      console.log(this.isFixed);
-
       this.searchContainerStyle = {
         position: 'fixed',
         top: '60px', // 固定在导航栏下方
@@ -126,22 +136,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  onScroll() {
-    if (this.isLoading) return;
-
-    this.isLoading = true;
-    setTimeout(() => {
-      this.discoverItems = [
-        ...this.discoverItems,
-        ...Array.from(
-          { length: 10 },
-          (_, i) => this.discoverItems.length + i + 1
-        ),
-      ];
-      this.isLoading = false;
-    }, 1000); // 模拟API延迟
-  }
-
   onScrollEntity() {
     this.index++;
     this.service
@@ -155,8 +149,9 @@ export class HomeComponent implements OnInit {
       });
   }
 
-
-
+  queryKeyword(keyword: any) {
+    this.router.navigate(['/search'], { queryParams: { keyword } });
+  }
 
   // 判断新闻是否为新
   isToday(modified: string): boolean {
@@ -172,7 +167,6 @@ export class HomeComponent implements OnInit {
     return news.id._source.items.length >= threshold;
   }
 
-  
   // 获取新闻标记（优先级：真 > 新 > 热）
   getTag(news: any, index: number): string {
     const isTrue = this.isVerified(news); // 是否为真
@@ -190,7 +184,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  
   processHotNews(data: any[]): any[] {
     const today = new Date().toISOString().split('T')[0]; // 当前日期
 
@@ -205,18 +198,11 @@ export class HomeComponent implements OnInit {
     }));
   }
 
-
-
-
   // 根据新闻类型获取卡片宽度
   getCardWidth(news: any): string {
     if (news?._source?.videos?.length > 0) {
       return 'span 2'; // 视频新闻占 2 列
     }
     return 'span 1'; // 不带视频的新闻占 1 列
-  }
-
-  queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { keyword } });
   }
 }
