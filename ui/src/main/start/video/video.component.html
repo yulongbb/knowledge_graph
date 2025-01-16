@@ -39,7 +39,7 @@
   <div *ngFor="let video of videos" class="video-card">
     <img [src]="getFullVideoUrl(video.thumbnail)" class="video-thumbnail">
     <div class="video-metadata">
-      <h3 class="video-title" (click)="action('info', video)">{{ video?.title?.slice(0,20) }}</h3>
+      <h3 class="video-title" (click)="action('info', video)">{{ video?.label?.slice(0,20) }}</h3>
       <p class="video-description">{{ video?.description?.slice(0,50) }}</p>
       <div class="video-details">
         <span class="video-duration">{{ video?.duration }}</span>

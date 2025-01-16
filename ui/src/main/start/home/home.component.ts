@@ -1,7 +1,6 @@
 import {
   Component,
   ElementRef,
-  HostListener,
   OnInit,
   Renderer2,
   ViewChild,
@@ -172,7 +171,6 @@ export class HomeComponent implements OnInit {
     const isTrue = this.isVerified(news); // 是否为真
     const isNew = this.isToday(news.id._source.modified); // 是否为新
     const isHot = index < 3; // 前三名标记为热
-
     if (isTrue) {
       return '真';
     } else if (isNew) {

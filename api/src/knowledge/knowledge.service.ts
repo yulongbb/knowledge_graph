@@ -242,6 +242,7 @@ export class KnowledgeService {
           modified: new Date().toISOString(),
           items: ['entity/' + doc['_key']],
           images: entity?.images,
+          videos: entity?.videos,
           location: entity?.location,
           sources: entity?.sources,
         };
@@ -270,6 +271,7 @@ export class KnowledgeService {
       modified: new Date().toISOString(),
       items: entity?.items,
       images: entity?.images,
+      videos: entity?.videos,
       location: entity?.location,
       sources: entity?.sources,
     });

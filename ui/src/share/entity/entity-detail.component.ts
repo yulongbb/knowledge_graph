@@ -65,7 +65,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
 
   imgs: any = [];
   videos: any;
-  vids: any;
+  vids: any = [];
   files: any;
 
   tags: Map<string, Array<string>> | undefined;
@@ -174,7 +174,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     public tagService: TagService,
     private nodeService: EntityService,
     private location: Location,
-    private cdr: ChangeDetectorRef  ) {
+    private cdr: ChangeDetectorRef) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
@@ -200,18 +200,18 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       this.action(this.type);
     }
   }
-  
+
   onImagePaste(event: ClipboardEvent) {
     console.log('粘贴事件触发', event);
     const clipboardData = event.clipboardData || (window as any).clipboardData;
-  
+
     if (clipboardData) {
       const items = clipboardData.items;
-  
+
       for (let i = 0; i < items.length; i++) {
         if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
           const file = items[i].getAsFile();
-  
+
           if (file) {
             const generateUniqueFileName = (originalName: string): string => {
               const timestamp = new Date().getTime();
@@ -219,14 +219,14 @@ export class EntityDetailComponent implements OnInit, OnChanges {
               const extension = originalName.substring(originalName.lastIndexOf('.'));
               return `${timestamp}-${uniqueSuffix}${extension}`;
             };
-  
+
             const uniqueFileName = generateUniqueFileName(file.name);
-  
+
             console.log('捕获到文件:', file, '生成的新文件名:', uniqueFileName);
-  
+
             const formData = new FormData();
             formData.append('file', file, uniqueFileName);
-  
+
             fetch('http://localhost:3000/api/minio-client/uploadFile', {
               method: 'POST',
               body: formData,
@@ -260,9 +260,89 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   }
 
   uploadVideo($event: any) {
-    this.vids[this.imgs.length - 1] = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-    };
+    console.log('文件上传成功:', $event);
+    const videoFile = $event; // 假设 event.file 是上传的视频文件
+    console.log(videoFile);
+    this.generateVideoCover(videoFile).then(async (coverFile: File) => {
+      // 上传封面
+      const formData = new FormData();
+      formData.append('file', coverFile);
+
+      // 调用 API 上传封面
+      fetch('http://localhost:3000/api/minio-client/uploadFile', {
+        method: 'POST',
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('封面上传成功:', data);
+          this.vids.push({
+            url: `http://localhost:9000/kgms/${$event.body.name}`,
+            thumbnail: `http://localhost:9000/kgms/${data.name}`,
+          });
+          console.log(this.vids);
+          console.log(this.imgs);
+        })
+        .catch((error) => {
+          console.error('封面上传失败:', error);
+        });
+
+    });
+
+  }
+
+
+  // 生成视频封面
+  generateVideoCover(videoFile: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+      const videoElement = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      // 设置视频源
+      videoElement.src = URL.createObjectURL(videoFile);
+
+      // 当视频元数据加载完成时
+      videoElement.addEventListener('loadedmetadata', () => {
+        // 设置 canvas 尺寸为视频尺寸
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+
+        // 跳转到视频的第 1 秒
+        videoElement.currentTime = 1;
+      });
+
+      // 当视频帧可渲染时
+      videoElement.addEventListener('seeked', () => {
+        if (context) {
+          // 将当前帧绘制到 canvas 上
+          context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+          // 将 canvas 转换为 Blob
+          canvas.toBlob((blob) => {
+            if (blob) {
+              // 将 Blob 转换为 File
+              const coverFile = new File([blob], 'cover.png', {
+                type: 'image/png',
+              });
+              resolve(coverFile);
+            } else {
+              reject(new Error('无法生成封面'));
+            }
+          }, 'image/png');
+        }
+      });
+
+      // 加载视频
+      videoElement.load();
+    });
+  }
+
+
+  // 上传失败回调
+  handleUploadError(event: any) {
+    console.error('文件上传失败:', event);
+    // 处理上传失败的逻辑
   }
 
   uploadDocument($event: any) {
@@ -580,20 +660,6 @@ export class EntityDetailComponent implements OnInit, OnChanges {
                   });
               });
           });
-          this.images = x?._source?.images.filter(
-            (image: any) =>
-              image?.split('.')[image.split('.').length - 1] != 'mp4' &&
-              image?.split('.')[image.split('.').length - 1] != 'pdf'
-          );
-          this.videos = x?._source?.images.filter(
-            (image: any) =>
-              image?.split('.')[image.split('.').length - 1] == 'mp4'
-          );
-          this.pdfs = x?._source?.images.filter(
-            (image: any) =>
-              image?.split('.')[image.split('.').length - 1] == 'pdf'
-          );
-          // 新增浏览记录
           console.log({ knowledgeId: this.id });
           this.nodeService.view({ id: this.id }).subscribe();
         });
@@ -602,7 +668,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
         this.action('info');
         break;
       case 'save':
-        console.log(this.form.formGroup.value.aliases);
+        console.log(this.imgs);
         let item: any = {
           _key: this.form.formGroup.value._key,
           tags: this.tag(),
@@ -629,18 +695,53 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             },
           },
           type: this.form.formGroup.value.type,
-          images: this.imgs?.map((i: any) => {
-            if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
-              return i.url.replace('http://localhost:9000/kgms/', '');
-            } else {
-              return i.url.split('/')[i.url.split('/').length - 1];
+          // 其他字段
+          ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
+          ...(this.form.formGroup.value.source ? { sources: [this.form.formGroup.value.source] } : {}), // 如果 source 存在，生成 sources 字段
+          ...(this.imgs && this.imgs.length > 0
+            ? {
+              images: this.imgs.map((i: any) => {
+                if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
+                  return i.url.replace('http://localhost:9000/kgms/', '');
+                } else {
+                  return i.url.split('/')[i.url.split('/').length - 1];
+                }
+              }),
             }
-          }),
-          location: this.item?.location,
-          sources: [this.form.formGroup.value.source],
+            : {}),
+          // 其他字段
+          ...(this.vids && this.vids.length > 0
+            ? {
+              videos: this.vids.map((i: any) => {
+                // 处理 URL
+                let url = i.url || ''; // 默认值为空字符串
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                  url = url.replace('http://localhost:9000/kgms/', '');
+                } else {
+                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                }
+
+                // 处理 Thumbnail
+                let thumbnail = i.thumbnail || ''; // 默认值为空字符串
+                if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
+                  thumbnail = thumbnail.replace('http://localhost:9000/kgms/', '');
+                } else {
+                  thumbnail = thumbnail.split('/').pop() || thumbnail; // 如果 pop() 返回 undefined，使用原始 Thumbnail
+                }
+
+                // 返回新的视频对象
+                return {
+                  url: url,
+                  thumbnail: thumbnail,
+                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
+                  description: this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                };
+              }),
+            }
+            : {}),
         };
         console.log(item);
-        if (this.type === 'add' || this.type === 'add_image') {
+        if (this.type === 'add' || this.type === 'add_image'|| this.type === 'add_video') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();
