@@ -1,0 +1,64 @@
+<header class="top-nav">
+  <div class="logo">
+    <a href="#">知识图谱</a>
+  </div>
+  <div class="right-section">
+    <button class="add-button" [routerLink]="'/document/add_document'">上传文件</button>
+    <button class="login-button" [routerLink]="'/login'">登录</button>
+  </div>
+</header>
+<div class="container">
+  <!-- 左侧分类导航栏 -->
+  <div class="sidebar">
+    <ul class="category-list">
+      <li *ngFor="let category of categories" (click)="selectCategory(category)">
+        {{ category }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- 右侧内容区域 -->
+  <div class="content">
+    <!-- 最热列表 -->
+    <h2>最热</h2>
+    <div class="extension-grid six-columns">
+      <div *ngFor="let extension of hotExtensions" class="extension-card">
+        <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
+        <div class="card-content">
+          <div class="card-header">
+            <h3>{{ extension.name }}</h3>
+            <div class="rating">
+              <span *ngFor="let star of [1,2,3,4,5]">
+                <span *ngIf="star <= extension.rating">★</span>
+                <span *ngIf="star > extension.rating">☆</span>
+              </span>
+              <span class="reviews">({{ extension.reviews }})</span>
+            </div>
+          </div>
+          <p class="description">{{ extension.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最新列表 -->
+    <h2>更多应用</h2>
+    <div class="extension-grid one-column">
+      <div *ngFor="let extension of latestExtensions" class="extension-card">
+        <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
+        <div class="card-content">
+          <div class="card-header">
+            <h3>{{ extension.name }}</h3>
+            <div class="rating">
+              <span *ngFor="let star of [1,2,3,4,5]">
+                <span *ngIf="star <= extension.rating">★</span>
+                <span *ngIf="star > extension.rating">☆</span>
+              </span>
+              <span class="reviews">({{ extension.reviews }})</span>
+            </div>
+          </div>
+          <p class="description">{{ extension.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

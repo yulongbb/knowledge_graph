@@ -65,7 +65,11 @@ export const mainRoutes: Routes = [
       import("../main/start/map/map.module").then(x => x.MapModule)
   },
 
-
+  {
+    path: "addons",
+    loadChildren: () =>
+      import("../main/start/addons/addons.module").then(x => x.addonsModule)
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.layout, pathMatch: "full" },
 
