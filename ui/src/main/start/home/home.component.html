@@ -42,20 +42,25 @@
     <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
       <!-- 显示视频缩略图 -->
       <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
-        <img
-          class="video"
-          [src]="
-            entity['_source']?.videos[0].thumbnail.startsWith('http')
-              ? entity['_source']?.videos[0].thumbnail
-              : 'http://localhost:9000/kgms/' + entity['_source']?.videos[0].thumbnail
-          "
-          loading="lazy"
-          style="width: 100%; border-radius: 4px;"
-        />
-        <!-- 添加播放图标 -->
-        <div class="play-icon">
-          <i class="fas fa-play"></i> <!-- Font Awesome 播放图标 -->
-        </div>
+        <a [routerLink]="'/search/info/' + entity._id">
+          <img
+            class="video"
+            [src]="
+              entity['_source']?.videos[0].thumbnail.startsWith('http')
+                ? entity['_source']?.videos[0].thumbnail
+                : 'http://localhost:9000/kgms/' + entity['_source']?.videos[0].thumbnail
+            "
+            loading="lazy"
+            style="width: 100%; border-radius: 4px;"
+          />
+          <!-- 添加播放图标和时长 -->
+          <div class="play-icon">
+            <i class="fas fa-play"></i>
+          </div>
+          <div class="video-duration">
+            {{ entity['_source']?.videos[0].duration || '00:00' }}
+          </div>
+        </a>
         <!-- 叠加的标题和描述 -->
         <div class="overlay-text">
           <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
