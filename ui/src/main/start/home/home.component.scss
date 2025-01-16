@@ -196,6 +196,7 @@
   .thumbnail-container {
     position: relative;
     width: 100%;
+    max-height: 300px;
     border-radius: 4px;
     overflow: hidden;
     /* 确保内容不会超出容器 */
