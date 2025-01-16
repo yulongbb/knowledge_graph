@@ -199,7 +199,23 @@
     border-radius: 4px;
     overflow: hidden;
     /* 确保内容不会超出容器 */
+
+    .play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40px;
+      color: rgba(255, 255, 255, 0.8); /* 半透明白色 */
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 添加阴影 */
+    }
+    
+    .play-icon:hover {
+      color: rgba(255, 255, 255, 1); /* 鼠标悬停时更亮 */
+    }
   }
+
+
 
   /* 叠加的文字 */
   .overlay-text {

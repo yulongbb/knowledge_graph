@@ -52,6 +52,10 @@
           loading="lazy"
           style="width: 100%; border-radius: 4px;"
         />
+        <!-- 添加播放图标 -->
+        <div class="play-icon">
+          <i class="fas fa-play"></i> <!-- Font Awesome 播放图标 -->
+        </div>
         <!-- 叠加的标题和描述 -->
         <div class="overlay-text">
           <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
@@ -66,7 +70,6 @@
           </p>
         </div>
       </div>
-  
       <!-- 显示图片 -->
       <div *ngIf="!entity['_source']?.videos?.length">
         <img
