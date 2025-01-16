@@ -33,6 +33,7 @@ import { OntologyService } from '../ontology/ontology/ontology.service';
 import { PropertyService } from '../ontology/property/property.service';
 import { createPopper } from '@popperjs/core';
 import { color } from 'echarts';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-graph',
@@ -75,6 +76,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     public propertyService: PropertyService,
     private esService: EsService,
     private message: XMessageService,
+    private router: Router,
     private msgBox: XMessageBoxService
   ) {
 
@@ -234,9 +236,8 @@ export class GraphComponent implements OnInit, OnDestroy {
                 content: '浏览',
                 select: (ele: any) => {
                   console.log(ele.data)
-                  this.visible.set(true)
                   this.id = ele.data().id;
-                  this.type = 'info';
+                  this.router.navigate(['/index/entity/info', ele.data().id]);
                   // this.dialog(ele.data(), 'info', 'center');
                 },
               },
@@ -245,9 +246,8 @@ export class GraphComponent implements OnInit, OnDestroy {
                 content: '编辑',
                 select: (ele: any) => {
                   console.log(ele.data())
-                  this.visible.set(true)
                   this.id = ele.data().id;
-                  this.type = 'edit';
+                  this.router.navigate(['/index/entity/edit', ele.data().id]);
                   // this.dialog(ele.data(), 'edit', 'center');
                 },
               },
@@ -322,9 +322,8 @@ export class GraphComponent implements OnInit, OnDestroy {
               {
                 content: '创建知识',
                 select: (ele: any) => {
-                  this.visible.set(true)
                   console.log(ele.data())
-                  // this.dialog(ele.data(), 'add', 'center');
+                  this.router.navigate(['/index/entity/add']);
                 },
               },
             ],
@@ -339,7 +338,7 @@ export class GraphComponent implements OnInit, OnDestroy {
               ele.target.trigger('doubleTap', ele);
             }
             previousTapStamp = currentTapStamp;
-      
+
           });
           this.cy.on('doubleTap', (ele: any) => {
             var target: any = ele.target;
@@ -352,7 +351,7 @@ export class GraphComponent implements OnInit, OnDestroy {
                 .graph(1, 100, target.data().id)
                 .subscribe((data: any) => {
                   console.log(data);
-           
+
                   this.initializeCytoscape(data);
                 });
             } else if (target.isEdge()) {
