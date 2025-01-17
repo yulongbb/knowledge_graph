@@ -250,15 +250,6 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-  {
-    path: "application",
-    loadChildren: () =>
-      import("../main/application/application.module").then(x => x.ApplicationModule),
-    // canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
 
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
