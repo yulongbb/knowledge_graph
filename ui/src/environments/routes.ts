@@ -26,14 +26,14 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/login/login.module").then(x => x.LoginModule)
   },
-    // index
-    {
-      path: "index",
-      loadChildren: () =>
-        import("../layout/index/index.module").then(x => x.IndexModule),
-      canActivateChild: [AuthGuard]
-      // canLoad: [AuthGuard]
-    },
+  // index
+  {
+    path: "index",
+    loadChildren: () =>
+      import("../layout/index/index.module").then(x => x.IndexModule),
+    canActivateChild: [AuthGuard],
+    canLoad: [AuthGuard]
+  },
   {
     path: "home",
     loadChildren: () =>
@@ -245,15 +245,6 @@ export const layoutRoutes: Routes = [
     path: "entity",
     loadChildren: () =>
       import("../main/entity/entity.module").then(x => x.EntityModule),
-    // canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
-  {
-    path: "application",
-    loadChildren: () =>
-      import("../main/application/application.module").then(x => x.ApplicationModule),
     // canLoad: [AuthGuard],
     data: {
       shouldReuse: true

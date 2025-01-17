@@ -134,7 +134,7 @@ export class TabsComponent implements OnInit {
         this.nav.destroy();
         this.config.deleteRouteSnapshot();
         this.config.deleteRouteSnapshot(this.location.path());
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       }
     });
   }
