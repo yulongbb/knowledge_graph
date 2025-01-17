@@ -10,15 +10,23 @@
       <a [routerLink]="'/document'" [queryParams]="{ keyword: '' }">文档</a>
       <a [routerLink]="'/map'" [queryParams]="{ keyword: '' }">地图</a>
       <a [routerLink]="'/addons'" [queryParams]="{ keyword: '' }">应用</a>
-      <a [routerLink]="'/index/login'">登录</a>
+      <!-- 动态显示登录/用户信息 -->
+      <ng-container *ngIf="auth.isLoggedIn; else loginLink">
+        <a [routerLink]="'/profile'">{{ auth.user.name }}</a>
+        <a (click)="logout()">退出</a>
+      </ng-container>
+      <ng-template #loginLink>
+        <a [routerLink]="'/index/login'">登录</a>
+      </ng-template>
     </div>
   </nav>
+
+
 
   <!-- 搜索框 -->
   <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
     <input type="text" placeholder="搜索知识" class="search-box" [(ngModel)]="keyword"
       (keyup.enter)="queryKeyword(keyword)" />
-
     <div class="hot-news-container" *ngIf="!isFixed" @fadeInOut>
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
@@ -43,16 +51,11 @@
       <!-- 显示视频缩略图 -->
       <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
         <a [routerLink]="'/search/info/' + entity._id">
-          <img
-            class="video"
-            [src]="
+          <img class="video" [src]="
               entity['_source']?.videos[0].thumbnail.startsWith('http')
                 ? entity['_source']?.videos[0].thumbnail
                 : 'http://localhost:9000/kgms/' + entity['_source']?.videos[0].thumbnail
-            "
-            loading="lazy"
-            style="width: 100%; border-radius: 4px;"
-          />
+            " loading="lazy" style="width: 100%; border-radius: 4px;" />
           <!-- 添加播放图标和时长 -->
           <div class="play-icon">
             <i class="fas fa-play"></i>
@@ -69,25 +72,19 @@
           </h3>
           <p>
             {{
-              entity["_source"]?.descriptions?.zh?.value ||
-              "No description available."
+            entity["_source"]?.descriptions?.zh?.value ||
+            "No description available."
             }}
           </p>
         </div>
       </div>
       <!-- 显示图片 -->
       <div *ngIf="!entity['_source']?.videos?.length">
-        <img
-          class="image"
-          *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
-          [src]="
+        <img class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)" [src]="
             image.startsWith('http')
               ? image
               : 'http://localhost:9000/kgms/' + image
-          "
-          loading="lazy"
-          style="width: 100%; border-radius: 4px; margin-bottom: 12px"
-        />
+          " loading="lazy" style="width: 100%; border-radius: 4px; margin-bottom: 12px" />
         <!-- 新闻标题 -->
         <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
           {{ entity["_source"]?.labels?.zh?.value | slice : 0 : 25 }}
@@ -96,8 +93,8 @@
         <!-- 新闻描述 -->
         <p>
           {{
-            entity["_source"]?.descriptions?.zh?.value ||
-            "No description available."
+          entity["_source"]?.descriptions?.zh?.value ||
+          "No description available."
           }}
         </p>
       </div>

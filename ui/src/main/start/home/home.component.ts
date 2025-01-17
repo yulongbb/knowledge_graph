@@ -8,6 +8,11 @@ import {
 import { Router } from '@angular/router';
 import { EsService } from './es.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { AuthService } from 'src/services/auth.service';
+import { IndexService } from 'src/layout/index/index.service';
+import { NavService } from 'src/services/nav.service';
+import { ConfigService } from 'src/services/config.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -51,10 +56,16 @@ export class HomeComponent implements OnInit {
   constructor(
     private router: Router,
     private renderer: Renderer2,
-    private service: EsService
+    private service: EsService,
+    public auth: AuthService,
+    public location: Location,
+    public indexService: IndexService,
+    public nav: NavService,
+    private config: ConfigService
   ) { }
 
   ngOnInit(): void {
+    console.log(this.auth);
     this.service.getHot().subscribe((res: any) => {
       console.log(res); // 输出原始数据，便于调试
       this.hots = this.processHotNews(res); // 调用处理函数，将结果存入组件变量
@@ -202,5 +213,23 @@ export class HomeComponent implements OnInit {
       return 'span 2'; // 视频新闻占 2 列
     }
     return 'span 1'; // 不带视频的新闻占 1 列
+  }
+
+
+
+  /**
+   * 退出
+   */
+  logout() {
+    this.auth.logout().subscribe((x) => {
+      if (x) {
+        this.indexService.removeSession();
+        this.indexService.session = { tabsPage: [] };
+        this.nav.destroy();
+        this.config.deleteRouteSnapshot();
+        this.config.deleteRouteSnapshot(this.location.path());
+        this.router.navigate(['/']);
+      }
+    });
   }
 }
