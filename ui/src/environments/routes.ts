@@ -26,14 +26,14 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/login/login.module").then(x => x.LoginModule)
   },
-    // index
-    {
-      path: "index",
-      loadChildren: () =>
-        import("../layout/index/index.module").then(x => x.IndexModule),
-      canActivateChild: [AuthGuard]
-      // canLoad: [AuthGuard]
-    },
+  // index
+  {
+    path: "index",
+    loadChildren: () =>
+      import("../layout/index/index.module").then(x => x.IndexModule),
+    canActivateChild: [AuthGuard],
+    canLoad: [AuthGuard]
+  },
   {
     path: "home",
     loadChildren: () =>

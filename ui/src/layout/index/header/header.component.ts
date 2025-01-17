@@ -33,9 +33,7 @@ export class HeaderComponent implements OnInit {
             this.nav.destroy();
             this.config.deleteRouteSnapshot();
             this.config.deleteRouteSnapshot(this.location.path());
-            this.router.navigate(['/']).then(() => {
-              window.location.reload(); // 刷新页面
-            });
+            this.router.navigate(['/login']);
           }
         });
         break;

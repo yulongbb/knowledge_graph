@@ -46,11 +46,8 @@ export class LoginComponent implements OnInit {
           () => {
             if (this.authService.isLoggedIn) {
               console.log('登录成功');
-              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.layout}`;
+              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.index}`;
               this.router.navigate([redirect]);
-              this.router.navigate(['/']).then(() => {
-                window.location.reload(); // 刷新页面
-              });
             }
           },
           () => {

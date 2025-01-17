@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
+  index: 'home',
   // 框架页
-  layout: 'home',
+  layout: 'index',
   // 默认的首页
   defaultPage: 'dashboard',
   // Api请求地址
