@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { XDrawerModule } from '@ng-nest/ui/drawer';
-import { XAvatarModule, XButtonModule, XCheckboxModule, XInputModule, XLinkModule, XMenuModule, XRadioModule, XTagModule, XTextareaModule, XTimelineModule } from '@ng-nest/ui';
+import { XAvatarModule, XButtonModule, XCheckboxModule, XDropdownModule, XInputModule, XLinkModule, XMenuModule, XRadioModule, XTagModule, XTextareaModule, XTimelineModule } from '@ng-nest/ui';
 import { ShareModule } from 'src/share/share.module';
 import { XSliderModule } from '@ng-nest/ui/slider';
 import { XLayoutModule } from '@ng-nest/ui/layout';
@@ -28,6 +28,7 @@ import { HomeComponent } from './home.component';
     XDrawerModule,
     XButtonModule,
     XRadioModule,
+    XDropdownModule,
     XInputModule,
     XTextareaModule,
     XMenuModule,

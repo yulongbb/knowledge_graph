@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnInit,
   Renderer2,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
@@ -53,6 +54,8 @@ export class HomeComponent implements OnInit {
   private scrollListener!: () => void;
   private lastScrollTop = 0; // 记录上一次滚动位置
 
+  data = signal(['个人中心', '退出登录']);
+
   constructor(
     private router: Router,
     private renderer: Renderer2,
@@ -99,6 +102,15 @@ export class HomeComponent implements OnInit {
   ngOnDestroy() {
     if (this.scrollListener) {
       this.scrollListener(); // 移除滚动事件监听器
+    }
+  }
+
+  nodeClick($event: any) {
+    console.log($event);
+    if ($event.label == '个人中心') {
+      this.router.navigate(['/user']);
+    } else if ($event.label == '退出登录') {
+      this.logout();
     }
   }
 
@@ -228,7 +240,9 @@ export class HomeComponent implements OnInit {
         this.nav.destroy();
         this.config.deleteRouteSnapshot();
         this.config.deleteRouteSnapshot(this.location.path());
-        this.router.navigate(['/']);
+        this.router.navigate(['/']).then(() => {
+          window.location.reload(); // 刷新页面
+        });
       }
     });
   }

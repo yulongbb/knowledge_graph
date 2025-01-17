@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { UntypedFormBuilder } from '@angular/forms';
 import { XMessageService } from '@ng-nest/ui/message';
 import { Location } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -45,10 +46,11 @@ export class LoginComponent implements OnInit {
           () => {
             if (this.authService.isLoggedIn) {
               console.log('登录成功');
-              // let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.layout}`;
-              // this.router.navigate([redirect]);
-              // this.router.navigate(['/index']);
-              this.location.back();
+              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.layout}`;
+              this.router.navigate([redirect]);
+              this.router.navigate(['/']).then(() => {
+                window.location.reload(); // 刷新页面
+              });
             }
           },
           () => {

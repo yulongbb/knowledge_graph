@@ -2,7 +2,7 @@
   [infiniteScrollThrottle]="50" (scrolled)="onScrollEntity()" [scrollWindow]="false">
   <!-- 导航栏 -->
   <nav class="navbar">
-    <div class="logo">知识图谱</div>
+    <a [routerLink]="'/index'" [queryParams]="{ keyword: '' }" class="logo">知识图谱</a>
     <div class="menu">
       <a [routerLink]="'/search'" [queryParams]="{ keyword: '' }">知识</a>
       <a [routerLink]="'/image'" [queryParams]="{ keyword: '' }">图片</a>
@@ -12,8 +12,11 @@
       <a [routerLink]="'/addons'" [queryParams]="{ keyword: '' }">应用</a>
       <!-- 动态显示登录/用户信息 -->
       <ng-container *ngIf="auth.isLoggedIn; else loginLink">
-        <a [routerLink]="'/profile'">{{ auth.user.name }}</a>
-        <a (click)="logout()">退出</a>
+        <x-dropdown [data]="data()" (nodeClick)="nodeClick($event)">
+          <x-button type="primary" icon="fto-chevron-down" direction="row-reverse"> {{ auth.user.name }}</x-button>
+        </x-dropdown>
+        <!-- <a [routerLink]="'/profile'"></a>
+        <a (click)="logout()">退出</a> -->
       </ng-container>
       <ng-template #loginLink>
         <a [routerLink]="'/index/login'">登录</a>
