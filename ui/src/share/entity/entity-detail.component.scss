@@ -1,3 +1,4 @@
+
 :host {
   padding: 1rem;
   display: block;
@@ -6,15 +7,14 @@
     margin-left: 1rem;
   }
 
-  >.app-footer,
-  >h3 {
+  > .app-footer,
+  > h3 {
     padding-left: 6rem;
   }
 
-  >h3 {
+  > h3 {
     margin: 0;
   }
-
 
   .row:not(:first-child) {
     margin-top: 1rem;
@@ -30,27 +30,24 @@
     margin-right: 5px;
   }
 
-
   .row .card .bottom {
     padding: 0.625rem;
   }
 
-  .row .card .bottom>p {
+  .row .card .bottom > p {
     margin: 0;
     font-size: 1rem;
   }
 
-  .row .card .bottom>.time {
+  .row .card .bottom > .time {
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
 
-  .row .card .bottom>.time>span {
+  .row .card .bottom > .time > span {
     color: var(--x-text-400);
   }
-
-
 
   .row.scroll {
     height: 60rem;
@@ -58,9 +55,18 @@
     overflow: auto;
   }
 
+/* 创建一个 16:9 的固定比例容器 */
+.plyr-wrapper {
+  width: 100%; /* 宽度自适应 */
+  height: 600px; /* 固定高度 */
+  position: relative;
+  overflow: hidden;
+}
 
-
-
+/* 设置视频的宽高比为 16:9 */
+.plyr-wrapper video {
+  height: 600px;
+}
   .masonry-item {
     transition: top 0.4s ease-in-out, left 0.4s ease-in-out;
     padding: 10px;
@@ -74,51 +80,6 @@
     height: auto;
     border-radius: 5px;
   }
-
-  //全屏按钮
-  video::-webkit-media-controls-fullscreen-button {
-    display: none;
-  }
-
-  //播放按钮
-  video::-webkit-media-controls-play-button {
-    display: none;
-  }
-
-  //进度条
-  video::-webkit-media-controls-timeline {
-    display: none;
-  }
-
-  //观看的当前时间
-  video::-webkit-media-controls-current-time-display {
-    display: none;
-  }
-
-  //剩余时间
-  video::-webkit-media-controls-time-remaining-display {
-    display: none;
-  }
-
-  //音量按钮
-  video::-webkit-media-controls-mute-button {
-    display: none;
-  }
-
-  video::-webkit-media-controls-toggle-closed-captions-button {
-    display: none;
-  }
-
-  //音量的控制条
-  video::-webkit-media-controls-volume-slider {
-    display: none;
-  }
-
-  //所有控件
-  video::-webkit-media-controls-enclosure {
-    display: none;
-  }
-
 
   .gallery {
     width: 100%;
@@ -135,7 +96,7 @@
   }
 
   .gallery .thumbnail {
-    border: 1px solid #CCC;
+    border: 1px solid #ccc;
     width: 100%;
     height: 100px;
     background-repeat: no-repeat;
@@ -158,84 +119,83 @@
     white-space: -pre-wrap; /* Opera <7 */
     white-space: -o-pre-wrap; /* Opera 7 */
     word-wrap: break-word; /* Internet Explorer 5.5+ */
-    
-  	font-size: 18px;
+
+    font-size: 18px;
     padding: 0;
     margin: 0;
     line-height: 32px; /* 行距 */
     overflow: auto; /* 超出宽度出现滑动条 */
-    overflow-Y:hidden; /* 作用是隐藏IE的右侧滑动条 */
+    overflow-y: hidden; /* 作用是隐藏IE的右侧滑动条 */
   }
 
   /* Table Styles */
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-.custom-table th,
-.custom-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
+  .custom-table th,
+  .custom-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
 
-.custom-table th {
-  background-color: #f8f9fa;
-  font-weight: bold;
-  color: #333;
-}
+  .custom-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+  }
 
-.custom-table tbody tr:hover {
-  background-color: #f1f1f1;
-}
+  .custom-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
 
-/* Sticky Left Column */
-.sticky-left {
-  position: sticky;
-  left: 0;
-  background-color: #fff;
-  z-index: 1;
-}
+  /* Sticky Left Column */
+  .sticky-left {
+    position: sticky;
+    left: 0;
+    background-color: #fff;
+    z-index: 1;
+  }
 
-/* Full-Width Inputs and Selects */
-.full-width {
-  width: 100%;
-}
+  /* Full-Width Inputs and Selects */
+  .full-width {
+    width: 100%;
+  }
 
-/* Add Button */
-.add-button {
-  margin-top: 1rem;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
+  /* Add Button */
+  .add-button {
+    margin-top: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-.add-button:hover {
-  background-color: #0056b3;
-}
+  .add-button:hover {
+    background-color: #0056b3;
+  }
 
-/* Link Styles */
-x-link {
-  margin-right: 8px;
-  cursor: pointer;
-}
+  /* Link Styles */
+  x-link {
+    margin-right: 8px;
+    cursor: pointer;
+  }
 
-x-link[type="primary"] {
-  color: #007bff;
-}
+  x-link[type="primary"] {
+    color: #007bff;
+  }
 
-x-link[type="danger"] {
-  color: #dc3545;
-}
+  x-link[type="danger"] {
+    color: #dc3545;
+  }
 
-x-link:hover {
-  text-decoration: underline;
-}
-
+  x-link:hover {
+    text-decoration: underline;
+  }
 }

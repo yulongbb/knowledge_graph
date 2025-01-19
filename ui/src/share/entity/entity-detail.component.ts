@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -33,6 +34,7 @@ import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
+import * as Plyr from 'plyr';
 
 @Component({
   selector: 'app-entity-detail',
@@ -40,7 +42,9 @@ import { Location } from '@angular/common';
   styleUrls: ['./entity-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntityDetailComponent implements OnInit, OnChanges {
+export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
+  @ViewChild('player') player!: ElementRef;
+
   @Input() id: string = '';
   @Input() type: string = '';
   knowledge: string = '';
@@ -74,7 +78,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   images: any;
   pdfs: any;
   docs: any;
-  entity: any;
+  entity:any;
   claims: any;
 
   properties: any;
@@ -84,6 +88,8 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   statements: any = signal([]);
 
   markers: Marker[] = [];
+
+  videoLoaded:boolean = false;
 
   options = {
     layers: [
@@ -201,6 +207,13 @@ export class EntityDetailComponent implements OnInit, OnChanges {
     }
   }
 
+  ngAfterViewInit() {
+    new Plyr(this.player.nativeElement, {
+      autoplay: true,
+      controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+    });
+  }
+
   onImagePaste(event: ClipboardEvent) {
     console.log('粘贴事件触发', event);
     const clipboardData = event.clipboardData || (window as any).clipboardData;
@@ -298,26 +311,40 @@ export class EntityDetailComponent implements OnInit, OnChanges {
       const videoElement = document.createElement('video');
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-
+  
       // 设置视频源
       videoElement.src = URL.createObjectURL(videoFile);
-
+  
+      // 如果视频跨域，需要设置 crossOrigin 属性
+      videoElement.crossOrigin = 'anonymous';
+  
+      // 处理加载错误
+      videoElement.addEventListener('error', () => {
+        reject(new Error('视频加载失败'));
+      });
+  
       // 当视频元数据加载完成时
       videoElement.addEventListener('loadedmetadata', () => {
         // 设置 canvas 尺寸为视频尺寸
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
-
+        
+        // 确保视频能够播放并触发下一事件
+        videoElement.currentTime = 1; // 跳转到视频的第 1 秒
+      });
+  
+      // 确保视频足够加载
+      videoElement.addEventListener('canplaythrough', () => {
         // 跳转到视频的第 1 秒
         videoElement.currentTime = 1;
       });
-
+  
       // 当视频帧可渲染时
       videoElement.addEventListener('seeked', () => {
         if (context) {
           // 将当前帧绘制到 canvas 上
           context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
+  
           // 将 canvas 转换为 Blob
           canvas.toBlob((blob) => {
             if (blob) {
@@ -329,10 +356,13 @@ export class EntityDetailComponent implements OnInit, OnChanges {
             } else {
               reject(new Error('无法生成封面'));
             }
+  
+            // 释放 URL
+            URL.revokeObjectURL(videoElement.src);
           }, 'image/png');
         }
       });
-
+  
       // 加载视频
       videoElement.load();
     });
@@ -555,7 +585,7 @@ export class EntityDetailComponent implements OnInit, OnChanges {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.esService.getEntity(this.id).subscribe((x) => {
+        this.esService.getEntity(this.id).subscribe((x:any) => {
           console.log(x);
           this.entity = signal({ value: x });
           this.item = x._source;

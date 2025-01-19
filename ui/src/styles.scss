@@ -85,3 +85,19 @@ html {
   height: 0;
 }
 
+
+/* 设置播放器容器的固定高度 */
+.plyr-wrapper {
+  position: relative;
+  width: 100%;  /* 宽度自适应 */
+  height: 400px; /* 固定高度 */
+  max-width: 100%; /* 确保宽度最大不超过100% */
+}
+
+/* 设置视频以 16:9 比例填充容器 */
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 保持视频比例，不裁切 */
+}
+
