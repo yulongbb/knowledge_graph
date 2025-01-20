@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
   private scrollListener!: () => void;
   private lastScrollTop = 0; // 记录上一次滚动位置
 
-  data = signal(['个人中心', '退出登录']);
+  data = signal(['个人中心', '图谱管理', '退出登录']);
 
   constructor(
     private router: Router,
@@ -109,6 +109,8 @@ export class HomeComponent implements OnInit {
     console.log($event);
     if ($event.label == '个人中心') {
       this.router.navigate(['/user']);
+    }  if ($event.label == '图谱管理') {
+      this.router.navigate(['/index']);
     } else if ($event.label == '退出登录') {
       this.logout();
     }

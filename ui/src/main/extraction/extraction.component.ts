@@ -11,6 +11,7 @@ import { EsService } from '../start/search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { DatasetService } from '../dataset/dataset.sevice';
+import { HttpClient } from '@angular/common/http';
 declare const canvasDatagrid: any;
 
 @Component({
@@ -42,6 +43,7 @@ export class ExtractionComponent extends PageBase {
   label: any;
   description: any;
   category: any;
+  url: any;
 
   aliases: any;
   tags: any;
@@ -73,7 +75,7 @@ export class ExtractionComponent extends PageBase {
     private activatedRoute: ActivatedRoute,
     private msgBox: XMessageBoxService,
     private dialogService: XDialogService,
-
+    private http: HttpClient
   ) {
     super(indexService);
   }
@@ -217,10 +219,44 @@ export class ExtractionComponent extends PageBase {
 
   // 选择数据集并加载其数据
   selectDataset(value: string) {
+    console.log(value);
     this.datasetService.get(value).subscribe((dataset: any) => {
-      this.loadDataset(dataset.files[0]);
+      console.log(dataset);
+      if (dataset.type == '文件') {
+        this.loadDataset(dataset.files[0]);
+
+      } else if (dataset.type == 'api') {
+        // 获取api数据
+        this.loadApiData(dataset);
+      }
     });
   }
+  loadApiData(dataset: any) {
+    // Make the HTTP GET request
+    this.http.get<any>(dataset.description).subscribe(
+      (apiData: any) => {
+        // Define the fields you want to extract
+
+        // Extract and transform the data
+        this.grid.data = apiData.sections[0].cards.map((card: any) => {
+          // Create a new object with only the required fields
+          const transformedCard: any = {};
+          dataset.tags.forEach((field: any) => {
+            if (card[field] !== undefined) {
+              transformedCard[field] = card[field];
+            }
+          });
+          return transformedCard;
+        });
+
+        console.log('Transformed Data:', this.grid.data);
+      },
+      (error: any) => {
+        console.error('Error fetching API data:', error);
+      }
+    );
+  }
+
 
   // 从文件加载数据集数据
   loadDataset(file: string) {
@@ -258,8 +294,10 @@ export class ExtractionComponent extends PageBase {
       this.startPolling();
       this.isImporting = false;
     }, 2000); // 假设导入任务需要2秒准备时间
+    console.log(this.grid.data)
     const props = this.getFilteredProperties();
     const data = this.grid.data.map((row: any) => this.createEntity(row, props));
+    console.log(data)
     this.nodeService.import(data).subscribe((res: any) => {
       console.log(res);
     });
@@ -268,13 +306,11 @@ export class ExtractionComponent extends PageBase {
 
   // 获取过滤后的属性
   getFilteredProperties() {
-    console.log(this.tags)
-    console.log(this.images)
-    console.log(this.aliases)
     return this.grid.schema.filter((p: any) => ![
       this.label?.name,
       this.description?.name,
       this.category?.name,
+      this.url?.name,
     ].concat(this.tags?.map((t: any) => t.name))
       .concat(this.aliases?.map((a: any) => a.name))
       .concat(this.images?.map((i: any) => i.name)).includes(p.name)).map((p: any) => p.name);
@@ -299,13 +335,15 @@ export class ExtractionComponent extends PageBase {
     if (this.description?.name && row[this.description.name]) {
       entity["descriptions"] = { "zh": { "language": "zh", "value": row[this.description.name] } };
     }
-
     if (this.category?.name && row[this.category.name]) {
       entity["category"] = row[this.category.name];
       entity["type"] = row[this.category.name];
     }
     if (this.images?.name && row[this.images.name]) {
       entity["images"] = [row[this.images.name]];
+    }
+    if (this.url?.name && row[this.url.name]) {
+      entity["sources"] = [row[this.url.name]];
     }
   }
 

@@ -41,7 +41,7 @@ export class DatasetDetailComponent implements OnInit {
       control: 'select',
       id: 'type',
       label: '类型',
-      data: ['常识','城市','金融','农业','地理','气象','社交','物联网','医疗','娱乐','生活','商业','出行','科教','其它',]
+      data: ['文件','api']
     },
     // {
     //   control: 'textarea',
