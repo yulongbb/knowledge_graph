@@ -287,7 +287,7 @@ export class DocumentComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { keyword } });
+    this.router.navigate(['/start/document'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {
@@ -357,7 +357,7 @@ export class DocumentComponent implements OnInit {
     switch (type) {
       case 'info':
         this.router
-          .navigate([`/search/${type}/${item._id}`], {
+          .navigate([`/start/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
           .then(() => { });

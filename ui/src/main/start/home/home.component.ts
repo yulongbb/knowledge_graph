@@ -174,7 +174,7 @@ export class HomeComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { keyword } });
+    this.router.navigate(['/start/search'], { queryParams: { keyword } });
   }
 
   // 判断新闻是否为新

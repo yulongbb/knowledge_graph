@@ -287,7 +287,7 @@ export class VideoComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { q: keyword } });
+    this.router.navigate(['/start/video'], { queryParams: { q: keyword } });
   }
 
   selectKeyword(keyword: any) {
@@ -357,7 +357,7 @@ export class VideoComponent implements OnInit {
     switch (type) {
       case 'info':
         this.router
-          .navigate([`/search/${type}/${item._id}`], {
+          .navigate([`/start/search/${type}/${item._id}`], {
             relativeTo: this.activatedRoute,
           })
           .then(() => { });
