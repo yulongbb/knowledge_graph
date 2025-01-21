@@ -287,7 +287,7 @@ export class DocumentComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/search'], { queryParams: { q: keyword } });
+    this.router.navigate(['/search'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {

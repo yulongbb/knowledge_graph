@@ -4,11 +4,11 @@
   <nav class="navbar">
     <a [routerLink]="'/home'" [queryParams]="{ keyword: '' }" class="logo">知识图谱</a>
     <div class="menu">
-      <a [routerLink]="'/search'" [queryParams]="{ keyword: '' }">知识</a>
-      <a [routerLink]="'/image'" [queryParams]="{ keyword: '' }">图片</a>
-      <a [routerLink]="'/video'" [queryParams]="{ keyword: '' }">视频</a>
-      <a [routerLink]="'/document'" [queryParams]="{ keyword: '' }">文档</a>
-      <a [routerLink]="'/map'" [queryParams]="{ keyword: '' }">地图</a>
+      <a [routerLink]="'/start/search'" [queryParams]="{ keyword: '' }">知识</a>
+      <a [routerLink]="'/start/image'" [queryParams]="{ keyword: '' }">图片</a>
+      <a [routerLink]="'/start/video'" [queryParams]="{ keyword: '' }">视频</a>
+      <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }">文档</a>
+      <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a>
       <a [routerLink]="'/addons'" [queryParams]="{ keyword: '' }">应用</a>
       <!-- 动态显示登录/用户信息 -->
       <ng-container *ngIf="auth.isLoggedIn; else loginLink">

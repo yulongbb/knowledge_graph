@@ -1,0 +1,29 @@
+<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll" infiniteScroll [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50" (scrolled)="onScrollEntity()" [scrollWindow]="false">
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <a [routerLink]="'/home'" [queryParams]="{ keyword: '' }" class="logo">知识图谱</a>
+    <div class="menu">
+      <a [routerLink]="'/start/search'" [queryParams]="{ keyword: '' }">知识</a>
+      <a [routerLink]="'/start/image'" [queryParams]="{ keyword: '' }">图片</a>
+      <a [routerLink]="'/start/video'" [queryParams]="{ keyword: '' }">视频</a>
+      <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }">文档</a>
+      <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a>
+      <a [routerLink]="'/start/addons'" [queryParams]="{ keyword: '' }">应用</a>
+      <!-- 动态显示登录/用户信息 -->
+      <ng-container *ngIf="auth.isLoggedIn; else loginLink">
+        <x-dropdown [data]="data()" (nodeClick)="nodeClick($event)">
+          <x-button type="primary" icon="fto-chevron-down" direction="row-reverse"> {{ auth.user.name }}</x-button>
+        </x-dropdown>
+        <!-- <a [routerLink]="'/profile'"></a>
+        <a (click)="logout()">退出</a> -->
+      </ng-container>
+      <ng-template #loginLink>
+        <a [routerLink]="'/index/login'">登录</a>
+      </ng-template>
+    </div>
+  </nav>
+
+  <router-outlet></router-outlet>
+
+</div>

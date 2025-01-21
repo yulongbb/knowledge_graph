@@ -5,7 +5,6 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AppRoutesModule } from './app-routes.module';
 import { ShareModule } from 'src/share/share.module';
-import { HomeModule } from 'src/main/start/home/home.module';
 
 @NgModule({
   declarations: [AppComponent],

@@ -40,36 +40,12 @@ export const mainRoutes: Routes = [
       import("../main/start/home/home.module").then(x => x.HomeModule)
   },
   {
-    path: "search",
+    path: "start",
     loadChildren: () =>
-      import("../main/start/search/search.module").then(x => x.SearchModule)
-  },
-  {
-    path: "image",
-    loadChildren: () =>
-      import("../main/start/image/image.module").then(x => x.ImageModule)
-  },
-  {
-    path: "video",
-    loadChildren: () =>
-      import("../main/start/video/video.module").then(x => x.VideoModule)
-  },
-  {
-    path: "document",
-    loadChildren: () =>
-      import("../main/start/document/document.module").then(x => x.DocumentModule)
-  },
-  {
-    path: "map",
-    loadChildren: () =>
-      import("../main/start/map/map.module").then(x => x.MapModule)
+      import("../main/start/start.module").then(x => x.StartModule),
   },
 
-  {
-    path: "addons",
-    loadChildren: () =>
-      import("../main/start/addons/addons.module").then(x => x.addonsModule)
-  },
+
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.layout, pathMatch: "full" },
 
