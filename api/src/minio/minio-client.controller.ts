@@ -14,11 +14,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { MinioClientService } from './minio-client.service';
+import { ThumbnailService } from './thumbnail.service';
+import * as path from 'path';
 
 @ApiTags('文件上传') // 分组
 @Controller('minio-client')
 export class MinioClientController {
-  constructor(private readonly minioClientService: MinioClientService) {}
+  constructor(private readonly minioClientService: MinioClientService,
+    private readonly thumbnailService: ThumbnailService
+  ) { }
 
   @Post('uploadFile')
   @UseInterceptors(FileInterceptor('file'))
@@ -38,6 +42,27 @@ export class MinioClientController {
   })
   async uploadMinio(@UploadedFile() file: Express.Multer.File) {
     return await this.minioClientService.upload(file);
+  }
+
+
+
+  @Post('extract')
+  @UseInterceptors(FileInterceptor('video'))
+  async extractThumbnail(@UploadedFile() file: Express.Multer.File) {
+    const allowedFormats = ['.mp4', '.avi', '.mov'];
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (!allowedFormats.includes(ext)) {
+      throw new HttpException('Unsupported file format', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      const base64Thumbnail = await this.thumbnailService.extractThumbnail(file.buffer);
+      return { thumbnail: base64Thumbnail };
+    } catch (err) {
+      console.error('Error extracting thumbnail:', err); // 记录错误日志
+      throw new HttpException('Failed to extract thumbnail', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @ApiOperation({ summary: '删除文件' })

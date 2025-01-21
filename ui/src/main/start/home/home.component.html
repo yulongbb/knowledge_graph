@@ -54,11 +54,7 @@
       <!-- 显示视频缩略图 -->
       <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
         <a [routerLink]="'/search/info/' + entity._id">
-          <img class="video" [src]="
-              entity['_source']?.videos[0].thumbnail.startsWith('http')
-                ? entity['_source']?.videos[0].thumbnail
-                : 'http://localhost:9000/kgms/' + entity['_source']?.videos[0].thumbnail
-            " loading="lazy" style="width: 100%; border-radius: 4px;" />
+          <img [src]="'data:image/jpeg;base64,'+entity['_source']?.videos[0].thumbnail" class="thumbnail" loading="lazy" style="width: 100%; border-radius: 4px;">
           <!-- 添加播放图标和时长 -->
           <div class="play-icon">
             <i class="fas fa-play"></i>

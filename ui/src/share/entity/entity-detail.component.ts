@@ -42,7 +42,7 @@ import * as Plyr from 'plyr';
   styleUrls: ['./entity-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
+export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('player') player!: ElementRef;
 
   @Input() id: string = '';
@@ -78,7 +78,7 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
   images: any;
   pdfs: any;
   docs: any;
-  entity:any;
+  entity: any;
   claims: any;
 
   properties: any;
@@ -89,7 +89,7 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
 
   markers: Marker[] = [];
 
-  videoLoaded:boolean = false;
+  videoLoaded: boolean = false;
 
   options = {
     layers: [
@@ -268,112 +268,38 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
       url: `http://localhost:9000/kgms/${$event.body.name}`,
     });
     this.cdr.detectChanges(); // 手动触发变更检测
-
     console.log(this.imgs);
   }
 
   uploadVideo($event: any) {
     console.log('文件上传成功:', $event);
     const videoFile = $event; // 假设 event.file 是上传的视频文件
+
     console.log(videoFile);
-    this.generateVideoCover(videoFile).then(async (coverFile: File) => {
-      // 上传封面
-      const formData = new FormData();
-      formData.append('file', coverFile);
+    // 上传封面
+    const formData = new FormData();
+    formData.append('video', videoFile);
 
-      // 调用 API 上传封面
-      fetch('http://localhost:3000/api/minio-client/uploadFile', {
-        method: 'POST',
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log('封面上传成功:', data);
-          this.vids.push({
-            url: `http://localhost:9000/kgms/${$event.body.name}`,
-            thumbnail: `http://localhost:9000/kgms/${data.name}`,
-          });
-          console.log(this.vids);
-          console.log(this.imgs);
-        })
-        .catch((error) => {
-          console.error('封面上传失败:', error);
+    // 调用 API 上传封面
+    fetch('http://localhost:3000/api/minio-client/extract', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('封面上传成功:', data);
+        this.vids.push({
+          url: `http://localhost:9000/kgms/${$event.body.name}`,
+          thumbnail: data.thumbnail,
         });
-
-    });
-
+        console.log(this.vids);
+        console.log(this.imgs);
+      })
+      .catch((error) => {
+        console.error('封面上传失败:', error);
+      });
   }
 
-
-  // 生成视频封面
-  generateVideoCover(videoFile: File): Promise<File> {
-    return new Promise((resolve, reject) => {
-      const videoElement = document.createElement('video');
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-  
-      // 设置视频源
-      videoElement.src = URL.createObjectURL(videoFile);
-  
-      // 如果视频跨域，需要设置 crossOrigin 属性
-      videoElement.crossOrigin = 'anonymous';
-  
-      // 处理加载错误
-      videoElement.addEventListener('error', () => {
-        reject(new Error('视频加载失败'));
-      });
-  
-      // 当视频元数据加载完成时
-      videoElement.addEventListener('loadedmetadata', () => {
-        // 设置 canvas 尺寸为视频尺寸
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-        
-        // 确保视频能够播放并触发下一事件
-        videoElement.currentTime = 1; // 跳转到视频的第 1 秒
-      });
-  
-      // 确保视频足够加载
-      videoElement.addEventListener('canplaythrough', () => {
-        // 跳转到视频的第 1 秒
-        videoElement.currentTime = 1;
-      });
-  
-      // 当视频帧可渲染时
-      videoElement.addEventListener('seeked', () => {
-        if (context) {
-          // 将当前帧绘制到 canvas 上
-          context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-  
-          // 将 canvas 转换为 Blob
-          canvas.toBlob((blob) => {
-            if (blob) {
-              // 将 Blob 转换为 File
-              const coverFile = new File([blob], 'cover.png', {
-                type: 'image/png',
-              });
-              resolve(coverFile);
-            } else {
-              reject(new Error('无法生成封面'));
-            }
-  
-            // 释放 URL
-            URL.revokeObjectURL(videoElement.src);
-          }, 'image/png');
-        }
-      });
-  
-      // 加载视频
-      videoElement.load();
-    });
-  }
-
-
-  // 上传失败回调
-  handleUploadError(event: any) {
-    console.error('文件上传失败:', event);
-    // 处理上传失败的逻辑
-  }
 
   uploadDocument($event: any) {
     this.docs[this.imgs.length - 1] = {
@@ -585,7 +511,7 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
   action(type: string) {
     switch (type) {
       case 'info':
-        this.esService.getEntity(this.id).subscribe((x:any) => {
+        this.esService.getEntity(this.id).subscribe((x: any) => {
           console.log(x);
           this.entity = signal({ value: x });
           this.item = x._source;
@@ -751,18 +677,10 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
                   url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
                 }
 
-                // 处理 Thumbnail
-                let thumbnail = i.thumbnail || ''; // 默认值为空字符串
-                if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
-                  thumbnail = thumbnail.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  thumbnail = thumbnail.split('/').pop() || thumbnail; // 如果 pop() 返回 undefined，使用原始 Thumbnail
-                }
-
                 // 返回新的视频对象
                 return {
                   url: url,
-                  thumbnail: thumbnail,
+                  thumbnail: i.thumbnail,
                   label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
                   description: this.form.formGroup.value.description || '默认描述', // 提供默认描述
                 };
@@ -771,7 +689,7 @@ export class EntityDetailComponent implements OnInit, OnChanges,AfterViewInit  {
             : {}),
         };
         console.log(item);
-        if (this.type === 'add' || this.type === 'add_image'|| this.type === 'add_video') {
+        if (this.type === 'add' || this.type === 'add_image' || this.type === 'add_video') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();

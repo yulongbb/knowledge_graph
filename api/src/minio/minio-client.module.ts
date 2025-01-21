@@ -3,6 +3,7 @@ import { MinioModule } from 'nestjs-minio-client';
 import { MinioClientService } from './minio-client.service';
 import { MinioClientController } from './minio-client.controller';
 import { MINIO_CONFIG } from './config';
+import { ThumbnailService } from './thumbnail.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { MINIO_CONFIG } from './config';
     }),
   ],
   controllers: [MinioClientController],
-  providers: [MinioClientService],
+  providers: [MinioClientService,ThumbnailService],
 })
 export class MinioClientModule {}

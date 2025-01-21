@@ -336,10 +336,7 @@
             <div class="gallery" *ngIf="vids.length > 0">
               <div class="warp">
                 <div *ngFor="let file of vids">
-                  <div
-                    class="thumbnail"
-                    [style]="'background-image: url(' + file?.thumbnail + ')'"
-                  ></div>
+                  <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
                 </div>
               </div>
             </div>

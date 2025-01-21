@@ -13,11 +13,8 @@
     [tableData]="grid.schema"></x-find>
   <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
     [tableData]="grid.schema"></x-find>
-
-    <x-find label="url" columnLabel="name" direction="row" [(ngModel)]="url" [tableColumns]="tableColumns()"
+  <x-find label="url" columnLabel="name" direction="row" [(ngModel)]="url" [tableColumns]="tableColumns()"
     [tableData]="grid.schema"></x-find>
-
-
   <x-find label="别名" columnLabel="name" direction="row" [(ngModel)]="aliases" [tableColumns]="tableColumns()"
     [tableData]="grid.schema" multiple></x-find>
   <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
