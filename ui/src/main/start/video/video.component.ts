@@ -287,7 +287,7 @@ export class VideoComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/start/video'], { queryParams: { q: keyword } });
+    this.router.navigate(['/start/video'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {

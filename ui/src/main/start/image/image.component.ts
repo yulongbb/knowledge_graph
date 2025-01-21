@@ -292,7 +292,7 @@ export class ImageComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/start/image'], { queryParams: { q: keyword } });
+    this.router.navigate(['/start/image'], { queryParams: {keyword } });
   }
 
   selectKeyword(keyword: any) {

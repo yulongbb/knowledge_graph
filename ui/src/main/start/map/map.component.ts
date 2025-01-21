@@ -287,7 +287,7 @@ export class MapComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/start/map'], { queryParams: { q: keyword } });
+    this.router.navigate(['/start/map'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {
