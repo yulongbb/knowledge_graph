@@ -1,19 +1,37 @@
-<div class="home" #scrollContainer style="height: 100%; overflow-y: scroll" infiniteScroll [infiniteScrollDistance]="2"
-  [infiniteScrollThrottle]="50" (scrolled)="onScrollEntity()" [scrollWindow]="false">
+<div
+  class="home"
+  #scrollContainer
+  style="height: 100%; overflow-y: scroll"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  (scrolled)="onScrollEntity()"
+  [scrollWindow]="false"
+>
   <!-- 导航栏 -->
   <nav class="navbar">
-    <a [routerLink]="'/home'" [queryParams]="{ keyword: '' }" class="logo">知识图谱</a>
+    <a [routerLink]="'/home'" [queryParams]="{ keyword: '' }" class="logo"
+      >知识图谱</a
+    >
     <div class="menu">
       <a [routerLink]="'/start/search'" [queryParams]="{ keyword: '' }">知识</a>
       <a [routerLink]="'/start/image'" [queryParams]="{ keyword: '' }">图片</a>
       <a [routerLink]="'/start/video'" [queryParams]="{ keyword: '' }">视频</a>
-      <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }">文档</a>
+      <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }"
+        >文档</a
+      >
       <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a>
       <a [routerLink]="'/addons'" [queryParams]="{ keyword: '' }">应用</a>
       <!-- 动态显示登录/用户信息 -->
       <ng-container *ngIf="auth.isLoggedIn; else loginLink">
         <x-dropdown [data]="data()" (nodeClick)="nodeClick($event)">
-          <x-button type="primary" icon="fto-chevron-down" direction="row-reverse"> {{ auth.user.name }}</x-button>
+          <x-button
+            type="primary"
+            icon="fto-chevron-down"
+            direction="row-reverse"
+          >
+            {{ auth.user.name }}</x-button
+          >
         </x-dropdown>
         <!-- <a [routerLink]="'/profile'"></a>
         <a (click)="logout()">退出</a> -->
@@ -24,25 +42,41 @@
     </div>
   </nav>
 
-
-
   <!-- 搜索框 -->
-  <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
-    <input type="text" placeholder="搜索知识" class="search-box" [(ngModel)]="keyword"
-      (keyup.enter)="queryKeyword(keyword)" />
+  <div
+    class="search-container"
+    #searchContainer
+    [ngStyle]="searchContainerStyle"
+  >
+    <input
+      type="text"
+      placeholder="搜索知识"
+      class="search-box"
+      [(ngModel)]="keyword"
+      (keyup.enter)="queryKeyword(keyword)"
+    />
     <div class="hot-news-container" *ngIf="!isFixed" @fadeInOut>
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
-        <div class="hot-news-item" *ngFor="let news of hots | slice : 0 : 9; let i = index">
+        <div
+          class="hot-news-item"
+          *ngFor="let news of hots | slice : 0 : 9; let i = index"
+        >
           <span class="rank">{{ i + 1 }}</span>
-          <span class="news-title"><a (click)="queryKeyword(news.id._source.labels.zh.value)">{{
+          <span class="news-title"
+            ><a (click)="queryKeyword(news.id._source.labels.zh.value)">{{
               news["id"]._source.labels.zh.value | slice : 0 : 10
-              }}</a><span [ngClass]="{
+            }}</a
+            ><span
+              [ngClass]="{
                 'true-label': news.tag === '真',
                 'new-label': news.tag === '新',
                 'hot-label': news.tag === '热'
-              }">
-              {{ news.tag }}</span></span>
+              }"
+            >
+              {{ news.tag }}</span
+            ></span
+          >
         </div>
       </div>
     </div>
@@ -50,50 +84,104 @@
 
   <!-- 新闻网格 -->
   <div class="news-grid">
-    <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
+    <div
+      *ngFor="let entity of entities"
+      class="news-card"
+      [style.grid-column]="getCardWidth(entity)"
+    >
       <!-- 显示视频缩略图 -->
-      <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
-        <a [routerLink]="'/search/info/' + entity._id">
-          <img [src]="'data:image/jpeg;base64,'+entity['_source']?.videos[0].thumbnail" class="thumbnail" loading="lazy" style="width: 100%; border-radius: 4px;">
+      <div
+        *ngIf="entity['_source']?.videos&&entity['_source']?.videos?.length > 0"
+        class="thumbnail-container"
+      >
+        <a [routerLink]="'/start/search/info/' + entity._id">
+          <img
+            [src]="
+              'data:image/jpeg;base64,' + entity['_source']?.videos[0].thumbnail
+            "
+            class="thumbnail"
+            loading="lazy"
+            style="width: 100%; border-radius: 4px"
+          />
           <!-- 添加播放图标和时长 -->
           <div class="play-icon">
             <i class="fas fa-play"></i>
           </div>
           <div class="video-duration">
-            {{ entity['_source']?.videos[0].duration || '00:00' }}
+            {{ entity["_source"]?.videos[0].duration || "00:00" }}
           </div>
         </a>
         <!-- 叠加的标题和描述 -->
         <div class="overlay-text">
-          <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
+          <h3
+            style="cursor: pointer"
+            [routerLink]="'/start/search/info/' + entity._id"
+          >
             {{ entity["_source"]?.labels?.zh?.value | slice : 0 : 25 }}
             {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
           </h3>
           <p>
             {{
-            entity["_source"]?.descriptions?.zh?.value ||
-            "No description available."
+              entity["_source"]?.descriptions?.zh?.value ||
+                "No description available."
+            }}
+          </p>
+        </div>
+      </div>
+      <!-- 显示视频缩略图 -->
+      <div
+        *ngIf="entity['_source']?.documents&&entity['_source']?.documents?.length > 0"
+        class="thumbnail-container"
+      >
+        <a [routerLink]="'/start/search/info/' + entity._id">
+          <img
+            [src]="entity['_source']?.documents[0].thumbnail"
+            class="thumbnail"
+            loading="lazy"
+            style="width: 100%; border-radius: 4px"
+          />
+          <!-- 添加播放图标和时长 -->
+        </a>
+        <!-- 叠加的标题和描述 -->
+        <div class="overlay-text">
+          <h3
+            style="cursor: pointer"
+            [routerLink]="'/start/search/info/' + entity._id"
+          >
+            {{ entity["_source"]?.labels?.zh?.value | slice : 0 : 25 }}
+            {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+          </h3>
+          <p>
+            {{
+              entity["_source"]?.descriptions?.zh?.value ||
+                "No description available."
             }}
           </p>
         </div>
       </div>
       <!-- 显示图片 -->
-      <div *ngIf="!entity['_source']?.videos?.length">
-        <img class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)" [src]="
+      <div *ngIf="!entity['_source']?.videos&&entity['_source']?.images&&entity['_source']?.images?.length > 0">
+        <img
+          class="image"
+          *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
+          [src]="
             image.startsWith('http')
               ? image
               : 'http://localhost:9000/kgms/' + image
-          " loading="lazy" style="width: 100%; border-radius: 4px; margin-bottom: 12px" />
+          "
+          loading="lazy"
+          style="width: 100%; border-radius: 4px; margin-bottom: 12px"
+        />
         <!-- 新闻标题 -->
-        <h3 style="cursor: pointer" [routerLink]="'/search/info/' + entity._id">
+        <h3 style="cursor: pointer" [routerLink]="'/start/search/info/' + entity._id">
           {{ entity["_source"]?.labels?.zh?.value | slice : 0 : 25 }}
           {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
         </h3>
         <!-- 新闻描述 -->
         <p>
           {{
-          entity["_source"]?.descriptions?.zh?.value ||
-          "No description available."
+            entity["_source"]?.descriptions?.zh?.value ||
+              "No description available."
           }}
         </p>
       </div>

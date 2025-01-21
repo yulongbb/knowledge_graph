@@ -26,6 +26,16 @@ export class EsService {
     return data.hits.hits[0];
   }
 
+  async update(id: any, doc: any) {
+    return await this.elasticsearchService.update({
+      index: this.defaultIndex,
+      id: id,
+      body: {
+        doc: doc,  // 更新的字段和值
+      },
+    });
+  }
+
   async bulk(doc: any) {
     return await this.elasticsearchService.bulk({
       body: [

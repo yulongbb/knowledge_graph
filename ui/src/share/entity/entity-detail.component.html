@@ -12,7 +12,7 @@
           <span *ngIf="entity()?.value?._source?.labels" class="label">{{ entity()?.value?._source?.labels?.zh?.value }}
           </span>
 
-          <x-button [routerLink]="'/search/edit/' + id" type="primary">编辑</x-button>
+          <x-button [routerLink]="'/start/search/edit/' + id" type="primary">编辑</x-button>
           <span *ngFor="let aliase of entity()?.value?._source?.aliases?.zh">{{
             aliase.value
             }}</span>
@@ -37,6 +37,7 @@
             </div>
 
             <div class="plyr-wrapper" *ngIf="entity()?.value?._source?.videos?.length > 0">
+
               <video #player id="player" controls>
                 <source [src]="'http://localhost:9000/kgms/' + entity().value._source.videos[0].url" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -452,6 +453,16 @@
                 <x-icon class="upload-icon" type="fto-upload"></x-icon>
                 <span>选择视频</span>
               </ng-template>
+              <div class="gallery" *ngIf="vids.length > 0">
+                <div class="warp">
+                  <div *ngFor="let file of vids">
+                    <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
+                    <x-button (click)="updateTideohumbnail(file.url)" type="primary">更新封面</x-button>
+
+                  </div>
+                </div>
+              </div>
+
             </div>
           </x-collapse-panel>
         </x-collapse>

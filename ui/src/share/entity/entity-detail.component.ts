@@ -56,10 +56,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('form') form!: XFormComponent;
   @ViewChild('form2') form2!: XFormComponent;
 
-
-
   query: any;
-
 
   title = '';
   get formInvalid() {
@@ -181,7 +178,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     public tagService: TagService,
     private nodeService: EntityService,
     private location: Location,
-    private cdr: ChangeDetectorRef) {
+    private cdr: ChangeDetectorRef
+  ) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
@@ -211,7 +209,14 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   ngAfterViewInit() {
     new Plyr(this.player.nativeElement, {
       autoplay: true,
-      controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+      controls: [
+        'play',
+        'progress',
+        'current-time',
+        'mute',
+        'volume',
+        'fullscreen',
+      ],
     });
   }
 
@@ -230,7 +235,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
             const generateUniqueFileName = (originalName: string): string => {
               const timestamp = new Date().getTime();
               const uniqueSuffix = Math.random().toString(36).substring(2, 10);
-              const extension = originalName.substring(originalName.lastIndexOf('.'));
+              const extension = originalName.substring(
+                originalName.lastIndexOf('.')
+              );
               return `${timestamp}-${uniqueSuffix}${extension}`;
             };
 
@@ -245,17 +252,17 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               method: 'POST',
               body: formData,
             })
-              .then(response => {
+              .then((response) => {
                 if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
               })
-              .then(data => {
+              .then((data) => {
                 console.log('上传成功:', data);
                 this.uploadImage({ body: { name: data.name } });
               })
-              .catch(error => {
+              .catch((error) => {
                 console.error('上传失败:', error);
               });
           }
@@ -301,6 +308,54 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       });
   }
 
+  updateTideohumbnail(url: any) {
+    // 获取视频文件
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('视频下载失败');
+        }
+        return response.blob(); // 将视频转为 Blob 对象
+      })
+      .then((videoBlob) => {
+        console.log('视频 Blob:', videoBlob);
+
+        // 创建一个 FormData 对象，用于上传视频文件
+        const formData = new FormData();
+        formData.append('video', videoBlob, 'video.mp4'); // 添加视频文件，指定文件名
+
+        // 调用 API 获取封面图
+        fetch('http://localhost:3000/api/minio-client/extract', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('封面获取成功:', data);
+            // 假设返回的数据包含封面图的 URL
+            const thumbnailUrl = data.thumbnail;
+            console.log('获取到的封面:', thumbnailUrl);
+
+            // 将封面图 URL 保存到 vids 或其他地方
+            // 使用 map 或 find 找到对应 url 的视频对象，并更新封面
+            this.vids = this.vids.map((video:any) => {
+              if (video.url === url) {
+                // 找到对应的 url 后替换其封面图
+                video.thumbnail = thumbnailUrl;
+              }
+              return video; // 返回更新后的对象
+            });
+
+            console.log('更新后的 video 数据:', this.vids);
+          })
+          .catch((error) => {
+            console.error('封面获取失败:', error);
+          });
+      })
+      .catch((error) => {
+        console.error('视频下载失败:', error);
+      });
+  }
 
   uploadDocument($event: any) {
     console.log('文件上传成功:', $event);
@@ -346,7 +401,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   upload($event: any, row: any) {
     row.mainsnak.datavalue.value = $event.body.name;
   }
-
 
   onMapClick(event: any) {
     const { lat, lng } = event.latlng;
@@ -444,20 +498,22 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${this.propertyList().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${this.propertyList().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
@@ -470,10 +526,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         };
         break;
       case 'quantity':
-        statements.mainsnak.property = `P${this.propertyList().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -485,10 +542,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         };
         break;
       case 'time':
-        statements.mainsnak.property = `P${this.propertyList().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -506,10 +564,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${this.propertyList().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
+        statements.mainsnak.property = `P${
+          this.propertyList().filter(
+            (p: any) => p.name == statements.mainsnak.label
+          )[0].id
+        }`;
         statements.mainsnak.datavalue = {
           value: {
             'entity-type': statements.mainsnak.datatype.replace(
@@ -525,7 +584,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     }
     console.log(statements);
   }
-
 
   trustUrl(url: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -543,7 +601,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           this.item?.images?.forEach((image: any) => {
             this.imgs.push({ url: `http://localhost:9000/kgms/${image}` });
           });
-          console.log(this.item);
+          this.item?.videos?.forEach((video: any) => {
+            this.vids.push({url: `http://localhost:9000/kgms/${video.url}`, thumbnail: video.thumbnail, label: video.label, description: video.description});
+          });
+          console.log(this.vids);
           if (this.item.location) {
             const newMarker = marker([
               this.item.location.lat,
@@ -676,64 +737,76 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           type: this.form.formGroup.value.type,
           // 其他字段
           ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
-          ...(this.form.formGroup.value.source ? { sources: [this.form.formGroup.value.source] } : {}), // 如果 source 存在，生成 sources 字段
+          ...(this.form.formGroup.value.source
+            ? { sources: [this.form.formGroup.value.source] }
+            : {}), // 如果 source 存在，生成 sources 字段
           ...(this.imgs && this.imgs.length > 0
             ? {
-              images: this.imgs.map((i: any) => {
-                if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
-                  return i.url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  return i.url.split('/')[i.url.split('/').length - 1];
-                }
-              }),
-            }
+                images: this.imgs.map((i: any) => {
+                  if (
+                    i.url.startsWith('http://') ||
+                    i.url.startsWith('https://')
+                  ) {
+                    return i.url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    return i.url.split('/')[i.url.split('/').length - 1];
+                  }
+                }),
+              }
             : {}),
           // 其他字段
           ...(this.vids && this.vids.length > 0
             ? {
-              videos: this.vids.map((i: any) => {
-                // 处理 URL
-                let url = i.url || ''; // 默认值为空字符串
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                  url = url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
-                }
+                videos: this.vids.map((i: any) => {
+                  // 处理 URL
+                  let url = i.url || ''; // 默认值为空字符串
+                  if (url.startsWith('http://') || url.startsWith('https://')) {
+                    url = url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                  }
 
-                // 返回新的视频对象
-                return {
-                  url: url,
-                  thumbnail: i.thumbnail,
-                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
-                  description: this.form.formGroup.value.description || '默认描述', // 提供默认描述
-                };
-              }),
-            }
+                  // 返回新的视频对象
+                  return {
+                    url: url,
+                    thumbnail: i.thumbnail,
+                    label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
+                    description:
+                      this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                  };
+                }),
+              }
             : {}),
           ...(this.fs && this.fs.length > 0
             ? {
-              documents: this.fs.map((i: any) => {
-                // 处理 URL
-                let url = i.url || ''; // 默认值为空字符串
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                  url = url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
-                }
+                documents: this.fs.map((i: any) => {
+                  // 处理 URL
+                  let url = i.url || ''; // 默认值为空字符串
+                  if (url.startsWith('http://') || url.startsWith('https://')) {
+                    url = url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                  }
 
-                // 返回新的视频对象
-                return {
-                  url: url,
-                  thumbnail: i.thumbnail,
-                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
-                  description: this.form.formGroup.value.description || '默认描述', // 提供默认描述
-                };
-              }),
-            }
+                  // 返回新的视频对象
+                  return {
+                    url: url,
+                    thumbnail: i.thumbnail,
+                    label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
+                    description:
+                      this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                  };
+                }),
+              }
             : {}),
         };
         console.log(item);
-        if (this.type === 'add' || this.type === 'add_image' || this.type === 'add_video' || this.type === 'add_document') {
+        if (
+          this.type === 'add' ||
+          this.type === 'add_image' ||
+          this.type === 'add_video' ||
+          this.type === 'add_document'
+        ) {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();
