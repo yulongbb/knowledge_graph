@@ -71,6 +71,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   videos: any;
   vids: any = [];
   files: any;
+  fs: any = [];
 
   tags: Map<string, Array<string>> | undefined;
 
@@ -302,9 +303,31 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
 
   uploadDocument($event: any) {
-    this.docs[this.imgs.length - 1] = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-    };
+    console.log('文件上传成功:', $event);
+    const pdfFile = $event; // 假设 event.file 是上传的视频文件
+
+    console.log(pdfFile);
+    // 上传封面
+    const formData = new FormData();
+    formData.append('pdf', pdfFile);
+
+    // 调用 API 上传封面
+    fetch('http://localhost:3000/api/minio-client/cover', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('封面上传成功:', data);
+        this.fs.push({
+          url: `http://localhost:9000/kgms/${$event.body.name}`,
+          thumbnail: data.cover,
+        });
+        console.log(this.fs);
+      })
+      .catch((error) => {
+        console.error('封面上传失败:', error);
+      });
   }
 
   removeFile(file: any, files: any) {
@@ -687,9 +710,30 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               }),
             }
             : {}),
+          ...(this.fs && this.fs.length > 0
+            ? {
+              documents: this.fs.map((i: any) => {
+                // 处理 URL
+                let url = i.url || ''; // 默认值为空字符串
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                  url = url.replace('http://localhost:9000/kgms/', '');
+                } else {
+                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                }
+
+                // 返回新的视频对象
+                return {
+                  url: url,
+                  thumbnail: i.thumbnail,
+                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
+                  description: this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                };
+              }),
+            }
+            : {}),
         };
         console.log(item);
-        if (this.type === 'add' || this.type === 'add_image' || this.type === 'add_video') {
+        if (this.type === 'add' || this.type === 'add_image' || this.type === 'add_video' || this.type === 'add_document') {
           this.nodeService.post(item).subscribe((x) => {
             this.message.success('新增成功！');
             this.back();

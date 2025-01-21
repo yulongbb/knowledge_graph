@@ -245,6 +245,7 @@ export class KnowledgeService {
           videos: entity?.videos,
           location: entity?.location,
           sources: entity?.sources,
+          documents: entity?.documents,
         };
         let data = await this.elasticsearchService.bulk(source);
 
@@ -274,6 +275,7 @@ export class KnowledgeService {
       videos: entity?.videos,
       location: entity?.location,
       sources: entity?.sources,
+      documents: entity?.documents,
     });
     console.log(entity);
     const myCollection = this.db.collection('entity');
