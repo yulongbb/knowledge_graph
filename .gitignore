@@ -10,6 +10,7 @@ db/arangodb/data
 db/minio/data
 db/elasticsearch/data
 db/nginx/html/gis
+db/nginx/conf
 python/model
 python/dicts
 python/results
