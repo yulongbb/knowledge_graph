@@ -483,19 +483,27 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  preview(i: any, images: any) {
+  preview(i: any, images: Array<any>) {
+    console.log(images.map((image: any) => {
+      if (image.image?.startsWith('http://') || image.image.startsWith('https://')) {
+        return { src: image.image };
+      } else {
+        // 如果不是完整的 URL，则添加前缀
+        return { src: 'http://localhost:9000/kgms/' + image.image };
+      }
+    }));
+
     // 检查 imagePath 是否已经是完整的 URL
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
-      data: images.map((image: any) => {
-        console.log(image.image);
+      data: images.slice(i, images.length).map((image: any) => {
         if (image.image?.startsWith('http://') || image.image.startsWith('https://')) {
           return { src: image.image };
         } else {
           // 如果不是完整的 URL，则添加前缀
-          return { src: 'http://localhost:9000/kgms/' + image.image };
+          return { src: 'http://localhost:9000/kgms/' + image.image, previewText: image.label };
         }
       }),
     });
