@@ -141,23 +141,31 @@
     position: relative;
   }
 
-  .video-thumbnail video {
-    width: 250px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-
+ 
   .play-icon {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 24px;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    border-radius: 50%;
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease; /* 添加过渡效果 */
+  }
+  
+  .play-icon .play-text {
+    display: none;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+  
+  .thumbnail-container:hover .play-icon {
+    font-size: 50px; /* 放大图标 */
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .thumbnail-container:hover .play-icon .play-text {
+    display: block; /* 显示文字 */
   }
 
   /* 分页导航 */

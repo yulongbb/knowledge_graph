@@ -1,6 +1,3 @@
-
-
-
 <div class="search-container">
   <div class="search-nav">
     <a *ngFor="let item of navItems()" [routerLink]="item.link" [queryParams]="{ keyword: keyword }"
@@ -85,19 +82,26 @@
       <div class="image-grid">
         <img *ngFor="let image of images?.slice(0, 4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
       </div>
-      <a href="#" class="see-more">查看更多图片</a>
+      <a [routerLink]="'/start/image'" [queryParams]="{ keyword }" class="see-more">查看更多图片</a>
     </div>
 
     <!-- 视频预览 -->
     <div *ngIf="videos.length > 0">
       <div class="result-item video-preview" *ngFor="let video of videos?.slice(0, 4)">
         <div class="video-thumbnail">
-          <video #videoPlayer controls [src]="getFullImageUrl(video.url)" class="video-element"></video>
+          <img [src]="
+          'data:image/jpeg;base64,' + video.thumbnail
+        " loading="lazy" style="width: 100%; border-radius: 4px" />
+         <!-- 添加播放图标和时长 -->
+         <div class="play-icon">
+          <i class="fas fa-play"></i>
+        </div>
+     
         </div>
         <div class="video-info">
-          <a href="#" class="result-title">{{ video.label }}</a>
-          <div class="result-url">https://www.ted.com/talks/ai-future</div>
-          <div class="result-snippet">探索人工智能如何改变我们的世界...</div>
+          <a (click)="action('info', video)" class="result-title">{{ video.label }}</a>
+          <div class="result-url">{{ video.url }}</div>
+          <div class="result-snippet">{{ video.description }}</div>
         </div>
       </div>
     </div>

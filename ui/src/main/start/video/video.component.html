@@ -30,7 +30,13 @@
 <!-- Video Results Grid -->
 <div class="video-results-grid" *ngIf="videos&&videos.length > 0">
   <div *ngFor="let video of videos" class="video-card">
-    <img [src]="'data:image/jpeg;base64,'+video.thumbnail" class="video-thumbnail">
+    <div class="video-thumbnail">
+      <img [src]="'data:image/jpeg;base64,'+video.thumbnail" class="video-thumbnail">
+      <div class="play-icon">
+        <i class="fas fa-play"></i>
+      </div>
+    </div>
+  
     <div class="video-metadata">
       <h3 class="video-title" (click)="action('info', video)">{{ video?.label?.slice(0,20) }}</h3>
       <p class="video-description">{{ video?.description?.slice(0,50) }}</p>
