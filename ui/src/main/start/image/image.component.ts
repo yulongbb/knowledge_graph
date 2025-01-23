@@ -292,7 +292,7 @@ export class ImageComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/start/image'], { queryParams: {keyword } });
+    this.router.navigate(['/start/image'], { queryParams: { keyword } });
   }
 
   selectKeyword(keyword: any) {
@@ -483,24 +483,21 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  preview(image: any) {
-    let img;
+  preview(i: any, images: any) {
     // 检查 imagePath 是否已经是完整的 URL
-    if (image.startsWith('http://') || image.startsWith('https://')) {
-      img = image;
-    } else {
-      // 如果不是完整的 URL，则添加前缀
-      img = 'http://localhost:9000/kgms/' + image;
-    }
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
       height: '100%',
       className: 'x-image-preview-portal',
-      data: [
-        {
-          src: img,
-        },
-      ],
+      data: images.map((image: any) => {
+        console.log(image.image);
+        if (image.image?.startsWith('http://') || image.image.startsWith('https://')) {
+          return { src: image.image };
+        } else {
+          // 如果不是完整的 URL，则添加前缀
+          return { src: 'http://localhost:9000/kgms/' + image.image };
+        }
+      }),
     });
   }
 }

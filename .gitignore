@@ -11,7 +11,9 @@ db/minio/data
 db/elasticsearch/data
 db/nginx/html/gis
 db/nginx/conf
-python/model
+python/ner_training_system/model
+python/ner_training_system/results
+python/ner_training_system/saved_model
 python/dicts
 python/results
 

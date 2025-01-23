@@ -1,0 +1,169 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.75rem;
+    margin-bottom: 15px;
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#training-logs {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;  /* 保留换行和空格 */
+    height: 200px;
+    overflow-y: auto;
+    border-radius: 4px;
+}
+
+#training-logs p {
+    margin: 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+#training-logs p:last-child {
+    border-bottom: none;
+}
+
+#training-progress {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#training-progress::-webkit-progress-bar {
+    background-color: #e1e1e1;
+}
+
+#training-progress::-webkit-progress-value {
+    background-color: #3498db;
+}
+
+#progress-text {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+#input-text {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+#entities-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#entities-list li {
+    background-color: #f0f0f0;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+#entities-result .entity {
+    background-color: #ecf0f1;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+code {
+    background-color: #f5f5f5;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+a {
+    text-decoration: none;
+}
+
+a button {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.entity-type {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.entity-type strong {
+    color: #333;
+}

@@ -5,7 +5,6 @@ import { DesignModule } from './design/design.module';
 
 import { AuthModule } from './auth/auth.module';
 import { OntologynModule } from 'src/ontology/ontology.module';
-import { ExtractionModule } from 'src/extraction/extraction.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
@@ -27,7 +26,6 @@ import { DatasetModule } from './dataset/dataset.module';
     SystemModule,
     DesignModule,
     OntologynModule,
-    ExtractionModule,
     KnowledgeModule,
     DatasetModule,
     MinioClientModule,

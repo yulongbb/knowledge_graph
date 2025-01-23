@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NER 模型训练系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>NER 模型训练系统</h1>
+
+        <!-- 自动标注数据 -->
+        <div class="section">
+            <h2>1. 自动标注数据</h2>
+            <textarea id="entity-object" placeholder="在此输入实体对象 JSON..."></textarea>
+            <button onclick="annotateData()">自动标注</button>
+            <h3>标注结果：</h3>
+            <div id="annotation-result">
+                <p>暂无标注结果。</p>
+            </div>
+        </div>
+        <!-- 预览标注数据 -->
+        <div class="section">
+            <h2>2. 预览标注数据</h2>
+            <button onclick="previewAnnotations()">预览标注数据</button>
+            <div id="annotations-preview">
+                <p>暂无标注数据。</p>
+            </div>
+        </div>
+        <!-- 下载标注数据 -->
+        <div class="section">
+            <h2>3. 下载标注数据</h2>
+            <p>点击以下按钮下载标注训练数据文件：</p>
+            <button onclick="downloadAnnotations()">下载标注数据</button>
+        </div>
+        <!-- 上传训练数据 -->
+        <div class="section">
+            <h2>4. 上传训练数据</h2>
+            <form id="upload-form">
+                <input type="file" id="file" name="file" accept=".jsonl" required>
+                <button type="submit">上传并训练模型</button>
+            </form>
+            <p id="upload-status"></p>
+        </div>
+
+        <!-- 训练进度条 -->
+        <div class="section">
+            <h2>5. 训练进度</h2>
+            <progress id="training-progress" value="0" max="100"></progress>
+            <span id="progress-text">0%</span>
+        </div>
+
+        <!-- 训练日志 -->
+        <div class="section">
+            <h2>6. 训练日志</h2>
+            <div id="training-logs">
+                <p>暂无日志。</p>
+            </div>
+        </div>
+
+        <!-- 输入文本进行预测 -->
+        <div class="section">
+            <h2>7. 实体预测</h2>
+            <textarea id="input-text" placeholder="在此输入文本...">塞斯纳-170和安-140和是日本旧日本陆军X系列秘密战机。</textarea>
+            <button onclick="predictEntities()">预测实体</button>
+            <h3>预测结果：</h3>
+            <div id="entities-result">
+                <p>暂无预测结果。</p>
+            </div>
+        </div>
+
+        <!-- 接口调用说明 -->
+        <div class="section">
+            <h2>接口调用说明</h2>
+            <p>以下是本系统提供的 API 接口：</p>
+            <ul>
+                <li>
+                    <strong>上传训练数据并开始训练：</strong><br>
+                    <code>POST /train</code><br>
+                    请求体：<code>multipart/form-data</code>，包含一个文件字段 <code>file</code>。<br>
+                    响应：<code>{"message": "Training started!"}</code>
+                </li>
+                <li>
+                    <strong>下载标注数据：</strong><br>
+                    <code>GET /download</code><br>
+                    响应：标注训练数据文件（如 <code>annotations.jsonl</code>）。
+                </li>
+                <li>
+                    <strong>获取训练日志和进度：</strong><br>
+                    <code>GET /train-log</code><br>
+                    响应：Server-Sent Events (SSE)，实时返回训练日志和进度。
+                </li>
+                <li>
+                    <strong>实体预测：</strong><br>
+                    <code>POST /predict</code><br>
+                    请求体：<code>{"text": "输入文本"}</code><br>
+                    响应：<code>{"entities": ["实体1", "实体2"]}</code>
+                </li>
+                <li>
+                    <strong>自动标注数据：</strong><br>
+                    <code>POST /annotate</code><br>
+                    请求体：<code>application/json</code>，包含一个实体对象字段。<br>
+                    请求示例：
+                    <pre>
+{
+  "type": "飞行器",
+  "labels": {
+    "zh": "J6K1阵风"
+  },
+  "descriptions": {
+    "zh": "战争末期海军的一种高性能岸基战斗机，但设计完成太晚，而当时川西公司正忙着紧急生产紫电改，J6K1的生产进度缓慢，所以在首机还没试飞就战争结束了。"
+  }
+}
+                    </pre>
+                    响应：<code>{"tokens": [...], "labels": [...]}</code>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 上传训练数据并训练模型
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('file');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const uploadStatus = document.getElementById('upload-status');
+            uploadStatus.textContent = '正在上传并训练模型...';
+
+            try {
+                const response = await fetch('/train', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    uploadStatus.textContent = '训练已开始！';
+                    startLogTracking();  // 开始监听训练日志
+                } else {
+                    uploadStatus.textContent = `错误：${result.error}`;
+                }
+            } catch (error) {
+                uploadStatus.textContent = `错误：${error.message}`;
+            }
+        });
+
+        // 监听训练日志和进度
+        function startLogTracking() {
+            const trainingLogs = document.getElementById('training-logs');
+            const trainingProgress = document.getElementById('training-progress');
+            const progressText = document.getElementById('progress-text');
+
+            trainingLogs.innerHTML = '';  // 清空日志
+
+            const eventSource = new EventSource('/train-log');
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.log) {
+                        const logEntry = document.createElement('p');
+                        logEntry.textContent = data.log;
+                        trainingLogs.appendChild(logEntry);
+                        trainingLogs.scrollTop = trainingLogs.scrollHeight;  // 自动滚动到底部
+                    }
+                    if (data.progress !== undefined) {
+                        trainingProgress.value = data.progress;
+                        progressText.textContent = `${data.progress}%`;
+                    }
+                } catch (error) {
+                    console.error("解析日志数据时出错：", error);
+                }
+            };
+
+            // 训练完成后关闭 EventSource
+            eventSource.addEventListener('complete', () => {
+                eventSource.close();
+                const logEntry = document.createElement('p');
+                logEntry.textContent = "训练已完成！";
+                trainingLogs.appendChild(logEntry);
+            });
+        }
+
+        // 调用模型进行预测
+        async function predictEntities() {
+            const inputText = document.getElementById('input-text').value;
+            if (!inputText) {
+                alert('请输入文本！');
+                return;
+            }
+
+            const entitiesResult = document.getElementById('entities-result');
+            entitiesResult.innerHTML = '<p>加载中...</p>';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: inputText })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    entitiesResult.innerHTML = '';
+                    for (const [entityType, entities] of Object.entries(result.entities)) {
+                        const entityDiv = document.createElement('div');
+                        entityDiv.classList.add('entity-type');
+                        entityDiv.innerHTML = `<strong>${entityType}:</strong> ${entities.length > 0 ? entities.join(', ') : '无'}`;
+                        entitiesResult.appendChild(entityDiv);
+                    }
+                } else {
+                    entitiesResult.innerHTML = `<p>错误：${result.error}</p>`;
+                }
+            } catch (error) {
+                entitiesResult.innerHTML = `<p>错误：${error.message}</p>`;
+            }
+        }
+
+        // 自动标注数据
+        async function annotateData() {
+            const entityObjectText = document.getElementById('entity-object').value;
+            if (!entityObjectText) {
+                alert('请输入实体对象 JSON！');
+                return;
+            }
+
+            let entityObject;
+            try {
+                entityObject = JSON.parse(entityObjectText);
+            } catch (error) {
+                alert('无效的 JSON 格式！');
+                return;
+            }
+
+            const annotationResult = document.getElementById('annotation-result');
+            annotationResult.innerHTML = '<p>加载中...</p>';
+
+            try {
+                const response = await fetch('/annotate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(entityObject)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    annotationResult.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } else {
+                    annotationResult.innerHTML = `<p>错误：${result.error}</p>`;
+                }
+            } catch (error) {
+                annotationResult.innerHTML = `<p>错误：${error.message}</p>`;
+            }
+        }
+
+        async function previewAnnotations() {
+            const annotationsPreview = document.getElementById('annotations-preview');
+            annotationsPreview.innerHTML = '<p>加载中...</p>';
+
+            try {
+                const response = await fetch('/preview-annotations');
+                const result = await response.json();
+                if (response.ok) {
+                    annotationsPreview.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                } else {
+                    annotationsPreview.innerHTML = `<p>错误：${result.error}</p>`;
+                }
+            } catch (error) {
+                annotationsPreview.innerHTML = `<p>错误：${error.message}</p>`;
+            }
+        }
+
+        async function downloadAnnotations() {
+            try {
+                const response = await fetch('/download-annotations');
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'annotations.jsonl';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    alert('下载失败');
+                }
+            } catch (error) {
+                alert(`错误：${error.message}`);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -122,8 +122,8 @@
       <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']"
         (click)="action('info', entity)" class="result-title"></div>
       <div>
-        <a [href]="entity['_source']?.sources[0]" target="_blank" *ngIf="entity['_source']?.sources"
-          class="result-url">{{ entity["_source"]?.sources[0].slice(0, 50) }}</a>
+        <a  target="_blank" [href]="'http://localhost:4200/start/search/info/'+  entity['_id'] "
+          class="result-url">http://localhost:4200/start/search/info/{{  entity["_id"] }}</a>
       </div>
 
       <div *ngIf="!entity['highlight']" class="result-snippet">
