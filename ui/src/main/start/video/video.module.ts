@@ -18,10 +18,12 @@ import { XSelectModule } from '@ng-nest/ui/select';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EntityDetailComponent } from 'src/share/entity/entity-detail.component';
+import { VideoDialogComponent } from './video-dialog/video-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
-  declarations: [VideoComponent],
+  declarations: [VideoComponent, VideoDialogComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -47,6 +49,8 @@ import { EntityDetailComponent } from 'src/share/entity/entity-detail.component'
     LeafletModule,
     FontAwesomeModule,
     InfiniteScrollDirective,
+    MatIconModule,
+
     RouterModule.forChild([
       {
         path: '',

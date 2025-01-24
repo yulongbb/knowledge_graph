@@ -19,6 +19,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { faVideo } from '@fortawesome/free-solid-svg-icons';
+import { VideoDialogComponent } from './video-dialog/video-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-video',
@@ -90,6 +92,7 @@ export class VideoComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     public propertyService: PropertyService,
     private entityService: EntityService,
+    public dialog: MatDialog,
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
@@ -104,7 +107,13 @@ export class VideoComponent implements OnInit {
   }
   ngOnInit(): void { }
 
-
+  openVideoDialog(video:any): void {
+    this.dialog.open(VideoDialogComponent, {
+      width: '800px', // 弹框宽度
+      panelClass: 'custom-dialog-container',
+      data: video
+    });
+  }
   // 计算总页数
   get totalPages(): number {
     return Math.ceil(this.total / this.size);

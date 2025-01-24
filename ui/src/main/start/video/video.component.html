@@ -30,7 +30,7 @@
 <!-- Video Results Grid -->
 <div class="video-results-grid" *ngIf="videos&&videos.length > 0">
   <div *ngFor="let video of videos" class="video-card">
-    <div class="video-thumbnail">
+    <div class="video-thumbnail"  (click)="openVideoDialog(video)">
       <img [src]="'data:image/jpeg;base64,'+video.thumbnail" class="video-thumbnail">
       <div class="play-icon">
         <i class="fas fa-play"></i>

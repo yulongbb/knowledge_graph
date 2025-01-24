@@ -18,10 +18,12 @@ import { XSelectModule } from '@ng-nest/ui/select';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EntityDetailComponent } from 'src/share/entity/entity-detail.component';
+import { ImageDialogComponent } from './image-dialog/image.dialog.component';
+import { MatIconModule } from '@angular/material/icon'; // 导入 MatIconModule
 
 
 @NgModule({
-  declarations: [ImageComponent],
+  declarations: [ImageComponent, ImageDialogComponent],
   imports: [
     CommonModule,
     ShareModule,
@@ -46,6 +48,8 @@ import { EntityDetailComponent } from 'src/share/entity/entity-detail.component'
     XLinkModule,
     LeafletModule,
     FontAwesomeModule,
+    MatIconModule,
+
     InfiniteScrollDirective,
     RouterModule.forChild([
       {

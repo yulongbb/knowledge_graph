@@ -36,7 +36,7 @@
   <div class="gallery">
     <div class="warp">
       <div *ngFor="let image of images; let i = index">
-        <div (click)="preview(i, images)" class="thumbnail"
+        <div (click)="openDialog(i, images)" class="thumbnail"
           [style.background-image]="'url(' + getFullImageUrl(image.image) + ')'"></div>
         <x-link (click)="action('info', image)" type="info">{{image.label}}</x-link>
       </div>

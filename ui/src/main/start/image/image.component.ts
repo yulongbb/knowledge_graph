@@ -18,6 +18,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageDialogComponent } from './image-dialog/image.dialog.component';
 
 @Component({
   selector: 'app-image',
@@ -85,7 +87,7 @@ export class ImageComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     public propertyService: PropertyService,
-    private entityService: EntityService,
+    public dialog: MatDialog,
     private dialogSewrvice: XDialogService
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
@@ -481,6 +483,22 @@ export class ImageComponent implements OnInit {
       // 如果不是完整的 URL，则添加前缀
       return 'http://localhost:9000/kgms/' + imagePath;
     }
+  }
+
+  openDialog(index: number, images: Array<any>): void {
+    this.dialog.open(ImageDialogComponent, {
+      data: {
+        images: images.map((image: any) => {
+          if (image.image?.startsWith('http://') || image.image.startsWith('https://')) {
+            return image.image;
+          } else {
+            // 如果不是完整的 URL，则添加前缀
+            return 'http://localhost:9000/kgms/' + image.image;
+          }
+        }),
+        currentIndex: index
+      }
+    });
   }
 
   preview(i: any, images: Array<any>) {

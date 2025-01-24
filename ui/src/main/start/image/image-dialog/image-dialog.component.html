@@ -1,0 +1,22 @@
+<div class="dialog-container">
+    <!-- 关闭按钮 -->
+    <button mat-icon-button class="close-button" (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  
+    <!-- 图片区域 -->
+    <div class="image-container">
+      <img [src]="data.images[data.currentIndex]" class="dialog-image" alt="预览图片">
+    </div>
+  
+    <!-- 切换按钮 -->
+    <div class="navigation-buttons">
+      <button mat-icon-button class="nav-button" (click)="prevImage()" [disabled]="data.currentIndex === 0">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <span class="image-counter">{{ data.currentIndex + 1 }} / {{ data.images.length }}</span>
+      <button mat-icon-button class="nav-button" (click)="nextImage()" [disabled]="data.currentIndex === data.images.length - 1">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
