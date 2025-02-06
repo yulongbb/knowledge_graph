@@ -26,6 +26,7 @@ services:
       - "9300:9300"
   minio:
     image: minio/minio:latest
+    container_name: minio
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -94,16 +95,9 @@ networks:
 
 volumes:
   arangodb:
-   external: true
   elasticsearch:
-   external: true
   minio:
-   external: true
   mysql:
-   external: true
   nginx:
-   external: true
   web:
-   external: true
   redis:
-   external: true

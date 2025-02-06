@@ -18,7 +18,7 @@ import { DatasetModule } from './dataset/dataset.module';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'rbac',
+      database: 'kgms',
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: ['query', 'error'],
