@@ -5,12 +5,6 @@ api/.env
 ui/node_modules
 ui/dist
 ui/.angular/cache
-db/MySQL/db
-db/arangodb/data
-db/minio/data
-db/elasticsearch/data
-db/nginx/html/gis
-db/nginx/conf
 python/ner_training_system/model
 python/ner_training_system/results
 python/ner_training_system/saved_model
