@@ -46,6 +46,13 @@
             <p id="upload-status"></p>
         </div>
 
+        <!-- 使用本地文件训练 -->
+        <div class="section">
+            <h2>5. 使用本地文件训练</h2>
+            <button onclick="trainWithLocalFile()">使用本地文件训练模型</button>
+            <p id="local-train-status"></p>
+        </div>
+
         <!-- 训练进度条 -->
         <div class="section">
             <h2>5. 训练进度</h2>
@@ -294,6 +301,27 @@
                 }
             } catch (error) {
                 alert(`错误：${error.message}`);
+            }
+        }
+
+        // 使用本地文件训练模型
+        async function trainWithLocalFile() {
+            const localTrainStatus = document.getElementById('local-train-status');
+            localTrainStatus.textContent = '正在使用本地文件训练模型...';
+
+            try {
+                const response = await fetch('/train-local', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    localTrainStatus.textContent = '训练已开始！';
+                    startLogTracking();  // 开始监听训练日志
+                } else {
+                    localTrainStatus.textContent = `错误：${result.error}`;
+                }
+            } catch (error) {
+                localTrainStatus.textContent = `错误：${error.message}`;
             }
         }
     </script>

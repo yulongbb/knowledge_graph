@@ -1,23 +1,103 @@
 version: "2"
 services:
-  api:
-    image: api
-    container_name: api
+  arango:
+    image: arangodb/arangodb:latest
+    container_name: arango
+    environment:
+    - ARANGO_ROOT_PASSWORD=root
+    volumes:
+    - arangodb:/var/lib/arangodb3 
     restart: always
     ports:
-      - "3333:3000"
+    - "8529:8529"
     networks:
       - my_network
-  ui:
-    image: ui
-    container_name: ui
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+      - "9999:9999"
+    restart: always
+    command: server /data --console-address ":9999"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123
+    read_only: true
+    volumes:
+      - minio:/data
+  mysql:
+    image: mysql
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - my_network
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+    - nginx:/etc/nginx
+    - web:/usr/share/nginx/html
     restart: always
     ports:
-      - "80:80"
-    networks:
-      - my_network
+      - 80:80
+      - 7777:7777
+      - 443:443
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+  # api:
+  #   image: api
+  #   container_name: api
+  #   restart: always
+  #   ports:
+  #     - "3333:3000"
+  #   networks:
+  #     - my_network
+  # ui:
+  #   image: ui
+  #   container_name: ui
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - my_network
 
 networks:
   my_network:
     driver: bridge
 
+
+volumes:
+  arangodb:
+  elasticsearch:
+  minio:
+  mysql:
+  nginx:
+  web:
+  redis:

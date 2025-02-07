@@ -73,6 +73,32 @@ def train():
 
     return jsonify({"message": "Training started!"})
 
+# 使用本地文件训练模型接口
+@app.route('/train-local', methods=['POST'])
+def train_local():
+    global training_logs, training_progress
+
+    # 本地文件路径
+    local_file_path = os.path.join(UPLOAD_FOLDER, 'annotations.jsonl')
+    if not os.path.exists(local_file_path):
+        return jsonify({"error": "Local file not found"}), 404
+
+    # 清空训练日志和进度
+    training_logs = []
+    training_progress = 0
+
+    # 启动训练线程
+    def train_task():
+        global training_logs, training_progress
+        try:
+            train_model(local_file_path, MODEL_FOLDER, training_logs, lambda p: set_progress(p))
+        except Exception as e:
+            training_logs.append(f"Error: {str(e)}")
+
+    threading.Thread(target=train_task).start()
+
+    return jsonify({"message": "Training started with local file!"})
+
 # 设置训练进度
 def set_progress(progress):
     global training_progress
@@ -182,6 +208,10 @@ def train_model(data_path, model_save_path="./saved_model", training_logs=None, 
         "model/bert-base-chinese", num_labels=len(label_to_id)
     )
 
+    # 将模型移动到CPU
+    device = torch.device("cpu")
+    model.to(device)
+
     # 定义训练参数
     training_args = TrainingArguments(
         output_dir="./results",
@@ -232,10 +262,6 @@ def train_model(data_path, model_save_path="./saved_model", training_logs=None, 
 
     return model_save_path
 
-
-
-
-
 # 改进后的推理函数
 def predict_entities(text):
     # 加载模型和分词器
@@ -257,6 +283,9 @@ def predict_entities(text):
     for i in range(max_label_id + 1):
         if i not in id_to_label:
             id_to_label[i] = "O"  # 默认标签
+
+    # 将模型和输入数据移动到CPU
+    model.to('cpu')
     inputs = tokenizer(
         text,
         return_tensors="pt",  # 返回PyTorch张量
@@ -264,7 +293,8 @@ def predict_entities(text):
         padding=True,
         max_length=128,
         is_split_into_words=False  # 输入是原始文本，而不是预分词的列表
-    )
+    ).to('cpu')
+    
     with torch.no_grad():  # 禁用梯度计算
         outputs = model(**inputs)
     predictions = torch.argmax(outputs.logits, dim=-1).squeeze().tolist()
@@ -333,7 +363,7 @@ def annotate_text(text, entities, entity_type):
     # 标注实体
     for entity in entities:
         start_idx = text.find(entity)
-        if start_idx != -1:
+        if (start_idx != -1):
             end_idx = start_idx + len(entity)
             labels[start_idx] = f"B-{entity_type}"
             for i in range(start_idx + 1, end_idx):
@@ -389,4 +419,5 @@ def preview_annotations():
     return jsonify(annotations)
 
 if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
     app.run(host='0.0.0.0', port=5000)
