@@ -1,0 +1,27 @@
+<div class="chat-container">
+  <div class="sessions">
+    <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session" (click)="selectSession(session.id)">
+      {{ session.name }}
+      <fa-icon [icon]="faTrash" (click)="deleteSession(session.id)"></fa-icon>
+      <fa-icon [icon]="faEdit" (click)="updateSession(session.id)"></fa-icon>
+    </div>
+    <button (click)="addSession()">
+      <fa-icon [icon]="faPlus"></fa-icon>
+    </button>
+  </div>
+  <div class="chat-content">
+    <div class="messages" #messagesContainer>
+      <div *ngFor="let message of messages" [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
+        <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
+        <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
+        <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+      </div>
+    </div>
+    <div class="input-container">
+      <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." />
+      <button (click)="sendMessage()">
+        <fa-icon [icon]="faPaperPlane"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

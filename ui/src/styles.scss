@@ -4,6 +4,7 @@
 @import '~quill/dist/quill.snow.css';
 @import 'src/styles/themes/default';
 @import 'src/styles/core/index';
+@import '~highlight.js/styles/github.css';
 @font-face {
   font-family: 'ubuntu';
   src: url('/src/assets/fonts/ubuntu.eot?#') format('eot'), url('/src/assets/fonts/ubuntu.ttf') format('truetype'),
@@ -51,8 +52,7 @@ a {
 
 i{color: red;}
 
-code,
-pre,
+
 tt {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
 }

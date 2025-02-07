@@ -9,6 +9,7 @@ import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { DatasetModule } from './dataset/dataset.module';
+import { ChatModule } from '../../backend/src/chat/chat.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DatasetModule } from './dataset/dataset.module';
     MinioClientModule,
     AuthModule,
     RedisModule,
+    ChatModule
   ],
   controllers: [],
   providers: [],
