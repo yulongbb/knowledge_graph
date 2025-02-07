@@ -9,8 +9,7 @@ import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { DatasetModule } from './dataset/dataset.module';
-import { ChatModule } from '../../backend/src/chat/chat.module';
-
+import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -32,7 +31,7 @@ import { ChatModule } from '../../backend/src/chat/chat.module';
     MinioClientModule,
     AuthModule,
     RedisModule,
-    ChatModule
+    ChatModule,
   ],
   controllers: [],
   providers: [],

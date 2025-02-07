@@ -10,4 +10,5 @@ python/ner_training_system/results
 python/ner_training_system/saved_model
 python/dicts
 python/results
+db/
 

@@ -15,7 +15,7 @@ import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { XTagModule } from '@ng-nest/ui/tag';
 import { XMessageBoxService } from '@ng-nest/ui/message-box';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ChatComponent } from './chat.component';
 
 @NgModule({
@@ -44,7 +44,7 @@ import { ChatComponent } from './chat.component';
     XMenuModule,
     XAutoCompleteModule,
     LeafletModule,
-    InfiniteScrollDirective,
+    InfiniteScrollModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),

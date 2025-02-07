@@ -91,28 +91,63 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   private getAIResponse(userMessage: string): void {
-    const headers = new HttpHeaders({
+    const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.apiKey}`
-    });
+    };
 
     const body = {
       model: 'qwen-plus',
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: userMessage }
-      ],
-      stream: false
+      messages: this.messages.map(message => ({
+        role: message.sender === 'user' ? 'user' : 'system',
+        content: message.text
+      })),
+      stream: true
     };
 
-    this.http.post<any>('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', body, { headers })
-      .subscribe(response => {
-        const aiMessage = response.choices[0].message.content;
-        this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
-        this.saveMessage(aiMessage, 'ai');
-      }, error => {
-        console.error('Error fetching AI response:', error);
-      });
+    fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    })
+    .then(response => response.body)
+    .then(body => {
+      const reader = body?.getReader(); 
+      let aiMessage = '';
+      this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
+
+      const read = () => {
+        reader?.read().then(({ done, value }) => {
+          if (done) {
+            this.saveMessage(aiMessage, 'ai');
+            return;
+          }
+          const text = new TextDecoder().decode(value);
+          const lines = text.split('\n');
+          for (const line of lines) {
+            if (line.trim()) {
+              if (line === 'data: [DONE]') {
+                this.saveMessage(aiMessage, 'ai');
+                return;
+              }
+              if (line.startsWith('data: ')) {
+                const json = JSON.parse(line.replace(/^data: /, ''));
+                if (json.choices[0].delta.content) {
+                  aiMessage += json.choices[0].delta.content;
+                  this.messages[this.messages.length - 1].text = aiMessage;
+                  this.messages = [...this.messages]; // Trigger change detection
+                }
+              }
+            }
+          }
+          read();
+        });
+      };
+      read();
+    })
+    .catch(error => {
+      console.error('Error fetching AI response:', error);
+    });
   }
 
   private scrollToBottom(): void {
