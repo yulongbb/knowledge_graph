@@ -1,9 +1,22 @@
 <div class="chat-container">
   <div class="sessions">
-    <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session" (click)="selectSession(session.id)">
-      {{ session.name }}
-      <fa-icon [icon]="faTrash" (click)="deleteSession(session.id)"></fa-icon>
-      <fa-icon [icon]="faEdit" (click)="updateSession(session.id)"></fa-icon>
+    <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session">
+      <div *ngIf="!session.isEditing" (click)="selectSession(session.id)">
+        {{ session.name }}
+      </div>
+      <div *ngIf="session.isEditing">
+        <input [(ngModel)]="session.name" />
+      </div>
+      <div class="actions">
+        <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
+          (click)="toggleMenu($event, session)"></fa-icon>
+        <div [ngClass]="{'menu': true, 'show': session.showMenu}">
+          <button (click)="editSession(session)"><fa-icon [icon]="faEdit" ></fa-icon>编辑</button>
+          <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash" ></fa-icon>删除</button>
+        </div>
+        <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
+        <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+      </div>
     </div>
     <button (click)="addSession()">
       <fa-icon [icon]="faPlus"></fa-icon>
@@ -11,7 +24,8 @@
   </div>
   <div class="chat-content">
     <div class="messages" #messagesContainer>
-      <div *ngFor="let message of messages" [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
+      <div *ngFor="let message of messages"
+        [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
         <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
         <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>

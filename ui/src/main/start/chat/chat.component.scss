@@ -1,35 +1,99 @@
 .chat-container {
   display: flex;
   height: 100%;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .sessions {
-  width: 200px;
-  border-right: 1px solid #ccc;
+  width: 250px;
+  border-right: 1px solid #dee2e6;
   padding-top: 60px;
-  background-color: #fff;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
 }
 
 .session {
   padding: 10px;
   cursor: pointer;
   border-radius: 5px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 0.3s;
+  position: relative;
 }
 
 .session:hover {
-  background-color: #e0e0e0;
+  background-color: #e9ecef;
 }
 
 .session.active {
-  background-color: #007bff;
-  color: white;
+  background-color: #e2e3e5;
+  color: black;
+}
+
+.session input {
+  flex: 1;
+  margin-right: 10px;
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.session .actions {
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  right: 10px;
+  color: #6c757d;
+}
+
+
+
+.session .menu-button {
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.session .menu-button:hover {
+  background-color: #e9ecef;
+}
+
+.session .menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  display: none;
+}
+
+.session .menu.show {
+  display: block;
+  width: 80px;
+}
+
+.session .menu button {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: #000;
+}
+
+.session .menu button:hover {
+  background-color: #e9ecef;
 }
 
 .chat-content {
@@ -76,30 +140,30 @@
 .message .text {
   padding: 10px;
   border-radius: 10px;
-  background-color: #fff;
+  background-color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .message.user .text {
-  background-color: #dcf8c6;
+  background-color: #d1e7dd;
 }
 
 .message.ai .text {
-  background-color: #ececec;
+  background-color: #e2e3e5;
 }
 
 .input-container {
   display: flex;
   padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
+  background-color: #ffffff;
+  border-top: 1px solid #dee2e6;
   border-radius: 0 0 10px 10px;
 }
 
 input {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ced4da;
   border-radius: 5px;
   margin-right: 10px;
 }
@@ -107,14 +171,14 @@ input {
 button {
   padding: 10px;
   border: none;
-  background-color: #007bff;
+  background-color: #6c757d;
   color: white;
   border-radius: 5px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #495057;
 }
 
 button fa-icon {

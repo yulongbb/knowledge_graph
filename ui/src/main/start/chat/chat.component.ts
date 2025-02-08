@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { faPaperPlane, faUser, faRobot, faTrash, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus,faEdit,faTrash } from '@fortawesome/free-solid-svg-icons';
 import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -22,15 +22,19 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   userInput: string = '';
   faPaperPlane = faPaperPlane;
   faUser = faUser;
-  faRobot = faRobot;
-  faTrash = faTrash;
-  faEdit = faEdit;
   faPlus = faPlus;
-  sessions: { id: number, name: string }[] = [];
+  faRobot = faRobot;
+  faEllipsisV = faEllipsisV;
+  faSave = faSave;
+  faEdit = faEdit;
+  faTrash = faTrash;
+  fa = faEdit;
+  faTimes = faTimes;
+  sessions: any = [];
   selectedSession: number | null = null;
   apiKey: string = ''; // Replace with your actual API key
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private renderer: Renderer2) {
     marked.setOptions({
       highlight: (code: string, lang: string) => {
         if (lang && hljs.getLanguage(lang)) {
@@ -43,6 +47,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.loadSessions();
+    this.renderer.listen('window', 'click', (e: Event) => {
+      this.sessions.forEach((session: any) => {
+        session.showMenu = false;
+      });
+    });
   }
 
   ngAfterViewChecked(): void {
@@ -178,7 +187,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   deleteSession(sessionId: number): void {
     this.http.delete(`/api/sessions/${sessionId}`)
       .subscribe(() => {
-        this.sessions = this.sessions.filter(session => session.id !== sessionId);
+        this.sessions = this.sessions.filter((session:any) => session.id !== sessionId);
         if (this.selectedSession === sessionId) {
           this.selectedSession = this.sessions.length > 0 ? this.sessions[0].id : null;
           if (this.selectedSession !== null) {
@@ -190,18 +199,35 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
   }
 
-  updateSession(sessionId: number): void {
-    const sessionName = `Session ${sessionId}`;
+  updateSession(sessionId: number, sessionName: string): void {
     this.http.put(`/api/sessions/${sessionId}`, { name: sessionName })
       .subscribe(() => {
-        const session = this.sessions.find(session => session.id === sessionId);
+        const session = this.sessions.find((session:any) => session.id === sessionId);
         if (session) {
           session.name = sessionName;
+          session.isEditing = false;
         }
       });
   }
 
+  editSession(session: { id: number, name: string, isEditing?: boolean }): void {
+    session.isEditing = true;
+  }
+
+  saveSession(session: { id: number, name: string, isEditing?: boolean }): void {
+    this.updateSession(session.id, session.name);
+  }
+
+  cancelEditSession(session: { id: number, name: string, isEditing?: boolean }): void {
+    session.isEditing = false;
+  }
+
   parseMarkdown(text: string): any {
     return marked(text);
+  }
+
+  toggleMenu(event: Event, session: any): void {
+    event.stopPropagation();
+    session.showMenu = !session.showMenu;
   }
 }
