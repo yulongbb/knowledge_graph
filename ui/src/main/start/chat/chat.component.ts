@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus,faEdit,faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
+import { EsService } from '../search/es.service';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
@@ -33,8 +34,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   sessions: any = [];
   selectedSession: number | null = null;
   apiKey: string = ''; // Replace with your actual API key
-
-  constructor(private http: HttpClient, private renderer: Renderer2) {
+  keyword: string = '';
+  entities:any;
+  constructor(private http: HttpClient, private renderer: Renderer2, private service: EsService,
+  ) {
     marked.setOptions({
       highlight: (code: string, lang: string) => {
         if (lang && hljs.getLanguage(lang)) {
@@ -47,6 +50,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.loadSessions();
+    this.queryKeyword('')
     this.renderer.listen('window', 'click', (e: Event) => {
       this.sessions.forEach((session: any) => {
         session.showMenu = false;
@@ -82,7 +86,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   loadMessages(sessionId: number): void {
     this.http.get<{ text: string, sender: string, avatar: any }[]>(`/api/sessions/${sessionId}/messages`)
       .subscribe(messages => {
-        console.log(messages);
         this.messages = messages;
       });
   }
@@ -101,7 +104,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   private saveMessage(text: string, sender: string): void {
     if (this.selectedSession !== null) {
       this.http.post(`/api/sessions/${this.selectedSession}/messages`, { text, sender })
-        .subscribe();
+        .subscribe(() => {
+          if (sender === 'user' && this.messages.length === 1) {
+            const truncatedTitle = text.length > 20 ? text.substring(0, 20) + '...' : text;
+            this.updateSession(this.selectedSession, truncatedTitle);
+          }
+        });
     }
   }
 
@@ -177,7 +185,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   addSession(): void {
-    this.http.post<{ id: number, name: string }>('/api/sessions', { name: `Session ${this.sessions.length + 1}` })
+    this.http.post<{ id: number, name: string }>('/api/sessions', { name: 'New Session' })
       .subscribe(session => {
         this.sessions.push(session);
         this.selectSession(session.id);
@@ -187,7 +195,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   deleteSession(sessionId: number): void {
     this.http.delete(`/api/sessions/${sessionId}`)
       .subscribe(() => {
-        this.sessions = this.sessions.filter((session:any) => session.id !== sessionId);
+        this.sessions = this.sessions.filter((session: any) => session.id !== sessionId);
         if (this.selectedSession === sessionId) {
           this.selectedSession = this.sessions.length > 0 ? this.sessions[0].id : null;
           if (this.selectedSession !== null) {
@@ -199,10 +207,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
   }
 
-  updateSession(sessionId: number, sessionName: string): void {
+  updateSession(sessionId: any, sessionName: string): void {
     this.http.put(`/api/sessions/${sessionId}`, { name: sessionName })
       .subscribe(() => {
-        const session = this.sessions.find((session:any) => session.id === sessionId);
+        const session = this.sessions.find((session: any) => session.id === sessionId);
         if (session) {
           session.name = sessionName;
           session.isEditing = false;
@@ -229,5 +237,31 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   toggleMenu(event: Event, session: any): void {
     event.stopPropagation();
     session.showMenu = !session.showMenu;
+  }
+
+  queryKeyword(keyword: any) {
+    if(keyword === ''){
+      this.service
+      .searchEntity(1, 10, { bool: { should: [{ match_all: {} }] } })
+      .subscribe((data: any) => {
+        console.log(data);
+        this.entities = data.list;
+      });
+    }else{
+      this.service
+      .searchEntity(1, 10, { bool: { should: [{ match: { 'labels.zh.value': keyword } }, { match: { 'descriptions.zh.value': keyword } }] } })
+      .subscribe((data: any) => {
+        console.log(data);
+        this.entities = data.list;
+      });
+    }
+ 
+
+  }
+
+  selectKnowledge(entity: any) {
+    console.log(entity);
+    this.userInput = entity['_source'].labels.zh.value;
+    this.sendMessage();
   }
 }

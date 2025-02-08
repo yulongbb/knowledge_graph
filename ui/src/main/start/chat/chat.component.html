@@ -11,8 +11,8 @@
         <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
           (click)="toggleMenu($event, session)"></fa-icon>
         <div [ngClass]="{'menu': true, 'show': session.showMenu}">
-          <button (click)="editSession(session)"><fa-icon [icon]="faEdit" ></fa-icon>编辑</button>
-          <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash" ></fa-icon>删除</button>
+          <button (click)="editSession(session)"><fa-icon [icon]="faEdit"></fa-icon>编辑</button>
+          <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash"></fa-icon>删除</button>
         </div>
         <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
         <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
@@ -37,5 +37,35 @@
         <fa-icon [icon]="faPaperPlane"></fa-icon>
       </button>
     </div>
+  </div>
+  <div class="knowledges">
+    <!-- 搜索框 -->
+    <div class="search-box">
+      <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
+
+    </div>
+    <!-- 搜索结果列表 -->
+    <div class="search-results">
+      <!-- 普通搜索结果 -->
+      <div class="result-item" (click)="selectKnowledge(entity)" *ngFor="let entity of entities">
+        <div *ngIf="!entity['highlight']" class="result-title">
+          {{ entity["_source"]?.labels?.zh?.value }}
+        </div>
+        <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']" class="result-title">
+        </div>
+        <div>
+          <a target="_blank" [href]="'http://localhost:4200/start/search/info/'+  entity['_id'] "
+            class="result-url">http://localhost:4200/start/search/info/{{ entity["_id"] }}</a>
+        </div>
+
+        <div *ngIf="!entity['highlight']" class="result-snippet">
+          {{ entity["_source"]?.descriptions?.zh?.value }}
+        </div>
+
+        <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"
+          class="result-snippet"></div>
+      </div>
+    </div>
+
   </div>
 </div>
