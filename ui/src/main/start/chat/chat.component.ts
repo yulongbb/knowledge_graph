@@ -47,6 +47,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked(): void {
     this.scrollToBottom();
+
+    // 使用新版highlight.js API
+    document.querySelectorAll('pre code').forEach((block: any) => {
+      hljs.highlightElement(block);
+    });
+
   }
 
   loadSessions(): void {
@@ -110,44 +116,44 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       headers: headers,
       body: JSON.stringify(body)
     })
-    .then(response => response.body)
-    .then(body => {
-      const reader = body?.getReader(); 
-      let aiMessage = '';
-      this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
+      .then(response => response.body)
+      .then(body => {
+        const reader = body?.getReader();
+        let aiMessage = '';
+        this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
 
-      const read = () => {
-        reader?.read().then(({ done, value }) => {
-          if (done) {
-            this.saveMessage(aiMessage, 'ai');
-            return;
-          }
-          const text = new TextDecoder().decode(value);
-          const lines = text.split('\n');
-          for (const line of lines) {
-            if (line.trim()) {
-              if (line === 'data: [DONE]') {
-                this.saveMessage(aiMessage, 'ai');
-                return;
-              }
-              if (line.startsWith('data: ')) {
-                const json = JSON.parse(line.replace(/^data: /, ''));
-                if (json.choices[0].delta.content) {
-                  aiMessage += json.choices[0].delta.content;
-                  this.messages[this.messages.length - 1].text = aiMessage;
-                  this.messages = [...this.messages]; // Trigger change detection
+        const read = () => {
+          reader?.read().then(({ done, value }) => {
+            if (done) {
+              this.saveMessage(aiMessage, 'ai');
+              return;
+            }
+            const text = new TextDecoder().decode(value);
+            const lines = text.split('\n');
+            for (const line of lines) {
+              if (line.trim()) {
+                if (line === 'data: [DONE]') {
+                  this.saveMessage(aiMessage, 'ai');
+                  return;
+                }
+                if (line.startsWith('data: ')) {
+                  const json = JSON.parse(line.replace(/^data: /, ''));
+                  if (json.choices[0].delta.content) {
+                    aiMessage += json.choices[0].delta.content;
+                    this.messages[this.messages.length - 1].text = aiMessage;
+                    this.messages = [...this.messages]; // Trigger change detection
+                  }
                 }
               }
             }
-          }
-          read();
-        });
-      };
-      read();
-    })
-    .catch(error => {
-      console.error('Error fetching AI response:', error);
-    });
+            read();
+          });
+        };
+        read();
+      })
+      .catch(error => {
+        console.error('Error fetching AI response:', error);
+      });
   }
 
   private scrollToBottom(): void {

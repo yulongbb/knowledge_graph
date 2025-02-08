@@ -30,7 +30,7 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/highlight.js/styles/default.css",
+              "node_modules/highlight.js/styles/github.css",
               "node_modules/@ng-nest/ui/style/core/index.css",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",

@@ -9,6 +9,7 @@
       <a [routerLink]="'/start/video'" [queryParams]="{ keyword: '' }">视频</a>
       <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }">文档</a>
       <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a>
+      <a [routerLink]="'/start/chat'" [queryParams]="{ keyword: '' }">AI</a>
       <a [routerLink]="'/addons'" [queryParams]="{ keyword: '' }">应用</a>
       <!-- 动态显示登录/用户信息 -->
       <ng-container *ngIf="auth.isLoggedIn; else loginLink">
