@@ -6,6 +6,9 @@ import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
 import { EsService } from '../search/es.service';
+import { EntityService } from 'src/main/entity/entity.service';
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { PropertyService } from 'src/main/ontology/property/property.service';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
@@ -35,8 +38,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   selectedSession: number | null = null;
   apiKey: string = ''; // Replace with your actual API key
   keyword: string = '';
-  entities:any;
-  constructor(private http: HttpClient, private renderer: Renderer2, private service: EsService,
+  entities: any;
+  constructor(private http: HttpClient, private renderer: Renderer2,
+    private service: EsService, private nodeService: EntityService,
+    private ontologyService: OntologyService,
+    public propertyService: PropertyService,
   ) {
     marked.setOptions({
       highlight: (code: string, lang: string) => {
@@ -240,28 +246,116 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   queryKeyword(keyword: any) {
-    if(keyword === ''){
+    if (keyword === '') {
       this.service
-      .searchEntity(1, 10, { bool: { should: [{ match_all: {} }] } })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.entities = data.list;
-      });
-    }else{
+        .searchEntity(1, 10, { bool: { should: [{ match_all: {} }] } })
+        .subscribe((data: any) => {
+          console.log(data);
+          this.entities = data.list;
+        });
+    } else {
       this.service
-      .searchEntity(1, 10, { bool: { should: [{ match: { 'labels.zh.value': keyword } }, { match: { 'descriptions.zh.value': keyword } }] } })
-      .subscribe((data: any) => {
-        console.log(data);
-        this.entities = data.list;
-      });
+        .searchEntity(1, 10, { bool: { should: [{ match: { 'labels.zh.value': keyword } }, { match: { 'descriptions.zh.value': keyword } }] } })
+        .subscribe((data: any) => {
+          console.log(data);
+          this.entities = data.list;
+        });
     }
- 
+
 
   }
 
   selectKnowledge(entity: any) {
     console.log(entity);
-    this.userInput = entity['_source'].labels.zh.value;
-    this.sendMessage();
+    this.ontologyService
+      .getAllParentIds(entity['_source'].type)
+      .subscribe((parents: any) => {
+        parents.push(entity['_source'].type);
+
+        this.propertyService
+          .getList(1, 50, {
+            filter: [
+              {
+                field: 'id',
+                value: parents as string[],
+                relation: 'schemas',
+                operation: 'IN',
+              },
+            ],
+          })
+          .subscribe((x: any) => {
+            console.log(x.list);
+
+            let properties: any = {}
+            x.list.forEach((p: any) => {
+              properties[`P${p.id}`] = p.name
+            });
+            this.nodeService
+              .getLinks(1, 50, entity['_id'], {})
+              .subscribe((c: any) => {
+                let statements: any = [];
+                c.list.forEach((p: any) => {
+                  if (p.edges[0].mainsnak.property != 'P31') {
+                    p.edges[0].mainsnak.label = properties[p.edges[0].mainsnak.property];
+                    if (p.edges[0]['_from'] != p.edges[0]['_to']) {
+                      console.log(p.edges[0].mainsnak.property);
+                      p.edges[0].mainsnak.datavalue.value.id =
+                        p.vertices[1]?.id;
+                      p.edges[0].mainsnak.datavalue.value.label =
+                        p.vertices[1]?.labels?.zh?.value;
+                    }
+                    statements.push(p.edges[0]);
+                  }
+                });
+                entity['_source'].statements = statements
+                this.userInput = this.jsonToMarkdown(entity['_source']);
+                this.sendMessage();
+              });
+          });
+      });
+  }
+
+
+  jsonToMarkdown(data: any): string {
+    console.log(data);
+    const lines: string[] = [];
+
+    // Start blockquote
+    lines.push('> ');
+    // Tags
+    if (data?.tags?.length > 0) {
+      data.tags.forEach((tag: any) => {
+        lines.push(`> \`${tag}\``);
+      });
+      lines.push('> ');
+    }
+
+    // Images
+    if (data?.images?.length > 0) {
+      data.images.forEach((image: any) => {
+        lines.push(`> <img src="http://localhost:9000/kgms/${image}" alt="描述" height="120">`);
+      });
+      lines.push('> ');
+    }
+
+    // Title from first label
+    const title = (Object.values(data.labels)[0] as { value: string })?.value || data.type;
+    lines.push(`> ### ${title}`);
+    lines.push('> ');
+
+    // Description
+    const description = (Object.values(data.descriptions)[0] as { value: string })?.value;
+    if (description) {
+      lines.push(`> ${description}`);
+      lines.push('> ');
+    }
+
+    data.statements.forEach((statement: any) => {
+      const property = statement.mainsnak.label;
+      const value = statement.mainsnak.datavalue.value;
+      const label = statement.mainsnak.datavalue.label;
+      lines.push(`> - ${property}: ${label || value}`);
+    });
+    return lines.join('\n');
   }
 }

@@ -173,8 +173,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     private dialogService: XDialogService,
     public nav: NavService,
     private ontologyService: OntologyService,
-    private esService: EsService,
     public propertyService: PropertyService,
+    private esService: EsService,
+
     public tagService: TagService,
     private nodeService: EntityService,
     private location: Location,
