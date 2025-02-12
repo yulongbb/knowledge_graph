@@ -126,7 +126,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
 
     const body = {
-      model: 'qwen-plus',
+      // model: 'qwen-plus',
+      model: 'DeepSeek-R1-Distill-Qwen-14B',
       messages: this.messages.map(message => ({
         role: message.sender === 'user' ? 'user' : 'system',
         content: message.text
@@ -134,7 +135,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       stream: true
     };
 
-    fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+    // fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+    fetch('http://10.117.1.238:5013/chat/completions', {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(body)
@@ -314,7 +316,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
           });
       });
   }
-
 
   jsonToMarkdown(data: any): string {
     console.log(data);

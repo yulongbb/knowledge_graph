@@ -47,7 +47,7 @@ export const mainRoutes: Routes = [
 
 
   // 如果路由为空就指向 index
-  { path: "", redirectTo: environment.layout, pathMatch: "full" },
+  { path: "", redirectTo: environment.index, pathMatch: "full" },
 
   ...shareRoutes
 ];
