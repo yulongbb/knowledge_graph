@@ -41,4 +41,10 @@ export class ChatController {
   createMessage(@Param('id') id: number, @Body('text') text: string, @Body('sender') sender: string): Promise<Message> {
     return this.chatService.createMessage(id, text, sender);
   }
+
+  @Delete(':id/messages')
+  deleteMessages(@Param('id') id: number): Promise<void> {
+    return this.chatService.deleteMessages(id);
+  }
+
 }

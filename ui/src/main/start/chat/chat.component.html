@@ -1,29 +1,46 @@
 <div class="chat-container">
-  <div class="sessions">
-    <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session">
-      <div *ngIf="!session.isEditing" (click)="selectSession(session.id)">
-        {{ session.name }}
-      </div>
-      <div *ngIf="session.isEditing">
-        <input [(ngModel)]="session.name" />
-      </div>
-      <div class="actions">
-        <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
-          (click)="toggleMenu($event, session)"></fa-icon>
-        <div [ngClass]="{'menu': true, 'show': session.showMenu}">
-          <button (click)="editSession(session)"><fa-icon [icon]="faEdit"></fa-icon>编辑</button>
-          <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash"></fa-icon>删除</button>
+  <div class="sessions-container">
+    <div class="session-header">
+      <button (click)="toggleSessions()">
+        <fa-icon [icon]="sessionsVisible ? faTimes : faPlus"></fa-icon>
+      </button>
+      <button (click)="addSession()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </button>
+    </div>
+    <div class="sessions" [ngClass]="{'hidden': !sessionsVisible}">
+      <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session" (click)="selectSession(session.id)">
+        <div *ngIf="!session.isEditing">
+          {{ session.name }}
         </div>
-        <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
-        <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+        <div *ngIf="session.isEditing">
+          <input [(ngModel)]="session.name" />
+        </div>
+        <div class="actions">
+          <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
+            (click)="toggleMenu($event, session)"></fa-icon>
+          <div [ngClass]="{'menu': true, 'show': session.showMenu}">
+            <button (click)="editSession(session)"><fa-icon [icon]="faEdit"></fa-icon>编辑</button>
+            <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash"></fa-icon>删除</button>
+          </div>
+          <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
+          <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+        </div>
       </div>
     </div>
-    <button (click)="addSession()">
-      <fa-icon [icon]="faPlus"></fa-icon>
-    </button>
   </div>
   <div class="chat-content">
-    <div class="messages" #messagesContainer>
+    <div *ngIf="selectedSession === null" class="welcome-screen">
+      <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
+      <h2>欢迎使用知识图谱AI助手</h2>
+      <p>快在下方输入问题开始聊天吧</p>
+      <div class="recommended-knowledge">
+        <div class="knowledge-item" *ngFor="let knowledge of hots"  (click)="selectKnowledge(knowledge?.id)">
+          {{ knowledge?.id["_source"]?.labels?.zh?.value  }}
+        </div>
+      </div>
+    </div>
+    <div *ngIf="selectedSession !== null" class="messages" #messagesContainer>
       <div *ngFor="let message of messages"
         [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
@@ -32,40 +49,24 @@
       </div>
     </div>
     <div class="input-container">
-      <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." />
-      <button (click)="sendMessage()">
-        <fa-icon [icon]="faPaperPlane"></fa-icon>
-      </button>
-    </div>
-  </div>
-  <div class="knowledges">
-    <!-- 搜索框 -->
-    <div class="search-box">
-      <input type="text" placeholder="输入搜索词" [(ngModel)]="keyword" (keyup.enter)="queryKeyword(keyword)" />
-
-    </div>
-    <!-- 搜索结果列表 -->
-    <div class="search-results">
-      <!-- 普通搜索结果 -->
-      <div class="result-item" (click)="selectKnowledge(entity)" *ngFor="let entity of entities">
-        <div *ngIf="!entity['highlight']" class="result-title">
-          {{ entity["_source"]?.labels?.zh?.value }}
-        </div>
-        <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['labels.zh.value']" class="result-title">
-        </div>
-        <div>
-          <a target="_blank" [href]="'http://localhost:4200/start/search/info/'+  entity['_id'] "
-            class="result-url">http://localhost:4200/start/search/info/{{ entity["_id"] }}</a>
-        </div>
-
-        <div *ngIf="!entity['highlight']" class="result-snippet">
-          {{ entity["_source"]?.descriptions?.zh?.value }}
-        </div>
-
-        <div *ngIf="entity['highlight']" [innerHTML]="entity['highlight']['descriptions.zh.value']"
-          class="result-snippet"></div>
+      <div class="input-wrapper">
+        <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." autofocus />
+        <button (click)="sendMessage()">
+          <fa-icon [icon]="faPaperPlane"></fa-icon>
+        </button>
       </div>
     </div>
-
+  </div>
+  <div class="knowledges-container">
+    <div class="knowledge-header">
+      <button (click)="toggleKnowledges()">
+        <fa-icon [icon]="knowledgesVisible ? faTimes : faPlus"></fa-icon>
+      </button>
+    </div>
+    <div class="knowledges" [ngClass]="{'hidden': !knowledgesVisible}">
+      <div *ngFor="let entity of entities" class="result-item" (click)="selectKnowledge(entity)">
+        {{ entity["_source"]?.labels?.zh?.value }}
+      </div>
+    </div>
   </div>
 </div>

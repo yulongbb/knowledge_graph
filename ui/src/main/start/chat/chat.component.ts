@@ -5,10 +5,10 @@ import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
-import { EsService } from '../search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
+import { EsService } from '../home/es.service';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
@@ -39,10 +39,19 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   apiKey: string = ''; // Replace with your actual API key
   keyword: string = '';
   entities: any;
+  sessionsVisible: boolean = false;
+  knowledgesVisible: boolean = false;
+  recommendedKnowledge: string[] = [
+    '知识1', '知识2', '知识3',
+    '知识4', '知识5', '知识6'
+  ];
+  hots: any[] | undefined;
+
   constructor(private http: HttpClient, private renderer: Renderer2,
     private service: EsService, private nodeService: EntityService,
     private ontologyService: OntologyService,
     public propertyService: PropertyService,
+
   ) {
     marked.setOptions({
       highlight: (code: string, lang: string) => {
@@ -57,6 +66,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.loadSessions();
     this.queryKeyword('')
+    this.service.getHot().subscribe((res: any) => {
+      console.log(res); // 输出原始数据，便于调试
+      this.hots = res; // 调用处理函数，将结果存入组件变量
+    });
+
     this.renderer.listen('window', 'click', (e: Event) => {
       this.sessions.forEach((session: any) => {
         session.showMenu = false;
@@ -74,13 +88,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   }
 
+
   loadSessions(): void {
     this.http.get<{ id: number, name: string }[]>('/api/sessions')
       .subscribe(sessions => {
         this.sessions = sessions;
-        if (sessions.length > 0) {
-          this.selectSession(sessions[0].id);
-        }
       });
   }
 
@@ -97,22 +109,44 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   sendMessage(): void {
-    if (this.userInput.trim() && this.selectedSession !== null) {
-      const userMessage = this.userInput;
-      this.messages.push({ text: userMessage, sender: 'user', avatar: this.faUser });
-      this.userInput = '';
-      this.messageInput?.nativeElement.focus();
-      this.saveMessage(userMessage, 'user');
-      this.getAIResponse(userMessage);
+    if (this.userInput.trim()) {
+      if (this.selectedSession === null) {
+        this.createSessionAndSendMessage();
+      } else {
+        const userMessage = this.userInput;
+        this.messages.push({ text: userMessage, sender: 'user', avatar: this.faUser });
+        this.userInput = '';
+        this.messageInput?.nativeElement.focus();
+        this.saveMessage(userMessage, 'user');
+        this.getAIResponse(userMessage);
+      }
     }
+  }
+
+  private createSessionAndSendMessage(): void {
+    const userMessage = this.userInput;
+    const truncatedTitle = userMessage.length > 20 ? userMessage.substring(0, 20).split(':')[0] + '...' : userMessage.split(':')[0];
+    this.http.post<{ id: number, name: string }>('/api/sessions', { name: truncatedTitle })
+      .subscribe(session => {
+        this.sessions.push(session);
+        this.selectedSession = session.id;
+        this.messages.push({ text: userMessage, sender: 'user', avatar: this.faUser });
+        this.userInput = '';
+        this.messageInput?.nativeElement.focus();
+        this.saveMessage(userMessage, 'user');
+        this.getAIResponse(userMessage);
+        this.knowledgesVisible = true; // Automatically expand the knowledge list
+      });
   }
 
   private saveMessage(text: string, sender: string): void {
     if (this.selectedSession !== null) {
       this.http.post(`/api/sessions/${this.selectedSession}/messages`, { text, sender })
         .subscribe(() => {
-          if (sender === 'user' && this.messages.length === 1) {
-            const truncatedTitle = text.length > 20 ? text.substring(0, 20) + '...' : text;
+          console.log('Message saved:', text, sender);
+          console.log(this.messages);
+          if (sender === 'user' && this.messages.length <= 2) {
+            const truncatedTitle = text.length > 20 ? text.substring(0, 20).split(':')[0] + '...' : text.split(':')[0];
             this.updateSession(this.selectedSession, truncatedTitle);
           }
         });
@@ -149,6 +183,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
         const read = () => {
           reader?.read().then(({ done, value }) => {
+
             if (done) {
               this.saveMessage(aiMessage, 'ai');
               return;
@@ -156,6 +191,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             const text = new TextDecoder().decode(value);
             const lines = text.split('\n');
             for (const line of lines) {
+              console.log(line);
+
               if (line.trim()) {
                 if (line === 'data: [DONE]') {
                   this.saveMessage(aiMessage, 'ai');
@@ -163,7 +200,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
                 }
                 if (line.startsWith('data: ')) {
                   const json = JSON.parse(line.replace(/^data: /, ''));
-                  if (json.choices[0].delta.content) {
+                  if (json.choices && json.choices[0].delta.content) {
                     aiMessage += json.choices[0].delta.content;
                     this.messages[this.messages.length - 1].text = aiMessage;
                     this.messages = [...this.messages]; // Trigger change detection
@@ -193,29 +230,25 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   addSession(): void {
-    this.http.post<{ id: number, name: string }>('/api/sessions', { name: 'New Session' })
-      .subscribe(session => {
-        this.sessions.push(session);
-        this.selectSession(session.id);
-      });
+    this.selectedSession = null;
+    this.messages = [];
+
   }
 
   deleteSession(sessionId: number): void {
-    this.http.delete(`/api/sessions/${sessionId}`)
+    this.http.delete(`/api/sessions/${sessionId}/messages`)
       .subscribe(() => {
-        this.sessions = this.sessions.filter((session: any) => session.id !== sessionId);
-        if (this.selectedSession === sessionId) {
-          this.selectedSession = this.sessions.length > 0 ? this.sessions[0].id : null;
-          if (this.selectedSession !== null) {
-            this.loadMessages(this.selectedSession);
-          } else {
-            this.messages = [];
-          }
-        }
+        this.http.delete(`/api/sessions/${sessionId}`)
+          .subscribe(() => {
+            this.sessions = this.sessions.filter((session: any) => session.id !== sessionId);
+            this.addSession();
+          });
       });
   }
 
   updateSession(sessionId: any, sessionName: string): void {
+    console.log('更新会话');
+    console.log(sessionId, sessionName);
     this.http.put(`/api/sessions/${sessionId}`, { name: sessionName })
       .subscribe(() => {
         const session = this.sessions.find((session: any) => session.id === sessionId);
@@ -245,6 +278,14 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   toggleMenu(event: Event, session: any): void {
     event.stopPropagation();
     session.showMenu = !session.showMenu;
+  }
+
+  toggleSessions(): void {
+    this.sessionsVisible = !this.sessionsVisible;
+  }
+
+  toggleKnowledges(): void {
+    this.knowledgesVisible = !this.knowledgesVisible;
   }
 
   queryKeyword(keyword: any) {
@@ -321,6 +362,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     console.log(data);
     const lines: string[] = [];
 
+    // Title from first label
+    const title = (Object.values(data.labels)[0] as { value: string })?.value || data.type;
+    lines.push(`${title}:`);
+
+
     // Start blockquote
     lines.push('> ');
     // Tags
@@ -339,10 +385,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       lines.push('> ');
     }
 
-    // Title from first label
-    const title = (Object.values(data.labels)[0] as { value: string })?.value || data.type;
-    lines.push(`> ### ${title}`);
-    lines.push('> ');
 
     // Description
     const description = (Object.values(data.descriptions)[0] as { value: string })?.value;

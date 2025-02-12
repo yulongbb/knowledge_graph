@@ -42,4 +42,12 @@ export class ChatService {
     const message = this.messagesRepository.create({ sessionId, text, sender });
     return this.messagesRepository.save(message);
   }
+
+  
+  deleteMessages(sessionId: number): Promise<void> {
+    return this.messagesRepository.find({ where: { sessionId } }).then(messages => { 
+      this.messagesRepository.remove(messages).then(() => {});
+     });
+  }
+
 }
