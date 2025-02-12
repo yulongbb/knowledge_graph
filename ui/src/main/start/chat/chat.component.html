@@ -2,7 +2,7 @@
   <div class="sessions-container">
     <div class="session-header">
       <button (click)="toggleSessions()">
-        <fa-icon [icon]="sessionsVisible ? faTimes : faPlus"></fa-icon>
+        <fa-icon [icon]="sessionsVisible ? faTimes : faArrowRight"></fa-icon>
       </button>
       <button (click)="addSession()">
         <fa-icon [icon]="faPencilSquare"></fa-icon>
@@ -38,7 +38,7 @@
     <div *ngIf="selectedSession === null" class="welcome-screen">
       <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
       <h2>欢迎使用知识图谱AI助手</h2>
-      <p>快在下方输入问题开始聊天吧</p>
+      <p>快在下方聊天框输入问题开始聊天吧</p>
       <div class="recommended-knowledge">
         <div class="knowledge-item" *ngFor="let knowledge of hots"  (click)="selectKnowledge(knowledge?.id)">
           {{ knowledge?.id["_source"]?.labels?.zh?.value  }}
@@ -55,7 +55,7 @@
     </div>
     <div class="input-container">
       <div class="input-wrapper">
-        <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." autofocus />
+        <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="请输入您感兴趣的问题..." autofocus />
         <button *ngIf="!isAnswering" (click)="sendMessage()">
           <fa-icon [icon]="faPaperPlane"></fa-icon>
         </button>
@@ -68,7 +68,7 @@
   <div class="knowledges-container">
     <div class="knowledge-header">
       <button (click)="toggleKnowledges()">
-        <fa-icon [icon]="knowledgesVisible ? faTimes : faPlus"></fa-icon>
+        <fa-icon [icon]="knowledgesVisible ? faTimes : faArrowLeft"></fa-icon>
       </button>
     </div>
     <div class="knowledges" [ngClass]="{'hidden': !knowledgesVisible}">

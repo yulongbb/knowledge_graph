@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash, faPencilSquare, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash, faPencilSquare, faPause, faTentArrowLeftRight, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -28,7 +28,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   faPencilSquare = faPencilSquare;
   faPaperPlane = faPaperPlane;
   faUser = faUser;
-  faPlus = faPlus;
+  faArrowLeft = faArrowLeft;
+  faArrowRight = faArrowRight;
   faRobot = faRobot;
   faEllipsisV = faEllipsisV;
   faSave = faSave;
