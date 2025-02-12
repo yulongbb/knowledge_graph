@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash, faPencilSquare, faPause } from '@fortawesome/free-solid-svg-icons';
 import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -24,6 +24,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer: ElementRef | undefined;
   messages: { text: string, sender: string, avatar: any }[] = [];
   userInput: string = '';
+  faPause =faPause;
+  faPencilSquare = faPencilSquare;
   faPaperPlane = faPaperPlane;
   faUser = faUser;
   faPlus = faPlus;
@@ -46,6 +48,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     '知识4', '知识5', '知识6'
   ];
   hots: any[] | undefined;
+  models: string[] = ['DeepSeek-R1','通义千问-Max-Latest',  'Baichuan2-开源版-7B'];
+  selectedModel: string = this.models[0];
+  isAnswering: boolean = false;
+  private reader: ReadableStreamDefaultReader | undefined;
 
   constructor(private http: HttpClient, private renderer: Renderer2,
     private service: EsService, private nodeService: EntityService,
@@ -135,7 +141,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.messageInput?.nativeElement.focus();
         this.saveMessage(userMessage, 'user');
         this.getAIResponse(userMessage);
-        this.knowledgesVisible = true; // Automatically expand the knowledge list
       });
   }
 
@@ -177,15 +182,17 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     })
       .then(response => response.body)
       .then(body => {
-        const reader = body?.getReader();
+        this.reader = body?.getReader();
         let aiMessage = '';
         this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
+        this.isAnswering = true;
 
         const read = () => {
-          reader?.read().then(({ done, value }) => {
+          this.reader?.read().then(({ done, value }) => {
 
             if (done) {
               this.saveMessage(aiMessage, 'ai');
+              this.isAnswering = false;
               return;
             }
             const text = new TextDecoder().decode(value);
@@ -196,6 +203,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
               if (line.trim()) {
                 if (line === 'data: [DONE]') {
                   this.saveMessage(aiMessage, 'ai');
+                  this.isAnswering = false;
                   return;
                 }
                 if (line.startsWith('data: ')) {
@@ -215,7 +223,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       })
       .catch(error => {
         console.error('Error fetching AI response:', error);
+        this.isAnswering = false;
       });
+  }
+
+  stopResponse(): void {
+    this.reader?.cancel();
+    this.isAnswering = false;
   }
 
   private scrollToBottom(): void {

@@ -33,6 +33,7 @@
 }
 
 .session-header button {
+  font-size: 24px;
   background: none;
   border: none;
   cursor: pointer;
@@ -128,6 +129,27 @@
   padding-top: 60px;
 }
 
+.model-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.model-selector label {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #6c757d;
+}
+
+.model-selector select {
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #6c757d;
+}
+
 .messages {
   flex: 1;
   overflow-y: auto;
@@ -136,6 +158,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.messages::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 
 .message {
@@ -194,7 +222,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  border: 1px solid #ced4da;
+  border: 2px solid #006edb;
   border-radius: 5px;
   padding: 5px;
 }
@@ -206,10 +234,6 @@ input {
   outline: none;
 }
 
-input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
 
 button {
   padding: 10px;
@@ -227,6 +251,14 @@ button:hover {
 button fa-icon {
   width: 20px;
   height: 20px;
+}
+
+.pause-button {
+  background-color: #dc3545;
+}
+
+.pause-button:hover {
+  background-color: #c82333;
 }
 
 .knowledges-container {
@@ -256,6 +288,7 @@ button fa-icon {
 }
 
 .knowledge-header button {
+  font-size: 24px;
   background: none;
   border: none;
   cursor: pointer;

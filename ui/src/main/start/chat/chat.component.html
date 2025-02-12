@@ -5,7 +5,7 @@
         <fa-icon [icon]="sessionsVisible ? faTimes : faPlus"></fa-icon>
       </button>
       <button (click)="addSession()">
-        <fa-icon [icon]="faPlus"></fa-icon>
+        <fa-icon [icon]="faPencilSquare"></fa-icon>
       </button>
     </div>
     <div class="sessions" [ngClass]="{'hidden': !sessionsVisible}">
@@ -30,6 +30,11 @@
     </div>
   </div>
   <div class="chat-content">
+    <div class="model-selector">
+      <select id="modelSelect" [(ngModel)]="selectedModel">
+        <option *ngFor="let model of models" [value]="model">{{ model }}</option>
+      </select>
+    </div>
     <div *ngIf="selectedSession === null" class="welcome-screen">
       <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
       <h2>欢迎使用知识图谱AI助手</h2>
@@ -51,8 +56,11 @@
     <div class="input-container">
       <div class="input-wrapper">
         <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." autofocus />
-        <button (click)="sendMessage()">
+        <button *ngIf="!isAnswering" (click)="sendMessage()">
           <fa-icon [icon]="faPaperPlane"></fa-icon>
+        </button>
+        <button *ngIf="isAnswering" (click)="stopResponse()" class="pause-button">
+          <fa-icon [icon]="faPause"></fa-icon>
         </button>
       </div>
     </div>
