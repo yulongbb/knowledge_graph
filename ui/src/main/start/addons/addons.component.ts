@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 interface Extension {
+  id?: number;
   name: string;
   rating: number;
   description: string;
   reviews: number;
   category: string;
-  image: string; // 新增图片字段
+  image: string;
 }
 
 @Component({
@@ -14,30 +16,103 @@ interface Extension {
   templateUrl: './addons.component.html',
   styleUrls: ['./addons.component.scss']
 })
-export class AddonsComponent {
-  categories: string[] = [
-    '博客', '通讯', '开发人员工具', '娱乐', '新闻和天气', '照片', '高效工作', '搜索工具', '购物', '社交', '体育'
-  ];
+export class AddonsComponent implements OnInit {
+  categories: string[] = [];
+  filteredExtensions: Extension[] = [];
+  selectedExtension: Extension | null = null;
+  newExtension: Extension = {
+    name: '',
+    rating: 0,
+    description: '',
+    reviews: 0,
+    category: '',
+    image: ''
+  };
+  isCreating: boolean = false;
+  isEditing: boolean = false;
 
-  // 最热应用列表
-  hotExtensions: Extension[] = [
-    { name: 'Global Speed: 视频速度控制', rating: 5, description: '设置视频和音频的默认速度。', reviews: 96, category: '高效工作', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: '闪避式翻译：网易翻译插件', rating: 5, description: 'PDF翻译 | ...', reviews: 36, category: '高效工作', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: '轻松读', rating: 5, description: '', reviews: 4, category: '高效工作', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: 'ChatGPT免费版', rating: 5, description: 'GPT-4(即时重选)', reviews: 9, category: '开发人员工具', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: '极酷Lab 快活版', rating: 5, description: '(CnixGPT免费版)', reviews: 1, category: '开发人员工具', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: 'AdGuard广告挂载版', rating: 5, description: '', reviews: 6, category: '高效工作', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' }
-  ];
+  constructor(private http: HttpClient) {}
 
-  // 最新应用列表
-  latestExtensions: Extension[] = [
-    { name: 'Magic VPN - 最好的免费代理工具', rating: 5, description: '', reviews: 8, category: '高效工作', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: 'The Elder Scrolls V: Skyrim 10th Anniversary', rating: 5, description: 'Personalize Microsoft Edge with a new browser theme inspired by The Elder Scrolls V: Skyrim Anniversary Edition...', reviews: 25, category: '娱乐', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: 'BattleTabs', rating: 5, description: 'Multiplayer Battles in your New Tab', reviews: 76, category: '娱乐', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' },
-    { name: 'YouTube NonStop', rating: 5, description: 'Kiss the annoying “Video paused. Continue watching?” confirmation goodbye!', reviews: 23, category: '娱乐', image: 'https://avatars.githubusercontent.com/u/17495916?s=100&v=4' }
-  ];
+  ngOnInit() {
+    this.fetchExtensions();
+    this.fetchCategories();
+  }
+
+  fetchExtensions() {
+    this.http.get<Extension[]>('/api/addons').subscribe(data => {
+      this.filteredExtensions = data;
+    });
+  }
+
+  fetchCategories() {
+    this.http.get<string[]>('/api/addons/categories').subscribe(data => {
+      this.categories = data;
+    });
+  }
 
   selectCategory(category: string) {
-    // 筛选逻辑（根据需求实现）
+    this.http.get<Extension[]>(`/api/addons?category=${category}`).subscribe(data => {
+      this.filteredExtensions = data;
+    });
+  }
+
+  viewDetails(extension: Extension) {
+    this.selectedExtension = extension;
+  }
+
+  goBack() {
+    this.selectedExtension = null;
+    this.isCreating = false;
+    this.isEditing = false;
+    this.fetchExtensions();
+  }
+
+  startCreating() {
+    this.isCreating = true;
+  }
+
+  cancelCreating() {
+    this.isCreating = false;
+  }
+
+  createExtension() {
+    this.http.post<Extension>('/api/addons', this.newExtension).subscribe(() => {
+      this.fetchExtensions();
+      this.isCreating = false;
+      this.newExtension = {
+        name: '',
+        rating: 0,
+        description: '',
+        reviews: 0,
+        category: '',
+        image: ''
+      };
+    });
+  }
+
+  startEditing() {
+    this.isEditing = true;
+  }
+
+  cancelEditing() {
+    this.isEditing = false;
+  }
+
+  saveEdit() {
+    if (this.selectedExtension && this.selectedExtension.id) {
+      this.http.put<Extension>(`/api/addons/${this.selectedExtension.id}`, this.selectedExtension).subscribe(() => {
+        this.fetchExtensions();
+        this.isEditing = false;
+      });
+    }
+  }
+
+  deleteExtension(extension: Extension) {
+    if (extension.id) {
+      this.http.delete(`/api/addons/${extension.id}`).subscribe(() => {
+        this.fetchExtensions();
+        this.selectedExtension = null;
+      });
+    }
   }
 }

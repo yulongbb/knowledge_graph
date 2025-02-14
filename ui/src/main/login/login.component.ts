@@ -24,6 +24,14 @@ export class LoginComponent implements OnInit {
   });
   data = signal(['kgms', 'demo']);
 
+  registerForm: UntypedFormGroup = this.formBuilder.group({
+    username: [''],
+    password: [''],
+    confirmPassword: ['']
+  });
+
+  showLoginForm: boolean = true;
+
   constructor(
     public authService: AuthService,
     public router: Router,
@@ -47,7 +55,8 @@ export class LoginComponent implements OnInit {
             if (this.authService.isLoggedIn) {
               console.log('登录成功');
               const queryParams = { keyword: '' }; // 可以设置默认值或动态值
-              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.index}`;
+              // let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.index}`;
+              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/start/chat`;
               this.router.navigate([redirect], { queryParams });
             }
           },
@@ -61,6 +70,33 @@ export class LoginComponent implements OnInit {
       } else {
         this.message.warning('用户名或密码不能为空！');
       }
+    }
+  }
+
+  // 注册
+  register() {
+    if (this.registerForm.valid) {
+      const newUser = this.registerForm.value;
+      if (newUser.password !== newUser.confirmPassword) {
+        this.message.warning('密码和确认密码不一致！');
+        return;
+      }
+      // Handle registration logic here
+      console.log('注册用户:', newUser);
+      this.message.success('注册成功！');
+      this.registerForm.reset();
+      this.showLoginForm = true;
+    } else {
+      this.message.warning('请填写所有必填字段！');
+    }
+  }
+
+  // 切换表单
+  toggleForm() {
+    this.showLoginForm = !this.showLoginForm;
+    const formContainer = document.querySelector('.form-container');
+    if (formContainer) {
+      formContainer.classList.toggle('show-register', !this.showLoginForm);
     }
   }
 }

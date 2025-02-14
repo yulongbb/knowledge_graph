@@ -12,14 +12,14 @@
       <a [routerLink]="'/start/chat'" [queryParams]="{ keyword: '' }">AI</a>
       <a [routerLink]="'/start/addons'" [queryParams]="{ keyword: '' }">应用</a>
       <!-- 动态显示登录/用户信息 -->
-      <!-- <ng-container *ngIf="auth.isLoggedIn; else loginLink">
+      <ng-container *ngIf="auth.isLoggedIn; else loginLink">
         <x-dropdown [data]="data()" (nodeClick)="nodeClick($event)">
-          <x-button type="primary" icon="fto-chevron-down" direction="row-reverse"> {{ auth.user.name }}</x-button>
+          {{ auth.user.name }}
         </x-dropdown>
       </ng-container>
       <ng-template #loginLink>
         <a [routerLink]="'/index/login'">登录</a>
-      </ng-template> -->
+      </ng-template>
     </div>
   </nav>
 

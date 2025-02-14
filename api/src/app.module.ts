@@ -10,6 +10,8 @@ import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { DatasetModule } from './dataset/dataset.module';
 import { ChatModule } from './chat/chat.module';
+import { PluginModule } from './plugin/plugin.module';
+import { AddonModule } from './addons/addon.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -32,6 +34,8 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     RedisModule,
     ChatModule,
+    PluginModule,
+    AddonModule
   ],
   controllers: [],
   providers: [],

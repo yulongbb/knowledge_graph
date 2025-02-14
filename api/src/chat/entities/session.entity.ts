@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class Session {
@@ -7,4 +7,7 @@ export class Session {
 
   @Column()
   name: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

@@ -17,10 +17,12 @@ import { XMessageBoxService } from '@ng-nest/ui/message-box';
 import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ChatComponent } from './chat.component';
+import { PluginComponent } from './plugin/plugin.component';
 
 @NgModule({
   declarations: [
     ChatComponent,
+    PluginComponent
     // ...existing code...
   ],
   imports: [
@@ -53,6 +55,10 @@ import { ChatComponent } from './chat.component';
       {
         path: '',
         component: ChatComponent,
+      },
+      {
+        path: 'plugin',
+        component: PluginComponent,
       },
     ]),
   ],

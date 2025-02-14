@@ -1,0 +1,90 @@
+<div class="plugin-management-container">
+  <div class="plugin-management">
+    <div class="plugin-header">
+      <button (click)="addPlugin()">
+        <fa-icon [icon]="faPlus"></fa-icon>
+      </button>
+    </div>
+    <div class="plugins">
+      <div class="plugin-group" *ngIf="plugins.length > 0">
+        <div *ngFor="let plugin of plugins" [ngClass]="{'active': plugin === editingPlugin}" class="plugin" (click)="editPlugin(plugin)">
+          <div *ngIf="!plugin.isEditing">
+            {{ plugin.name }}
+          </div>
+          <div *ngIf="plugin.isEditing">
+            <input [(ngModel)]="plugin.name" />
+          </div>
+          <div class="actions" (click)="$event.stopPropagation()">
+            <fa-icon *ngIf="!plugin.isEditing" [icon]="faEllipsisV" class="menu-button"
+              (click)="toggleMenu($event, plugin)"></fa-icon>
+            <div [ngClass]="{'menu': true, 'show': plugin.showMenu}">
+              <button (click)="editPlugin(plugin); plugin.showMenu = false;"><fa-icon [icon]="faEdit"></fa-icon>编辑</button>
+              <button (click)="deletePlugin(plugin); plugin.showMenu = false;"><fa-icon [icon]="faTrash"></fa-icon>删除</button>
+            </div>
+            <fa-icon *ngIf="plugin.isEditing" [icon]="faSave" (click)="savePlugin()"></fa-icon>
+            <fa-icon *ngIf="plugin.isEditing" [icon]="faTimes" (click)="cancelEditPlugin(plugin)"></fa-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="plugin-configuration">
+    <div *ngIf="editingPlugin">
+      <div class="card">
+        <h2>编辑插件名称和描述</h2>
+        <input [(ngModel)]="editingPlugin.name" placeholder="插件名称" />
+        <textarea [(ngModel)]="editingPlugin.description" placeholder="插件描述"></textarea>
+      </div>
+      <div class="card">
+        <h2>配置 Prompt</h2>
+        <textarea [(ngModel)]="editingPlugin.prompt" placeholder="请输入插件的 Prompt"></textarea>
+      </div>
+      <div class="card">
+        <h2>配置接口的输入参数和输出格式</h2>
+        <div *ngFor="let param of editingPlugin.inputParams; let i = index" class="input-param">
+          <input [(ngModel)]="param.name" placeholder="参数名称" />
+          <select [(ngModel)]="param.type">
+            <option value="string">String</option>
+            <option value="number">Number</option>
+            <option value="boolean">Boolean</option>
+          </select>
+          <button (click)="removeInputParam(i)">
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
+        </div>
+        <button (click)="addInputParam()">
+          <fa-icon [icon]="faPlus"></fa-icon> 添加参数
+        </button>
+        <textarea [(ngModel)]="editingPlugin.outputFormat" placeholder="请输入接口的输出格式"></textarea>
+      </div>
+      <button (click)="savePlugin(editingPlugin)">
+        <fa-icon [icon]="faSave"></fa-icon> 保存配置
+      </button>
+    </div>
+    <p *ngIf="!editingPlugin">选择一个插件进行配置。</p>
+  </div>
+  <div class="plugin-chat-test" *ngIf="editingPlugin">
+    <h1>体验窗</h1>
+    <div class="chat-content">
+      <div class="messages" #messagesContainer>
+        <div *ngFor="let message of messages"
+          [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
+          <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
+          <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
+          <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+        </div>
+      </div>
+      <div class="input-container">
+        <div class="input-wrapper">
+          <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="请输入您感兴趣的问题..." autofocus />
+          <button *ngIf="!isAnswering" (click)="sendMessage()">
+            <fa-icon [icon]="faPaperPlane"></fa-icon>
+          </button>
+          <button *ngIf="isAnswering" (click)="stopResponse()" class="pause-button">
+            <fa-icon [icon]="faPause"></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

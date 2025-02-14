@@ -1,20 +1,43 @@
-<form (submit)="login()" [formGroup]="userForm">
-  <ul>
-    <li class="login">
-      <!-- <img class="logo" src="assets/img/logo/logo-96x96.png" /> -->
-      <span>知识图谱</span>
-    </li>
-    <!-- <li>
-      <x-select formControlName="database" [data]="data()"></x-select>
-    </li> -->
-    <li>
-      <x-input formControlName="account" icon="ado-user" iconLayout="left"></x-input>
-    </li>
-    <li>
-      <x-input formControlName="password" icon="ado-lock" type="password" iconLayout="left"></x-input>
-    </li>
-    <li class="submit">
-      <x-button type="primary" (click)="login()" [loading]="loading">登 录</x-button>
-    </li>
-  </ul>
-</form>
+<div class="login-page">
+  <div class="form-wrapper">
+    <div class="form-container" [class.show-register]="!showLoginForm">
+      <form (submit)="login()" [formGroup]="userForm">
+        <ul *ngIf="showLoginForm">
+          <li class="login">
+            <span>知识图谱</span>
+          </li>
+          <li>
+            <input formControlName="account" type="text" placeholder="账号" />
+          </li>
+          <li>
+            <input formControlName="password" type="password" placeholder="密码" />
+          </li>
+          <li class="submit">
+            <button type="submit" [disabled]="loading">登 录</button>
+          </li>
+        </ul>
+      </form>
+
+      <form (submit)="register()" [formGroup]="registerForm" class="register-form">
+        <ul *ngIf="!showLoginForm" class="register">
+          <li>
+            <input formControlName="username" type="text" placeholder="用户名" />
+          </li>
+          <li>
+            <input formControlName="password" type="password" placeholder="密码" />
+          </li>
+          <li>
+            <input formControlName="confirmPassword" type="password" placeholder="确认密码" />
+          </li>
+          <li class="submit">
+            <button type="submit">注 册</button>
+          </li>
+        </ul>
+      </form>
+
+      <div class="toggle-button">
+        <a (click)="toggleForm()">{{ showLoginForm ? '没有账号？注册' : '已有账号？登录' }}</a>
+      </div>
+    </div>
+  </div>
+</div>

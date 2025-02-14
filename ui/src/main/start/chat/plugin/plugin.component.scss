@@ -1,0 +1,321 @@
+.plugin-management-container {
+  display: flex;
+  height: calc(100% - 60px);
+  margin-top: 60px;
+}
+
+.plugin-management {
+  flex: 1;
+  max-width: 300px;
+  margin: 0;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+  background-color: #ffffff;
+}
+
+.plugin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.plugin-header button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+}
+
+.plugin-header button:hover {
+  color: #495057;
+}
+
+.plugins {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.plugins.hidden {
+  display: none;
+}
+
+.plugin-group {
+  padding: 10px 0;
+}
+
+.plugin {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.plugin:hover {
+  background-color: #e9ecef;
+}
+
+.plugin.active {
+  background-color: #e2e3e5;
+  color: black;
+}
+
+.plugin input {
+  flex: 1;
+  margin-right: 10px;
+  padding: 5px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.plugin .actions {
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  right: 10px;
+  color: #6c757d;
+}
+
+.plugin .menu-button {
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.plugin .menu-button:hover {
+  background-color: #e9ecef;
+}
+
+.plugin .menu {
+  position: absolute;
+  width: 80px;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  display: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.plugin .menu.show {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.plugin .menu button {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: #000;
+}
+
+.plugin .menu button:hover {
+  background-color: #e9ecef;
+}
+
+.plugin-configuration {
+  flex: 2;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+  background-color: #ffffff;
+}
+
+.plugin-configuration .card {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.plugin-configuration .card h2 {
+  margin-top: 0;
+}
+
+.plugin-configuration .card input,
+.plugin-configuration .card textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.plugin-chat-test {
+  flex: 3;
+  padding: 20px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.plugin-management h1,
+.plugin-configuration h1,
+.plugin-chat-test h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.plugin-form {
+  margin-top: 20px;
+}
+
+.plugin-form input {
+  width: calc(50% - 10px);
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.plugin-form button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plugin-form button:hover {
+  background-color: #218838;
+}
+
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px;
+  position: relative;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 0 100px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.messages::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.message {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+  align-self: flex-end;
+}
+
+.message.ai {
+  align-self: flex-start;
+}
+
+.message .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+.message .text {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.message.user .text {
+  background-color: #f6f8fa;
+  padding: 20px;
+  font-size: 18px;
+  line-height: 28px;
+  border-radius: 10px;
+}
+
+.message.ai .text {
+  font-size: 18px;
+  line-height: 28px;
+  background-color: #ffffff;
+}
+
+.input-container {
+  display: flex;
+  padding: 10px;
+  background-color: #ffffff;
+  border-top: 1px solid #dee2e6;
+  border-radius: 0 0 10px 10px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 2px solid #006edb;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #495057;
+}
+
+button fa-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.pause-button {
+  background-color: #dc3545;
+}
+
+.pause-button:hover {
+  background-color: #c82333;
+}

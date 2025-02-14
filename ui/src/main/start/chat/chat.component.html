@@ -1,30 +1,85 @@
 <div class="chat-container">
-  <div class="sessions-container">
+  <div class="sessions-container"
+    style="height: 100%; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
     <div class="session-header">
       <button (click)="toggleSessions()">
-        <fa-icon [icon]="sessionsVisible ? faTimes : faArrowRight"></fa-icon>
+        <fa-icon [icon]="sessionsVisible ? faArrowLeft : faArrowRight"></fa-icon>
       </button>
       <button (click)="addSession()">
         <fa-icon [icon]="faPencilSquare"></fa-icon>
       </button>
     </div>
     <div class="sessions" [ngClass]="{'hidden': !sessionsVisible}">
-      <div *ngFor="let session of sessions" [ngClass]="{'active': session.id === selectedSession}" class="session" (click)="selectSession(session.id)">
-        <div *ngIf="!session.isEditing">
-          {{ session.name }}
-        </div>
-        <div *ngIf="session.isEditing">
-          <input [(ngModel)]="session.name" />
-        </div>
-        <div class="actions">
-          <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
-            (click)="toggleMenu($event, session)"></fa-icon>
-          <div [ngClass]="{'menu': true, 'show': session.showMenu}">
-            <button (click)="editSession(session)"><fa-icon [icon]="faEdit"></fa-icon>编辑</button>
-            <button (click)="deleteSession(session.id)"><fa-icon [icon]="faTrash"></fa-icon>删除</button>
+      <div class="session-group" *ngIf="todaySessions.length > 0">
+        <h3>今天</h3>
+        <div *ngFor="let session of todaySessions" [ngClass]="{'active': session.id === selectedSession}"
+          class="session" (click)="selectSession(session.id)">
+          <div *ngIf="!session.isEditing">
+            {{ session.name }}
           </div>
-          <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
-          <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+          <div *ngIf="session.isEditing">
+            <input [(ngModel)]="session.name" />
+          </div>
+          <div class="actions" (click)="$event.stopPropagation()">
+            <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
+              (click)="toggleMenu($event, session)"></fa-icon>
+            <div [ngClass]="{'menu': true, 'show': session.showMenu}">
+              <button (click)="editSession(session); session.showMenu = false;"><fa-icon
+                  [icon]="faEdit"></fa-icon>编辑</button>
+              <button (click)="deleteSession(session.id); session.showMenu = false;"><fa-icon
+                  [icon]="faTrash"></fa-icon>删除</button>
+            </div>
+            <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
+            <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+          </div>
+        </div>
+      </div>
+      <div class="session-group" *ngIf="yesterdaySessions.length > 0">
+        <h3>昨天</h3>
+        <div *ngFor="let session of yesterdaySessions" [ngClass]="{'active': session.id === selectedSession}"
+          class="session" (click)="selectSession(session.id)">
+          <div *ngIf="!session.isEditing">
+            {{ session.name }}
+          </div>
+          <div *ngIf="session.isEditing">
+            <input [(ngModel)]="session.name" />
+          </div>
+          <div class="actions" (click)="$event.stopPropagation()">
+            <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
+              (click)="toggleMenu($event, session)"></fa-icon>
+            <div [ngClass]="{'menu': true, 'show': session.showMenu}">
+              <button (click)="editSession(session); session.showMenu = false;"><fa-icon
+                  [icon]="faEdit"></fa-icon>编辑</button>
+              <button (click)="deleteSession(session.id); session.showMenu = false;"><fa-icon
+                  [icon]="faTrash"></fa-icon>删除</button>
+            </div>
+            <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
+            <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+          </div>
+        </div>
+      </div>
+      <div class="session-group" *ngIf="earlierSessions.length > 0">
+        <h3>很久以前</h3>
+        <div *ngFor="let session of earlierSessions" [ngClass]="{'active': session.id === selectedSession}"
+          class="session" (click)="selectSession(session.id)">
+          <div *ngIf="!session.isEditing">
+            {{ session.name }}
+          </div>
+          <div *ngIf="session.isEditing">
+            <input [(ngModel)]="session.name" />
+          </div>
+          <div class="actions" (click)="$event.stopPropagation()">
+            <fa-icon *ngIf="!session.isEditing" [icon]="faEllipsisV" class="menu-button"
+              (click)="toggleMenu($event, session)"></fa-icon>
+            <div [ngClass]="{'menu': true, 'show': session.showMenu}">
+              <button (click)="editSession(session); session.showMenu = false;"><fa-icon
+                  [icon]="faEdit"></fa-icon>编辑</button>
+              <button (click)="deleteSession(session.id); session.showMenu = false;"><fa-icon
+                  [icon]="faTrash"></fa-icon>删除</button>
+            </div>
+            <fa-icon *ngIf="session.isEditing" [icon]="faSave" (click)="saveSession(session)"></fa-icon>
+            <fa-icon *ngIf="session.isEditing" [icon]="faTimes" (click)="cancelEditSession(session)"></fa-icon>
+          </div>
         </div>
       </div>
     </div>
@@ -40,8 +95,8 @@
       <h2>欢迎使用知识图谱AI助手</h2>
       <p>快在下方聊天框输入问题开始聊天吧</p>
       <div class="recommended-knowledge">
-        <div class="knowledge-item" *ngFor="let knowledge of hots"  (click)="selectKnowledge(knowledge?.id)">
-          {{ knowledge?.id["_source"]?.labels?.zh?.value  }}
+        <div class="knowledge-item" *ngFor="let knowledge of hots" (click)="selectKnowledge(knowledge?.id)">
+          {{ knowledge?.id["_source"]?.labels?.zh?.value }}
         </div>
       </div>
     </div>
@@ -55,7 +110,8 @@
     </div>
     <div class="input-container">
       <div class="input-wrapper">
-        <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="请输入您感兴趣的问题..." autofocus />
+        <input #messageInput [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="请输入您感兴趣的问题..."
+          autofocus />
         <button *ngIf="!isAnswering" (click)="sendMessage()">
           <fa-icon [icon]="faPaperPlane"></fa-icon>
         </button>
@@ -65,10 +121,14 @@
       </div>
     </div>
   </div>
+
   <div class="knowledges-container">
     <div class="knowledge-header">
       <button (click)="toggleKnowledges()">
-        <fa-icon [icon]="knowledgesVisible ? faTimes : faArrowLeft"></fa-icon>
+        <fa-icon [icon]="knowledgesVisible ? faArrowRight : faArrowLeft"></fa-icon>
+      </button>
+      <button (click)="openPluginManagement()">
+        <fa-icon [icon]="faPuzzlePiece"></fa-icon>
       </button>
     </div>
     <div class="knowledges" [ngClass]="{'hidden': !knowledgesVisible}">

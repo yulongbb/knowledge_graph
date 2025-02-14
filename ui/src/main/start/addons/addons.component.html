@@ -1,12 +1,3 @@
-<header class="top-nav">
-  <div class="logo">
-    <a href="#">知识图谱</a>
-  </div>
-  <div class="right-section">
-    <button class="add-button" [routerLink]="'/document/add_document'">上传文件</button>
-    <button class="login-button" [routerLink]="'/login'">登录</button>
-  </div>
-</header>
 <div class="container">
   <!-- 左侧分类导航栏 -->
   <div class="sidebar">
@@ -19,44 +10,119 @@
 
   <!-- 右侧内容区域 -->
   <div class="content">
-    <!-- 最热列表 -->
-    <h2>最热</h2>
-    <div class="extension-grid six-columns">
-      <div *ngFor="let extension of hotExtensions" class="extension-card">
-        <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
-        <div class="card-content">
-          <div class="card-header">
-            <h3>{{ extension.name }}</h3>
-            <div class="rating">
-              <span *ngFor="let star of [1,2,3,4,5]">
-                <span *ngIf="star <= extension.rating">★</span>
-                <span *ngIf="star > extension.rating">☆</span>
-              </span>
-              <span class="reviews">({{ extension.reviews }})</span>
-            </div>
-          </div>
-          <p class="description">{{ extension.description }}</p>
+    <a class="back-link" *ngIf="selectedExtension || isCreating || isEditing" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> 返回
+    </a>
+    <div *ngIf="selectedExtension && !isEditing; else editForm">
+      <div class="extension-details">
+        <img [src]="selectedExtension.image" alt="{{ selectedExtension.name }}" />
+        <h3>{{ selectedExtension.name }}</h3>
+        <div class="rating">
+          <span *ngFor="let star of [1,2,3,4,5]">
+            <span *ngIf="star <= selectedExtension.rating">★</span>
+            <span *ngIf="star > selectedExtension.rating">☆</span>
+          </span>
+          <span class="reviews">({{ selectedExtension.reviews }})</span>
         </div>
+        <p>{{ selectedExtension.description }}</p>
+        <button class="edit-button" (click)="startEditing()">编辑</button>
+        <button class="delete-button" (click)="deleteExtension(selectedExtension)">删除</button>
       </div>
     </div>
-
-    <!-- 最新列表 -->
-    <h2>更多应用</h2>
-    <div class="extension-grid one-column">
-      <div *ngFor="let extension of latestExtensions" class="extension-card">
-        <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
-        <div class="card-content">
-          <div class="card-header">
-            <h3>{{ extension.name }}</h3>
-            <div class="rating">
-              <span *ngFor="let star of [1,2,3,4,5]">
-                <span *ngIf="star <= extension.rating">★</span>
-                <span *ngIf="star > extension.rating">☆</span>
-              </span>
-              <span class="reviews">({{ extension.reviews }})</span>
+    <ng-template #editForm>
+      <div class="edit-extension" *ngIf="selectedExtension">
+        <h3>编辑应用</h3>
+        <form (ngSubmit)="saveEdit()">
+          <label>
+            名称:
+            <input [(ngModel)]="selectedExtension.name" name="name" required />
+          </label>
+          <label>
+            描述:
+            <input [(ngModel)]="selectedExtension.description" name="description" />
+          </label>
+          <label>
+            类别:
+            <input [(ngModel)]="selectedExtension.category" name="category" />
+          </label>
+          <label>
+            图片URL:
+            <input [(ngModel)]="selectedExtension.image" name="image" />
+          </label>
+          <button type="submit">保存</button>
+        </form>
+      </div>
+    </ng-template>
+    <ng-template #extensionList>
+      <div *ngIf="!isCreating && !selectedExtension && !isEditing">
+        <button class="create-button" (click)="startCreating()">创建新应用</button>
+        <div class="extension-grid one-column">
+          <div *ngFor="let extension of filteredExtensions" class="extension-card">
+            <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
+            <div class="card-content">
+              <div class="card-header">
+                <h3>{{ extension.name }}</h3>
+                <div class="rating">
+                  <span *ngFor="let star of [1,2,3,4,5]">
+                    <span *ngIf="star <= extension.rating">★</span>
+                    <span *ngIf="star > extension.rating">☆</span>
+                  </span>
+                  <span class="reviews">({{ extension.reviews }})</span>
+                </div>
+              </div>
+              <p class="description">{{ extension.description }}</p>
+              <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
             </div>
           </div>
-          <p class="description">{{ extension.description }}</p>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #createForm>
+      <div class="create-extension">
+        <h3>创建新应用</h3>
+        <form (ngSubmit)="createExtension()">
+          <label>
+            名称:
+            <input [(ngModel)]="newExtension.name" name="name" required />
+          </label>
+          <label>
+            描述:
+            <input [(ngModel)]="newExtension.description" name="description" />
+          </label>
+          <label>
+            类别:
+            <input [(ngModel)]="newExtension.category" name="category" />
+          </label>
+          <label>
+            图片URL:
+            <input [(ngModel)]="newExtension.image" name="image" />
+          </label>
+          <button type="submit">创建</button>
+        </form>
+      </div>
+    </ng-template>
+    <div *ngIf="isCreating">
+      <ng-container *ngTemplateOutlet="createForm"></ng-container>
+    </div>
+    <div *ngIf="!isCreating && !selectedExtension && !isEditing">
+      <button class="create-button" (click)="startCreating()">创建新应用</button>
+      <div class="extension-grid one-column">
+        <div *ngFor="let extension of filteredExtensions" class="extension-card">
+          <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
+          <div class="card-content">
+            <div class="card-header">
+              <h3>{{ extension.name }}</h3>
+              <div class="rating">
+                <span *ngFor="let star of [1,2,3,4,5]">
+                  <span *ngIf="star <= extension.rating">★</span>
+                  <span *ngIf="star > extension.rating">☆</span>
+                </span>
+                <span class="reviews">({{ extension.reviews }})</span>
+              </div>
+            </div>
+            <p class="description">{{ extension.description }}</p>
+            <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
+          </div>
         </div>
       </div>
     </div>

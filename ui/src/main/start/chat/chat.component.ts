@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, Renderer2 } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash, faPencilSquare, faPause, faTentArrowLeftRight, faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUser, faRobot, faEllipsisV, faSave, faTimes, faPlus, faEdit, faTrash, faPencilSquare, faPause, faTentArrowLeftRight, faArrowLeft, faArrowRight, faPuzzlePiece } from '@fortawesome/free-solid-svg-icons';
 import { marked, MarkedOptions } from 'marked';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
@@ -9,6 +9,7 @@ import { EntityService } from 'src/main/entity/entity.service';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EsService } from '../home/es.service';
+import { Router } from '@angular/router';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
@@ -25,6 +26,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   messages: { text: string, sender: string, avatar: any }[] = [];
   userInput: string = '';
   faPause =faPause;
+  faPuzzlePiece = faPuzzlePiece;
   faPencilSquare = faPencilSquare;
   faPaperPlane = faPaperPlane;
   faUser = faUser;
@@ -38,16 +40,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   fa = faEdit;
   faTimes = faTimes;
   sessions: any = [];
+  todaySessions: any[] = [];
+  yesterdaySessions: any[] = [];
+  earlierSessions: any[] = [];
   selectedSession: number | null = null;
   apiKey: string = ''; // Replace with your actual API key
   keyword: string = '';
   entities: any;
   sessionsVisible: boolean = false;
   knowledgesVisible: boolean = false;
-  recommendedKnowledge: string[] = [
-    '知识1', '知识2', '知识3',
-    '知识4', '知识5', '知识6'
-  ];
   hots: any[] | undefined;
   models: string[] = ['DeepSeek-R1','通义千问-Max-Latest',  'Baichuan2-开源版-7B'];
   selectedModel: string = this.models[0];
@@ -58,7 +59,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     private service: EsService, private nodeService: EntityService,
     private ontologyService: OntologyService,
     public propertyService: PropertyService,
-
+    private router: Router // Add Router to the constructor
   ) {
     marked.setOptions({
       highlight: (code: string, lang: string) => {
@@ -79,7 +80,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     });
 
     this.renderer.listen('window', 'click', (e: Event) => {
-      this.sessions.forEach((session: any) => {
+      [...this.todaySessions, ...this.yesterdaySessions, ...this.earlierSessions].forEach((session: any) => {
         session.showMenu = false;
       });
     });
@@ -97,9 +98,26 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
 
   loadSessions(): void {
-    this.http.get<{ id: number, name: string }[]>('/api/sessions')
+    this.http.get<{ id: number, name: string, createdAt: string }[]>('/api/sessions')
       .subscribe(sessions => {
-        this.sessions = sessions;
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        this.todaySessions = sessions.filter(session => {
+          const sessionDate = new Date(session.createdAt);
+          return sessionDate.toDateString() === today.toDateString();
+        });
+
+        this.yesterdaySessions = sessions.filter(session => {
+          const sessionDate = new Date(session.createdAt);
+          return sessionDate.toDateString() === yesterday.toDateString();
+        });
+
+        this.earlierSessions = sessions.filter(session => {
+          const sessionDate = new Date(session.createdAt);
+          return sessionDate < yesterday;
+        });
       });
   }
 
@@ -133,9 +151,13 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   private createSessionAndSendMessage(): void {
     const userMessage = this.userInput;
     const truncatedTitle = userMessage.length > 20 ? userMessage.substring(0, 20).split(':')[0] + '...' : userMessage.split(':')[0];
-    this.http.post<{ id: number, name: string }>('/api/sessions', { name: truncatedTitle })
+    this.http.post<{ id: number, name: string, createdAt: string }>('/api/sessions', { name: truncatedTitle })
       .subscribe(session => {
-        this.sessions.push(session);
+        const sessionDate = new Date(session.createdAt);
+        const today = new Date();
+        if (sessionDate.toDateString() === today.toDateString()) {
+          this.todaySessions.push(session);
+        }
         this.selectedSession = session.id;
         this.messages.push({ text: userMessage, sender: 'user', avatar: this.faUser });
         this.userInput = '';
@@ -255,7 +277,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       .subscribe(() => {
         this.http.delete(`/api/sessions/${sessionId}`)
           .subscribe(() => {
-            this.sessions = this.sessions.filter((session: any) => session.id !== sessionId);
+            this.todaySessions = this.todaySessions.filter((session: any) => session.id !== sessionId);
+            this.yesterdaySessions = this.yesterdaySessions.filter((session: any) => session.id !== sessionId);
+            this.earlierSessions = this.earlierSessions.filter((session: any) => session.id !== sessionId);
             this.addSession();
           });
       });
@@ -278,8 +302,21 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     session.isEditing = true;
   }
 
-  saveSession(session: { id: number, name: string, isEditing?: boolean }): void {
+  saveSession(session: { id: number, name: string, isEditing?: boolean, createdAt:string}): void {
     this.updateSession(session.id, session.name);
+    session.isEditing = false;
+    const sessionDate = new Date(session.createdAt);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (sessionDate.toDateString() === today.toDateString()) {
+      this.todaySessions = this.todaySessions.map(s => s.id === session.id ? session : s);
+    } else if (sessionDate.toDateString() === yesterday.toDateString()) {
+      this.yesterdaySessions = this.yesterdaySessions.map(s => s.id === session.id ? session : s);
+    } else {
+      this.earlierSessions = this.earlierSessions.map(s => s.id === session.id ? session : s);
+    }
   }
 
   cancelEditSession(session: { id: number, name: string, isEditing?: boolean }): void {
@@ -292,6 +329,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   toggleMenu(event: Event, session: any): void {
     event.stopPropagation();
+    [...this.todaySessions, ...this.yesterdaySessions, ...this.earlierSessions].forEach((s: any) => {
+      if (s !== session) {
+        s.showMenu = false;
+      }
+    });
     session.showMenu = !session.showMenu;
   }
 
@@ -415,5 +457,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       lines.push(`> - ${property}: ${label || value}`);
     });
     return lines.join('\n');
+  }
+
+  openPluginManagement(): void {
+    this.router.navigate(['/start/chat/plugin']);
   }
 }
