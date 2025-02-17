@@ -1,0 +1,16 @@
+<div class="card-container" [style.max-height]="isCollapsed ? '40px' : '200px'">
+  <div class="card-header" (click)="toggleCollapse()">
+    <fa-icon [icon]="'fa-search'" class="search-icon"></fa-icon>
+    <span class="keyword" [ngClass]="{'active': !isCollapsed}">
+      {{ isLoading ? '正在检索知识库...' : '知识库检索成功' }}
+    </span>
+    <span class="result-count">{{ results.length }} 条信息</span>
+    <fa-icon [icon]="isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></fa-icon>
+  </div>
+  <div class="card-content" *ngIf="!isCollapsed">
+    <div *ngFor="let result of results" class="knowledge-item" (click)="navigateToDetail(result)">
+      <div class="label">{{ result["_source"]?.labels?.zh?.value }}</div>
+      <div class="description">{{ result["_source"]?.descriptions?.zh?.value }}</div>
+    </div>
+  </div>
+</div>

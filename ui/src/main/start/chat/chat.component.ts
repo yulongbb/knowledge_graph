@@ -54,6 +54,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   selectedModel: string = this.models[0];
   isAnswering: boolean = false;
   private reader: ReadableStreamDefaultReader | undefined;
+  knowledgeResults: any;
 
   constructor(private http: HttpClient, private renderer: Renderer2,
     private service: EsService, private nodeService: EntityService,
@@ -144,6 +145,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.messageInput?.nativeElement.focus();
         this.saveMessage(userMessage, 'user');
         this.getAIResponse(userMessage);
+        this.searchKnowledgeBase(userMessage); // Add this line to search the knowledge base
       }
     }
   }
@@ -164,6 +166,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.messageInput?.nativeElement.focus();
         this.saveMessage(userMessage, 'user');
         this.getAIResponse(userMessage);
+        this.searchKnowledgeBase(userMessage); // Add this line to search the knowledge base
+
       });
   }
 
@@ -247,6 +251,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       .catch(error => {
         console.error('Error fetching AI response:', error);
         this.isAnswering = false;
+      });
+  }
+
+  private searchKnowledgeBase(query: string): void {
+    this.knowledgeResults = [];
+    this.keyword = query;
+    this.service.searchEntity(1, 10, { bool: { must: [{ match: { 'labels.zh.value': query } }, { match: { 'descriptions.zh.value': query } }] } })
+      .subscribe((data: any) => {
+        this.knowledgeResults = data.list;
+        console.log(data);
       });
   }
 

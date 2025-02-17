@@ -2,7 +2,9 @@
   <!-- 左侧分类导航栏 -->
   <div class="sidebar">
     <ul class="category-list">
-      <li *ngFor="let category of categories" (click)="selectCategory(category)">
+      <li *ngFor="let category of categories" 
+          (click)="selectCategory(category)" 
+          [class.selected]="category === selectedCategory">
         {{ category }}
       </li>
     </ul>

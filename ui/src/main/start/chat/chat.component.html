@@ -105,7 +105,11 @@
         [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
         <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
-        <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+        <div *ngIf="message.sender === 'ai'" style="display: block; width: 100%;">
+          <knowledge-card *ngIf="knowledgeResults" [results]="knowledgeResults" [keyword]="keyword"></knowledge-card>
+          <div  class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+        </div>
+        <div  *ngIf="message.sender !== 'ai'" class="text" [innerHTML]="parseMarkdown(message.text)"></div>
       </div>
     </div>
     <div class="input-container">

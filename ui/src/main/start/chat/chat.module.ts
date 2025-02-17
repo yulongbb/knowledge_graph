@@ -18,11 +18,13 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ChatComponent } from './chat.component';
 import { PluginComponent } from './plugin/plugin.component';
+import { KnowledgeCardComponent } from './knowledge-card/knowledge-card.component';
 
 @NgModule({
   declarations: [
     ChatComponent,
-    PluginComponent
+    PluginComponent,
+    KnowledgeCardComponent
     // ...existing code...
   ],
   imports: [

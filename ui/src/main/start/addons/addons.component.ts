@@ -20,6 +20,7 @@ export class AddonsComponent implements OnInit {
   categories: string[] = [];
   filteredExtensions: Extension[] = [];
   selectedExtension: Extension | null = null;
+  selectedCategory: string | null = null;
   newExtension: Extension = {
     name: '',
     rating: 0,
@@ -46,14 +47,20 @@ export class AddonsComponent implements OnInit {
 
   fetchCategories() {
     this.http.get<string[]>('/api/addons/categories').subscribe(data => {
-      this.categories = data;
+      this.categories = ['全部', ...data];
     });
   }
 
   selectCategory(category: string) {
-    this.http.get<Extension[]>(`/api/addons?category=${category}`).subscribe(data => {
-      this.filteredExtensions = data;
-    });
+    this.selectedCategory = category;
+    this.selectedExtension = null;
+    if (category === '全部') {
+      this.fetchExtensions();
+    } else {
+      this.http.get<Extension[]>(`/api/addons?category=${category}`).subscribe(data => {
+        this.filteredExtensions = data;
+      });
+    }
   }
 
   viewDetails(extension: Extension) {
@@ -64,6 +71,7 @@ export class AddonsComponent implements OnInit {
     this.selectedExtension = null;
     this.isCreating = false;
     this.isEditing = false;
+    this.selectedCategory = null;
     this.fetchExtensions();
   }
 
