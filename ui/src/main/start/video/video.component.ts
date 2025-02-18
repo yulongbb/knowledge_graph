@@ -21,6 +21,7 @@ import * as L from 'leaflet';
 import { faVideo } from '@fortawesome/free-solid-svg-icons';
 import { VideoDialogComponent } from './video-dialog/video-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-video',
@@ -28,6 +29,7 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './video.component.html',
 })
 export class VideoComponent implements OnInit {
+  ip = environment.ip;
   @ViewChildren('thumbnailCanvas')
   thumbnailCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
 
@@ -67,7 +69,7 @@ export class VideoComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
+      tileLayer('http://'+this.ip+'/gis/{z}/{x}/{y}.jpg', {
         noWrap: true,
         maxZoom: 6,
         minZoom: 1,
@@ -180,7 +182,7 @@ export class VideoComponent implements OnInit {
   // 更新视频源
   updateVideoSrc(): void {
     this.currentVideoSrc =
-      'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+      'http://'+this.ip+':9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -385,7 +387,7 @@ export class VideoComponent implements OnInit {
       return imagePath;
     } else {
       // 如果不是完整的 URL，则添加前缀
-      return 'http://localhost:9000/kgms/' + imagePath;
+      return 'http://'+this.ip+':9000/kgms/' + imagePath;
     }
   }
 

@@ -20,6 +20,7 @@ import * as L from 'leaflet';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageDialogComponent } from './image-dialog/image.dialog.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-image',
@@ -27,6 +28,7 @@ import { ImageDialogComponent } from './image-dialog/image.dialog.component';
   templateUrl: './image.component.html',
 })
 export class ImageComponent implements OnInit {
+  ip = environment.ip;
   entities: any;
   knowledge: any;
 
@@ -167,7 +169,7 @@ export class ImageComponent implements OnInit {
   // 更新视频源
   updateVideoSrc(): void {
     this.currentVideoSrc =
-      'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+      'http://'+this.ip+':9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -481,7 +483,7 @@ export class ImageComponent implements OnInit {
       return imagePath;
     } else {
       // 如果不是完整的 URL，则添加前缀
-      return 'http://localhost:9000/kgms/' + imagePath;
+      return 'http://'+this.ip+':9000/kgms/' + imagePath;
     }
   }
 
@@ -493,7 +495,7 @@ export class ImageComponent implements OnInit {
             return image.image;
           } else {
             // 如果不是完整的 URL，则添加前缀
-            return 'http://localhost:9000/kgms/' + image.image;
+            return 'http://'+this.ip+':9000/kgms/' + image.image;
           }
         }),
         currentIndex: index
@@ -507,7 +509,7 @@ export class ImageComponent implements OnInit {
         return { src: image.image };
       } else {
         // 如果不是完整的 URL，则添加前缀
-        return { src: 'http://localhost:9000/kgms/' + image.image };
+        return { src: 'http://'+this.ip+':9000/kgms/' + image.image };
       }
     }));
 
@@ -521,7 +523,7 @@ export class ImageComponent implements OnInit {
           return { src: image.image };
         } else {
           // 如果不是完整的 URL，则添加前缀
-          return { src: 'http://localhost:9000/kgms/' + image.image, previewText: image.label };
+          return { src: 'http://'+this.ip+':9000/kgms/' + image.image, previewText: image.label };
         }
       }),
     });

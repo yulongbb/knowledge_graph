@@ -101,15 +101,18 @@
       </div>
     </div>
     <div *ngIf="selectedSession !== null" class="messages" #messagesContainer>
-      <div *ngFor="let message of messages"
+      <div *ngFor="let message of messages; let i = index"
         [ngClass]="{'user': message.sender === 'user', 'ai': message.sender === 'ai'}" class="message">
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
         <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
         <div *ngIf="message.sender === 'ai'" style="display: block; width: 100%;">
-          <knowledge-card *ngIf="knowledgeResults" [results]="knowledgeResults" [keyword]="keyword"></knowledge-card>
-          <div  class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+          <div class="knowledge-cards" style="display: flex; overflow-x: auto;">
+            <knowledge-card *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults" [keyword]="message.keyword || ''"></knowledge-card>
+          </div>
+          <image-list *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults"></image-list>
+          <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
         </div>
-        <div  *ngIf="message.sender !== 'ai'" class="text" [innerHTML]="parseMarkdown(message.text)"></div>
+        <div *ngIf="message.sender !== 'ai'" class="text" [innerHTML]="parseMarkdown(message.text)"></div>
       </div>
     </div>
     <div class="input-container">

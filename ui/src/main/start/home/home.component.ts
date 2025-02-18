@@ -14,6 +14,7 @@ import { IndexService } from 'src/layout/index/index.service';
 import { NavService } from 'src/services/nav.service';
 import { ConfigService } from 'src/services/config.service';
 import { Location } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -29,6 +30,7 @@ import { Location } from '@angular/common';
   ],
 })
 export class HomeComponent implements OnInit {
+  ip = environment.ip;
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   @ViewChild('searchContainer') searchContainer!: ElementRef;
 

@@ -14,6 +14,7 @@ import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-search',
@@ -21,6 +22,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './search.component.html',
 })
 export class SearchComponent implements OnInit {
+  ip =environment.ip;
   entities: any;
   knowledge: any;
 
@@ -55,7 +57,7 @@ export class SearchComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 6, minZoom: 1, attribution: '...' })
+      tileLayer('http://'+this.ip+'/gis/{z}/{x}/{y}.jpg', { noWrap: true, maxZoom: 6, minZoom: 1, attribution: '...' })
     ],
     zoom: 3,
     center: latLng(46.879966, -121.726909)
@@ -162,7 +164,7 @@ export class SearchComponent implements OnInit {
 
   // 更新视频源
   updateVideoSrc(): void {
-    this.currentVideoSrc = 'http://localhost:9000/kgms/' + this.videos[this.currentVideoIndex].image;
+    this.currentVideoSrc = 'http://'+this.ip+':9000/kgms/' + this.videos[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -684,7 +686,7 @@ export class SearchComponent implements OnInit {
       return imagePath;
     } else {
       // 如果不是完整的 URL，则添加前缀
-      return 'http://localhost:9000/kgms/' + imagePath;
+      return 'http://'+this.ip+':9000/kgms/' + imagePath;
     }
   }
 
@@ -695,7 +697,7 @@ export class SearchComponent implements OnInit {
       img = image;
     } else {
       // 如果不是完整的 URL，则添加前缀
-      img = 'http://localhost:9000/kgms/' + image;
+      img = 'http://'+this.ip+':9000/kgms/' + image;
     }
     this.dialogSewrvice.create(XImagePreviewComponent, {
       width: '100%',
@@ -703,7 +705,7 @@ export class SearchComponent implements OnInit {
       className: 'x-image-preview-portal',
       data: [
         {
-          src: 'http://localhost:9000/kgms/' + img,
+          src: 'http://'+this.ip+':9000/kgms/' + img,
         },
       ],
     });

@@ -1,0 +1,5 @@
+<div class="image-list">
+  <ng-container *ngFor="let result of results">
+    <img *ngFor="let image of result['_source']?.images; let i = index" [src]="'http://'+ip+':9000/kgms/' + image" alt="描述" class="image-item" [attr.data-total]="i === result['_source']?.images.length - 1 ? result['_source']?.images.length : null">
+  </ng-container>
+</div>

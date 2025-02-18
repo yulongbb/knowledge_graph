@@ -19,12 +19,14 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ChatComponent } from './chat.component';
 import { PluginComponent } from './plugin/plugin.component';
 import { KnowledgeCardComponent } from './knowledge-card/knowledge-card.component';
+import { ImageListComponent } from './image-list/image-list.component';
 
 @NgModule({
   declarations: [
     ChatComponent,
     PluginComponent,
-    KnowledgeCardComponent
+    KnowledgeCardComponent,
+    ImageListComponent
     // ...existing code...
   ],
   imports: [

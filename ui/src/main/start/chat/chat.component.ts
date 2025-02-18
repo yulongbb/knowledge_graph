@@ -10,6 +10,7 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
 import { EsService } from '../home/es.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
@@ -21,9 +22,10 @@ hljs.registerLanguage('typescript', typescript);
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
+  ip = environment.ip;
   @ViewChild('messageInput') messageInput: ElementRef | undefined;
   @ViewChild('messagesContainer') messagesContainer: ElementRef | undefined;
-  messages: { text: string, sender: string, avatar: any }[] = [];
+  messages: { text: string, sender: string, avatar: any, knowledgeResults?: any[], keyword?: string }[] = [];
   userInput: string = '';
   faPause =faPause;
   faPuzzlePiece = faPuzzlePiece;
@@ -211,7 +213,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       .then(body => {
         this.reader = body?.getReader();
         let aiMessage = '';
-        this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot });
+        this.messages.push({ text: aiMessage, sender: 'ai', avatar: this.faRobot, knowledgeResults: [], keyword: '' });
         this.isAnswering = true;
 
         const read = () => {
@@ -257,10 +259,14 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   private searchKnowledgeBase(query: string): void {
     this.knowledgeResults = [];
     this.keyword = query;
-    this.service.searchEntity(1, 10, { bool: { must: [{ match: { 'labels.zh.value': query } }, { match: { 'descriptions.zh.value': query } }] } })
+    this.service.searchEntity(1, 10, { bool: { must: [{ match: { 'labels.zh.value': query } }] } })
       .subscribe((data: any) => {
         this.knowledgeResults = data.list;
         console.log(data);
+        if (this.messages.length > 0) {
+          this.messages[this.messages.length - 1].knowledgeResults = this.knowledgeResults;
+          this.messages[this.messages.length - 1].keyword = this.keyword;
+        }
       });
   }
 
@@ -451,7 +457,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     // Images
     if (data?.images?.length > 0) {
       data.images.forEach((image: any) => {
-        lines.push(`> <img src="http://localhost:9000/kgms/${image}" alt="描述" height="120">`);
+        lines.push(`> <img src="http://${this.ip}:9000/kgms/${image}" alt="描述" height="120">`);
       });
       lines.push('> ');
     }

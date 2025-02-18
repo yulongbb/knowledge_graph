@@ -5,7 +5,7 @@
     </button>
     <!-- 视频播放器 -->
     <video #player id="player" controls>
-        <source [src]="'http://localhost:9000/kgms/' + data.url" type="video/mp4" />
+        <source [src]="'http://'+this.ip+':9000/kgms/' + data.url" type="video/mp4" />
         Your browser does not support the video tag.
     </video>
 </div>

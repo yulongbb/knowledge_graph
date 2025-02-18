@@ -1,5 +1,6 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { faChevronLeft, faChevronRight, faPencilSquare } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'knowledge-card',
@@ -11,6 +12,10 @@ export class KnowledgeCardComponent implements OnChanges {
   @Input() keyword: string = '';
   isCollapsed: boolean = false;
   isLoading: boolean = true;
+  faChevronLeft = faChevronLeft;
+  faChevronRight = faChevronRight;
+
+  @ViewChild('cardContent') cardContent: ElementRef | undefined;
 
   constructor(private router: Router) {}
 
@@ -24,5 +29,13 @@ export class KnowledgeCardComponent implements OnChanges {
 
   navigateToDetail(result: any) {
     this.router.navigate(['/start/search/info', result["_id"]]);
+  }
+
+  scrollLeft() {
+    this.cardContent?.nativeElement.scrollBy({ left: -300, behavior: 'smooth' });
+  }
+
+  scrollRight() {
+    this.cardContent?.nativeElement.scrollBy({ left: 300, behavior: 'smooth' });
   }
 }

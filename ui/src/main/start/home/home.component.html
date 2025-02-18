@@ -103,7 +103,7 @@
         <img class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)" [src]="
             image.startsWith('http')
               ? image
-              : 'http://localhost:9000/kgms/' + image
+              : 'http://'+this.ip+':9000/kgms/' + image
           " loading="lazy" style="width: 100%; border-radius: 4px; margin-bottom: 12px" />
         <!-- 新闻标题 -->
         <h3 style="cursor: pointer" [routerLink]="'/start/search/info/' + entity._id">

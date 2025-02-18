@@ -19,6 +19,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { latLng, marker, Marker, tileLayer } from 'leaflet';
 import * as L from 'leaflet';
 import { faVideo } from '@fortawesome/free-solid-svg-icons';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-document',
@@ -26,6 +27,7 @@ import { faVideo } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './document.component.html',
 })
 export class DocumentComponent implements OnInit {
+  ip = environment.ip;
   @ViewChildren('thumbnailCanvas')
   thumbnailCanvases!: QueryList<ElementRef<HTMLCanvasElement>>;
 
@@ -64,7 +66,7 @@ export class DocumentComponent implements OnInit {
 
   options = {
     layers: [
-      tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
+      tileLayer('http://'+this.ip+'/gis/{z}/{x}/{y}.jpg', {
         noWrap: true,
         maxZoom: 6,
         minZoom: 1,
@@ -171,7 +173,7 @@ export class DocumentComponent implements OnInit {
   // 更新视频源
   updateVideoSrc(): void {
     this.currentVideoSrc =
-      'http://localhost:9000/kgms/' + this.documents[this.currentVideoIndex].image;
+      'http://'+this.ip+':9000/kgms/' + this.documents[this.currentVideoIndex].image;
   }
 
   get transitionStyle(): string {
@@ -376,7 +378,7 @@ export class DocumentComponent implements OnInit {
       return imagePath;
     } else {
       // 如果不是完整的 URL，则添加前缀
-      return 'http://localhost:9000/kgms/' + imagePath;
+      return 'http://'+this.ip+':9000/kgms/' + imagePath;
     }
   }
 

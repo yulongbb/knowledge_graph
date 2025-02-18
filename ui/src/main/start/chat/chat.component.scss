@@ -450,3 +450,10 @@ button fa-icon {
 .knowledge-item:hover {
   background-color: #e9ecef;
 }
+
+.knowledge-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
