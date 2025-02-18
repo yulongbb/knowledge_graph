@@ -74,6 +74,7 @@
               </div>
               <p class="description">{{ extension.description }}</p>
               <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
+              <button class="visit-button">访问应用</button>
             </div>
           </div>
         </div>
@@ -124,6 +125,7 @@
             </div>
             <p class="description">{{ extension.description }}</p>
             <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
+            <a target="_blank" [href]="extension.url" class="visit-button">访问应用</a>
           </div>
         </div>
       </div>

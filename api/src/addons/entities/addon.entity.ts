@@ -22,4 +22,8 @@ export class Addon {
 
   @Column()
   image: string;
+
+  @Column()
+  url: string;
+  
 }

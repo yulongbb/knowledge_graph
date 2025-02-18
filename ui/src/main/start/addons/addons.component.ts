@@ -9,6 +9,7 @@ interface Extension {
   reviews: number;
   category: string;
   image: string;
+  url: string;
 }
 
 @Component({
@@ -27,7 +28,8 @@ export class AddonsComponent implements OnInit {
     description: '',
     reviews: 0,
     category: '',
-    image: ''
+    image: '',
+    url: ''
   };
   isCreating: boolean = false;
   isEditing: boolean = false;
@@ -93,7 +95,8 @@ export class AddonsComponent implements OnInit {
         description: '',
         reviews: 0,
         category: '',
-        image: ''
+        image: '',
+        url: ''
       };
     });
   }

@@ -1,0 +1,50 @@
+<div class="container">
+  <header>
+    <input type="text" [(ngModel)]="searchQuery" (input)="updateSearchQuery(searchQuery)" (keydown.enter)="updateSearchQuery(searchQuery)" placeholder="搜索人物..." autofocus>
+  </header>
+  <div class="content" *ngIf="searchQuery || selectedGroup; else groupedPersonsTemplate">
+    <aside class="profile" *ngIf="basicInfo.name">
+      <h2>人物基本资料</h2>
+      <div id="basic-info">
+        <img style="width: 100%;" *ngIf="basicInfo.photo" [src]="basicInfo.photo" alt="{{basicInfo.name}}">
+        <h3>{{basicInfo.name}}</h3>
+        <p>{{basicInfo.description}}</p>
+      </div>
+    </aside>
+    <section class="media" *ngIf="mediaList.length > 0">
+      <h2>媒体资料列表</h2>
+      <div id="media-list">
+        <ul>
+          <li *ngFor="let media of mediaList; let i = index" [class.selected]="i === selectedMediaIndex" (click)="playVideo(i)">
+            <a [href]="media.url">{{media.label}}</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <section class="persons" *ngIf="selectedGroup">
+      <h2>{{selectedGroup.name}}</h2>
+      <div class="person-list">
+        <div *ngFor="let person of selectedGroup.persons" class="person">
+          <div class="person-icon"></div>
+          <div class="person-name">{{person.name}}</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <ng-template #groupedPersonsTemplate>
+    <div class="grouped-persons">
+      <div *ngFor="let group of groupedPersons" class="group" (click)="selectGroup(group)">
+        <div class="folder-icon"></div>
+        <h3>{{group.name}}</h3>
+      </div>
+    </div>
+  </ng-template>
+  <div id="video-modal" *ngIf="isVideoPlaying">
+    <div class="modal-content">
+      <video controls autoplay>
+        <source [src]="'http://'+ip+ ':9000/kgms/'+mediaList[selectedMediaIndex].url" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+</div>

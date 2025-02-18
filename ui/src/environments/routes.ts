@@ -44,6 +44,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/start.module").then(x => x.StartModule),
   },
+  {
+    path: "person",
+    loadChildren: () =>
+      import("../main/person/person.module").then(x => x.PersonModule),
+  },
 
 
   // 如果路由为空就指向 index
