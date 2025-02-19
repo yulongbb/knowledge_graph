@@ -140,7 +140,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     {
       control: 'input',
       id: 'label',
-      label: '标签',
+      label: '名称',
       required: true,
     },
     {
@@ -160,6 +160,13 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       control: 'input',
       id: 'source',
       label: 'url',
+      required: false,
+    },
+    {
+      control: 'textarea',
+      id: 'tags',
+      label: '标签',
+      span: 8,
       required: false,
     },
   ];
@@ -630,6 +637,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                   ?.map((aliase: any) => aliase.value)
                   .toString(),
                 type: { id: type?.id, label: type?.name },
+                tags: this.item?.tags?.join('#'),
                 description: this.item.descriptions?.zh?.value,
               });
             }
@@ -719,7 +727,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(this.imgs);
         let item: any = {
           _key: this.form.formGroup.value._key,
-          tags: this.tag(),
           labels: {
             zh: {
               language: 'zh',
@@ -743,6 +750,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
             },
           },
           type: this.form.formGroup.value.type,
+          tags: this.form.formGroup.value.tags.split('#').filter((x: any) => x != ''),
           // 其他字段
           ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
           ...(this.form.formGroup.value.source
@@ -778,9 +786,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                 return {
                   url: url,
                   thumbnail: i.thumbnail,
-                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
-                  description:
-                    this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                  label: i.label ?? this.form.formGroup.value.label, // 提供默认标签
+                  description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
                 };
               }),
             }
@@ -800,9 +807,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                 return {
                   url: url,
                   thumbnail: i.thumbnail,
-                  label: this.form.formGroup.value.label || '默认标签', // 提供默认标签
-                  description:
-                    this.form.formGroup.value.description || '默认描述', // 提供默认描述
+                  label: i.label ?? this.form.formGroup.value.label, //供默认标签
+                  description:i.description ?? this.form.formGroup.value.description, // 提供默认描述
                 };
               }),
             }
