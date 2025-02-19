@@ -45,7 +45,7 @@ export class PersonComponent {
       return;
     }
     this.query = {
-      must: [{ term: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } }, { term: { 'labels.zh.value.keyword': query } }],
+      must: [{ match: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } }, { term: { 'labels.zh.value.keyword': query } }],
     };
     this.esService.searchEntity(1, 10, { bool: this.query }).subscribe(response => {
       console.log(response);
