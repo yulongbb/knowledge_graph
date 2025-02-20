@@ -148,6 +148,7 @@ section.media h2 {
   width: 100%;
   display: flex;
   flex-flow: row wrap;
+  align-content: flex-start;
   gap: 20px;
   padding: 20px;
 }

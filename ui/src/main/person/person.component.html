@@ -25,7 +25,7 @@
         <p>{{basicInfo.description}}</p>
       </div>
     </aside>
-    <section class="media" *ngIf="mediaList.length > 0">
+    <section class="media" *ngIf="basicInfo.name && mediaList.length > 0">
       <h2>媒体资料列表</h2>
       <div id="media-list">
         <ul>
