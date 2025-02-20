@@ -36,19 +36,17 @@
       </div>
     </section>
     <section class="persons" *ngIf="selectedGroup && !basicInfo.name">
-      <h2>{{selectedGroup.key}}</h2>
-      <div class="person-list">
-        <div *ngFor="let person of persons; let i = index" class="person" [class.selected]="i === selectedPersonIndex" (click)="navigateToPerson(person, i)">
-          <div *ngIf="person._source.images[0]; else defaultAvatar" class="person-avatar">
-            <img [src]="'http://localhost:9000/kgms/' + person._source.images[0]" alt="{{person._source.labels.zh}}">
-          </div>
-          <ng-template #defaultAvatar>
-            <div class="person-avatar" [style.background-color]="getRandomColor()">
-              <span>{{ getFirstLetter(person._source.labels.zh.value) }}</span>
-            </div>
-          </ng-template>
-          <div class="person-name">{{person._source.labels.zh.value}}</div>
+      <div *ngFor="let person of persons; let i = index" class="person" [class.selected]="i === selectedPersonIndex"
+        (click)="navigateToPerson(person, i)">
+        <div *ngIf="person._source.images[0]; else defaultAvatar" class="person-avatar">
+          <img [src]="'http://localhost:9000/kgms/' + person._source.images[0]" alt="{{person._source.labels.zh}}">
         </div>
+        <ng-template #defaultAvatar>
+          <div class="person-avatar" [style.background-color]="getRandomColor()">
+            <span>{{ getFirstLetter(person._source.labels.zh.value) }}</span>
+          </div>
+        </ng-template>
+        <div class="person-name">{{person._source.labels.zh.value}}</div>
       </div>
     </section>
   </div>

@@ -12,7 +12,7 @@ import { ShareModule } from 'src/share/share.module';
     ],
     imports: [
         CommonModule,
-            ShareModule,
+        ShareModule,
         RouterModule.forChild([
             {
                 path: '',

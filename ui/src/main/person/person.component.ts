@@ -3,14 +3,14 @@ import { EsService } from './es.service';
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
   styleUrls: ['./person.component.css']
 })
-export class PersonComponent {
+export class PersonComponent implements OnInit {
   ip = environment.ip;
   searchQuery: string = '';
   query: any = {};
@@ -26,17 +26,31 @@ export class PersonComponent {
   selectedGroupIndex: number = 0;
   selectedPersonIndex: number = -1;
 
-  constructor(private esService: EsService, private router: Router) {
+  constructor(private esService: EsService, private router: Router, private route: ActivatedRoute) {
     this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
       this.performSearch(query);
     });
-    this.loadGroupedPersons();
   }
 
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const search = params['search'];
+      if (search) {
+        this.searchQuery = search;
+        this.performSearch(search);
+      } else {
+        this.loadGroupedPersons();
+      }
+    });
+  }
 
   updateSearchQuery(query: string) {
     this.searchQuery = query;
     this.searchSubject.next(query);
+    this.router.navigate([], {
+      queryParams: { search: query },
+      queryParamsHandling: 'merge',
+    });
   }
 
   performSearch(query: string) {
@@ -63,11 +77,14 @@ export class PersonComponent {
       }
       this.updateBreadcrumb();
     });
-    // 实现搜索功能，更新人物基本资料和媒体资料列表
-    // ...existing code...
   }
 
   loadGroupedPersons() {
+    this.searchQuery = '';
+    this.router.navigate([], {
+      queryParams: { search: null },
+      queryParamsHandling: 'merge',
+    });
     this.query = {
       must: [{ match: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } }],
     };
@@ -83,15 +100,15 @@ export class PersonComponent {
 
   selectGroup(index: any) {
     this.selectedGroupIndex = index;
-
   }
+
   enterGroup(group: any) {
     this.selectedGroup = group;
     this.updateBreadcrumb();
     this.query = {
       must: [
         { match: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } },
-        { term: { 'tags.keyword': this.selectedGroup.key } } // 使用terms而非term
+        { term: { 'tags.keyword': this.selectedGroup.key } }
       ],
     };
     this.esService.searchEntity(1, 10, { bool: this.query }).subscribe(response => {
@@ -131,14 +148,12 @@ export class PersonComponent {
   playVideo(index: number) {
     this.selectedMediaIndex = index;
     this.isVideoPlaying = true;
-    (document.activeElement as HTMLElement).blur(); // Remove focus from the search input
-    // Implement video playback logic, e.g., open a modal with the video player
+    (document.activeElement as HTMLElement).blur();
     console.log('Playing video:', this.mediaList[this.selectedMediaIndex].url);
   }
 
   closeVideo() {
     this.isVideoPlaying = false;
-    // Implement logic to close the video player
     console.log('Closing video player');
   }
 
@@ -164,6 +179,11 @@ export class PersonComponent {
     };
     this.mediaList = person._source.videos || [];
     this.updateBreadcrumb();
+    this.searchQuery = person._source.labels.zh.value;
+    this.router.navigate([], {
+      queryParams: { search: this.searchQuery },
+      queryParamsHandling: 'merge',
+    });
   }
 
   updateBreadcrumb() {
