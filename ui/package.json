@@ -35,6 +35,7 @@
     "cytoscape-edgehandles": "^4.0.1",
     "cytoscape-popper": "^4.0.1",
     "echarts": "^5.5.1",
+    "gojs": "^3.0.19",
     "hammerjs": "^2.0.8",
     "highlight.js": "^11.9.0",
     "leaflet": "^1.9.4",

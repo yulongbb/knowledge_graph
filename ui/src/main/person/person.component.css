@@ -128,7 +128,8 @@ section.media h2 {
 .folder-icon {
   width: 100px;
   height: 80px;
-  background-color: #002855;
+  background-image: url('folder-icon.png'); /* Replace with your image path */
+  background-size: cover;
   margin: 0 auto 10px;
   position: relative;
 }
@@ -140,7 +141,7 @@ section.media h2 {
   left: 10px;
   width: 80px;
   height: 20px;
-  background-color: #002855;
+  background-color: transparent;
 }
 
 .persons {
