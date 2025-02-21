@@ -34,13 +34,12 @@
     <h2>{{ selectedCourse.title }}</h2>
     <p>{{ selectedCourse.description }}</p>
     <div class="course-video">
-      <!-- Embed course video here -->
+      <!-- Remove app-path-styles-demo from here -->
     </div>
     <div class="course-path">
       <h3>学习路径</h3>
-      <ul>
-        <li *ngFor="let step of selectedCourse.path">{{ step }}</li>
-      </ul>
+      <app-learning-path></app-learning-path>
+
     </div>
     <div class="course-quiz">
       <!-- Display course quiz here -->

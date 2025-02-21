@@ -218,3 +218,22 @@ html, body {
 .course-video, .course-path, .course-quiz {
   margin-top: 20px;
 }
+
+.course-path {
+  height: calc(100vh - 300px);
+  min-height: 400px;
+  margin: 20px 0;
+}
+
+.course-path .diagram-container {
+  width: 100%;
+  height: calc(100% - 40px); // 减去标题高度
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#learningPathChart {
+  width: 100%;
+  max-width: 400px; /* Adjust the size as needed */
+  margin: 0 auto;
+}
