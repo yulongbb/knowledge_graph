@@ -20,8 +20,23 @@ import { Component, AfterViewInit } from '@angular/core';
         </div>
       </div>
       <div class="path-wrapper">
-        <h3 class="path-title">{{ chapters[selectedChapter]?.title }} - 知识图谱</h3>
-        <div class="path-container" #pathContainer>
+        <div class="path-header">
+          <h3 class="path-title">
+            {{ chapters[selectedChapter].title }} - 
+            {{ getViewModeTitle() }}
+          </h3>
+          <button *ngIf="viewMode !== 'path'" 
+                  class="back-btn"
+                  (click)="returnToPath()">
+            <i class="fas fa-arrow-left"></i>
+            返回图谱
+          </button>
+        </div>
+
+        <!-- 知识图谱视图 -->
+        <div class="path-container" 
+             #pathContainer
+             *ngIf="viewMode === 'path'">
           <svg class="connection-lines">
             <path *ngFor="let line of connectionLines" 
                   [attr.d]="line"
@@ -47,16 +62,73 @@ import { Component, AfterViewInit } from '@angular/core';
               <div class="point-progress" *ngIf="point.mastery > 0">
                 掌握度: {{ point.mastery }}%
               </div>
+              <div class="point-actions">
+                <button class="action-btn start-btn" 
+                        (click)="startLearning(point)">
+                  <i class="fas fa-play"></i>
+                  开始学习
+                </button>
+                <button class="action-btn test-btn" 
+                        [disabled]="!point.mastery"
+                        (click)="startTest(point)">
+                  <i class="fas fa-tasks"></i>
+                  知识测试
+                </button>
+              </div>
             </div>
             <div class="checkpoint" 
                  [ngClass]="{
                    'completed': point.completed,
-                   'locked': !point.unlocked,
-                   'active': selectedPoint === i
+                   'not-completed': !point.completed,
+                   'mastery-low': point.mastery > 0 && point.mastery < 60,
+                   'mastery-medium': point.mastery >= 60 && point.mastery < 80,
+                   'mastery-high': point.mastery >= 80
                  }"
                  (click)="togglePoint(i)">
-              {{ i + 1 }}
+              <svg class="progress-ring" width="60" height="60">
+                <circle class="checkpoint-background"
+                        cx="30" cy="30" r="26"
+                        [attr.fill]="point.completed ? '#58cc02' : '#ccc'"/>
+                <!-- 只对有学习进度的显示圆环 -->
+                <ng-container *ngIf="point.mastery > 0">
+                  <circle class="progress-ring-background"
+                          cx="30" cy="30" r="26"
+                          fill="transparent"
+                          stroke-width="6"/>
+                  <circle class="progress-ring-circle"
+                          cx="30" cy="30" r="26"
+                          fill="transparent"
+                          stroke-width="6"
+                          [style.strokeDasharray]="2 * PI * 26"
+                          [style.strokeDashoffset]="2 * PI * 26 * (1 - point.mastery / 100)"/>
+                </ng-container>
+              </svg>
+              <span class="checkpoint-number">{{ i + 1 }}</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 视频学习视图 -->
+        <div class="video-container" *ngIf="viewMode === 'video'">
+          <div class="video-wrapper">
+            <iframe [src]="currentPoint?.videoUrl | safe"
+                   frameborder="0" 
+                   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                   allowfullscreen>
+            </iframe>
+          </div>
+          <div class="video-info">
+            <h4>{{ currentPoint?.title }}</h4>
+            <p>{{ currentPoint?.description }}</p>
+          </div>
+        </div>
+
+        <!-- 测试题视图 -->
+        <div class="test-container" *ngIf="viewMode === 'test'">
+          <div class="test-content">
+            <h4>{{ currentPoint?.title }} - 知识测试</h4>
+            <!-- 这里可以添加测试题组件 -->
+            <div class="placeholder-text">测试题内容将在这里显示</div>
           </div>
         </div>
       </div>
@@ -148,6 +220,32 @@ import { Component, AfterViewInit } from '@angular/core';
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       padding: 24px;
+    }
+
+    .path-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #f5f5f5;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #eee;
+      }
     }
 
     .path-title {
@@ -308,40 +406,207 @@ import { Component, AfterViewInit } from '@angular/core';
     .checkpoint {
       width: 60px;
       height: 60px;
-      background: #58cc02;
-      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .checkpoint-background {
+      transition: fill 0.3s;
+    }
+
+    .progress-ring-background {
+      stroke: rgba(255, 255, 255, 0.3);
+    }
+
+    .progress-ring-circle {
+      stroke: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s;
+    }
+
+    .checkpoint.mastery-low .progress-ring-circle {
+      stroke: #dc3545;  // 红色表示掌握度低
+    }
+
+    .checkpoint.mastery-medium .progress-ring-circle {
+      stroke: #ffc107;  // 黄色表示掌握度中等
+    }
+
+    .checkpoint.mastery-high .progress-ring-circle {
+      stroke: #ffbf00;  // 金色表示掌握度高
+    }
+
+    // 对应的背景色
+    .checkpoint.mastery-low .progress-ring-background {
+      stroke: rgba(220, 53, 69, 0.2);
+    }
+
+    .checkpoint.mastery-medium .progress-ring-background {
+      stroke: rgba(255, 193, 7, 0.2);
+    }
+
+    .checkpoint.mastery-high .progress-ring-background {
+      stroke: rgba(255, 191, 0, 0.2);
+    }
+
+    .checkpoint-number {
+      position: absolute;
       color: white;
       font-size: 20px;
       font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s;
-      position: relative;
-      z-index: 2;
+      z-index: 3;
+    }
+
+    .progress-ring {
+      position: absolute;
+      transform: rotate(-90deg);
+      width: 60px;
+      height: 60px;
+    }
+
+    .progress-ring-background {
+      stroke: rgba(255, 255, 255, 0.3);
+    }
+
+    .progress-ring-circle {
+      stroke: rgba(255, 255, 255, 0.8);
+      transition: stroke-dashoffset 0.3s;
     }
 
     .checkpoint:hover {
       transform: scale(1.1);
     }
 
-    .checkpoint.completed {
-      background: #ffbf00;
-    }
-
-    .checkpoint.locked {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
     .checkpoint.active {
       transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      
+      .progress-ring-circle {
+        stroke-width: 5;
+      }
+    }
+
+    .point-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      i {
+        font-size: 12px;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        &:hover {
+          transform: none;
+        }
+      }
+    }
+
+    .start-btn {
+      background: #58cc02;
+      color: white;
+      &:hover {
+        background: #46a302;
+      }
+    }
+
+    .test-btn {
+      background: #007bff;
+      color: white;
+      &:hover {
+        background: #0056b3;
+      }
+    }
+
+    .video-container,
+    .test-container {
+      padding: 20px;
+      height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; // 16:9 比例
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .video-info,
+    .test-content {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+      h4 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+        color: #333;
+      }
+
+      p {
+        color: #666;
+        line-height: 1.6;
+      }
+    }
+
+    .placeholder-text {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
     }
   `]
 })
 export class LearningPathComponent implements AfterViewInit {
+  // 添加视图模式
+  viewMode: 'path' | 'video' | 'test' = 'path';
+  currentPoint: any = null;
+
+  // Add PI constant at class level
+  readonly PI = Math.PI;
+
   chapters = [
     {
       title: 'Angular 基础',
@@ -668,7 +933,9 @@ export class LearningPathComponent implements AfterViewInit {
 
   selectChapter(index: number) {
     this.selectedChapter = index;
-    this.selectedPoint = null; // 切换章节时清除选中的知识点
+    this.selectedPoint = null;      // 清除选中的知识点
+    this.currentPoint = null;       // 清除当前学习的知识点
+    this.viewMode = 'path';         // 切换回知识图谱视图
     setTimeout(() => this.updateConnectionLines(), 100);
   }
 
@@ -746,5 +1013,30 @@ export class LearningPathComponent implements AfterViewInit {
       'needs_review': '需要复习'
     };
     return textMap[point.status] || '未开始';
+  }
+
+  getViewModeTitle(): string {
+    switch(this.viewMode) {
+      case 'video': return '视频学习';
+      case 'test': return '知识测试';
+      default: return '知识图谱';
+    }
+  }
+
+  returnToPath() {
+    this.viewMode = 'path';
+    this.currentPoint = null;
+    this.selectedPoint = null;
+    setTimeout(() => this.updateConnectionLines(), 100);
+  }
+
+  startLearning(point: any) {
+    this.currentPoint = point;
+    this.viewMode = 'video';
+  }
+
+  startTest(point: any) {
+    this.currentPoint = point;
+    this.viewMode = 'test';
   }
 }
