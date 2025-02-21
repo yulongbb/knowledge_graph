@@ -8,7 +8,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
-  styleUrls: ['./person.component.css']
+  styleUrls: ['./person.component.scss']
 })
 export class PersonComponent implements OnInit {
   ip = environment.ip;
@@ -40,6 +40,13 @@ export class PersonComponent implements OnInit {
         this.performSearch(search);
       } else {
         this.loadGroupedPersons();
+      }
+    });
+
+    this.route.params.subscribe(params => {
+      const groupName = params['groupName'];
+      if (groupName) {
+        this.enterGroupByName(groupName);
       }
     });
   }
@@ -105,6 +112,7 @@ export class PersonComponent implements OnInit {
   enterGroup(group: any) {
     this.selectedGroup = group;
     this.updateBreadcrumb();
+    this.router.navigate(['/person/group', group.key]);
     this.query = {
       must: [
         { match: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } },
@@ -119,6 +127,26 @@ export class PersonComponent implements OnInit {
         }
         return person;
       });
+    });
+  }
+
+  enterGroupByName(groupName: string) {
+    this.query = {
+      must: [
+        { match: { 'type': '7eed2cf0-d708-6f48-4aeb-386dcb1165f0' } },
+        { term: { 'tags.keyword': groupName } }
+      ],
+    };
+    this.esService.searchEntity(1, 10, { bool: this.query }).subscribe(response => {
+      console.log(response);
+      this.selectedGroup = { key: groupName };
+      this.persons = response.list.map((person: any) => {
+        if (!person._source.images || person._source.images.length === 0) {
+          person._source.images = [null];
+        }
+        return person;
+      });
+      this.updateBreadcrumb();
     });
   }
 

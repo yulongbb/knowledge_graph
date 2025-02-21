@@ -47,14 +47,18 @@ export const mainRoutes: Routes = [
   {
     path: "person",
     loadChildren: () =>
-      import("../main/person/person.module").then(x => x.PersonModule),
+      import("../main/start/addons/person/person.module").then(x => x.PersonModule),
   },
   {
     path: "organization",
     loadChildren: () =>
-      import("../main/organization/organization.module").then(x => x.OrganizationModule),
+      import("../main/start/addons/organization/organization.module").then(x => x.OrganizationModule),
   },
-
+  {
+    path: "course",
+    loadChildren: () =>
+      import("../main/start/addons/course/course.module").then(x => x.CourseModule),
+  },
 
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },

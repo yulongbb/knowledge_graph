@@ -18,6 +18,10 @@ import { ShareModule } from 'src/share/share.module';
                 path: '',
                 component: PersonComponent,
             },
+            {
+                path: 'group/:groupName',
+                component: PersonComponent,
+            },
         ]),
         // ...existing code...
     ],

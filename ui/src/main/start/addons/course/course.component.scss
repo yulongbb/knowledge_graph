@@ -1,0 +1,220 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: white; /* Change background color to white */
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #2c3e50;
+  color: white;
+}
+
+.logo {
+  height: 40px;
+  cursor: pointer;
+}
+
+.nav-title {
+  margin-left: 20px;
+  font-size: 24px;
+  font-family: 'Georgia', serif;
+}
+
+.course-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: 'Georgia', serif;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  height: calc(100% - 60px); /* Adjust height to fill the page */
+}
+
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: white;
+  color: #2c3e50;
+  transition: border-color 0.3s;
+}
+
+.search-box input:focus {
+  border-color: #2c3e50;
+  outline: none;
+}
+
+.search-box button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  border: none;
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+  background-color: #1a252f;
+}
+
+.content {
+  display: flex;
+  flex: 1; /* Adjust to fill the remaining space */
+}
+
+.categories {
+  width: 20%;
+  padding-right: 20px;
+}
+
+.categories ul {
+  list-style: none;
+  padding: 0;
+}
+
+.categories li {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.categories li:hover {
+  background-color: #ecf0f1;
+}
+
+.categories input[type="checkbox"] {
+  display: none;
+}
+
+.categories input[type="checkbox"] + label {
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+}
+
+.categories input[type="checkbox"] + label:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: 2px solid #2c3e50;
+  border-radius: 4px;
+  background-color: white;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.categories input[type="checkbox"]:checked + label:before {
+  background-color: #2c3e50;
+  border-color: #2c3e50;
+}
+
+.categories input[type="checkbox"]:checked + label:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+}
+
+.course-list {
+  width: 80%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-rows: repeat(3, 1fr); /* Display three rows */
+  gap: 20px;
+}
+
+.course-item {
+  padding: 10px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s;
+  text-align: center;
+  height: 300px; /* Fixed height for course cards */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-item:hover {
+  background-color: #ecf0f1;
+}
+
+.course-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border: none;
+  background-color: white;
+  color: #2c3e50;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination button:hover {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.pagination button.active {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.course-details {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.course-details h2 {
+  margin-top: 0;
+}
+
+.course-video, .course-path, .course-quiz {
+  margin-top: 20px;
+}
