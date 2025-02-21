@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 20/02/2025 17:37:58
+ Date: 21/02/2025 17:49:01
 */
 
 SET NAMES utf8mb4;
@@ -31,13 +31,14 @@ CREATE TABLE `addon`  (
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of addon
 -- ----------------------------
-INSERT INTO `addon` VALUES (1, '人物资料', 0, '123', 0, '123', 'https://store-images.s-microsoft.com/image/apps.56263.d49a3368-918f-446f-8d8b-4dadb0f08e8e.cdbc41ed-1d7d-4505-afe8-a6a5e9625173.cee8f208-68bb-4658-8c00-42a1875c9156?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/person');
-INSERT INTO `addon` VALUES (2, '组织架构', 0, '456', 0, '456', 'https://store-images.s-microsoft.com/image/apps.51432.28814507-f5dd-460b-920a-434482a8221e.56cb44bd-7868-4d0c-9b18-f9f5203c0d0c.4e33ecf0-2cec-4a03-ac14-7cdbe119310f?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/organization');
+INSERT INTO `addon` VALUES (1, '人物资料', 0, '123', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.56263.d49a3368-918f-446f-8d8b-4dadb0f08e8e.cdbc41ed-1d7d-4505-afe8-a6a5e9625173.cee8f208-68bb-4658-8c00-42a1875c9156?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/person');
+INSERT INTO `addon` VALUES (2, '组织架构', 0, '456', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.51432.28814507-f5dd-460b-920a-434482a8221e.56cb44bd-7868-4d0c-9b18-f9f5203c0d0c.4e33ecf0-2cec-4a03-ac14-7cdbe119310f?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/organization');
+INSERT INTO `addon` VALUES (3, '课程', 0, '课程', 0, '教育', 'https://store-images.s-microsoft.com/image/apps.42712.ccd6f4ab-51e2-43c6-9b9c-b0e30988e026.45d062f5-f818-49e0-8264-8bb9df6f7645.ad7feeb0-87fa-423e-82d1-1313d64123da?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/course');
 
 -- ----------------------------
 -- Table structure for application_schema
@@ -252,7 +253,7 @@ CREATE TABLE `ontology_property`  (
   `type` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `group` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9518 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9519 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_property
