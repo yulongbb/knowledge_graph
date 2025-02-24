@@ -361,7 +361,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  
+
   .template-editor-container {
     flex: 1;
     display: flex;
@@ -382,7 +382,7 @@
 
     .editor-panel {
       flex: 1;
-      display: flex; 
+      display: flex;
       flex-direction: column;
       border: 1px solid #eee;
       border-radius: 4px;
@@ -409,7 +409,7 @@
           height: auto;
           overflow: hidden;
           border: none;
-          
+
           .ql-editor {
             flex: 1;
             overflow-y: auto;
@@ -592,6 +592,8 @@
   padding: 40px;
   background: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  height: calc(100vh - 80px); // 设置容器高度
+  overflow: hidden; // 防止双滚动条
 }
 
 // 左侧目录样式
@@ -626,13 +628,13 @@
         cursor: pointer;
         border-radius: 4px;
         transition: all 0.2s;
-        
+
         &:hover {
           background: #f5f5f5;
           color: #1a73e8;
           transform: translateX(4px);
         }
-        
+
         &.active {
           background: #e8f0fe;
           color: #1a73e8;
@@ -652,8 +654,33 @@
   max-width: 1000px;
   line-height: 1.6;
   position: relative; // 添加这行
-  padding-top: 60px;
-  
+  height: 100%; // 确保内容区域占满高度
+  overflow-y: auto; // 启用垂直滚动
+  padding: 60px 40px 20px;
+  position: relative;
+
+  // 优化滚动行为
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+
+  // 添加滚动条样式
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+
   // 添加滚动条样式
   &::-webkit-scrollbar {
     width: 8px;
@@ -667,7 +694,7 @@
   &::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 4px;
-    
+
     &:hover {
       background: #999;
     }
@@ -687,7 +714,7 @@
 
     .wiki-meta {
       color: #5f6368;
-      
+
       .description {
         font-size: 16px;
         line-height: 1.5;
@@ -695,7 +722,7 @@
 
       .tags {
         margin-top: 12px;
-        
+
         .tag {
           display: inline-block;
           padding: 4px 12px;
@@ -713,12 +740,14 @@
     color: #202124;
     font-size: 16px;
 
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       font-weight: 400;
       margin: 36px 0 16px;
       color: #202124;
       position: relative;
-    
+
       .anchor-link {
         position: absolute;
         left: -20px;
@@ -726,21 +755,29 @@
         transform: translateY(-50%);
         opacity: 0;
         transition: opacity 0.2s;
-      
+
         &:before {
           content: '#';
           color: #1a73e8;
         }
       }
-    
+
       &:hover .anchor-link {
         opacity: 1;
       }
     }
 
-    h1 { font-size: 28px; }
-    h2 { font-size: 24px; }
-    h3 { font-size: 20px; }
+    h1 {
+      font-size: 28px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 20px;
+    }
 
     p {
       margin: 16px 0;
@@ -759,7 +796,8 @@
       border-collapse: collapse;
       margin: 20px 0;
 
-      th, td {
+      th,
+      td {
         padding: 12px;
         border: 1px solid #e0e0e0;
         text-align: left;
@@ -782,7 +820,7 @@
 
   .featured-image {
     margin-bottom: 24px;
-    
+
     img {
       width: 100%;
       border-radius: 8px;
@@ -803,12 +841,12 @@
 
     dl {
       margin: 0;
-      
+
       dt {
         color: #5f6368;
         margin-bottom: 4px;
       }
-      
+
       dd {
         margin: 0 0 16px 0;
         color: #202124;
@@ -823,15 +861,15 @@
   border-radius: 8px;
   border: 1px solid #eee;
   margin-top: 20px;
-  
+
   .property-group {
     padding: 16px;
     border-bottom: 1px solid #eee;
-    
+
     &:last-child {
       border: none;
     }
-    
+
     .group-title {
       font-size: 15px;
       font-weight: 500;
@@ -839,23 +877,23 @@
       margin: 0 0 12px;
     }
   }
-  
+
   .property-list {
     list-style: none;
     padding: 0;
     margin: 0;
   }
-  
+
   .property-item {
     display: flex;
     flex-direction: column;
     margin-bottom: 8px;
-    
+
     .property-label {
       font-size: 13px;
       color: #5f6368;
     }
-    
+
     .property-value {
       margin-top: 4px;
       color: #202124;
@@ -869,7 +907,7 @@
     grid-template-columns: 200px 1fr;
     padding: 20px;
   }
-  
+
   .wiki-info {
     display: none;
   }
@@ -879,7 +917,7 @@
   .wiki-container {
     grid-template-columns: 1fr;
   }
-  
+
   .wiki-toc {
     display: none;
   }
@@ -905,20 +943,20 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:first-child {
     background: #1a73e8;
     color: white;
-    
+
     &:hover {
       background: #1557b0;
     }
   }
-  
+
   &:last-child {
     background: #f1f3f4;
     color: #1a73e8;
-    
+
     &:hover {
       background: #e8f0fe;
     }

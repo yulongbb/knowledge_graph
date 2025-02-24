@@ -251,6 +251,13 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         'fullscreen',
       ],
     });
+
+    // 添加滚动事件监听
+    if (this.contentMain?.nativeElement) {
+      this.contentMain.nativeElement.addEventListener('scroll', () => {
+        this.onContentScroll();
+      }, { passive: true });
+    }
   }
 
   onEditorCreated(editor: any) {
@@ -1009,48 +1016,54 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   scrollToSection(anchor: string) {
     const element = document.getElementById(anchor);
     if (element) {
-      // 计算相对于主内容区域的偏移量
-      const contentMainRect = this.contentMain.nativeElement.getBoundingClientRect();
-      const elementRect = element.getBoundingClientRect();
-      const relativeTop = elementRect.top - contentMainRect.top + this.contentMain.nativeElement.scrollTop;
-
-      // 添加偏移量以避免被顶部固定元素遮挡
+      // 获取目标元素的位置
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + this.contentMain.nativeElement.scrollTop;
+      
+      // 添加固定偏移量，避免被头部遮挡
       const offset = 80;
       
+      // 使用 scrollTo 进行平滑滚动
       this.contentMain.nativeElement.scrollTo({
-        top: relativeTop - offset,
+        top: offsetPosition - offset,
         behavior: 'smooth'
       });
 
-      // 更新当前活动章节
+      // 更新当前激活的目录项
       this.currentSection = anchor;
       this.cdr.detectChanges();
     }
   }
 
   onContentScroll() {
-    if (!this.contentMain) return;
+    if (!this.contentMain || !this.contentMain.nativeElement) return;
 
-    const scrollTop = this.contentMain.nativeElement.scrollTop;
-    const headings = this.contentMain.nativeElement.querySelectorAll('h1, h2');
-    
-    // 添加偏移量以提前激活目录项
-    const offset = 100;
+    const scrollPosition = this.contentMain.nativeElement.scrollTop;
+    const headings:any = Array.from(this.contentMain.nativeElement.querySelectorAll('h1, h2'));
+    const offset = 100; // 滚动偏移量
 
-    // 找到当前可视区域内最上方的标题
-    let current = '';
-    for (const heading of headings) {
-      const elementTop = heading.offsetTop;
-      if (elementTop - offset <= scrollTop) {
-        current = heading.id;
-      } else {
-        break;
+    // 查找当前可视区域内最靠上的标题
+    let currentHeading = headings.find((heading:any) => {
+      const elementPosition = heading.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + scrollPosition;
+      return offsetPosition > scrollPosition - offset;
+    });
+
+    if (currentHeading) {
+      const newSection = currentHeading.id;
+      if (this.currentSection !== newSection) {
+        this.currentSection = newSection;
+        this.cdr.detectChanges();
+        
+        // 更新目录项的激活状态
+        const activeLink = document.querySelector(`.toc-item a[href="#${newSection}"]`);
+        if (activeLink) {
+          document.querySelectorAll('.toc-item a').forEach(link => {
+            link.classList.remove('active');
+          });
+          activeLink.classList.add('active');
+        }
       }
-    }
-
-    if (current !== this.currentSection) {
-      this.currentSection = current;
-      this.cdr.detectChanges();
     }
   }
 
@@ -1061,11 +1074,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     let currentH1: any = null;
     let headingCounter = 0;
     
-    // 创建临时 DOM 解析 HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.renderedContent;
     
-    // 获取所有标题元素
     const headings = tempDiv.querySelectorAll('h1, h2');
     
     headings.forEach((heading) => {
@@ -1073,14 +1084,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       const title = heading.textContent || '';
       const anchor = `heading-${++headingCounter}`;
       
-      // 为标题添加 id
+      // 为每个标题添加 id 和锚点
       heading.id = anchor;
-      
-      // 添加锚点链接
-      const anchorLink = document.createElement('a');
-      anchorLink.className = 'anchor-link';
-      anchorLink.href = `#${anchor}`;
-      heading.appendChild(anchorLink);
       
       if (level === 1) {
         currentH1 = {
@@ -1099,11 +1104,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       }
     });
 
-    // 更新渲染内容,包含新添加的锚点
     this.renderedContent = tempDiv.innerHTML;
     this.tableOfContents = toc;
-    
-    // 触发变更检测
     this.cdr.detectChanges();
   }
 

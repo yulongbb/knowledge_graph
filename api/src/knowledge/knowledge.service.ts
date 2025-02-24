@@ -554,50 +554,7 @@ export class KnowledgeService {
           message: 'No template defined for this entity'
         };
       }
-  
-      // 注册目录生成助手
-      Handlebars.registerHelper('generateTOC', function() {
-        // 用正则匹配所有h1-h6标题
-        const headingRegex = /<h([1-6]).*?>(.*?)<\/h\1>/g;
-        const template = entity._source.template;
-        const toc = [];
-        let match;
-  
-        while ((match = headingRegex.exec(template)) !== null) {
-          const level = parseInt(match[1]);
-          const title = match[2].replace(/<[^>]*>/g, ''); // 移除标题内的HTML标签
-          const anchor = title.toLowerCase().replace(/\s+/g, '-');
-          
-          toc.push({
-            level,
-            title,
-            anchor
-          });
-        }
-  
-        // 生成目录HTML
-        let tocHtml = '<div class="toc">\n<h2>目录</h2>\n<ul>\n';
-        
-        toc.forEach(heading => {
-          const indent = '  '.repeat(heading.level - 1);
-          tocHtml += `${indent}<li><a href="#${heading.anchor}">${heading.title}</a></li>\n`;
-        });
-        
-        tocHtml += '</ul>\n</div>\n';
-  
-        // 为原文中的标题添加id
-        let processedTemplate = template;
-        toc.forEach(heading => {
-          const regex = new RegExp(`(<h${heading.level}.*?>${heading.title}</h${heading.level}>)`);
-          processedTemplate = processedTemplate.replace(
-            regex, 
-            `<h${heading.level} id="${heading.anchor}">$2</h${heading.level}>`
-          );
-        });
-  
-        entity._source.template = processedTemplate;
-        return new Handlebars.SafeString(tocHtml);
-      });
+
   
       // 编译模板
       const template = Handlebars.compile(entity._source.template);
