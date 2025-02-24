@@ -171,6 +171,30 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     },
   ];
 
+  editorModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean'],
+      ['link', 'image', 'video']
+    ]
+  }
+
+  private editor: any;
+
+  @ViewChild('contentMain') contentMain!: ElementRef;
+  tableOfContents: any[] = [];
+  currentSection: string = '';
+
   constructor(
     private sanitizer: DomSanitizer,
     private router: Router,
@@ -195,8 +219,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         this.disabled = true;
       } else if (this.type === 'add') {
         this.title = '新增实体';
-      } else if (this.type === 'update') {
+      } else if (this.type === 'edit') {
         this.title = '修改实体';
+      } else if (this.type === 'template') {
+        this.title = '修改模板';
       }
     });
   }
@@ -225,6 +251,103 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         'fullscreen',
       ],
     });
+  }
+
+  onEditorCreated(editor: any) {
+    this.editor = editor;
+  }
+
+  onDragStart(event: DragEvent, type: string, item: any) {
+    if (event.dataTransfer) {
+      event.dataTransfer.setData('text/plain', JSON.stringify({
+        type,
+        item
+      }));
+    }
+  }
+
+  onEditorDragover(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onEditorDrop(event: DragEvent) {
+    event.preventDefault();
+    if (!event.dataTransfer) return;
+  
+    const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+    const range = this.editor.getSelection(true);
+  
+    switch (data.type) {
+      case 'text':
+        let content = data.item.content || '';
+        
+        // 智能替换标签内容为变量
+        if (this.item) {
+          // 替换标题
+          if (this.item.labels?.zh?.value) {
+            content = content.replace(
+              new RegExp(this.item.labels.zh.value, 'g'),
+              '{{labels.zh.value}}'
+            );
+          }
+  
+          // 替换描述
+          if (this.item.descriptions?.zh?.value) {
+            content = content.replace(
+              new RegExp(this.item.descriptions.zh.value, 'g'),
+              '{{descriptions.zh.value}}'
+            );
+          }
+  
+          // 替换别名
+          this.item.aliases?.zh?.forEach((alias: any) => {
+            if (alias.value) {
+              content = content.replace(
+                new RegExp(alias.value, 'g'),
+                '{{aliases.zh.[].value}}'  
+              );
+            }
+          });
+  
+          // 替换标签
+          this.item.tags?.forEach((tag: string) => {
+            content = content.replace(
+              new RegExp(tag, 'g'),
+              '{{tags.[]}}'
+            );
+          });
+        }
+  
+        this.editor.clipboard.dangerouslyPasteHTML(range.index, content);
+        break;
+        
+      case 'image':
+        const imageUrl = this.getFullImageUrl(data.item.url);
+        // 使用条件渲染包裹图片
+        const imageHtml = `
+          {{#if images}}
+            <img src="${imageUrl}" alt="{{labels.zh.value}}" />
+          {{/if}}
+        `;
+        this.editor.clipboard.dangerouslyPasteHTML(range.index, imageHtml);
+        break;
+        
+      case 'video':
+        const videoHtml = `
+          {{#if videos}}
+            <video controls width="100%">
+              <source src="${this.getFullImageUrl(data.item.url)}" type="video/mp4">
+            </video>
+            {{#if videos.[0].label}}
+              <p class="video-caption">{{videos.[0].label}}</p>
+            {{/if}}
+          {{/if}}
+        `;
+        this.editor.clipboard.dangerouslyPasteHTML(range.index, videoHtml);
+        break;
+    }
+  
+    this.editor.setSelection(range.index + 1);
   }
 
   onImagePaste(event: ClipboardEvent) {
@@ -465,8 +588,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       console.log(this.schema);
       console.log(row.mainsnak.label);
 
-    }
-    ;
+    };
     console.log(row);
     // if (row._key) {
     //   this.nodeService.updateEdge(row).subscribe(() => {
@@ -475,7 +597,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     // } else {
     //   this.nodeService.addEdge(row).subscribe((data) => {
     //     console.log(data);
-    //     const index = this.statements().findIndex((x: any) => x.id === row.id);
+    //     const index = this.statements().findIndex((x: any) => x === row);
     //     this.statements()[index]['_key'] = data['_key'];
     //     this.message.success('新增成功！');
     //   });
@@ -484,7 +606,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   del(row: any) {
     console.log(row);
-    const index = this.statements().findIndex((x: any) => x.id === row.id);
+    const index = this.statements().findIndex((x: any) => x === row);
     if (index >= 0) {
       this.statements().splice(index, 1);
     }
@@ -604,6 +726,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
+  renderedContent: string = '';
+
   action(type: string) {
     switch (type) {
       case 'info':
@@ -716,137 +840,126 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                   });
               });
           });
+          this.nodeService.render(this.id).subscribe({
+            next: (response: any) => {
+              if (response.success) {
+                this.renderedContent = response.content;
+                this.setupTocFromTemplate();
+                this.cdr.detectChanges();
+              }
+            },
+            error: (error: Error) => {
+              console.error('Template rendering failed:', error);
+            }
+          });
           console.log({ knowledgeId: this.id });
           this.nodeService.view({ id: this.id }).subscribe();
         });
         break;
+      case 'template':
+        this.action('info');
+        break;
       case 'edit':
         this.action('info');
         break;
+
       case 'save':
-        console.log(this.imgs);
-        let item: any = {
-          _key: this.form.formGroup.value._key,
-          labels: {
-            zh: {
-              language: 'zh',
-              value: this.form.formGroup.value.label,
-            },
-          },
-          aliases: {
-            zh: this.form.formGroup.value.aliases
-              ?.split(',')
-              .map((aliase: any) => {
-                return {
-                  language: 'zh',
-                  value: aliase,
-                };
-              }),
-          },
-          descriptions: {
-            zh: {
-              language: 'zh',
-              value: this.form.formGroup.value.description,
-            },
-          },
-          type: this.form.formGroup.value.type,
-          tags: this.form.formGroup.value.tags.split('#').filter((x: any) => x != ''),
-          // 其他字段
-          ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
-          ...(this.form.formGroup.value.source
-            ? { sources: [this.form.formGroup.value.source] }
-            : {}), // 如果 source 存在，生成 sources 字段
-          ...(this.imgs && this.imgs.length > 0
-            ? {
-              images: this.imgs.map((i: any) => {
-                if (
-                  i.url.startsWith('http://') ||
-                  i.url.startsWith('https://')
-                ) {
-                  return i.url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  return i.url.split('/')[i.url.split('/').length - 1];
-                }
-              }),
-            }
-            : {}),
-          // 其他字段
-          ...(this.vids && this.vids.length > 0
-            ? {
-              videos: this.vids.map((i: any) => {
-                // 处理 URL
-                let url = i.url || ''; // 默认值为空字符串
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                  url = url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
-                }
-
-                // 返回新的视频对象
-                return {
-                  url: url,
-                  thumbnail: i.thumbnail,
-                  label: i.label ?? this.form.formGroup.value.label, // 提供默认标签
-                  description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
-                };
-              }),
-            }
-            : {}),
-          ...(this.fs && this.fs.length > 0
-            ? {
-              documents: this.fs.map((i: any) => {
-                // 处理 URL
-                let url = i.url || ''; // 默认值为空字符串
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                  url = url.replace('http://localhost:9000/kgms/', '');
-                } else {
-                  url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
-                }
-
-                // 返回新的视频对象
-                return {
-                  url: url,
-                  thumbnail: i.thumbnail,
-                  label: i.label ?? this.form.formGroup.value.label, //供默认标签
-                  description:i.description ?? this.form.formGroup.value.description, // 提供默认描述
-                };
-              }),
-            }
-            : {}),
-        };
-        console.log(item);
-        if (
-          this.type === 'add' ||
-          this.type === 'add_image' ||
-          this.type === 'add_video' ||
-          this.type === 'add_document'
-        ) {
-          this.nodeService.post(item).subscribe((x) => {
-            this.message.success('新增成功！');
+        if (this.type === 'template') {
+          const updateData = {
+            id: this.id,
+            template: this.entity().value._source.template
+          };
+          this.nodeService.put(updateData).subscribe(() => {
+            this.message.success('模板更新成功！');
             this.back();
-            // this.router.navigate(['/index/entity']);
           });
+          return;
         } else if (this.type === 'edit') {
-          this.nodeService.getLinks(1, 20, this.id, {}).subscribe((c: any) => {
-            let statements: any = [];
-            c.list.forEach((p: any) => {
-              p.edges[0].state = 'info';
-              if (p.edges[0]['_from'] != p.edges[0]['_to']) {
-                p.edges[0].mainsnak.datavalue.value.id = p.vertices[1].id;
-                p.edges[0].mainsnak.datavalue.value.label =
-                  p.vertices[1].labels.zh.value;
-              }
-              statements.push(p.edges[0]);
+          // 构建更新数据对象
+          const updateData:any = {
+            id: this.id,
+            _key: this.item.items[0].split('/')[1],
+            items: this.item.items,
+          };
+
+          // 如果表单存在，添加表单数据
+          if (this.form?.formGroup.value) {
+            const formValue = this.form.formGroup.value;
+            Object.assign(updateData, {
+              labels: {
+                zh: {
+                  language: 'zh',
+                  value: formValue.label,
+                }
+              },
+              aliases: {
+                zh: formValue.aliases?.split(',').map((aliase: string) => ({
+                  language: 'zh',
+                  value: aliase.trim()
+                }))
+              },
+              descriptions: {
+                zh: {
+                  language: 'zh',
+                  value: formValue.description,
+                }
+              },
+              type: formValue.type?.id,
+              tags: formValue.tags?.split('#').filter((x: string) => x.trim() !== '') || [],
             });
+          }
+
+          // 添加位置信息
+          if (this.item?.location) {
+            updateData['location'] = this.item.location;
+          }
+
+          // 添加图片信息
+          if (this.imgs?.length > 0) {
+            updateData['images'] = this.imgs.map((i: any) => {
+              if (i.url.startsWith('http://') || i.url.startsWith('https://')) {
+                return i.url.replace('http://localhost:9000/kgms/', '');
+              }
+              return i.url.split('/').pop();
+            });
+          }
+
+          // 添加视频信息
+          if (this.vids?.length > 0) {
+            updateData['videos'] = this.vids.map((i: any) => ({
+              url: i.url.replace('http://localhost:9000/kgms/', ''),
+              thumbnail: i.thumbnail,
+              label: i.label || '',
+              description: i.description || ''
+            }));
+          }
+
+          // 添加文档信息
+          if (this.fs?.length > 0) {
+            updateData['documents'] = this.fs.map((i: any) => ({
+              url: i.url.replace('http://localhost:9000/kgms/', ''),
+              thumbnail: i.thumbnail,
+              label: i.label || '',
+              description: i.description || ''
+            }));
+          }
+
+          // 发送更新请求
+          this.nodeService.put(updateData).subscribe({
+            next: () => {
+              this.message.success('编辑成功！');
+              this.back();
+            },
+            error: (error) => {
+              this.message.error('编辑失败：' + error.message);
+              console.error('更新失败:', error);
+            }
           });
-          item.id = this.id;
-          item['_key'] = this.item.items[0].split('/')[1];
-          item['items'] = this.item.items;
-          this.nodeService.put(item).subscribe((x) => {
-            this.message.success('编辑成功！');
-            this.back();
-            // this.router.navigate(['/index/entity']);
-          });
+        } else if (this.type === 'add' || 
+                  this.type === 'add_image' || 
+                  this.type === 'add_video' || 
+                  this.type === 'add_document') {
+          // ...现有的添加逻辑保持不变...
         }
         break;
       case 'cancel':
@@ -877,9 +990,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   getFullImageUrl(imagePath: string): string {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
-    } else {
-      return 'http://localhost:9000/kgms/' + imagePath;
     }
+    return 'http://localhost:9000/kgms/' + imagePath;
   }
 
   back() {
@@ -892,5 +1004,114 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       x.splice(x.indexOf($event), 1);
       return [...x];
     });
+  }
+
+  scrollToSection(anchor: string) {
+    const element = document.getElementById(anchor);
+    if (element) {
+      // 计算相对于主内容区域的偏移量
+      const contentMainRect = this.contentMain.nativeElement.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+      const relativeTop = elementRect.top - contentMainRect.top + this.contentMain.nativeElement.scrollTop;
+
+      // 添加偏移量以避免被顶部固定元素遮挡
+      const offset = 80;
+      
+      this.contentMain.nativeElement.scrollTo({
+        top: relativeTop - offset,
+        behavior: 'smooth'
+      });
+
+      // 更新当前活动章节
+      this.currentSection = anchor;
+      this.cdr.detectChanges();
+    }
+  }
+
+  onContentScroll() {
+    if (!this.contentMain) return;
+
+    const scrollTop = this.contentMain.nativeElement.scrollTop;
+    const headings = this.contentMain.nativeElement.querySelectorAll('h1, h2');
+    
+    // 添加偏移量以提前激活目录项
+    const offset = 100;
+
+    // 找到当前可视区域内最上方的标题
+    let current = '';
+    for (const heading of headings) {
+      const elementTop = heading.offsetTop;
+      if (elementTop - offset <= scrollTop) {
+        current = heading.id;
+      } else {
+        break;
+      }
+    }
+
+    if (current !== this.currentSection) {
+      this.currentSection = current;
+      this.cdr.detectChanges();
+    }
+  }
+
+  setupTocFromTemplate() {
+    if (!this.renderedContent) return;
+    
+    const toc: any[] = [];
+    let currentH1: any = null;
+    let headingCounter = 0;
+    
+    // 创建临时 DOM 解析 HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = this.renderedContent;
+    
+    // 获取所有标题元素
+    const headings = tempDiv.querySelectorAll('h1, h2');
+    
+    headings.forEach((heading) => {
+      const level = parseInt(heading.tagName[1]);
+      const title = heading.textContent || '';
+      const anchor = `heading-${++headingCounter}`;
+      
+      // 为标题添加 id
+      heading.id = anchor;
+      
+      // 添加锚点链接
+      const anchorLink = document.createElement('a');
+      anchorLink.className = 'anchor-link';
+      anchorLink.href = `#${anchor}`;
+      heading.appendChild(anchorLink);
+      
+      if (level === 1) {
+        currentH1 = {
+          level: 1,
+          title,
+          anchor,
+          children: []
+        };
+        toc.push(currentH1);
+      } else if (level === 2 && currentH1) {
+        currentH1.children.push({
+          level: 2,
+          title,
+          anchor
+        });
+      }
+    });
+
+    // 更新渲染内容,包含新添加的锚点
+    this.renderedContent = tempDiv.innerHTML;
+    this.tableOfContents = toc;
+    
+    // 触发变更检测
+    this.cdr.detectChanges();
+  }
+
+  editEntity() {
+    this.router.navigate(['/start/search/edit', this.id]);
+  }
+
+  editTemplate() {
+    this.router.navigate(['/start/search/template', this.id]);
   }
 }

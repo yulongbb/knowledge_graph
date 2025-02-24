@@ -208,4 +208,17 @@ export class KnowledgeController {
     // 示例：在此处补充逻辑整合 Elasticsearch 数据
     return hotKnowledge;
   }
+
+  @Get('render/:id') 
+  async renderTemplate(@Param('id') id: string) {
+    try {
+      const result = await this.knowledgeService.renderTemplate(id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result;
+    } catch (error) {
+      throw new Error(`Template rendering failed: ${error.message}`);
+    }
+  }
 }

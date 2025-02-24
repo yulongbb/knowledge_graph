@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PathStylesDemoComponent } from './path-styles-demo.component';
 import { LearningPathComponent } from './app-learning-path.conponent';
-import { SafePipe } from 'src/main/shared/pipes/safe.pipe';
+import { SafePipe } from 'src/pipes/safe.pipe';
 
 @NgModule({
     declarations: [

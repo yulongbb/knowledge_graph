@@ -3,6 +3,8 @@ import { Query, RepositoryService } from 'src/services/repository.service';
 import { HttpService } from 'src/services/http.service';
 import { XId } from '@ng-nest/ui/core';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class EntityService extends RepositoryService<Item> {
@@ -98,6 +100,10 @@ export class EntityService extends RepositoryService<Item> {
       `${this.option.controller?.name}/view`,
       knowledge
     );
+  }
+
+  render(id: string) {
+    return this.http.get(`${this.option.controller?.name}/render/${id}`);
   }
 }
 

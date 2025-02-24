@@ -2,162 +2,77 @@
 
   <div [ngSwitch]="type">
     <div *ngSwitchCase="'info'">
-      <div class="row">
-        <x-page-header *ngIf="entity()?.value?._source?.labels"
-          [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)" [subTitle]="entity()?.value?._id"
-          (backClick)="back()">
-        </x-page-header>
+      <div class="wiki-container">
+        <!-- 左侧目录 -->
+        <aside class="wiki-toc">
+          <h3 class="toc-title">目录</h3>
+          <ul class="toc-list">
+            <ng-container *ngFor="let h1 of tableOfContents">
+              <li class="toc-item level-1">
+                <a [class.active]="currentSection === h1.anchor" (click)="scrollToSection(h1.anchor)">
+                  {{h1.title}}
+                </a>
+                <ul *ngIf="h1.children?.length" class="toc-sublist">
+                  <li *ngFor="let h2 of h1.children" class="toc-item level-2">
+                    <a [class.active]="currentSection === h2.anchor" (click)="scrollToSection(h2.anchor)">
+                      {{h2.title}}
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ng-container>
+          </ul>
+        </aside>
 
-        <x-card width="100%" class="card" [bodyStyle]="{ padding: 10, }">
-          <span *ngIf="entity()?.value?._source?.labels" class="label">{{ entity()?.value?._source?.labels?.zh?.value }}
-          </span>
-
-          <x-button [routerLink]="'/start/search/edit/' + id" type="primary">编辑</x-button>
-          <span *ngFor="let aliase of entity()?.value?._source?.aliases?.zh">{{
-            aliase.value
-            }}</span>
-          <div class="bottom">
-
-            <h2>简介</h2>
-            <p *ngIf="entity()?.value?._source?.descriptions" [innerHTML]="
-                linkifyText(
-                  entity()?.value?._source?.descriptions?.zh?.value,
-                  entity()?.value?._source?.entities
-                )
-              "></p>
-
-            <div class="gallery" *ngIf="entity()?.value?._source?.images">
-              <div class="warp">
-                <div *ngFor="let image of entity()?.value?._source?.images">
-                  <div (click)="preview(image)" class="thumbnail" [style.background-image]="
-                      'url(' + getFullImageUrl(image) + ')'
-                    "></div>
-                </div>
+        <!-- 主要内容区 -->
+        <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
+          <!-- 标题区域 -->
+          <header class="wiki-header">
+            <div class="wiki-title-row">
+              <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
+              <div class="wiki-actions">
+                <button class="edit-btn" (click)="editEntity()">编辑知识</button>
+                <button class="edit-btn" (click)="editTemplate()">编辑模板</button>
               </div>
             </div>
-
-            <div class="plyr-wrapper" *ngIf="entity()?.value?._source?.videos?.length > 0">
-
-              <video #player id="player" controls>
-                <source [src]="'http://localhost:9000/kgms/' + entity().value._source.videos[0].url" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+            <div class="wiki-meta">
+              <span *ngIf="item?.descriptions?.zh?.value" class="description">
+                {{item?.descriptions?.zh?.value}}
+              </span>
+              <div class="tags" *ngIf="tag()?.length">
+                <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+              </div>
             </div>
+          </header>
 
-            <div class="pdf-wrapper" *ngIf="entity()?.value?._source?.documents?.length > 0">
-              <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
-                [src]="
-                trustUrl(
-                  'http://localhost:7777/web/viewer.html?file=/pdf/kgms/' +
-                  entity()?.value?._source?.documents[0].url
-                )
-              ">
-              </iframe>
-            </div>
+          <!-- 正文内容 -->
+          <div class="wiki-body" [innerHTML]="renderedContent"></div>
+        </main>
 
-
-
-
-
-
-            <div class="time">
-              <span>{{ entity()?.value?._source?.modified }}</span>
-              <span>{{ entity()?.value?._id }}</span>
-            </div>
-
-
-            <div #scroll class="row scroll" *ngIf="propertyData()">
-              <x-anchor [scroll]="scroll">
-                <ng-container *ngFor="let group of propertyData() | keyvalue">
-                  <h1>{{ group.key }}</h1>
-                  <dl *ngFor="let property of group.value">
-                    <dl *ngIf="getStatement(property).length > 0">
-                      <dt>
-                        {{ property.name }}
-                      </dt>
-                      <dd>
-                        <span *ngFor="let statement of getStatement(property)">
-                          <strong *ngIf="
-                              statement.mainsnak.datatype == 'wikibase-item'
-                            "><a [href]="
-                                'http://localhost:4200/index/search/info/' +
-                                statement.mainsnak.datavalue.value.id
-                              ">{{ statement.mainsnak.datavalue.value.label }}</a>
-                          </strong>
-                          <strong *ngIf="statement.mainsnak.datatype == 'string'">
-                            {{ statement.mainsnak.datavalue.value }}
-                          </strong>
-                          <strong *ngIf="
-                              statement.mainsnak.datatype == 'commonsMedia'
-                            ">
-                            <img *ngIf="
-                                statement?.mainsnak?.datavalue?.value?.split(
-                                  '.'
-                                )[
-                                  statement?.mainsnak.datavalue.value.split('.')
-                                    .length - 1
-                                ] != 'mp4'
-                              " width="500px" [src]="
-                                'http://localhost:9000/kgms/' +
-                                statement?.mainsnak?.datavalue.value
-                              " />
-                            <video *ngIf="
-                                statement?.mainsnak.datavalue.value.split('.')[
-                                  statement?.mainsnak.datavalue.value.split('.')
-                                    .length - 1
-                                ] == 'mp4'
-                              " width="500px" controls>
-                              <source [src]="
-                                  'http://localhost:9000/kgms/' +
-                                  statement?.mainsnak.datavalue.value
-                                " type="video/mp4" />
-                              <p>
-                                你的浏览器不支持 HTML5 视频。这里有一个<a href="myVideo.mp4" download="myVideo.mp4">视频</a>链接。
-                              </p>
-                            </video>
-                          </strong>
-                          <strong *ngIf="statement.mainsnak.datatype == 'url'"><a target="_blank"
-                              [href]="statement?.mainsnak.datavalue.value">{{ statement?.mainsnak.datavalue.value
-                              }}</a></strong>
-                          <strong *ngIf="statement.mainsnak.datatype == 'quantity'">{{
-                            statement.mainsnak.datavalue.value.amount
-                            }}</strong>
-
-                          <div *ngIf="
-                              statement.mainsnak.datatype == 'monolingualtext'
-                            " [innerHtml]="statement.mainsnak.datavalue.value"></div>
-                          <strong *ngIf="statement.mainsnak.datatype == 'geo-shape'">{{
-                            statement.mainsnak.datavalue.value }}</strong>
-                          <strong *ngIf="
-                              statement.mainsnak.datatype == 'globe-coordinate'
-                            ">{{
-                            statement.mainsnak.datavalue.value.latitude
-                            }},{{
-                            statement.mainsnak.datavalue.value.longitude
-                            }}</strong>
-                          <strong *ngIf="statement.mainsnak.datatype == 'time'">{{
-                            statement.mainsnak.datavalue.value.time
-                            }}</strong>
-                        </span>
-                      </dd>
-                    </dl>
-                  </dl>
-                </ng-container>
-              </x-anchor>
-            </div>
-
-            <div *ngFor="let pdf of pdfs">
-              <iframe id="inlineFrameExample" title="Inline Frame Example" frameborder="0" width="100%" height="1500"
-                [src]="
-                  trustUrl(
-                    'http://localhost:7777/web/viewer.html?file=/pdf/kgms/' +
-                      pdf
-                  )
-                ">
-              </iframe>
-            </div>
+        <!-- 右侧信息栏 -->
+        <aside class="wiki-info">
+          <!-- 特色图片 -->
+          <div class="featured-image" *ngIf="imgs?.length">
+            <img [src]="getFullImageUrl(imgs[0].url)" alt="特色图片">
           </div>
-        </x-card>
+
+          <!-- 属性信息 -->
+          <div class="property-box">
+            <ng-container *ngFor="let property of propertyData() | keyvalue">
+              <div class="property-group">
+                <h4 class="group-title">{{property.key}}</h4>
+                <ul class="property-list">
+                  <li *ngFor="let claim of getStatement(property.value)">
+                    <div class="property-item">
+                      <span class="property-label">{{claim.mainsnak.label}}</span>
+                      <span class="property-value">{{claim.mainsnak.datavalue.value}}</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </ng-container>
+          </div>
+        </aside>
       </div>
     </div>
     <div *ngSwitchCase="'add'">
@@ -308,7 +223,79 @@
         </x-card>
       </div>
     </div>
+    <div *ngSwitchCase="'template'">
+      <div class="template-layout">
+        <x-page-header [title]="'编辑模板'" [subTitle]="entity()?.value?._id" (backClick)="back()">
+        </x-page-header>
+        
+        <div class="template-editor-container">
+          <!-- 左侧素材面板 -->
+          <div class="materials-panel">
+            <h3>素材库</h3>
 
+            <!-- 文本素材 -->
+            <div class="material-group">
+              <h4>文本内容 <small>(拖拽插入变量)</small></h4>
+              <div class="material-items text-items">
+                <div class="material-item text-item" draggable="true"
+                  (dragstart)="onDragStart($event, 'text', {type: 'label', content: item?.labels?.zh?.value})">
+                  <div class="text-content">
+                    <strong>标题:</strong> {{item?.labels?.zh?.value}}
+                  </div>
+                </div>
+                <div class="material-item text-item" draggable="true"
+                  (dragstart)="onDragStart($event, 'text', {type: 'description', content: item?.descriptions?.zh?.value})">
+                  <div class="text-content">
+                    <strong>描述:</strong> {{item?.descriptions?.zh?.value}}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 图片素材 -->
+            <div class="material-group">
+              <h4>图片 <small>(拖拽插入变量)</small></h4>
+              <div class="material-items">
+                <div *ngFor="let image of imgs" class="material-item" draggable="true"
+                  (dragstart)="onDragStart($event, 'image', image)">
+                  <img [src]="getFullImageUrl(image.url)" alt="图片素材">
+                </div>
+              </div>
+            </div>
+
+            <!-- 视频素材 -->
+            <div class="material-group">
+              <h4>视频 <small>(拖拽插入变量)</small></h4>
+              <div class="material-items">
+                <div *ngFor="let video of vids" class="material-item" draggable="true"
+                  (dragstart)="onDragStart($event, 'video', video)">
+                  <img [src]="'data:image/jpeg;base64,' + video.thumbnail" alt="视频缩略图">
+                  <div class="video-title">{{video.label || '未命名视频'}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧编辑器 -->
+          <div class="editor-panel">
+            <quill-editor [(ngModel)]="entity().value._source.template" 
+              [styles]="{height: '100%'}"
+              [modules]="editorModules"
+              (onEditorCreated)="onEditorCreated($event)"
+              (drop)="onEditorDrop($event)"
+              (dragover)="onEditorDragover($event)">
+            </quill-editor>
+          </div>
+        </div>
+
+        <div class="template-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="back()">取消</x-button>
+            <x-button type="primary" (click)="action('save')">保存</x-button>
+          </x-buttons>
+        </div>
+      </div>
+    </div>
     <div *ngSwitchCase="'edit'">
       <div class="row">
         <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
@@ -324,7 +311,7 @@
         </x-collapse>
 
 
-     
+
         <x-collapse>
           <x-collapse-panel label="属性信息" active="true">
             <!-- Standard HTML Table with Optimized Styles -->

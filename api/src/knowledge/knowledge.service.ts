@@ -7,6 +7,7 @@ import { SchemasService } from 'src/ontology/services/schemas.service';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Redis from 'ioredis';
+import * as Handlebars from 'handlebars';
 
 @Injectable()
 export class KnowledgeService {
@@ -259,38 +260,68 @@ export class KnowledgeService {
       (err) => console.error('Failed to save document:', err),
     );
   }
+
   async updateEntity(entity: any): Promise<any> {
-    console.log(entity?.location);
-    // Fetch the existing document
+    // 1. 获取现有文档
+    const existingDoc:any = await this.elasticsearchService.get(entity.id);
+    if (!existingDoc) {
+      throw new Error('Entity not found');
+    }
+  
+    // 2. 深度合并现有文档和更新内容
+    const mergedDoc = {
+      ...existingDoc._source,
+      ...entity,
+      // 确保某些字段的合并逻辑
+      labels: entity.labels || existingDoc._source.labels,
+      descriptions: entity.descriptions || existingDoc._source.descriptions,
+      aliases: entity.aliases || existingDoc._source.aliases,
+      tags: entity.tags || existingDoc._source.tags,
+      // 媒体字段合并
+      images: entity.images || existingDoc._source.images,
+      videos: entity.videos || existingDoc._source.videos,
+      documents: entity.documents || existingDoc._source.documents,
+      sources: entity.sources || existingDoc._source.sources,
+      // 其他字段合并
+      location: entity.location || existingDoc._source.location,
+      template: entity.template || existingDoc._source.template,
+      // 保持原有字段
+      items: existingDoc._source.items,
+      type: entity.type || existingDoc._source.type,
+      // 更新修改时间
+      modified: new Date().toISOString()
+    };
+  
+    // 3. 更新 Elasticsearch
     await this.elasticsearchService.bulk({
       id: entity.id,
-      type: entity?.type?.id,
-      tags: entity?.tags,
-      labels: entity?.labels,
-      descriptions: entity?.descriptions,
-      aliases: entity?.aliases,
-      modified: new Date().toISOString(),
-      items: entity?.items,
-      images: entity?.images,
-      videos: entity?.videos,
-      location: entity?.location,
-      sources: entity?.sources,
-      documents: entity?.documents,
+      ...mergedDoc
     });
-    console.log(entity);
-    const myCollection = this.db.collection('entity');
-    myCollection.document(entity['_key']).then((existingDocument) => {
-      console.log(existingDocument);
-      // existingDocument.id = entity['_key'];
-      // (existingDocument.type = 'item'),
-      //   (existingDocument.labels = entity?.labels);
-      // existingDocument.descriptions = entity?.descriptions;
-      // existingDocument.modified = new Date().toISOString();
-      // return myCollection.update(entity['_key'], existingDocument);
-    });
-    console.log(myCollection);
-    return null;
+  
+    // 4. 如果需要，更新 ArangoDB
+    if (entity._key) {
+      const myCollection = this.db.collection('entity');
+      const arangoDoc = await myCollection.document(entity._key);
+      if (arangoDoc) {
+        const arangoUpdate = {
+          type: 'item',
+          modified: mergedDoc.modified,
+          labels: mergedDoc.labels,
+          descriptions: mergedDoc.descriptions,
+          aliases: mergedDoc.aliases,
+          tags: mergedDoc.tags
+        };
+        await myCollection.update(entity._key, arangoUpdate);
+      }
+    }
+  
+    return { 
+      success: true, 
+      message: 'Entity updated successfully',
+      data: mergedDoc
+    };
   }
+  
   async deleteEntity(id: any): Promise<any> {
     return this.elasticsearchService.get(id).then((data: any) => {
       data['_source']['items'].forEach(async (item: any) => {
@@ -510,5 +541,112 @@ export class KnowledgeService {
     }
 
     return result;
+  }
+
+  async renderTemplate(id: string): Promise<any> {
+    try {
+      const entity:any = await this.elasticsearchService.get(id);
+      
+      if (!entity?._source?.template) {
+        return {
+          success: true,
+          content: '',
+          message: 'No template defined for this entity'
+        };
+      }
+  
+      // 注册目录生成助手
+      Handlebars.registerHelper('generateTOC', function() {
+        // 用正则匹配所有h1-h6标题
+        const headingRegex = /<h([1-6]).*?>(.*?)<\/h\1>/g;
+        const template = entity._source.template;
+        const toc = [];
+        let match;
+  
+        while ((match = headingRegex.exec(template)) !== null) {
+          const level = parseInt(match[1]);
+          const title = match[2].replace(/<[^>]*>/g, ''); // 移除标题内的HTML标签
+          const anchor = title.toLowerCase().replace(/\s+/g, '-');
+          
+          toc.push({
+            level,
+            title,
+            anchor
+          });
+        }
+  
+        // 生成目录HTML
+        let tocHtml = '<div class="toc">\n<h2>目录</h2>\n<ul>\n';
+        
+        toc.forEach(heading => {
+          const indent = '  '.repeat(heading.level - 1);
+          tocHtml += `${indent}<li><a href="#${heading.anchor}">${heading.title}</a></li>\n`;
+        });
+        
+        tocHtml += '</ul>\n</div>\n';
+  
+        // 为原文中的标题添加id
+        let processedTemplate = template;
+        toc.forEach(heading => {
+          const regex = new RegExp(`(<h${heading.level}.*?>${heading.title}</h${heading.level}>)`);
+          processedTemplate = processedTemplate.replace(
+            regex, 
+            `<h${heading.level} id="${heading.anchor}">$2</h${heading.level}>`
+          );
+        });
+  
+        entity._source.template = processedTemplate;
+        return new Handlebars.SafeString(tocHtml);
+      });
+  
+      // 编译模板
+      const template = Handlebars.compile(entity._source.template);
+      
+      // 渲染内容
+      const content = template(entity._source);
+  
+      // 添加目录样式
+      const contentWithStyle = `
+        <style>
+          .toc {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+          }
+          .toc h2 {
+            margin-top: 0;
+          }
+          .toc ul {
+            list-style: none;
+            padding-left: 0;
+          }
+          .toc ul ul {
+            padding-left: 20px;
+          }
+          .toc a {
+            color: #333;
+            text-decoration: none;
+            line-height: 1.7;
+          }
+          .toc a:hover {
+            color: #0066cc;
+          }
+        </style>
+        ${content}
+      `;
+  
+      return {
+        success: true,
+        content: contentWithStyle 
+      };
+    } catch (error) {
+      console.error('Template rendering failed:', error);
+      return {
+        success: false,
+        error: error.message
+      }; 
+    }
   }
 }
