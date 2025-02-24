@@ -192,6 +192,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   private editor: any;
 
   @ViewChild('contentMain') contentMain!: ElementRef;
+  @ViewChild('wikiInfo') wikiInfo!: ElementRef;
   tableOfContents: any[] = [];
   currentSection: string = '';
 
@@ -280,14 +281,14 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   onEditorDrop(event: DragEvent) {
     event.preventDefault();
     if (!event.dataTransfer) return;
-  
+
     const data = JSON.parse(event.dataTransfer.getData('text/plain'));
     const range = this.editor.getSelection(true);
-  
+
     switch (data.type) {
       case 'text':
         let content = data.item.content || '';
-        
+
         // 智能替换标签内容为变量
         if (this.item) {
           // 替换标题
@@ -297,7 +298,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               '{{labels.zh.value}}'
             );
           }
-  
+
           // 替换描述
           if (this.item.descriptions?.zh?.value) {
             content = content.replace(
@@ -305,17 +306,17 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               '{{descriptions.zh.value}}'
             );
           }
-  
+
           // 替换别名
           this.item.aliases?.zh?.forEach((alias: any) => {
             if (alias.value) {
               content = content.replace(
                 new RegExp(alias.value, 'g'),
-                '{{aliases.zh.[].value}}'  
+                '{{aliases.zh.[].value}}'
               );
             }
           });
-  
+
           // 替换标签
           this.item.tags?.forEach((tag: string) => {
             content = content.replace(
@@ -324,10 +325,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
             );
           });
         }
-  
+
         this.editor.clipboard.dangerouslyPasteHTML(range.index, content);
         break;
-        
+
       case 'image':
         const imageUrl = this.getFullImageUrl(data.item.url);
         // 使用条件渲染包裹图片
@@ -338,7 +339,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         `;
         this.editor.clipboard.dangerouslyPasteHTML(range.index, imageHtml);
         break;
-        
+
       case 'video':
         const videoHtml = `
           {{#if videos}}
@@ -353,7 +354,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         this.editor.clipboard.dangerouslyPasteHTML(range.index, videoHtml);
         break;
     }
-  
+
     this.editor.setSelection(range.index + 1);
   }
 
@@ -883,7 +884,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           return;
         } else if (this.type === 'edit') {
           // 构建更新数据对象
-          const updateData:any = {
+          const updateData: any = {
             id: this.id,
             _key: this.item.items[0].split('/')[1],
             items: this.item.items,
@@ -962,11 +963,105 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               console.error('更新失败:', error);
             }
           });
-        } else if (this.type === 'add' || 
-                  this.type === 'add_image' || 
-                  this.type === 'add_video' || 
-                  this.type === 'add_document') {
+        } else if (this.type === 'add' ||
+          this.type === 'add_image' ||
+          this.type === 'add_video' ||
+          this.type === 'add_document') {
           // ...现有的添加逻辑保持不变...
+          let item: any = {
+            _key: this.form.formGroup.value._key,
+            labels: {
+              zh: {
+                language: 'zh',
+                value: this.form.formGroup.value.label,
+              },
+            },
+            aliases: {
+              zh: this.form.formGroup.value.aliases
+                ?.split(',')
+                .map((aliase: any) => {
+                  return {
+                    language: 'zh',
+                    value: aliase,
+                  };
+                }),
+            },
+            descriptions: {
+              zh: {
+                language: 'zh',
+                value: this.form.formGroup.value.description,
+              },
+            },
+            type: this.form.formGroup.value.type,
+            tags: this.form.formGroup.value.tags.split('#').filter((x: any) => x != ''),
+            // 其他字段
+            ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
+            ...(this.form.formGroup.value.source
+              ? { sources: [this.form.formGroup.value.source] }
+              : {}), // 如果 source 存在，生成 sources 字段
+            ...(this.imgs && this.imgs.length > 0
+              ? {
+                images: this.imgs.map((i: any) => {
+                  if (
+                    i.url.startsWith('http://') ||
+                    i.url.startsWith('https://')
+                  ) {
+                    return i.url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    return i.url.split('/')[i.url.split('/').length - 1];
+                  }
+                }),
+              }
+              : {}),
+            // 其他字段
+            ...(this.vids && this.vids.length > 0
+              ? {
+                videos: this.vids.map((i: any) => {
+                  // 处理 URL
+                  let url = i.url || ''; // 默认值为空字符串
+                  if (url.startsWith('http://') || url.startsWith('https://')) {
+                    url = url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                  }
+
+                  // 返回新的视频对象
+                  return {
+                    url: url,
+                    thumbnail: i.thumbnail,
+                    label: i.label ?? this.form.formGroup.value.label, // 提供默认标签
+                    description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
+                  };
+                }),
+              }
+              : {}),
+            ...(this.fs && this.fs.length > 0
+              ? {
+                documents: this.fs.map((i: any) => {
+                  // 处理 URL
+                  let url = i.url || ''; // 默认值为空字符串
+                  if (url.startsWith('http://') || url.startsWith('https://')) {
+                    url = url.replace('http://localhost:9000/kgms/', '');
+                  } else {
+                    url = url.split('/').pop() || url; // 如果 pop() 返回 undefined，使用原始 URL
+                  }
+
+                  // 返回新的视频对象
+                  return {
+                    url: url,
+                    thumbnail: i.thumbnail,
+                    label: i.label ?? this.form.formGroup.value.label, //供默认标签
+                    description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
+                  };
+                }),
+              }
+              : {}),
+          };
+          this.nodeService.post(item).subscribe((x) => {
+            this.message.success('新增成功！');
+            this.back();
+            // this.router.navigate(['/index/entity']);
+          });
         }
         break;
       case 'cancel':
@@ -1019,10 +1114,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       // 获取目标元素的位置
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + this.contentMain.nativeElement.scrollTop;
-      
+
       // 添加固定偏移量，避免被头部遮挡
       const offset = 80;
-      
+
       // 使用 scrollTo 进行平滑滚动
       this.contentMain.nativeElement.scrollTo({
         top: offsetPosition - offset,
@@ -1039,11 +1134,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     if (!this.contentMain || !this.contentMain.nativeElement) return;
 
     const scrollPosition = this.contentMain.nativeElement.scrollTop;
-    const headings:any = Array.from(this.contentMain.nativeElement.querySelectorAll('h1, h2'));
-    const offset = 100; // 滚动偏移量
+    const headings = Array.from(this.contentMain.nativeElement.querySelectorAll('h1, h2'));
+    const offset = 100;
 
-    // 查找当前可视区域内最靠上的标题
-    let currentHeading = headings.find((heading:any) => {
+    // 只更新目录高亮，不再同步右侧栏滚动
+    let currentHeading:any = headings.find((heading: any) => {
       const elementPosition = heading.getBoundingClientRect().top;
       const offsetPosition = elementPosition + scrollPosition;
       return offsetPosition > scrollPosition - offset;
@@ -1054,39 +1149,38 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       if (this.currentSection !== newSection) {
         this.currentSection = newSection;
         this.cdr.detectChanges();
-        
-        // 更新目录项的激活状态
-        const activeLink = document.querySelector(`.toc-item a[href="#${newSection}"]`);
-        if (activeLink) {
-          document.querySelectorAll('.toc-item a').forEach(link => {
-            link.classList.remove('active');
-          });
-          activeLink.classList.add('active');
-        }
       }
     }
   }
 
   setupTocFromTemplate() {
     if (!this.renderedContent) return;
-    
+
     const toc: any[] = [];
     let currentH1: any = null;
     let headingCounter = 0;
-    
+
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.renderedContent;
-    
+
     const headings = tempDiv.querySelectorAll('h1, h2');
-    
+
+    // 如果没有标题，直接返回
+    if (headings.length === 0) {
+      this.tableOfContents = [];
+      this.renderedContent = tempDiv.innerHTML;
+      this.cdr.detectChanges();
+      return;
+    }
+
     headings.forEach((heading) => {
       const level = parseInt(heading.tagName[1]);
       const title = heading.textContent || '';
       const anchor = `heading-${++headingCounter}`;
-      
+
       // 为每个标题添加 id 和锚点
       heading.id = anchor;
-      
+
       if (level === 1) {
         currentH1 = {
           level: 1,
@@ -1107,6 +1201,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     this.renderedContent = tempDiv.innerHTML;
     this.tableOfContents = toc;
     this.cdr.detectChanges();
+  }
+
+  get hasTableOfContents(): boolean {
+    return this.tableOfContents && this.tableOfContents.length > 0;
   }
 
   editEntity() {

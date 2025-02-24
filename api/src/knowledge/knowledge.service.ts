@@ -565,30 +565,8 @@ export class KnowledgeService {
       // 添加目录样式
       const contentWithStyle = `
         <style>
-          .toc {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-          }
-          .toc h2 {
-            margin-top: 0;
-          }
-          .toc ul {
-            list-style: none;
-            padding-left: 0;
-          }
-          .toc ul ul {
-            padding-left: 20px;
-          }
-          .toc a {
-            color: #333;
-            text-decoration: none;
-            line-height: 1.7;
-          }
-          .toc a:hover {
-            color: #0066cc;
+          img{
+              width: 100%
           }
         </style>
         ${content}

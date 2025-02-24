@@ -1,106 +1,420 @@
+<div [ngSwitch]="type">
+  <div *ngSwitchCase="'info'">
+    <!-- 添加动态类名控制布局 -->
+    <div class="wiki-container" [class.no-toc]="!hasTableOfContents">
+      <!-- 根据目录内容条件渲染左侧目录 -->
+      <aside class="wiki-toc" *ngIf="hasTableOfContents">
+        <h3 class="toc-title">目录</h3>
+        <ul class="toc-list">
+          <ng-container *ngFor="let h1 of tableOfContents">
+            <li class="toc-item level-1">
+              <a [class.active]="currentSection === h1.anchor" (click)="scrollToSection(h1.anchor)">
+                {{h1.title}}
+              </a>
+              <ul *ngIf="h1.children?.length" class="toc-sublist">
+                <li *ngFor="let h2 of h1.children" class="toc-item level-2">
+                  <a [class.active]="currentSection === h2.anchor" (click)="scrollToSection(h2.anchor)">
+                    {{h2.title}}
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ng-container>
+        </ul>
+      </aside>
 
-  <div [ngSwitch]="type">
-    <div *ngSwitchCase="'info'">
-      <div class="wiki-container">
-        <!-- 左侧目录 -->
-        <aside class="wiki-toc">
-          <h3 class="toc-title">目录</h3>
-          <ul class="toc-list">
-            <ng-container *ngFor="let h1 of tableOfContents">
-              <li class="toc-item level-1">
-                <a [class.active]="currentSection === h1.anchor" (click)="scrollToSection(h1.anchor)">
-                  {{h1.title}}
-                </a>
-                <ul *ngIf="h1.children?.length" class="toc-sublist">
-                  <li *ngFor="let h2 of h1.children" class="toc-item level-2">
-                    <a [class.active]="currentSection === h2.anchor" (click)="scrollToSection(h2.anchor)">
-                      {{h2.title}}
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ng-container>
-          </ul>
-        </aside>
+      <!-- 主要内容区域 -->
+      <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
+        <!-- 标题区域 -->
+        <header class="wiki-header">
+          <div class="wiki-title-row">
+            <button class="edit-btn" (click)="editEntity()">编辑知识</button>
+            <button class="edit-btn" (click)="editTemplate()">编辑模板</button>
+          </div>
+          <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
 
-        <!-- 主要内容区 -->
-        <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
-          <!-- 标题区域 -->
-          <header class="wiki-header">
-            <div class="wiki-title-row">
-              <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
-              <div class="wiki-actions">
-                <button class="edit-btn" (click)="editEntity()">编辑知识</button>
-                <button class="edit-btn" (click)="editTemplate()">编辑模板</button>
+          <div class="wiki-meta">
+            <span *ngIf="item?.descriptions?.zh?.value" class="description">
+              {{item?.descriptions?.zh?.value}}
+            </span>
+            <div class="tags" *ngIf="tag()?.length">
+              <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- 正文内容 -->
+        <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
+      </main>
+
+      <!-- 右侧信息栏 -->
+      <aside class="wiki-info" #wikiInfo>
+        <!-- 特色图片 -->
+        <div class="featured-image" *ngIf="imgs?.length">
+          <img [src]="getFullImageUrl(imgs[0].url)" alt="特色图片">
+        </div>
+
+        <!-- 属性信息 -->
+        <div class="property-box">
+          <ng-container *ngFor="let property of propertyData() | keyvalue">
+            <div class="property-group">
+              <h4 class="group-title">{{property.key}}</h4>
+              <ul class="property-list">
+                <li *ngFor="let claim of getStatement(property.value)">
+                  <div class="property-item">
+                    <span class="property-label">{{claim.mainsnak.label}}</span>
+                    <span class="property-value">{{claim.mainsnak.datavalue.value}}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </ng-container>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div *ngSwitchCase="'add'">
+    <div class="row">
+      <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
+      </x-page-header>
+      <x-card width="100%">
+        <div class="row" *ngFor="let t of tags | keyvalue">
+          <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
+            tag></x-checkbox>
+        </div>
+        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+          width="100%" labelAlign="end" span="24" space="2"></x-form>
+        <br />
+        <div class="app-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="action('cancel')">取消</x-button>
+            <x-button type="primary" (click)="!formInvalid && action('save')"
+              [disabled]="formInvalid || disabled">保存</x-button>
+          </x-buttons>
+        </div>
+      </x-card>
+    </div>
+  </div>
+  <div *ngSwitchCase="'add_image'" (paste)="onImagePaste($event)">
+    <div class="row">
+      <x-page-header [title]="'新增'" [subTitle]="'图片'" (backClick)="back()">
+      </x-page-header>
+      <x-card width="100%">
+        <div class="row">
+          <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
+            [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
+
+          <ng-template #textTpl>
+            <x-icon class="upload-icon" type="fto-upload"></x-icon>
+            <span>选择图片</span>
+          </ng-template>
+          <div class="gallery" *ngIf="imgs.length > 0">
+            <div class="warp">
+              <div *ngFor="let file of imgs">
+                <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'"></div>
               </div>
             </div>
-            <div class="wiki-meta">
-              <span *ngIf="item?.descriptions?.zh?.value" class="description">
-                {{item?.descriptions?.zh?.value}}
-              </span>
-              <div class="tags" *ngIf="tag()?.length">
-                <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+          </div>
+        </div>
+        <h3>{{ title }}</h3>
+        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+          width="100%" labelAlign="end" span="24" space="2"></x-form>
+        <br />
+        <div class="app-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="action('cancel')">取消</x-button>
+            <x-button type="primary" (click)="!formInvalid && action('save')"
+              [disabled]="formInvalid || disabled">保存</x-button>
+          </x-buttons>
+        </div>
+      </x-card>
+    </div>
+  </div>
+  <div *ngSwitchCase="'add_video'">
+    <div class="row">
+      <x-page-header [title]="'新增'" [subTitle]="'视频'" (backClick)="back()">
+      </x-page-header>
+      <x-card width="100%">
+        <div class="row">
+          <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
+            (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
+          <ng-template #textTpl>
+            <x-icon class="upload-icon" type="fto-upload"></x-icon>
+            <span>选择视频</span>
+          </ng-template>
+          <div class="gallery" *ngIf="vids.length > 0">
+            <div class="warp">
+              <div *ngFor="let file of vids">
+                <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
               </div>
             </div>
-          </header>
-
-          <!-- 正文内容 -->
-          <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
-        </main>
-
-        <!-- 右侧信息栏 -->
-        <aside class="wiki-info">
-          <!-- 特色图片 -->
-          <div class="featured-image" *ngIf="imgs?.length">
-            <img [src]="getFullImageUrl(imgs[0].url)" alt="特色图片">
           </div>
-
-          <!-- 属性信息 -->
-          <div class="property-box">
-            <ng-container *ngFor="let property of propertyData() | keyvalue">
-              <div class="property-group">
-                <h4 class="group-title">{{property.key}}</h4>
-                <ul class="property-list">
-                  <li *ngFor="let claim of getStatement(property.value)">
-                    <div class="property-item">
-                      <span class="property-label">{{claim.mainsnak.label}}</span>
-                      <span class="property-value">{{claim.mainsnak.datavalue.value}}</span>
-                    </div>
-                  </li>
-                </ul>
+        </div>
+        <h3>{{ title }}</h3>
+        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+          width="100%" labelAlign="end" span="24" space="2"></x-form>
+        <br />
+        <div class="app-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="action('cancel')">取消</x-button>
+            <x-button type="primary" (click)="!formInvalid && action('save')"
+              [disabled]="formInvalid || disabled">保存</x-button>
+          </x-buttons>
+        </div>
+      </x-card>
+    </div>
+  </div>
+  <div *ngSwitchCase="'add_document'">
+    <div class="row">
+      <x-page-header [title]="'新增'" [subTitle]="'文档'" (backClick)="back()">
+      </x-page-header>
+      <x-card width="100%">
+        <div class="row">
+          <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
+            multiple (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
+          <ng-template #textTpl>
+            <x-icon class="upload-icon" type="fto-upload"></x-icon>
+            <span>选择文档</span>
+          </ng-template>
+          <ng-template #filesTpl let-files="$files">
+            <div class="gallery" *ngIf="fs.length > 0">
+              <div class="warp">
+                <div *ngFor="let file of fs">
+                  <img [src]="file.thumbnail" class="thumbnail">
+                </div>
               </div>
-            </ng-container>
+            </div>
+          </ng-template>
+        </div>
+        <h3>{{ title }}</h3>
+        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+          width="100%" labelAlign="end" span="24" space="2"></x-form>
+        <br />
+        <div class="app-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="action('cancel')">取消</x-button>
+            <x-button type="primary" (click)="!formInvalid && action('save')"
+              [disabled]="formInvalid || disabled">保存</x-button>
+          </x-buttons>
+        </div>
+      </x-card>
+    </div>
+  </div>
+  <div *ngSwitchCase="'add_map'">
+    <div class="row">
+      <x-page-header [title]="'新增'" [subTitle]="'地理位置'" (backClick)="back()">
+      </x-page-header>
+      <x-card width="100%">
+        <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+          [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
+        <h3>{{ title }}</h3>
+        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
+          width="100%" labelAlign="end" span="24" space="2"></x-form>
+        <br />
+        <div class="app-footer">
+          <x-buttons space="0.5">
+            <x-button (click)="action('cancel')">取消</x-button>
+            <x-button type="primary" (click)="!formInvalid && action('save')"
+              [disabled]="formInvalid || disabled">保存</x-button>
+          </x-buttons>
+        </div>
+      </x-card>
+    </div>
+  </div>
+  <div *ngSwitchCase="'template'">
+    <div class="template-layout">
+      <x-page-header [title]="'编辑模板'" [subTitle]="entity()?.value?._id" (backClick)="back()">
+      </x-page-header>
+
+      <div class="template-editor-container">
+        <!-- 左侧素材面板 -->
+        <div class="materials-panel">
+          <h3>素材库</h3>
+
+          <!-- 文本素材 -->
+          <div class="material-group">
+            <h4>文本内容 <small>(拖拽插入变量)</small></h4>
+            <div class="material-items text-items">
+              <div class="material-item text-item" draggable="true"
+                (dragstart)="onDragStart($event, 'text', {type: 'label', content: item?.labels?.zh?.value})">
+                <div class="text-content">
+                  <strong>标题:</strong> {{item?.labels?.zh?.value}}
+                </div>
+              </div>
+              <div class="material-item text-item" draggable="true"
+                (dragstart)="onDragStart($event, 'text', {type: 'description', content: item?.descriptions?.zh?.value})">
+                <div class="text-content">
+                  <strong>描述:</strong> {{item?.descriptions?.zh?.value}}
+                </div>
+              </div>
+            </div>
           </div>
-        </aside>
+
+          <!-- 图片素材 -->
+          <div class="material-group">
+            <h4>图片 <small>(拖拽插入变量)</small></h4>
+            <div class="material-items">
+              <div *ngFor="let image of imgs" class="material-item" draggable="true"
+                (dragstart)="onDragStart($event, 'image', image)">
+                <img [src]="getFullImageUrl(image.url)" alt="图片素材">
+              </div>
+            </div>
+          </div>
+
+          <!-- 视频素材 -->
+          <div class="material-group">
+            <h4>视频 <small>(拖拽插入变量)</small></h4>
+            <div class="material-items">
+              <div *ngFor="let video of vids" class="material-item" draggable="true"
+                (dragstart)="onDragStart($event, 'video', video)">
+                <img [src]="'data:image/jpeg;base64,' + video.thumbnail" alt="视频缩略图">
+                <div class="video-title">{{video.label || '未命名视频'}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧编辑器 -->
+        <div class="editor-panel">
+          <quill-editor [(ngModel)]="entity().value._source.template" [styles]="{height: '100%'}"
+            [modules]="editorModules" (onEditorCreated)="onEditorCreated($event)" (drop)="onEditorDrop($event)"
+            (dragover)="onEditorDragover($event)">
+          </quill-editor>
+        </div>
+      </div>
+
+      <div class="template-footer">
+        <x-buttons space="0.5">
+          <x-button (click)="back()">取消</x-button>
+          <x-button type="primary" (click)="action('save')">保存</x-button>
+        </x-buttons>
       </div>
     </div>
-    <div *ngSwitchCase="'add'">
-      <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
-        </x-page-header>
-        <x-card width="100%">
-          <div class="row" *ngFor="let t of tags | keyvalue">
-            <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-              tag></x-checkbox>
-          </div>
+  </div>
+  <div *ngSwitchCase="'edit'">
+    <div class="row">
+      <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
+        [subTitle]="entity()?.value?._id" (backClick)="back()">
+      </x-page-header>
+
+      <x-collapse bordered>
+        <x-collapse-panel label="基本信息" active="true">
           <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
             width="100%" labelAlign="end" span="24" space="2"></x-form>
           <br />
-          <div class="app-footer">
-            <x-buttons space="0.5">
-              <x-button (click)="action('cancel')">取消</x-button>
-              <x-button type="primary" (click)="!formInvalid && action('save')"
-                [disabled]="formInvalid || disabled">保存</x-button>
-            </x-buttons>
+        </x-collapse-panel>
+      </x-collapse>
+
+
+
+      <x-collapse>
+        <x-collapse-panel label="属性信息" active="true">
+          <!-- Standard HTML Table with Optimized Styles -->
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th width="100px" class="sticky-left">序号</th>
+                <th width="200px">属性名</th>
+                <th>属性值</th>
+                <th width="200px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of statements(); let i = index">
+                <!-- Index Column -->
+                <td class="sticky-left">{{ i + 1 }}</td>
+
+                <!-- Property Column -->
+                <td>
+                  <input class="full-width" list="options" id="property" name="property"
+                    [(ngModel)]="row.mainsnak.label">
+
+                  <datalist id="options">
+                    <option *ngFor="let property of properties()" [value]="property.name">
+                  </datalist>
+                  <!-- <x-select class="full-width" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label"
+                      [data]="properties" (ngModelChange)="change(row)"></x-select> -->
+                </td>
+
+                <!-- Name Column -->
+                <td>
+                  <ng-container [ngSwitch]="row?.mainsnak?.datatype">
+                    <!-- Monolingual Text -->
+                    <quill-editor *ngSwitchCase="'monolingualtext'"
+                      [(ngModel)]="row.mainsnak.datavalue.value"></quill-editor>
+                    <!-- String, URL, Commons Media, Wikibase Item -->
+                    <x-input *ngSwitchCase="'string'" class="full-width"
+                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                    <x-input *ngSwitchCase="'url'" class="full-width"
+                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                    <x-input *ngSwitchCase="'commonsMedia'" class="full-width"
+                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
+                    <x-input *ngSwitchCase="'wikibase-item'" class="full-width"
+                      [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
+                    <!-- Quantity -->
+                    <x-input-number *ngSwitchCase="'quantity'" class="full-width"
+                      [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
+                    <!-- Time -->
+                    <x-date-picker *ngSwitchCase="'time'"
+                      [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
+                    <!-- Globe Coordinate -->
+                    <x-input-group *ngSwitchCase="'globe-coordinate'" class="full-width" compact>
+                      <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
+                      <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
+                    </x-input-group>
+                    <!-- File Upload (if needed) -->
+                    <x-upload *ngIf="row?.mainsnak?.datatype === 'commonsMedia'" (uploadSuccess)="upload($event, row)"
+                      action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
+                  </ng-container>
+                </td>
+
+                <!-- Actions Column -->
+                <td>
+                  <x-link type="primary" (click)="save(row)">保存</x-link>
+                  <x-link type="danger" (click)="del(row)">删除</x-link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Add Button -->
+          <x-button [style.marginTop.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
+
+          <!-- Node Template for Select -->
+          <ng-template #nodeTpl let-node="$node">
+            <ng-container *ngIf="node">
+              <span class="select-item">{{ node.label }}</span>
+            </ng-container>
+          </ng-template>
+        </x-collapse-panel>
+      </x-collapse>
+
+      <x-collapse>
+        <x-collapse-panel label="标签标注" style="overflow: scroll">
+          <div style="display: block; width: 100%; overflow: scroll">
+            <div *ngFor="let t of tags | keyvalue">
+              <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
+                tag></x-checkbox>
+            </div>
           </div>
-        </x-card>
-      </div>
-    </div>
-    <div *ngSwitchCase="'add_image'" (paste)="onImagePaste($event)">
-      <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'图片'" (backClick)="back()">
-        </x-page-header>
-        <x-card width="100%">
+          <div class="row">
+            标签：
+            <ng-container *ngFor="let item of tag(); trackBy: trackByFn">
+              <x-tag type="primary" closable (close)="close(item)">{{
+                item
+                }}</x-tag>
+            </ng-container>
+          </div>
+        </x-collapse-panel>
+      </x-collapse>
+      <x-collapse>
+        <x-collapse-panel label="地理位置">
+          <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+            [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
+        </x-collapse-panel>
+      </x-collapse>
+      <x-collapse>
+        <x-collapse-panel label="上传图片" (paste)="onImagePaste($event)">
           <div class="row">
             <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
               [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
@@ -109,6 +423,7 @@
               <x-icon class="upload-icon" type="fto-upload"></x-icon>
               <span>选择图片</span>
             </ng-template>
+
             <div class="gallery" *ngIf="imgs.length > 0">
               <div class="warp">
                 <div *ngFor="let file of imgs">
@@ -117,27 +432,12 @@
               </div>
             </div>
           </div>
-          <h3>{{ title }}</h3>
-          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-            width="100%" labelAlign="end" span="24" space="2"></x-form>
-          <br />
-          <div class="app-footer">
-            <x-buttons space="0.5">
-              <x-button (click)="action('cancel')">取消</x-button>
-              <x-button type="primary" (click)="!formInvalid && action('save')"
-                [disabled]="formInvalid || disabled">保存</x-button>
-            </x-buttons>
-          </div>
-        </x-card>
-      </div>
-    </div>
-    <div *ngSwitchCase="'add_video'">
-      <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'视频'" (backClick)="back()">
-        </x-page-header>
-        <x-card width="100%">
+        </x-collapse-panel>
+      </x-collapse>
+      <x-collapse>
+        <x-collapse-panel label="上传视频">
           <div class="row">
-            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="videos"
               (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
             <ng-template #textTpl>
               <x-icon class="upload-icon" type="fto-upload"></x-icon>
@@ -147,339 +447,35 @@
               <div class="warp">
                 <div *ngFor="let file of vids">
                   <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
+                  <x-button (click)="updateTideohumbnail(file.url)" type="primary">更新封面</x-button>
+
                 </div>
               </div>
             </div>
+
           </div>
-          <h3>{{ title }}</h3>
-          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-            width="100%" labelAlign="end" span="24" space="2"></x-form>
-          <br />
-          <div class="app-footer">
-            <x-buttons space="0.5">
-              <x-button (click)="action('cancel')">取消</x-button>
-              <x-button type="primary" (click)="!formInvalid && action('save')"
-                [disabled]="formInvalid || disabled">保存</x-button>
-            </x-buttons>
-          </div>
-        </x-card>
-      </div>
-    </div>
-    <div *ngSwitchCase="'add_document'">
-      <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'文档'" (backClick)="back()">
-        </x-page-header>
-        <x-card width="100%">
+        </x-collapse-panel>
+      </x-collapse>
+      <x-collapse>
+        <x-collapse-panel label="上传文件">
           <div class="row">
-            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" [filesTpl]="filesTpl"
-              multiple (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="files"
+              (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
             <ng-template #textTpl>
               <x-icon class="upload-icon" type="fto-upload"></x-icon>
-              <span>选择文档</span>
-            </ng-template>
-            <ng-template #filesTpl let-files="$files">
-              <div class="gallery" *ngIf="fs.length > 0">
-                <div class="warp">
-                  <div *ngFor="let file of fs">
-                    <img [src]="file.thumbnail" class="thumbnail">
-                  </div>
-                </div>
-              </div>
+              <span>选择文件</span>
             </ng-template>
           </div>
-          <h3>{{ title }}</h3>
-          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-            width="100%" labelAlign="end" span="24" space="2"></x-form>
-          <br />
-          <div class="app-footer">
-            <x-buttons space="0.5">
-              <x-button (click)="action('cancel')">取消</x-button>
-              <x-button type="primary" (click)="!formInvalid && action('save')"
-                [disabled]="formInvalid || disabled">保存</x-button>
-            </x-buttons>
-          </div>
-        </x-card>
-      </div>
-    </div>
-    <div *ngSwitchCase="'add_map'">
-      <div class="row">
-        <x-page-header [title]="'新增'" [subTitle]="'地理位置'" (backClick)="back()">
-        </x-page-header>
-        <x-card width="100%">
-          <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
-            [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
-          <h3>{{ title }}</h3>
-          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-            width="100%" labelAlign="end" span="24" space="2"></x-form>
-          <br />
-          <div class="app-footer">
-            <x-buttons space="0.5">
-              <x-button (click)="action('cancel')">取消</x-button>
-              <x-button type="primary" (click)="!formInvalid && action('save')"
-                [disabled]="formInvalid || disabled">保存</x-button>
-            </x-buttons>
-          </div>
-        </x-card>
-      </div>
-    </div>
-    <div *ngSwitchCase="'template'">
-      <div class="template-layout">
-        <x-page-header [title]="'编辑模板'" [subTitle]="entity()?.value?._id" (backClick)="back()">
-        </x-page-header>
-        
-        <div class="template-editor-container">
-          <!-- 左侧素材面板 -->
-          <div class="materials-panel">
-            <h3>素材库</h3>
-
-            <!-- 文本素材 -->
-            <div class="material-group">
-              <h4>文本内容 <small>(拖拽插入变量)</small></h4>
-              <div class="material-items text-items">
-                <div class="material-item text-item" draggable="true"
-                  (dragstart)="onDragStart($event, 'text', {type: 'label', content: item?.labels?.zh?.value})">
-                  <div class="text-content">
-                    <strong>标题:</strong> {{item?.labels?.zh?.value}}
-                  </div>
-                </div>
-                <div class="material-item text-item" draggable="true"
-                  (dragstart)="onDragStart($event, 'text', {type: 'description', content: item?.descriptions?.zh?.value})">
-                  <div class="text-content">
-                    <strong>描述:</strong> {{item?.descriptions?.zh?.value}}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 图片素材 -->
-            <div class="material-group">
-              <h4>图片 <small>(拖拽插入变量)</small></h4>
-              <div class="material-items">
-                <div *ngFor="let image of imgs" class="material-item" draggable="true"
-                  (dragstart)="onDragStart($event, 'image', image)">
-                  <img [src]="getFullImageUrl(image.url)" alt="图片素材">
-                </div>
-              </div>
-            </div>
-
-            <!-- 视频素材 -->
-            <div class="material-group">
-              <h4>视频 <small>(拖拽插入变量)</small></h4>
-              <div class="material-items">
-                <div *ngFor="let video of vids" class="material-item" draggable="true"
-                  (dragstart)="onDragStart($event, 'video', video)">
-                  <img [src]="'data:image/jpeg;base64,' + video.thumbnail" alt="视频缩略图">
-                  <div class="video-title">{{video.label || '未命名视频'}}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 右侧编辑器 -->
-          <div class="editor-panel">
-            <quill-editor [(ngModel)]="entity().value._source.template" 
-              [styles]="{height: '100%'}"
-              [modules]="editorModules"
-              (onEditorCreated)="onEditorCreated($event)"
-              (drop)="onEditorDrop($event)"
-              (dragover)="onEditorDragover($event)">
-            </quill-editor>
-          </div>
-        </div>
-
-        <div class="template-footer">
-          <x-buttons space="0.5">
-            <x-button (click)="back()">取消</x-button>
-            <x-button type="primary" (click)="action('save')">保存</x-button>
-          </x-buttons>
-        </div>
-      </div>
-    </div>
-    <div *ngSwitchCase="'edit'">
-      <div class="row">
-        <x-page-header [title]="entity()?.value?._source?.labels?.zh?.value?.slice(0, 20)"
-          [subTitle]="entity()?.value?._id" (backClick)="back()">
-        </x-page-header>
-
-        <x-collapse bordered>
-          <x-collapse-panel label="基本信息" active="true">
-            <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-              width="100%" labelAlign="end" span="24" space="2"></x-form>
-            <br />
-          </x-collapse-panel>
-        </x-collapse>
-
-
-
-        <x-collapse>
-          <x-collapse-panel label="属性信息" active="true">
-            <!-- Standard HTML Table with Optimized Styles -->
-            <table class="custom-table">
-              <thead>
-                <tr>
-                  <th width="100px" class="sticky-left">序号</th>
-                  <th width="200px">属性名</th>
-                  <th>属性值</th>
-                  <th width="200px">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of statements(); let i = index">
-                  <!-- Index Column -->
-                  <td class="sticky-left">{{ i + 1 }}</td>
-
-                  <!-- Property Column -->
-                  <td>
-                    <input class="full-width" list="options" id="property" name="property"
-                      [(ngModel)]="row.mainsnak.label">
-
-                    <datalist id="options">
-                      <option *ngFor="let property of properties()" [value]="property.name">
-                    </datalist>
-                    <!-- <x-select class="full-width" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label"
-                      [data]="properties" (ngModelChange)="change(row)"></x-select> -->
-                  </td>
-
-                  <!-- Name Column -->
-                  <td>
-                    <ng-container [ngSwitch]="row?.mainsnak?.datatype">
-                      <!-- Monolingual Text -->
-                      <quill-editor *ngSwitchCase="'monolingualtext'"
-                        [(ngModel)]="row.mainsnak.datavalue.value"></quill-editor>
-                      <!-- String, URL, Commons Media, Wikibase Item -->
-                      <x-input *ngSwitchCase="'string'" class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                      <x-input *ngSwitchCase="'url'" class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                      <x-input *ngSwitchCase="'commonsMedia'" class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                      <x-input *ngSwitchCase="'wikibase-item'" class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
-                      <!-- Quantity -->
-                      <x-input-number *ngSwitchCase="'quantity'" class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
-                      <!-- Time -->
-                      <x-date-picker *ngSwitchCase="'time'"
-                        [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
-                      <!-- Globe Coordinate -->
-                      <x-input-group *ngSwitchCase="'globe-coordinate'" class="full-width" compact>
-                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
-                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
-                      </x-input-group>
-                      <!-- File Upload (if needed) -->
-                      <x-upload *ngIf="row?.mainsnak?.datatype === 'commonsMedia'" (uploadSuccess)="upload($event, row)"
-                        action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
-                    </ng-container>
-                  </td>
-
-                  <!-- Actions Column -->
-                  <td>
-                    <x-link type="primary" (click)="save(row)">保存</x-link>
-                    <x-link type="danger" (click)="del(row)">删除</x-link>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Add Button -->
-            <x-button [style.marginTop.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
-
-            <!-- Node Template for Select -->
-            <ng-template #nodeTpl let-node="$node">
-              <ng-container *ngIf="node">
-                <span class="select-item">{{ node.label }}</span>
-              </ng-container>
-            </ng-template>
-          </x-collapse-panel>
-        </x-collapse>
-
-        <x-collapse>
-          <x-collapse-panel label="标签标注" style="overflow: scroll">
-            <div style="display: block; width: 100%; overflow: scroll">
-              <div *ngFor="let t of tags | keyvalue">
-                <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-                  tag></x-checkbox>
-              </div>
-            </div>
-            <div class="row">
-              标签：
-              <ng-container *ngFor="let item of tag(); trackBy: trackByFn">
-                <x-tag type="primary" closable (close)="close(item)">{{
-                  item
-                  }}</x-tag>
-              </ng-container>
-            </div>
-          </x-collapse-panel>
-        </x-collapse>
-        <x-collapse>
-          <x-collapse-panel label="地理位置">
-            <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
-              [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
-          </x-collapse-panel>
-        </x-collapse>
-        <x-collapse>
-          <x-collapse-panel label="上传图片" (paste)="onImagePaste($event)">
-            <div class="row">
-              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
-                [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
-
-              <ng-template #textTpl>
-                <x-icon class="upload-icon" type="fto-upload"></x-icon>
-                <span>选择图片</span>
-              </ng-template>
-
-              <div class="gallery" *ngIf="imgs.length > 0">
-                <div class="warp">
-                  <div *ngFor="let file of imgs">
-                    <div class="thumbnail" [style]="'background-image: url(' + file?.url + ')'"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </x-collapse-panel>
-        </x-collapse>
-        <x-collapse>
-          <x-collapse-panel label="上传视频">
-            <div class="row">
-              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="videos"
-                (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
-              <ng-template #textTpl>
-                <x-icon class="upload-icon" type="fto-upload"></x-icon>
-                <span>选择视频</span>
-              </ng-template>
-              <div class="gallery" *ngIf="vids.length > 0">
-                <div class="warp">
-                  <div *ngFor="let file of vids">
-                    <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
-                    <x-button (click)="updateTideohumbnail(file.url)" type="primary">更新封面</x-button>
-
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </x-collapse-panel>
-        </x-collapse>
-        <x-collapse>
-          <x-collapse-panel label="上传文件">
-            <div class="row">
-              <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="files"
-                (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
-              <ng-template #textTpl>
-                <x-icon class="upload-icon" type="fto-upload"></x-icon>
-                <span>选择文件</span>
-              </ng-template>
-            </div>
-          </x-collapse-panel>
-        </x-collapse>
-        <h3>{{ title }}</h3>
-        <div class="app-footer">
-          <x-buttons space="0.5">
-            <x-button (click)="action('cancel')">取消</x-button>
-            <x-button type="primary" (click)="!formInvalid && action('save')"
-              [disabled]="formInvalid || disabled">保存</x-button>
-          </x-buttons>
-        </div>
+        </x-collapse-panel>
+      </x-collapse>
+      <h3>{{ title }}</h3>
+      <div class="app-footer">
+        <x-buttons space="0.5">
+          <x-button (click)="action('cancel')">取消</x-button>
+          <x-button type="primary" (click)="!formInvalid && action('save')"
+            [disabled]="formInvalid || disabled">保存</x-button>
+        </x-buttons>
       </div>
     </div>
   </div>
+</div>
