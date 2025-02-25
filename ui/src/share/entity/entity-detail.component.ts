@@ -1157,14 +1157,16 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     if (!this.renderedContent) return;
 
     const toc: any[] = [];
-    let currentH1: any = null;
+    let currentParent: any = null;
     let headingCounter = 0;
+    let lastLevel = 0;
 
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.renderedContent;
 
-    const headings = tempDiv.querySelectorAll('h1, h2');
-
+    // 获取所有标题元素
+    const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    
     // 如果没有标题，直接返回
     if (headings.length === 0) {
       this.tableOfContents = [];
@@ -1173,34 +1175,81 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       return;
     }
 
-    headings.forEach((heading) => {
+    // 找出最小的标题级别作为顶层目录
+    const levels = Array.from(headings).map(heading => parseInt(heading.tagName[1]));
+    const minLevel = Math.min(...levels);
+
+    headings.forEach((heading, index) => {
       const level = parseInt(heading.tagName[1]);
       const title = heading.textContent || '';
       const anchor = `heading-${++headingCounter}`;
-
+      
       // 为每个标题添加 id 和锚点
       heading.id = anchor;
 
-      if (level === 1) {
-        currentH1 = {
-          level: 1,
-          title,
-          anchor,
-          children: []
-        };
-        toc.push(currentH1);
-      } else if (level === 2 && currentH1) {
-        currentH1.children.push({
-          level: 2,
-          title,
-          anchor
-        });
+      const tocItem = {
+        level: level - minLevel + 1, // 将级别标准化，最小级别变为1
+        title,
+        anchor,
+        children: []
+      };
+
+      // 处理第一个标题
+      if (index === 0) {
+        currentParent = tocItem;
+        toc.push(currentParent);
+        lastLevel = level;
+        return;
       }
+
+      // 处理后续标题
+      if (level === lastLevel) {
+        // 同级标题
+        if (level === minLevel) {
+          currentParent = tocItem;
+          toc.push(currentParent);
+        } else {
+          // 找到合适的父标题添加
+          let parent = this.findParentForLevel(toc, level - minLevel + 1);
+          if (parent) {
+            parent.children.push(tocItem);
+          } else {
+            toc.push(tocItem);
+          }
+        }
+      } else if (level > lastLevel) {
+        // 子标题
+        if (currentParent) {
+          currentParent.children.push(tocItem);
+        } else {
+          toc.push(tocItem);
+        }
+      } else {
+        // 回到更高级别
+        currentParent = tocItem;
+        toc.push(currentParent);
+      }
+
+      lastLevel = level;
     });
 
     this.renderedContent = tempDiv.innerHTML;
     this.tableOfContents = toc;
     this.cdr.detectChanges();
+  }
+
+  // 辅助函数：根据级别找到合适的父标题
+   findParentForLevel(toc: any[], targetLevel: number): any {
+    // 从后往前遍历查找第一个级别小于目标级别的标题
+    for (let i = toc.length - 1; i >= 0; i--) {
+      if (toc[i].level < targetLevel) {
+        return toc[i];
+      }
+      // 递归检查子项
+      const found = this.findParentForLevel(toc[i].children, targetLevel);
+      if (found) return found;
+    }
+    return null;
   }
 
   get hasTableOfContents(): boolean {

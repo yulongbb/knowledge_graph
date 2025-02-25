@@ -54,21 +54,16 @@
           <img [src]="getFullImageUrl(imgs[0].url)" alt="特色图片">
         </div>
 
-        <!-- 属性信息 -->
+        <!-- 属性信息 - 改用表格样式 -->
         <div class="property-box">
-          <ng-container *ngFor="let property of propertyData() | keyvalue">
-            <div class="property-group">
-              <h4 class="group-title">{{property.key}}</h4>
-              <ul class="property-list">
-                <li *ngFor="let claim of getStatement(property.value)">
-                  <div class="property-item">
-                    <span class="property-label">{{claim.mainsnak.label}}</span>
-                    <span class="property-value">{{claim.mainsnak.datavalue.value}}</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </ng-container>
+          <table class="info-table">
+            <tbody>
+              <tr *ngFor="let claim of claims()">
+                <td class="property-label">{{claim.mainsnak.label}}</td>
+                <td class="property-value">{{claim.mainsnak.datavalue.value}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </aside>
     </div>

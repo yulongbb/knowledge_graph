@@ -651,16 +651,19 @@
   
   .wiki-content {
     width: 100%;
-    max-width: 960px; // 限制内容宽度
-    margin: 0 auto; // 居中显示
-    padding: 60px 40px 20px;
-    max-width: 1000px;
-    line-height: 1.6;
-    position: relative; // 添加这行
-    height: 100%; // 确保内容区域占满高度
-    overflow-y: auto; // 启用垂直滚动
+    max-width: 860px;
+    margin: 0 auto;
     padding: 60px 40px 20px;
     position: relative;
+    height: 100%;
+    overflow-y: auto;
+    
+    // 隐藏滚动条但保持滚动功能
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE and Edge
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari, Opera
+    }
     
     // 优化滚动行为
     scroll-behavior: smooth;
@@ -1115,6 +1118,42 @@
     .property-value {
       margin-top: 4px;
       color: #202124;
+    }
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    tr {
+      border-bottom: 1px solid var(--border-color);
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+    }
+    
+    td {
+      padding: 12px 8px;
+      line-height: 1.5;
+      
+      &.property-label {
+        width: 30%;
+        color: var(--text-secondary);
+        font-size: 13px;
+        vertical-align: top;
+      }
+      
+      &.property-value {
+        width: 70%;
+        color: var(--text-primary);
+        font-size: 14px;
+        word-break: break-word;
+      }
     }
   }
 }
