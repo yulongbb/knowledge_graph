@@ -25,47 +25,53 @@
 
       <!-- 主要内容区域 -->
       <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
-        <!-- 标题区域 -->
-        <header class="wiki-header">
-          <div class="wiki-title-row">
-            <button class="edit-btn" (click)="editEntity()">编辑知识</button>
-            <button class="edit-btn" (click)="editTemplate()">编辑模板</button>
-          </div>
-          <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
-
-          <div class="wiki-meta">
-            <span *ngIf="item?.descriptions?.zh?.value" class="description">
-              {{item?.descriptions?.zh?.value}}
-            </span>
-            <div class="tags" *ngIf="tag()?.length">
-              <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+        <div>
+          <!-- 标题区域 -->
+          <header class="wiki-header">
+            <div class="wiki-title-row">
+              <button class="edit-btn" (click)="editEntity()">编辑知识</button>
+              <button class="edit-btn" (click)="editTemplate()">编辑模板</button>
             </div>
-          </div>
-        </header>
+            <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
 
-        <!-- 正文内容 -->
-        <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
+            <div class="wiki-meta">
+              <span *ngIf="item?.descriptions?.zh?.value" class="description">
+                {{item?.descriptions?.zh?.value}}
+              </span>
+              <div class="tags" *ngIf="tag()?.length">
+                <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- 正文内容 -->
+          <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
+        </div>
+
+
+        <!-- 右侧信息栏 -->
+        <aside class="wiki-info" #wikiInfo>
+          <!-- 特色图片 -->
+
+          <div class="featured-image">
+            <img [src]="imgs[0].url" alt="特色图片">
+          </div>
+
+          <!-- 属性信息 - 改用表格样式 -->
+          <div class="property-box">
+            <table class="info-table">
+              <tbody>
+                <tr *ngFor="let claim of claims()">
+                  <td class="property-label">{{claim.mainsnak.label}}</td>
+                  <td class="property-value">{{claim.mainsnak.datavalue.value}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </aside>
       </main>
 
-      <!-- 右侧信息栏 -->
-      <aside class="wiki-info" #wikiInfo>
-        <!-- 特色图片 -->
-        <div class="featured-image" *ngIf="imgs?.length">
-          <img [src]="getFullImageUrl(imgs[0].url)" alt="特色图片">
-        </div>
 
-        <!-- 属性信息 - 改用表格样式 -->
-        <div class="property-box">
-          <table class="info-table">
-            <tbody>
-              <tr *ngFor="let claim of claims()">
-                <td class="property-label">{{claim.mainsnak.label}}</td>
-                <td class="property-value">{{claim.mainsnak.datavalue.value}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </aside>
     </div>
   </div>
   <div *ngSwitchCase="'add'">
