@@ -1109,147 +1109,134 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   scrollToSection(anchor: string) {
-    const element = document.getElementById(anchor);
-    if (element) {
-      // 获取目标元素的位置
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + this.contentMain.nativeElement.scrollTop;
+    // 等待 DOM 更新
+    requestAnimationFrame(() => {
+      const element = document.getElementById(anchor);
+      const container = this.contentMain?.nativeElement;
+      console.log(element, container);
+      
+      if (element && container) {
+        // 获取目标元素和容器的位置信息
+        const elementTop = element.offsetTop;
+        const headerOffset = 80; // 头部固定区域的高度
+        
+        // 计算需要滚动的位置
+        const scrollPosition = elementTop - headerOffset;
 
-      // 添加固定偏移量，避免被头部遮挡
-      const offset = 80;
+        console.log('滚动到:', scrollPosition);
+        
+        // 使用平滑滚动
+        container.scrollTo({
+          top: scrollPosition,
+          behavior: 'smooth'
+        });
 
-      // 使用 scrollTo 进行平滑滚动
-      this.contentMain.nativeElement.scrollTo({
-        top: offsetPosition - offset,
-        behavior: 'smooth'
-      });
-
-      // 更新当前激活的目录项
-      this.currentSection = anchor;
-      this.cdr.detectChanges();
-    }
+        // 更新当前激活的章节
+        this.currentSection = anchor;
+        
+        // 添加高亮效果
+        element.classList.add('highlight-section');
+        setTimeout(() => {
+          element.classList.remove('highlight-section');
+        }, 2000);
+        
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   onContentScroll() {
-    if (!this.contentMain || !this.contentMain.nativeElement) return;
+    if (!this.contentMain?.nativeElement) return;
 
-    const scrollPosition = this.contentMain.nativeElement.scrollTop;
-    const headings = Array.from(this.contentMain.nativeElement.querySelectorAll('h1, h2'));
-    const offset = 100;
+    const container = this.contentMain.nativeElement;
+    const scrollPosition = container.scrollTop;
+    const headings = container.querySelectorAll('.section-heading');
+    const headerOffset = 100;
 
-    // 只更新目录高亮，不再同步右侧栏滚动
-    let currentHeading:any = headings.find((heading: any) => {
-      const elementPosition = heading.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + scrollPosition;
-      return offsetPosition > scrollPosition - offset;
-    });
-
-    if (currentHeading) {
-      const newSection = currentHeading.id;
-      if (this.currentSection !== newSection) {
-        this.currentSection = newSection;
-        this.cdr.detectChanges();
+    // 找到当前可见的标题
+    let currentHeading = null;
+    
+    for (const heading of headings) {
+      const elementTop = heading.offsetTop - container.offsetTop;
+      if (elementTop - headerOffset <= scrollPosition) {
+        currentHeading = heading;
+      } else {
+        break;
       }
+    }
+
+    if (currentHeading && this.currentSection !== currentHeading.id) {
+      this.currentSection = currentHeading.id;
+      this.cdr.detectChanges();
     }
   }
 
   setupTocFromTemplate() {
     if (!this.renderedContent) return;
 
-    const toc: any[] = [];
-    let currentParent: any = null;
-    let headingCounter = 0;
-    let lastLevel = 0;
-
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.renderedContent;
 
     // 获取所有标题元素
     const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
-    // 如果没有标题，直接返回
-    if (headings.length === 0) {
-      this.tableOfContents = [];
-      this.renderedContent = tempDiv.innerHTML;
-      this.cdr.detectChanges();
-      return;
-    }
+    const toc: any[] = [];
+    let currentH1: any = null;
+    let currentH2: any = null;
+    let headingCounter = 0;
 
-    // 找出最小的标题级别作为顶层目录
-    const levels = Array.from(headings).map(heading => parseInt(heading.tagName[1]));
-    const minLevel = Math.min(...levels);
-
-    headings.forEach((heading, index) => {
+    headings.forEach((heading) => {
       const level = parseInt(heading.tagName[1]);
-      const title = heading.textContent || '';
-      const anchor = `heading-${++headingCounter}`;
-      
-      // 为每个标题添加 id 和锚点
-      heading.id = anchor;
+      const headingId = `heading-${++headingCounter}`;
+      heading.id = headingId;
+      heading.classList.add('section-heading');
 
       const tocItem = {
-        level: level - minLevel + 1, // 将级别标准化，最小级别变为1
-        title,
-        anchor,
+        level,
+        title: heading.textContent?.trim() || '',
+        anchor: headingId,
         children: []
       };
 
-      // 处理第一个标题
-      if (index === 0) {
-        currentParent = tocItem;
-        toc.push(currentParent);
-        lastLevel = level;
-        return;
-      }
-
-      // 处理后续标题
-      if (level === lastLevel) {
-        // 同级标题
-        if (level === minLevel) {
-          currentParent = tocItem;
-          toc.push(currentParent);
-        } else {
-          // 找到合适的父标题添加
-          let parent = this.findParentForLevel(toc, level - minLevel + 1);
-          if (parent) {
-            parent.children.push(tocItem);
+      // 根据标题级别构建层级关系
+      switch (level) {
+        case 1:
+          currentH1 = tocItem;
+          currentH2 = null;
+          toc.push(tocItem);
+          break;
+        case 2:
+          if (currentH1) {
+            currentH2 = tocItem;
+            currentH1.children.push(tocItem);
+          } else {
+            currentH2 = tocItem;
+            toc.push(tocItem);
+          }
+          break;
+        case 3:
+          if (currentH2) {
+            currentH2.children.push(tocItem);
+          } else if (currentH1) {
+            currentH1.children.push(tocItem);
           } else {
             toc.push(tocItem);
           }
-        }
-      } else if (level > lastLevel) {
-        // 子标题
-        if (currentParent) {
-          currentParent.children.push(tocItem);
-        } else {
-          toc.push(tocItem);
-        }
-      } else {
-        // 回到更高级别
-        currentParent = tocItem;
-        toc.push(currentParent);
+          break;
+        default:
+          // 处理其他级别标题
+          if (currentH2) {
+            currentH2.children.push(tocItem);
+          } else if (currentH1) {
+            currentH1.children.push(tocItem);
+          } else {
+            toc.push(tocItem);
+          }
       }
-
-      lastLevel = level;
     });
 
     this.renderedContent = tempDiv.innerHTML;
     this.tableOfContents = toc;
     this.cdr.detectChanges();
-  }
-
-  // 辅助函数：根据级别找到合适的父标题
-   findParentForLevel(toc: any[], targetLevel: number): any {
-    // 从后往前遍历查找第一个级别小于目标级别的标题
-    for (let i = toc.length - 1; i >= 0; i--) {
-      if (toc[i].level < targetLevel) {
-        return toc[i];
-      }
-      // 递归检查子项
-      const found = this.findParentForLevel(toc[i].children, targetLevel);
-      if (found) return found;
-    }
-    return null;
   }
 
   get hasTableOfContents(): boolean {

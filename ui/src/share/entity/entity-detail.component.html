@@ -6,16 +6,33 @@
       <aside class="wiki-toc" *ngIf="hasTableOfContents">
         <h3 class="toc-title">目录</h3>
         <ul class="toc-list">
-          <ng-container *ngFor="let h1 of tableOfContents">
-            <li class="toc-item level-1">
-              <a [class.active]="currentSection === h1.anchor" (click)="scrollToSection(h1.anchor)">
-                {{h1.title}}
+          <ng-container *ngFor="let item of tableOfContents">
+            <!-- 一级标题 -->
+            <li class="toc-item">
+              <a [class.active]="currentSection === item.anchor" 
+                 (click)="scrollToSection(item.anchor)">
+                {{item.title}}
               </a>
-              <ul *ngIf="h1.children?.length" class="toc-sublist">
-                <li *ngFor="let h2 of h1.children" class="toc-item level-2">
-                  <a [class.active]="currentSection === h2.anchor" (click)="scrollToSection(h2.anchor)">
-                    {{h2.title}}
+              <!-- 二级标题 -->
+              <ul *ngIf="item.children?.length" class="toc-sublist">
+                <li *ngFor="let subItem of item.children" 
+                    class="toc-item" 
+                    [class.level-2]="subItem.level === 2"
+                    [class.level-3]="subItem.level === 3">
+                  <a [class.active]="currentSection === subItem.anchor" 
+                     (click)="scrollToSection(subItem.anchor)">
+                    {{subItem.title}}
                   </a>
+                  <!-- 三级标题 -->
+                  <ul *ngIf="subItem.children?.length" class="toc-sublist">
+                    <li *ngFor="let subSubItem of subItem.children" 
+                        class="toc-item level-3">
+                      <a [class.active]="currentSection === subSubItem.anchor" 
+                         (click)="scrollToSection(subSubItem.anchor)">
+                        {{subSubItem.title}}
+                      </a>
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </li>

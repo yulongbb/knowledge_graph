@@ -453,160 +453,6 @@ $github-radius: 6px;
   }
 }
 
-.entity-detail-container {
-  display: grid;
-  grid-template-columns: 250px 1fr 300px;
-  gap: 20px;
-  padding: 20px;
-  height: calc(100vh - 64px); // 减去顶部导航的高度
-  margin: 20px 0;
-
-  .toc-sidebar {
-    border-right: 1px solid #eee;
-    padding: 15px;
-    overflow-y: auto;
-    position: sticky;
-    top: 80px;
-    height: calc(100vh - 100px);
-
-    .toc-title {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    .toc-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        padding: 4px 0;
-
-        a {
-          color: #666;
-          text-decoration: none;
-          display: block;
-          padding: 4px 8px;
-          border-radius: 4px;
-
-          &:hover {
-            background: #f5f5f5;
-            color: #1890ff;
-          }
-
-          &.active {
-            background: #e6f7ff;
-            color: #1890ff;
-          }
-        }
-
-        &.indent-1 {
-          padding-left: 12px;
-        }
-
-        &.indent-2 {
-          padding-left: 24px;
-        }
-
-        &.indent-3 {
-          padding-left: 36px;
-        }
-      }
-
-      .toc-item {
-        &.level-1 {
-          margin-bottom: 8px;
-
-          >a {
-            font-weight: 500;
-            color: #333;
-          }
-        }
-
-        &.level-2 {
-          padding-left: 16px;
-
-          >a {
-            font-size: 13px;
-            color: #666;
-          }
-        }
-
-        a {
-          text-decoration: none;
-          display: block;
-          padding: 4px 8px;
-          border-radius: 4px;
-          line-height: 1.5;
-
-          &:hover {
-            background: #f5f5f5;
-            color: #1890ff;
-          }
-
-          &.active {
-            background: #e6f7ff;
-            color: #1890ff;
-          }
-        }
-      }
-
-      .toc-sublist {
-        list-style: none;
-        padding: 0;
-        margin: 4px 0 8px;
-      }
-    }
-  }
-
-  .content-main {
-    overflow-y: auto;
-    padding: 0 20px;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  .info-sidebar {
-    border-left: 1px solid #eee;
-    padding: 15px;
-    overflow-y: auto;
-
-    .entity-image {
-      margin-bottom: 20px;
-
-      img {
-        width: 100%;
-        border-radius: 4px;
-      }
-    }
-
-    .entity-properties {
-      .property-group {
-        margin-bottom: 15px;
-
-        .group-title {
-          font-weight: 500;
-          margin-bottom: 8px;
-        }
-
-        .property-item {
-          margin-bottom: 8px;
-
-          .property-label {
-            color: #666;
-            font-size: 13px;
-          }
-
-          .property-value {
-            color: #333;
-          }
-        }
-      }
-    }
-  }
-}
 
 .wiki-container {
   width: 100%;
@@ -631,8 +477,8 @@ $github-radius: 6px;
   // 左侧目录样式
   .wiki-toc {
     position: fixed; // 改为固定定位
-    top: 60px;
-    left: 10px;
+    top: 75px;
+    left: 30px;
     width: 300px;
     height: calc(100vh - 100px);
     background: #fff;
@@ -664,6 +510,15 @@ $github-radius: 6px;
 
         margin: 2px 0; // 减小目录项间距
 
+        // 缩进样式
+        &.level-2 {
+          padding-left: 1.5rem;
+        }
+
+        &.level-3 {
+          padding-left: 3rem;
+        }
+
         a {
           display: block;
           padding: 8px 12px;
@@ -686,23 +541,44 @@ $github-radius: 6px;
             color: $github-link;
             font-weight: 600;
           }
+
+          position: relative;
+          transition: all 0.2s ease-in-out;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 2px;
+            background-color: $github-link;
+            transition: width 0.2s ease-in-out;
+            transform: translateY(-50%);
+          }
+          
+          &.active {
+            padding-left: 16px;
+            
+            &::before {
+              width: 8px;
+            }
+          }
         }
 
-        &.level-2 {
-          padding-left: 16px;
-
-          padding-left: 12px; // 减小二级目录缩进
+        // 子目录样式
+        .toc-sublist {
+          list-style: none;
+          padding: 0;
+          margin: 0;
         }
       }
     }
   }
 
   .wiki-content {
-    grid-template-columns: 1fr 250px; // 改为两列布局
+    grid-template-columns: 1fr 350px; // 改为两列布局
     display: grid;
-    width: 100%;
-    margin: 60px 0px 0px 300px;
-    padding: 60px 40px 20px 300px;
     position: relative;
     height: 100%;
     overflow-y: auto;
@@ -710,10 +586,9 @@ $github-radius: 6px;
     border: 1px solid $github-border;
     border-radius: $github-radius;
     box-shadow: $github-card-shadow;
-    padding: 24px;
 
-    padding: 16px; // 减小内容区域边距
-    margin: 40px 0 0 250px; // 调整边距
+    margin: 40px 0 0 300px; // 调整边距
+    padding: 20px;
 
     // 隐藏滚动条但保持滚动功能
     scrollbar-width: none; // Firefox
@@ -904,9 +779,8 @@ $github-radius: 6px;
 
   .wiki-info {
     position: sticky; // 改为固定定位
-    top: 60px;
+    top: 0;
     right: 0;
-    width: 300px;
     height: calc(100vh - 100px);
     background: #fff;
     border-radius: 8px;
@@ -1034,196 +908,6 @@ $github-radius: 6px;
   }
 }
 
-// 响应式布局调整
-@media (max-width: 1400px) {
-  .wiki-container {
-    .wiki-content {
-      margin-right: 320px; // 为固定定位的侧边栏留出空间
-    }
-
-    .wiki-info {
-      display: none; // 在较小屏幕上隐藏右侧栏
-    }
-  }
-}
-
-@media (max-width: 1200px) {
-  .wiki-container {
-    .wiki-content {
-      padding-left: 0;
-      margin-right: 0; // 在较小屏幕上移除右侧边距
-    }
-
-    .wiki-info {
-      display: none; // 在较小屏幕上隐藏右侧栏
-    }
-  }
-}
-
-// 调整右侧栏布局
-.wiki-info {
-  position: sticky; // 改为固定定位
-  top: 60px;
-  right: 0;
-  width: 300px;
-  height: calc(100vh - 100px);
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  padding: 20px;
-
-  // 添加半透明背景效果
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
-
-  // 优化滚动条
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-  }
-
-  // 右侧属性框样式
-  .property-box {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    margin-top: 20px;
-
-    .property-group {
-      padding: 16px;
-      border-bottom: 1px solid #eee;
-
-      &:last-child {
-        border: none;
-      }
-
-      .group-title {
-        font-size: 15px;
-        font-weight: 500;
-        color: #202124;
-        margin: 0 0 12px;
-      }
-    }
-
-    .property-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .property-item {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 8px;
-
-      .property-label {
-        font-size: 13px;
-        color: #5f6368;
-      }
-
-      .property-value {
-        margin-top: 4px;
-        color: #202124;
-      }
-    }
-
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-
-      tr {
-        border-bottom: 1px solid var(--border-color);
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.02);
-        }
-      }
-
-      td {
-        padding: 12px 8px;
-        line-height: 1.5;
-
-        &.property-label {
-          width: 30%;
-          color: var(--text-secondary);
-          font-size: 13px;
-          vertical-align: top;
-        }
-
-        &.property-value {
-          width: 70%;
-          color: var(--text-primary);
-          font-size: 14px;
-          word-break: break-word;
-        }
-      }
-    }
-  }
-}
-
-// 响应式布局
-@media (max-width: $breakpoint-2xl) {
-  .wiki-container {
-    grid-template-columns: 250px minmax(600px, 1fr);
-
-    .wiki-info {
-      display: none;
-    }
-  }
-}
-
-@media (max-width: $breakpoint-xl) {
-  .wiki-container {
-    gap: 16px;
-    padding: 12px;
-  }
-}
-
-@media (max-width: $breakpoint-lg) {
-  .wiki-container {
-    grid-template-columns: 1fr;
-
-    .wiki-toc {
-      display: none;
-    }
-
-    .wiki-content {
-      padding: 24px 16px;
-      padding: 16px 12px;
-    }
-  }
-}
-
-@media (max-width: $breakpoint-md) {
-  .wiki-container {
-    padding: 16px;
-    padding: 16px;
-
-    .wiki-content {
-      padding: 16px;
-      padding: 16px;
-
-      .wiki-header {
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-      }
-    }
-  }
-}
-
 // Utility Classes
 .edit-btn {
   padding: 8px 16px;
@@ -1311,5 +995,35 @@ $github-radius: 6px;
       color: #202124;
       margin-top: 2px;
     }
+  }
+}
+
+// 添加锚点标题的样式
+.section-heading {
+  scroll-margin-top: 90px;
+  padding-top: 10px;
+  margin-bottom: 1rem;
+  
+  &::before {
+    content: '';
+    display: block;
+    height: 80px;
+    margin: -80px 0 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+// 添加高亮动画效果
+.highlight-section {
+  animation: highlight-fade 2s ease-out;
+}
+
+@keyframes highlight-fade {
+  0% {
+    background-color: rgba(255, 255, 0, 0.2);
+  }
+  100% {
+    background-color: transparent;
   }
 }
