@@ -11,7 +11,8 @@ export const environment = {
   defaultPage: 'dashboard',
   // Api请求地址
   api: 'http://localhost:3000/',
-  ip: '10.117.2.46'
+  // ip: '10.117.2.46'
+  ip: '127.0.0.1'
 };
 
 /*
