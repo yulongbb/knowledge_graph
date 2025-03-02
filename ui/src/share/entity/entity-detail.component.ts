@@ -193,7 +193,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   @ViewChild('contentMain') contentMain!: ElementRef;
   @ViewChild('wikiInfo') wikiInfo!: ElementRef;
-  tableOfContents: any[] = [];
+  tableOfContents: any;
   currentSection: string = '';
 
   constructor(
@@ -1109,40 +1109,38 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   scrollToSection(anchor: string) {
-    // 等待 DOM 更新
-    requestAnimationFrame(() => {
-      const element = document.getElementById(anchor);
-      const container = this.contentMain?.nativeElement;
-      console.log(element, container);
-      
-      if (element && container) {
-        // 获取目标元素和容器的位置信息
-        const elementTop = element.offsetTop;
-        const headerOffset = 80; // 头部固定区域的高度
-        
-        // 计算需要滚动的位置
-        const scrollPosition = elementTop - headerOffset;
-
-        console.log('滚动到:', scrollPosition);
-        
-        // 使用平滑滚动
-        container.scrollTo({
-          top: scrollPosition,
-          behavior: 'smooth'
-        });
-
-        // 更新当前激活的章节
-        this.currentSection = anchor;
-        
-        // 添加高亮效果
-        element.classList.add('highlight-section');
-        setTimeout(() => {
-          element.classList.remove('highlight-section');
-        }, 2000);
-        
-        this.cdr.detectChanges();
-      }
+    if (!this.contentMain?.nativeElement) return;
+    
+    const container = this.contentMain.nativeElement;
+    const element = document.getElementById(anchor);
+    
+    if (!element) return;
+    
+    // 获取元素相对于滚动容器的位置
+    const elementPosition = element.offsetTop;
+    const containerScrollTop = container.scrollTop;
+    const containerHeight = container.clientHeight;
+    
+    // 计算目标滚动位置
+    const offset = 80; // 顶部偏移量
+    const scrollTarget = elementPosition - offset;
+    
+    // 执行滚动
+    container.scrollTo({
+      top: scrollTarget,
+      behavior: 'smooth'
     });
+
+    // 更新当前激活的章节
+    this.currentSection = anchor;
+    
+    // 添加高亮效果
+    element.classList.add('highlight-section');
+    setTimeout(() => {
+      element.classList.remove('highlight-section');
+    }, 2000);
+    
+    this.cdr.detectChanges();
   }
 
   onContentScroll() {
@@ -1174,73 +1172,39 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   setupTocFromTemplate() {
     if (!this.renderedContent) return;
 
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = this.renderedContent;
-
+    // 创建临时 DOM 元素来解析 HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(this.renderedContent, 'text/html');
+    
     // 获取所有标题元素
-    const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
     const toc: any[] = [];
-    let currentH1: any = null;
-    let currentH2: any = null;
-    let headingCounter = 0;
+    
+    console.log('Found headings:', headings.length); // 调试日志
 
-    headings.forEach((heading) => {
+    headings.forEach((heading, index) => {
       const level = parseInt(heading.tagName[1]);
-      const headingId = `heading-${++headingCounter}`;
-      heading.id = headingId;
-      heading.classList.add('section-heading');
-
-      const tocItem = {
+      const id = heading.id || `heading-${index + 1}`;
+      const text = heading.textContent?.trim() || '';
+      
+      // 创建简化的目录项
+      const item = {
         level,
-        title: heading.textContent?.trim() || '',
-        anchor: headingId,
-        children: []
+        title: text,
+        anchor: id
       };
 
-      // 根据标题级别构建层级关系
-      switch (level) {
-        case 1:
-          currentH1 = tocItem;
-          currentH2 = null;
-          toc.push(tocItem);
-          break;
-        case 2:
-          if (currentH1) {
-            currentH2 = tocItem;
-            currentH1.children.push(tocItem);
-          } else {
-            currentH2 = tocItem;
-            toc.push(tocItem);
-          }
-          break;
-        case 3:
-          if (currentH2) {
-            currentH2.children.push(tocItem);
-          } else if (currentH1) {
-            currentH1.children.push(tocItem);
-          } else {
-            toc.push(tocItem);
-          }
-          break;
-        default:
-          // 处理其他级别标题
-          if (currentH2) {
-            currentH2.children.push(tocItem);
-          } else if (currentH1) {
-            currentH1.children.push(tocItem);
-          } else {
-            toc.push(tocItem);
-          }
-      }
+      // 直接添加到数组中
+      toc.push(item);
     });
 
-    this.renderedContent = tempDiv.innerHTML;
     this.tableOfContents = toc;
+    console.log('Generated TOC:', this.tableOfContents); // 调试日志
     this.cdr.detectChanges();
   }
 
   get hasTableOfContents(): boolean {
-    return this.tableOfContents && this.tableOfContents.length > 0;
+    return Array.isArray(this.tableOfContents) && this.tableOfContents.length > 0;
   }
 
   editEntity() {

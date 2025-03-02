@@ -555,32 +555,94 @@ export class KnowledgeService {
         };
       }
 
-  
+      let sanitizedTemplate = entity._source.template
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/(<h[1-6])/gi, '\n$1') // 确保标题标签前有换行
+        .replace(/(<\/h[1-6]>)/gi, '$1\n') // 确保标题标签后有换行
+        .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (match) => {
+          return match.replace(/{{/g, '&#123;&#123;').replace(/}}/g, '&#125;&#125;');
+        })
+        .replace(/(<[^>]+>)\s*{{/g, '$1 {{')
+        .replace(/}}\s*(<[^>]+>)/g, '}} $1');
+
       // 编译模板
-      const template = Handlebars.compile(entity._source.template);
-      
+      let template;
+      try {
+        template = Handlebars.compile(sanitizedTemplate, { 
+          strict: false,
+          noEscape: true 
+        });
+      } catch (compileError) {
+        console.error('Template compilation failed:', compileError);
+        return {
+          success: false,
+          error: 'Template compilation failed: ' + compileError.message
+        };
+      }
+
       // 渲染内容
-      const content = template(entity._source);
-  
-      // 添加目录样式
+      let content;
+      try {
+        content = template(entity._source);
+      } catch (renderError) {
+        console.error('Template rendering failed:', renderError);
+        return {
+          success: false,
+          error: 'Template rendering failed: ' + renderError.message
+        };
+      }
+
+      // 添加目录 ID
+      let counter = 0;
+      const contentWithIds = content.replace(
+        /<h([1-6])[^>]*>(.*?)<\/h\1>/gi,
+        (match, level, text) => {
+          const id = `heading-${++counter}`;
+          return `<h${level} id="${id}" class="section-heading">${text}</h${level}>`;
+        }
+      );
+
+      // 添加样式
       const contentWithStyle = `
         <style>
-          img{
-              width: 100%
+          img {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+          }
+          pre {
+            background-color: #f6f8fa;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+          }
+          code {
+            font-family: monospace;
+          }
+          h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            scroll-margin-top: 70px;
+          }
+          .section-heading {
+            position: relative;
+          }
+          .section-heading:target {
+            color: #0366d6;
           }
         </style>
-        ${content}
+        ${contentWithIds}
       `;
-  
+
       return {
         success: true,
-        content: contentWithStyle 
+        content: contentWithStyle
       };
     } catch (error) {
       console.error('Template rendering failed:', error);
       return {
         success: false,
-        error: error.message
+        error: 'Template processing failed: ' + error.message
       }; 
     }
   }

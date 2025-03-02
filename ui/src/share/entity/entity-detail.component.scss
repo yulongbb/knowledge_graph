@@ -491,6 +491,13 @@ $github-radius: 6px;
 
     padding: 12px; // 减小目录内边距
 
+    // 隐藏滚动条但保持滚动功能
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
     .toc-title {
       font-size: 16px;
       font-weight: 500;
@@ -589,6 +596,19 @@ $github-radius: 6px;
 
     margin: 40px 0 0 300px; // 调整边距
     padding: 20px;
+
+    height: calc(100vh - 120px); // 设置固定高度
+    overflow-y: auto; // 确保可以滚动
+    
+    // 平滑滚动
+    scroll-behavior: smooth;
+    
+    // 隐藏滚动条但保持功能
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     // 隐藏滚动条但保持滚动功能
     scrollbar-width: none; // Firefox
@@ -774,6 +794,12 @@ $github-radius: 6px;
           font-weight: 500;
         }
       }
+    }
+
+    .section-heading {
+      scroll-margin-top: 80px; // 调整滚动位置偏移
+      padding-top: 10px;
+      margin-bottom: 1rem;
     }
   }
 
@@ -1011,6 +1037,15 @@ $github-radius: 6px;
     margin: -80px 0 0;
     visibility: hidden;
     pointer-events: none;
+  }
+
+  position: relative;
+  scroll-margin-top: 20px;
+  margin-top: 1em;
+  padding-top: 0.5em;
+  
+  &.active {
+    color: #0366d6;
   }
 }
 

@@ -2,41 +2,24 @@
   <div *ngSwitchCase="'info'">
     <!-- 添加动态类名控制布局 -->
     <div class="wiki-container" [class.no-toc]="!hasTableOfContents">
+
       <!-- 根据目录内容条件渲染左侧目录 -->
       <aside class="wiki-toc" *ngIf="hasTableOfContents">
         <h3 class="toc-title">目录</h3>
+        
+        <!-- 简化的目录结构 -->
         <ul class="toc-list">
-          <ng-container *ngFor="let item of tableOfContents">
-            <!-- 一级标题 -->
-            <li class="toc-item">
-              <a [class.active]="currentSection === item.anchor" 
-                 (click)="scrollToSection(item.anchor)">
+          <li *ngFor="let item of tableOfContents" class="toc-item">
+            <a [class.active]="currentSection === item.anchor" 
+               (click)="scrollToSection(item.anchor)"
+               style="cursor: pointer;" 
+               [attr.data-level]="item.level">
+              <!-- 添加缩进指示 -->
+              <span [style.marginLeft.px]="(item.level - 1) * 20">
                 {{item.title}}
-              </a>
-              <!-- 二级标题 -->
-              <ul *ngIf="item.children?.length" class="toc-sublist">
-                <li *ngFor="let subItem of item.children" 
-                    class="toc-item" 
-                    [class.level-2]="subItem.level === 2"
-                    [class.level-3]="subItem.level === 3">
-                  <a [class.active]="currentSection === subItem.anchor" 
-                     (click)="scrollToSection(subItem.anchor)">
-                    {{subItem.title}}
-                  </a>
-                  <!-- 三级标题 -->
-                  <ul *ngIf="subItem.children?.length" class="toc-sublist">
-                    <li *ngFor="let subSubItem of subItem.children" 
-                        class="toc-item level-3">
-                      <a [class.active]="currentSection === subSubItem.anchor" 
-                         (click)="scrollToSection(subSubItem.anchor)">
-                        {{subSubItem.title}}
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ng-container>
+              </span>
+            </a>
+          </li>
         </ul>
       </aside>
 
@@ -75,7 +58,7 @@
           </div>
 
           <!-- 属性信息 - 改用表格样式 -->
-          <div class="property-box">
+          <!-- <div class="property-box">
             <table class="info-table">
               <tbody>
                 <tr *ngFor="let claim of claims()">
@@ -84,7 +67,7 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> -->
         </aside>
       </main>
 
