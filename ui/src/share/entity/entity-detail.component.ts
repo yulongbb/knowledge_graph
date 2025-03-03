@@ -1065,7 +1065,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/entity']);
+        this.back();
         break;
     }
   }
@@ -1114,17 +1114,17 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       const element = document.getElementById(anchor);
       const container = this.contentMain?.nativeElement;
       console.log(element, container);
-      
+
       if (element && container) {
         // 获取目标元素和容器的位置信息
         const elementTop = element.offsetTop;
         const headerOffset = 80; // 头部固定区域的高度
-        
+
         // 计算需要滚动的位置
         const scrollPosition = elementTop - headerOffset;
 
         console.log('滚动到:', scrollPosition);
-        
+
         // 使用平滑滚动
         container.scrollTo({
           top: scrollPosition,
@@ -1133,13 +1133,13 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
         // 更新当前激活的章节
         this.currentSection = anchor;
-        
+
         // 添加高亮效果
         element.classList.add('highlight-section');
         setTimeout(() => {
           element.classList.remove('highlight-section');
         }, 2000);
-        
+
         this.cdr.detectChanges();
       }
     });
@@ -1155,7 +1155,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
     // 找到当前可见的标题
     let currentHeading = null;
-    
+
     for (const heading of headings) {
       const elementTop = heading.offsetTop - container.offsetTop;
       if (elementTop - headerOffset <= scrollPosition) {

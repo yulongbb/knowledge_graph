@@ -51,6 +51,10 @@
             图片URL:
             <input [(ngModel)]="selectedExtension.image" name="image" />
           </label>
+          <label>
+            URL:
+            <input [(ngModel)]="selectedExtension.url" name="url" />
+          </label>
           <button type="submit">保存</button>
         </form>
       </div>
@@ -99,6 +103,10 @@
           <label>
             图片URL:
             <input [(ngModel)]="newExtension.image" name="image" />
+          </label>
+          <label>
+            URL:
+            <input [(ngModel)]="newExtension.url" name="url" />
           </label>
           <button type="submit">创建</button>
         </form>

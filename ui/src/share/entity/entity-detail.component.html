@@ -9,26 +9,21 @@
           <ng-container *ngFor="let item of tableOfContents">
             <!-- 一级标题 -->
             <li class="toc-item">
-              <a [class.active]="currentSection === item.anchor" 
-                 (click)="scrollToSection(item.anchor)">
+              <a [class.active]="currentSection === item.anchor" (click)="scrollToSection(item.anchor)">
                 {{item.title}}
               </a>
               <!-- 二级标题 -->
               <ul *ngIf="item.children?.length" class="toc-sublist">
-                <li *ngFor="let subItem of item.children" 
-                    class="toc-item" 
-                    [class.level-2]="subItem.level === 2"
-                    [class.level-3]="subItem.level === 3">
-                  <a [class.active]="currentSection === subItem.anchor" 
-                     (click)="scrollToSection(subItem.anchor)">
+                <li *ngFor="let subItem of item.children" class="toc-item" [class.level-2]="subItem.level === 2"
+                  [class.level-3]="subItem.level === 3">
+                  <a [class.active]="currentSection === subItem.anchor" (click)="scrollToSection(subItem.anchor)">
                     {{subItem.title}}
                   </a>
                   <!-- 三级标题 -->
                   <ul *ngIf="subItem.children?.length" class="toc-sublist">
-                    <li *ngFor="let subSubItem of subItem.children" 
-                        class="toc-item level-3">
-                      <a [class.active]="currentSection === subSubItem.anchor" 
-                         (click)="scrollToSection(subSubItem.anchor)">
+                    <li *ngFor="let subSubItem of subItem.children" class="toc-item level-3">
+                      <a [class.active]="currentSection === subSubItem.anchor"
+                        (click)="scrollToSection(subSubItem.anchor)">
                         {{subSubItem.title}}
                       </a>
                     </li>
@@ -62,7 +57,9 @@
           </header>
 
           <!-- 正文内容 -->
-          <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
+          <div class="wiki-body">
+            <div [innerHTML]="renderedContent | safeHtml"></div>
+          </div>
         </div>
 
 
@@ -71,11 +68,12 @@
           <!-- 特色图片 -->
 
           <div class="featured-image">
-            <img [src]="imgs[0].url" alt="特色图片">
+            <img width="100%" *ngIf="item.documents" [src]="item.documents[0].thumbnail" alt="特色图片">
+            <img width="100%"  *ngIf="item.images" [src]="imgs[0].url" alt="特色图片">
           </div>
 
           <!-- 属性信息 - 改用表格样式 -->
-          <div class="property-box">
+          <!-- <div class="property-box">
             <table class="info-table">
               <tbody>
                 <tr *ngFor="let claim of claims()">
@@ -84,7 +82,7 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> -->
         </aside>
       </main>
 

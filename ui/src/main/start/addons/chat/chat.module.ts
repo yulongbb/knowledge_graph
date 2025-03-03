@@ -27,7 +27,6 @@ import { ImageListComponent } from './image-list/image-list.component';
     PluginComponent,
     KnowledgeCardComponent,
     ImageListComponent
-    // ...existing code...
   ],
   imports: [
     CommonModule,

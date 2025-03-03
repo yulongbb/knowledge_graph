@@ -58,7 +58,7 @@ export class PluginService {
             stream: true,
         };
 
-        const response = await this.httpService.post('http://10.117.1.238:5013/chat/completions', body, { headers, responseType: 'stream' }).toPromise();
+        const response = await this.httpService.post('http://10.117.2.46:5013/chat/completions', body, { headers, responseType: 'stream' }).toPromise();
         return new Promise((resolve, reject) => {
             const chunks: any[] = [];
             response.data.on('data', (chunk: any) => chunks.push(chunk));

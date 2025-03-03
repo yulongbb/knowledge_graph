@@ -8,9 +8,9 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import { EntityService } from 'src/main/entity/entity.service';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { PropertyService } from 'src/main/ontology/property/property.service';
-import { EsService } from '../home/es.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { EsService } from '../../home/es.service';
 
 // Register languages you need
 hljs.registerLanguage('javascript', javascript);
