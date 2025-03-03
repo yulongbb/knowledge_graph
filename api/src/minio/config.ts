@@ -1,5 +1,5 @@
 export const MINIO_CONFIG = {
-    MINIO_ENDPOINT: 'localhost',
+    MINIO_ENDPOINT: '10.117.1.238',
     MINIO_PORT: 9000,
     MINIO_ACCESSKEY: 'NQVvaroIkaCFNQx7sW7M',
     MINIO_SECRETKEY: '7Odt6K0Kocpef4ZwMOM0fYRuxr59xx0Si4gKR3bu',

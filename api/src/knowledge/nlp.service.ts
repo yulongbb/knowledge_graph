@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as nodejieba from 'nodejieba';
+// import * as nodejieba from 'nodejieba';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -8,7 +8,7 @@ export class NLPService {
     private customWordSet: Array<any>;
 
     constructor() {
-        nodejieba.load();  // 加载默认词典
+        // nodejieba.load();  // 加载默认词典
     }
 
     // 加载自定义词汇
@@ -25,7 +25,7 @@ export class NLPService {
 
         lines.forEach(line => {
           this.customWordSet.push({id: line.trim().split(',')[0].trim(), word:line.trim().split(',')[1].trim()});
-          nodejieba.insertWord(line.trim().split(',')[1].trim());  // 动态插入到jieba的词典
+        //   nodejieba.insertWord(line.trim().split(',')[1].trim());  // 动态插入到jieba的词典
         
         });
     
@@ -36,12 +36,12 @@ export class NLPService {
         this.loadCustomDict();  // 加载自定义词典
 
         // 使用 nodejieba 进行分词
-        const result = nodejieba.cut(text);
+        // const result = nodejieba.cut(text);
         console.log(this.customWordSet);
         // 过滤掉不在自定义词库中的词汇
-        const filteredWords =  this.customWordSet.filter(word => result.filter(w=> w == word.word).length>0);
-        console.log(new Set(filteredWords));
+        // const filteredWords =  this.customWordSet.filter(word => result.filter(w=> w == word.word).length>0);
+        // console.log(new Set(filteredWords));
 
-        return filteredWords;
+        return [];
     }
 }

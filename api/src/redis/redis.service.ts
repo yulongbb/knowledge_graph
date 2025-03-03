@@ -10,7 +10,7 @@ export class RedisService {
 
   constructor() {
     this.redisClient = new Redis({
-      host: 'localhost', // Redis 服务器的主机名
+      host: '10.117.1.238', // Redis 服务器的主机名
       port: 6379, // Redis 服务器的端口
       password: 'root',
       db: 1

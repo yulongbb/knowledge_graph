@@ -3,13 +3,15 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+  production: true,
+  index: '/start/chat?keyword=',
   // 框架页
   layout: 'index',
   // 默认的首页
-  defaultPage: 'home',
+  defaultPage: 'dashboard',
   // Api请求地址
-  api: 'http://localhost:3333/',
+  api: 'http://10.117.2.46:3333/',
+  ip: '10.117.2.46'
 
 };
 

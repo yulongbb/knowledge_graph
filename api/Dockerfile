@@ -1,14 +1,31 @@
-# Base image
-FROM node:18
-# Create app directory
-WORKDIR /usr/src/app
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# 使用 Ubuntu 20.04 作为基础镜像
+FROM ubuntu:20.04
+
+# 更换为阿里云的镜像源
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list
+RUN sed -i 's|http://security.ubuntu.com/ubuntu/|http://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list
+
+# 安装必要的工具
+RUN apt-get update && apt-get install -y curl
+
+# 安装 Node.js 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get install -y nodejs
+
+# 创建一个工作目录
+WORKDIR /app
+
+# 复制 package.json 和 package-lock.json
 COPY package*.json ./
-# Install app dependencies
+
+# 安装依赖
 RUN npm install
-# Bundle app source
+
+# 复制应用代码
 COPY . .
-# Creates a "dist" folder with the production build
-RUN npm run build
-# Start the server using the production build
+
+# 暴露端口
+EXPOSE 3000
+
+# 启动应用
 CMD [ "node", "dist/main.js" ]

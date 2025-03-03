@@ -85,14 +85,14 @@
     </div>
   </div>
   <div class="chat-content">
-    <div class="model-selector">
+    <!-- <div class="model-selector">
       <select id="modelSelect" [(ngModel)]="selectedModel">
         <option *ngFor="let model of models" [value]="model">{{ model }}</option>
       </select>
-    </div>
+    </div> -->
     <div *ngIf="selectedSession === null" class="welcome-screen">
       <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
-      <h2>欢迎使用知识图谱AI助手</h2>
+      <h2>欢迎使用智能问答助手</h2>
       <p>快在下方聊天框输入问题开始聊天吧</p>
       <div class="recommended-knowledge">
         <div class="knowledge-item" *ngFor="let knowledge of hots" (click)="selectKnowledge(knowledge?.id)">
@@ -106,10 +106,10 @@
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
         <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
         <div *ngIf="message.sender === 'ai'" style="display: block; width: 100%;">
-          <div class="knowledge-cards" style="display: flex; overflow-x: auto;">
+          <!-- <div class="knowledge-cards" style="display: flex; overflow-x: auto;">
             <knowledge-card *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults" [keyword]="message.keyword || ''"></knowledge-card>
           </div>
-          <image-list *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults"></image-list>
+          <image-list *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults"></image-list> -->
           <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
         </div>
         <div *ngIf="message.sender !== 'ai'" class="text" [innerHTML]="parseMarkdown(message.text)"></div>

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  index: 'home',
+  index: '/start/chat?keyword=',
   // 框架页
   layout: 'index',
   // 默认的首页

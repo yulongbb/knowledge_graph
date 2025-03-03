@@ -125,11 +125,10 @@ import { Component, AfterViewInit } from '@angular/core';
 
         <!-- 测试题视图 -->
         <div class="test-container" *ngIf="viewMode === 'test'">
-          <div class="test-content">
-            <h4>{{ currentPoint?.title }} - 知识测试</h4>
-            <!-- 这里可以添加测试题组件 -->
-            <div class="placeholder-text">测试题内容将在这里显示</div>
-          </div>
+          <app-quiz [pointId]="currentPoint?.id"
+                    (quizComplete)="onQuizComplete($event)"
+                    (quizClose)="returnToPath()">
+          </app-quiz>
         </div>
       </div>
     </div>
@@ -1038,5 +1037,20 @@ export class LearningPathComponent implements AfterViewInit {
   startTest(point: any) {
     this.currentPoint = point;
     this.viewMode = 'test';
+  }
+
+  onQuizComplete(result: any) {
+    // 更新知识点掌握度
+    if (this.currentPoint && result.score >= 60) {
+      this.currentPoint.mastery = Math.max(this.currentPoint.mastery, result.score);
+      if (result.score >= 80) {
+        this.currentPoint.status = 'mastered';
+      } else {
+        this.currentPoint.status = 'completed';
+      }
+      this.currentPoint.completed = true;
+    } else if (this.currentPoint) {
+      this.currentPoint.status = 'needs_review';
+    }
   }
 }

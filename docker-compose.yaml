@@ -1,17 +1,22 @@
-version: "2"
+version: "2.4"
 services:
   arango:
     image: arangodb/arangodb:latest
     container_name: arango
     environment:
-    - ARANGO_ROOT_PASSWORD=root
+      - ARANGO_ROOT_PASSWORD=root
     volumes:
-    - arangodb:/var/lib/arangodb3 
+      - arangodb:/var/lib/arangodb3 
     restart: always
     ports:
-    - "8529:8529"
+      - "8529:8529"
+    cap_add: # 添加所需的能力
+      - SYS_NICE
+    security_opt: # 可选：如果需要进一步调整安全设置
+      - seccomp=unconfined # 注意：这可能会带来安全风险，请根据实际情况决定是否使用
     networks:
       - my_network
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     container_name: elasticsearch
@@ -21,6 +26,7 @@ services:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
       - elasticsearch:/usr/share/elasticsearch
+      - ./config:/usr/share/elasticsearch/config
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -56,8 +62,8 @@ services:
     image: nginx:latest
     container_name: nginx
     volumes:
-    - nginx:/etc/nginx
-    - web:/usr/share/nginx/html
+    - ./nginx:/etc/nginx
+    - ./ui/dist:/usr/share/nginx/html
     restart: always
     ports:
       - 80:80
@@ -67,31 +73,26 @@ services:
     image: redis:latest
     container_name: redis
     restart: always
+    privileged : true
     ports:
       - '6379:6379'
+    cap_add: # 添加所需的能力
+      - SYS_NICE
     volumes:
       - redis:/data
-  # api:
-  #   image: api
-  #   container_name: api
-  #   restart: always
-  #   ports:
-  #     - "3333:3000"
-  #   networks:
-  #     - my_network
-  # ui:
-  #   image: ui
-  #   container_name: ui
-  #   restart: always
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - my_network
+  
+  api:
+    image: api
+    container_name: api
+    restart: always
+    ports:
+      - "8101:3000"
+    networks:
+      - my_network
 
 networks:
   my_network:
     driver: bridge
-
 
 volumes:
   arangodb:

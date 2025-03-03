@@ -21,7 +21,7 @@ import { DataImportService } from './data-import.queue';
   imports: [
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
+        host: '10.117.1.238',
         port: 6379,
       },
     }),

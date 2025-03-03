@@ -16,7 +16,7 @@ import { AddonModule } from './addons/addon.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '127.0.0.1',
+      host: '10.117.1.238',
       port: 3306,
       username: 'root',
       password: 'root',

@@ -70,7 +70,7 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                         if (!prop) {
                             try {
                                 // 调用外部接口查询属性
-                                const url = `http://127.0.0.1:5555/property?name=${encodeURIComponent(statement.mainsnak.property)}`;
+                                const url = `http://10.117.1.238:5555/property?name=${encodeURIComponent(statement.mainsnak.property)}`;
                                 const response = await axios.get(url);
                     
                                 if (response.status === 200 && response.data && response.data._key && response.data.datatype) {

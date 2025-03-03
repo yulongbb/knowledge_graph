@@ -46,42 +46,42 @@ export class MinioClientController {
 
 
 
-  @Post('extract')
-  @UseInterceptors(FileInterceptor('video'))
-  async extractThumbnail(@UploadedFile() file: Express.Multer.File) {
-    const allowedFormats = ['.mp4', '.avi', '.mov'];
-    const ext = path.extname(file.originalname).toLowerCase();
+  // @Post('extract')
+  // @UseInterceptors(FileInterceptor('video'))
+  // async extractThumbnail(@UploadedFile() file: Express.Multer.File) {
+  //   const allowedFormats = ['.mp4', '.avi', '.mov'];
+  //   const ext = path.extname(file.originalname).toLowerCase();
 
-    if (!allowedFormats.includes(ext)) {
-      throw new HttpException('Unsupported file format', HttpStatus.BAD_REQUEST);
-    }
+  //   if (!allowedFormats.includes(ext)) {
+  //     throw new HttpException('Unsupported file format', HttpStatus.BAD_REQUEST);
+  //   }
 
-    try {
-      const base64Thumbnail = await this.thumbnailService.extractThumbnail(file.buffer);
-      return { thumbnail: base64Thumbnail };
-    } catch (err) {
-      console.error('Error extracting thumbnail:', err); // 记录错误日志
-      throw new HttpException('Failed to extract thumbnail', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   try {
+  //     const base64Thumbnail = await this.thumbnailService.extractThumbnail(file.buffer);
+  //     return { thumbnail: base64Thumbnail };
+  //   } catch (err) {
+  //     console.error('Error extracting thumbnail:', err); // 记录错误日志
+  //     throw new HttpException('Failed to extract thumbnail', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
 
   
-  @Post('cover')
-  @UseInterceptors(FileInterceptor('pdf')) // 接收名为 "pdf" 的文件
-  async getPdfCover(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      throw new HttpException('No PDF file uploaded', HttpStatus.BAD_REQUEST);
-    }
+  // @Post('cover')
+  // @UseInterceptors(FileInterceptor('pdf')) // 接收名为 "pdf" 的文件
+  // async getPdfCover(@UploadedFile() file: Express.Multer.File) {
+  //   if (!file) {
+  //     throw new HttpException('No PDF file uploaded', HttpStatus.BAD_REQUEST);
+  //   }
 
-    try {
-      const base64Image = await this.thumbnailService.getPdfCover(file.buffer);
-      return { cover: base64Image };
-    } catch (err) {
-      console.error('Error extracting PDF cover:', err);
-      throw new HttpException('Failed to extract PDF cover', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+  //   try {
+  //     const base64Image = await this.thumbnailService.getPdfCover(file.buffer);
+  //     return { cover: base64Image };
+  //   } catch (err) {
+  //     console.error('Error extracting PDF cover:', err);
+  //     throw new HttpException('Failed to extract PDF cover', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
 
   @ApiOperation({ summary: '删除文件' })
   @Delete('deleteFile/:fileName')

@@ -2,24 +2,24 @@
   [infiniteScrollThrottle]="50" (scrolled)="onScrollEntity()" [scrollWindow]="false">
   <!-- 导航栏 -->
   <nav class="navbar">
-    <a [routerLink]="'/home'" [queryParams]="{ keyword: '' }" class="logo">知识图谱</a>
+    <a [routerLink]="'/start/chat'" [queryParams]="{ keyword: '' }" class="logo">智能问答</a>
     <div class="menu">
-      <a [routerLink]="'/start/search'" [queryParams]="{ keyword: '' }">知识</a>
+      <!-- <a [routerLink]="'/start/search'" [queryParams]="{ keyword: '' }">知识</a>
       <a [routerLink]="'/start/image'" [queryParams]="{ keyword: '' }">图片</a>
       <a [routerLink]="'/start/video'" [queryParams]="{ keyword: '' }">视频</a>
       <a [routerLink]="'/start/document'" [queryParams]="{ keyword: '' }">文档</a>
-      <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a>
-      <a [routerLink]="'/start/chat'" [queryParams]="{ keyword: '' }">AI</a>
-      <a [routerLink]="'/start/addons'" [queryParams]="{ keyword: '' }">应用</a>
+      <a [routerLink]="'/start/map'" [queryParams]="{ keyword: '' }">地图</a> -->
+      <!-- <a [routerLink]="'/start/chat'" [queryParams]="{ keyword: '' }">AI</a> -->
+      <!-- <a [routerLink]="'/start/addons'" [queryParams]="{ keyword: '' }">应用</a> -->
       <!-- 动态显示登录/用户信息 -->
-      <ng-container *ngIf="auth.isLoggedIn; else loginLink">
+      <!-- <ng-container *ngIf="auth.isLoggedIn; else loginLink">
         <x-dropdown [data]="data()" (nodeClick)="nodeClick($event)">
           {{ auth.user.name }}
         </x-dropdown>
       </ng-container>
       <ng-template #loginLink>
         <a [routerLink]="'/index/login'">登录</a>
-      </ng-template>
+      </ng-template> -->
     </div>
   </nav>
 

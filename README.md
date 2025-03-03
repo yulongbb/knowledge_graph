@@ -278,3 +278,4 @@ cannot import name 'XXX' from partially initialized module
 
 openEI不支持中文
 
+docker run --name api --restart always -p 3333:3000 --network my_network  api     

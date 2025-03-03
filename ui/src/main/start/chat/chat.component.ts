@@ -46,7 +46,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   yesterdaySessions: any[] = [];
   earlierSessions: any[] = [];
   selectedSession: number | null = null;
-  apiKey: string = ''; // Replace with your actual API key
+  apiKey: string = 'sk-597c35aa711849a6a03efdd4b4fd1ef5'; // Replace with your actual API key
   keyword: string = '';
   entities: any;
   sessionsVisible: boolean = false;
@@ -194,8 +194,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
 
     const body = {
-      // model: 'qwen-plus',
-      model: 'DeepSeek-R1-Distill-Qwen-14B',
+      model: 'qwen-plus',
+      // model: 'DeepSeek-R1-Distill-Qwen-14B',
       messages: this.messages.map(message => ({
         role: message.sender === 'user' ? 'user' : 'system',
         content: message.text
@@ -204,7 +204,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
 
     // fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
-    fetch('http://10.117.1.238:5013/chat/completions', {
+    fetch('http://10.117.1.238:8106/chat/completions', {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(body)

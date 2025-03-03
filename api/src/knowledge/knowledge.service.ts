@@ -20,7 +20,7 @@ export class KnowledgeService {
     private readonly schemasService: SchemasService,
   ) {
     this.redis = new Redis({
-      host: 'localhost', // Redis 服务器的主机名
+      host: '10.117.1.238', // Redis 服务器的主机名
       port: 6379, // Redis 服务器的端口
       password: 'root',
       db: 1,
@@ -419,7 +419,7 @@ export class KnowledgeService {
           data: {
             _id: result[0]?.start?.id['_id'] ?? items[0],
             images: entity['_source']['images']?.map(
-              (image) => 'http://localhost:9000/kgms/' + image,
+              (image) => 'http://10.117.1.238:9000/kgms/' + image,
             ),
             type: entity['_source']['type'],
             id: result[0]?.start?.id ?? id,
@@ -442,7 +442,7 @@ export class KnowledgeService {
                 data: {
                   _id: vertex['_id'],
                   images: data['_source']['images']?.map(
-                    (image) => 'http://localhost:9000/kgms/' + image,
+                    (image) => 'http://10.117.1.238:9000/kgms/' + image,
                   ),
                   type: data['_source']['type'],
                   id: vertex.id,
