@@ -36,7 +36,7 @@
       </aside>
 
       <!-- 主要内容区域 -->
-      <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
+      <main class="wiki-content" #contentMain>
         <div>
           <!-- 标题区域 -->
           <header class="wiki-header">
@@ -69,11 +69,11 @@
 
           <div class="featured-image">
             <img width="100%" *ngIf="item.documents" [src]="item.documents[0].thumbnail" alt="特色图片">
-            <img width="100%"  *ngIf="item.images" [src]="imgs[0].url" alt="特色图片">
+            <img width="100%" *ngIf="item.images" [src]="imgs[0].url" alt="特色图片">
           </div>
 
           <!-- 属性信息 - 改用表格样式 -->
-          <!-- <div class="property-box">
+          <div class="property-box">
             <table class="info-table">
               <tbody>
                 <tr *ngFor="let claim of claims()">
@@ -82,7 +82,7 @@
                 </tr>
               </tbody>
             </table>
-          </div> -->
+          </div>
         </aside>
       </main>
 

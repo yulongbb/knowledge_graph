@@ -453,6 +453,10 @@ $github-radius: 6px;
   }
 }
 
+html {
+  scroll-behavior: smooth; // 启用全局平滑滚动
+  scroll-padding-top: 80px; // 为固定头部预留空间
+}
 
 .wiki-container {
   width: 100%;
@@ -544,7 +548,7 @@ $github-radius: 6px;
 
           position: relative;
           transition: all 0.2s ease-in-out;
-          
+
           &::before {
             content: '';
             position: absolute;
@@ -556,10 +560,10 @@ $github-radius: 6px;
             transition: width 0.2s ease-in-out;
             transform: translateY(-50%);
           }
-          
+
           &.active {
             padding-left: 16px;
-            
+
             &::before {
               width: 8px;
             }
@@ -580,8 +584,6 @@ $github-radius: 6px;
     grid-template-columns: 1fr 350px; // 改为两列布局
     display: grid;
     position: relative;
-    height: 100%;
-    overflow-y: auto;
     background: #fff;
     border: 1px solid $github-border;
     border-radius: $github-radius;
@@ -589,190 +591,142 @@ $github-radius: 6px;
 
     margin: 40px 0 0 300px; // 调整边距
     padding: 20px;
+    // 移除所有overflow和scroll相关样式
+  }
 
-    // 隐藏滚动条但保持滚动功能
-    scrollbar-width: none; // Firefox
-    -ms-overflow-style: none; // IE and Edge
+  .wiki-header {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $github-border;
+    background: $github-header;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
 
-    &::-webkit-scrollbar {
-      display: none; // Chrome, Safari, Opera
-    }
+    margin-bottom: 20px; // 减小标题区域下边距
+    padding-bottom: 12px; // 减小标题区域内边距
 
-    // 优化滚动行为
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-
-    // 添加滚动条样式
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 3px;
-
-      &:hover {
-        background: #555;
-      }
-    }
-
-    // 添加滚动条样式
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 4px;
-
-      &:hover {
-        background: #999;
-      }
-    }
-
-    .wiki-header {
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid $github-border;
-      background: $github-header;
-      padding-bottom: 16px;
-      margin-bottom: 24px;
-
-      margin-bottom: 20px; // 减小标题区域下边距
-      padding-bottom: 12px; // 减小标题区域内边距
-
-      .wiki-title {
-        font-size: 32px;
-        font-weight: 400;
-        color: #202124;
-        font-size: 24px;
-        font-weight: 600;
-        color: $github-text;
-
-        margin: 0 0 8px; // 减小标题间距
-      }
-
-      .wiki-meta {
-        color: #5f6368;
-
-        .description {
-          font-size: 16px;
-          line-height: 1.5;
-          color: #57606a;
-
-          margin-bottom: 8px; // 减小描述文字间距
-        }
-
-        .tags {
-          margin-top: 12px;
-
-          margin-top: 8px; // 减小标签区域上边距
-
-          .tag {
-            display: inline-block;
-            padding: 4px 12px;
-            margin: 0 8px 8px 0;
-            background: #f1f3f4;
-            border-radius: 16px;
-            font-size: 13px;
-            color: #5f6368;
-            background: #edf2f8;
-            border: 1px solid rgba(27, 31, 36, 0.15);
-            color: $github-link;
-
-            padding: 2px 8px; // 减小标签内边距
-            margin: 0 4px 4px 0; // 减小标签间距
-          }
-        }
-      }
-    }
-
-    .wiki-body {
+    .wiki-title {
+      font-size: 32px;
+      font-weight: 400;
       color: #202124;
-      font-size: 16px;
+      font-size: 24px;
+      font-weight: 600;
+      color: $github-text;
 
-      h1,
-      h2,
-      h3 {
-        font-weight: 400;
-        margin: 36px 0 16px;
-        color: #202124;
-        position: relative;
+      margin: 0 0 8px; // 减小标题间距
+    }
 
-        margin: 24px 0 12px; // 减小标题间距
+    .wiki-meta {
+      color: #5f6368;
 
-        .anchor-link {
-          position: absolute;
-          left: -20px;
-          top: 50%;
-          transform: translateY(-50%);
-          opacity: 0;
-          transition: opacity 0.2s;
+      .description {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #57606a;
 
-          &:before {
-            content: '#';
-            color: #1a73e8;
-          }
+        margin-bottom: 8px; // 减小描述文字间距
+      }
+
+      .tags {
+        margin-top: 12px;
+
+        margin-top: 8px; // 减小标签区域上边距
+
+        .tag {
+          display: inline-block;
+          padding: 4px 12px;
+          margin: 0 8px 8px 0;
+          background: #f1f3f4;
+          border-radius: 16px;
+          font-size: 13px;
+          color: #5f6368;
+          background: #edf2f8;
+          border: 1px solid rgba(27, 31, 36, 0.15);
+          color: $github-link;
+
+          padding: 2px 8px; // 减小标签内边距
+          margin: 0 4px 4px 0; // 减小标签间距
         }
+      }
+    }
+  }
 
-        &:hover .anchor-link {
-          opacity: 1;
+  .wiki-body {
+    color: #202124;
+    font-size: 16px;
+
+    h1,
+    h2,
+    h3 {
+      font-weight: 400;
+      margin: 36px 0 16px;
+      color: #202124;
+      position: relative;
+
+      margin: 24px 0 12px; // 减小标题间距
+
+      .anchor-link {
+        position: absolute;
+        left: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &:before {
+          content: '#';
+          color: #1a73e8;
         }
       }
 
-      h1 {
-        font-size: 28px;
+      &:hover .anchor-link {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 20px;
+    }
+
+    p {
+      margin: 16px 0;
+      line-height: 1.7;
+
+      margin: 12px 0; // 减小段落间距
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 20px 0;
+
+      margin: 12px 0; // 减小图片间距
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        text-align: left;
       }
 
-      h2 {
-        font-size: 24px;
-      }
-
-      h3 {
-        font-size: 20px;
-      }
-
-      p {
-        margin: 16px 0;
-        line-height: 1.7;
-
-        margin: 12px 0; // 减小段落间距
-      }
-
-      img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 20px 0;
-
-        margin: 12px 0; // 减小图片间距
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-
-        th,
-        td {
-          padding: 12px;
-          border: 1px solid #e0e0e0;
-          text-align: left;
-        }
-
-        th {
-          background: #f8f9fa;
-          font-weight: 500;
-        }
+      th {
+        background: #f8f9fa;
+        font-weight: 500;
       }
     }
   }
@@ -1000,17 +954,14 @@ $github-radius: 6px;
 
 // 添加锚点标题的样式
 .section-heading {
-  scroll-margin-top: 90px;
-  padding-top: 10px;
-  margin-bottom: 1rem;
-  
-  &::before {
-    content: '';
-    display: block;
-    height: 80px;
-    margin: -80px 0 0;
-    visibility: hidden;
-    pointer-events: none;
+  scroll-margin-top: 80px; // 调整滚动位置的偏移量
+  position: relative;
+
+  // 添加平滑过渡效果
+  transition: background-color 0.3s ease;
+
+  &.highlight-section {
+    background-color: rgba(255, 255, 0, 0.2);
   }
 }
 
@@ -1023,7 +974,21 @@ $github-radius: 6px;
   0% {
     background-color: rgba(255, 255, 0, 0.2);
   }
+
   100% {
     background-color: transparent;
+  }
+}
+
+// 优化章节标题的定位
+.section-heading {
+  scroll-margin-top: 80px; // 调整滚动位置的偏移量
+  position: relative;
+
+  // 添加平滑过渡效果
+  transition: background-color 0.3s ease;
+
+  &.highlight-section {
+    background-color: rgba(255, 255, 0, 0.2);
   }
 }
