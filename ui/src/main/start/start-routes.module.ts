@@ -38,11 +38,6 @@ const routes: Routes = [
         loadChildren: () =>
           import("./addons/addons.module").then(x => x.addonsModule)
       },
-      {
-        path: "chat",
-        loadChildren: () =>
-          import("./chat/chat.module").then(x => x.ChatModule)
-      },
     ]
   },
 

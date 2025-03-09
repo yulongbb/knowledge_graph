@@ -77,7 +77,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   pdfs: any;
   docs: any;
   entity: any;
-  claims: any;
+  claims: any = signal([]);
 
   properties: any;
   propertyData!: Signal<Map<String, any>>;
@@ -231,6 +231,19 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit(): void {
     this.videos = [];
     this.action(this.type);
+    
+    // 添加 hashchange 事件监听
+    window.addEventListener('hashchange', () => this.onHashChange());
+    
+    // 监听滚动以更新当前章节
+    window.addEventListener('scroll', () => this.checkActiveSection(), { passive: true });
+    
+    // 如果有初始 hash，滚动到对应位置
+    if (window.location.hash) {
+      setTimeout(() => {
+        this.scrollToSection(window.location.hash.slice(1));
+      }, 100);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -259,6 +272,31 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         this.onContentScroll();
       }, { passive: true });
     }
+
+    // 生成目录数据
+    const headings = document.querySelectorAll('h1, h2, h3');
+    this.tableOfContents = Array.from(headings).map(heading => {
+      const title = heading.textContent;
+      const level = parseInt(heading.tagName[1]);
+      const anchor = this.generateAnchor(title);
+      
+      heading.id = anchor;
+      heading.classList.add('section-heading');
+      
+      return {
+        title,
+        level,
+        anchor
+      };
+    });
+
+    this.hasTableOfContents = this.tableOfContents.length > 0;
+    this.cdr.detectChanges();
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('hashchange', () => this.onHashChange());
+    window.removeEventListener('scroll', () => this.checkActiveSection());
   }
 
   onEditorCreated(editor: any) {
@@ -1065,7 +1103,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/entity']);
+        this.back();
         break;
     }
   }
@@ -1109,62 +1147,72 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   scrollToSection(anchor: string) {
-    if (!this.contentMain?.nativeElement) return;
-    
-    const container = this.contentMain.nativeElement;
-    const element = document.getElementById(anchor);
-    
-    if (!element) return;
-    
-    // 获取元素相对于滚动容器的位置
-    const elementPosition = element.offsetTop;
-    const containerScrollTop = container.scrollTop;
-    const containerHeight = container.clientHeight;
-    
-    // 计算目标滚动位置
-    const offset = 80; // 顶部偏移量
-    const scrollTarget = elementPosition - offset;
-    
-    // 执行滚动
-    container.scrollTo({
-      top: scrollTarget,
-      behavior: 'smooth'
-    });
-
-    // 更新当前激活的章节
-    this.currentSection = anchor;
-    
-    // 添加高亮效果
-    element.classList.add('highlight-section');
-    setTimeout(() => {
-      element.classList.remove('highlight-section');
-    }, 2000);
-    
-    this.cdr.detectChanges();
+    // 使用 URL hash 来触发滚动
+    window.location.hash = '#' + anchor;
   }
 
-  onContentScroll() {
-    if (!this.contentMain?.nativeElement) return;
+  onHashChange() {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      this.currentSection = hash;
+      this.highlightSection(hash);
+    }
+  }
 
-    const container = this.contentMain.nativeElement;
-    const scrollPosition = container.scrollTop;
-    const headings = container.querySelectorAll('.section-heading');
-    const headerOffset = 100;
+  highlightSection(anchor: string) {
+    const element = document.getElementById(anchor);
+    if (element) {
+      // 移除之前的高亮
+      document.querySelectorAll('.highlight-section').forEach(el => {
+        el.classList.remove('highlight-section');
+      });
+      
+      // 添加新的高亮
+      element.classList.add('highlight-section');
+      setTimeout(() => {
+        element.classList.remove('highlight-section');
+      }, 2000);
+    }
+  }
 
-    // 找到当前可见的标题
-    let currentHeading = null;
-    
+  checkActiveSection() {
+    const headings:any = document.querySelectorAll('.section-heading');
+    const scrollPosition = window.scrollY;
+
     for (const heading of headings) {
-      const elementTop = heading.offsetTop - container.offsetTop;
-      if (elementTop - headerOffset <= scrollPosition) {
-        currentHeading = heading;
-      } else {
+      const sectionTop = heading.offsetTop - 100;
+      const sectionBottom = sectionTop + heading.offsetHeight;
+      
+      if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+        const newSection = heading.id;
+        if (this.currentSection !== newSection) {
+          this.currentSection = newSection;
+          // 更新 URL 但不触发新的滚动
+          history.replaceState(null, '', `#${newSection}`);
+          this.cdr.detectChanges();
+        }
         break;
       }
     }
+  }
 
-    if (currentHeading && this.currentSection !== currentHeading.id) {
-      this.currentSection = currentHeading.id;
+  onContentScroll() {
+    const scrollPosition = window.pageYOffset;
+    const headings = document.querySelectorAll('.section-heading');
+    const offset = 100;
+    
+    // 找到当前可见的标题
+    let currentSection = '';
+    
+    headings.forEach(heading => {
+      const elementTop = heading.getBoundingClientRect().top + window.pageYOffset;
+      if (elementTop - offset <= scrollPosition) {
+        currentSection = heading.id;
+      }
+    });
+
+    if (this.currentSection !== currentSection && currentSection) {
+      this.currentSection = currentSection;
       this.cdr.detectChanges();
     }
   }
@@ -1199,12 +1247,18 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     });
 
     this.tableOfContents = toc;
-    console.log('Generated TOC:', this.tableOfContents); // 调试日志
+    this.hasTableOfContents = this.tableOfContents && this.tableOfContents.length > 0;
     this.cdr.detectChanges();
   }
 
-  get hasTableOfContents(): boolean {
-    return Array.isArray(this.tableOfContents) && this.tableOfContents.length > 0;
+  hasTableOfContents: boolean = true;
+
+  private generateAnchor(text: string | null): string {
+    if (!text) return '';
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphen
+      .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
   }
 
   editEntity() {

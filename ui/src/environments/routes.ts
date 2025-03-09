@@ -59,6 +59,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/course/course.module").then(x => x.CourseModule),
   },
+  {
+    path: "ai",
+    loadChildren: () =>
+      import("../main/start/addons/chat/chat.module").then(x => x.ChatModule),
+  },
 
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },

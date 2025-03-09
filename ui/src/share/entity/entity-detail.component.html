@@ -9,22 +9,37 @@
         
         <!-- 简化的目录结构 -->
         <ul class="toc-list">
-          <li *ngFor="let item of tableOfContents" class="toc-item">
-            <a [class.active]="currentSection === item.anchor" 
-               (click)="scrollToSection(item.anchor)"
-               style="cursor: pointer;" 
-               [attr.data-level]="item.level">
-              <!-- 添加缩进指示 -->
-              <span [style.marginLeft.px]="(item.level - 1) * 20">
+          <ng-container *ngFor="let item of tableOfContents">
+            <!-- 一级标题 -->
+            <li class="toc-item">
+              <a [class.active]="currentSection === item.anchor" (click)="scrollToSection(item.anchor)">
                 {{item.title}}
-              </span>
-            </a>
-          </li>
+              </a>
+              <!-- 二级标题 -->
+              <ul *ngIf="item.children?.length" class="toc-sublist">
+                <li *ngFor="let subItem of item.children" class="toc-item" [class.level-2]="subItem.level === 2"
+                  [class.level-3]="subItem.level === 3">
+                  <a [class.active]="currentSection === subItem.anchor" (click)="scrollToSection(subItem.anchor)">
+                    {{subItem.title}}
+                  </a>
+                  <!-- 三级标题 -->
+                  <ul *ngIf="subItem.children?.length" class="toc-sublist">
+                    <li *ngFor="let subSubItem of subItem.children" class="toc-item level-3">
+                      <a [class.active]="currentSection === subSubItem.anchor"
+                        (click)="scrollToSection(subSubItem.anchor)">
+                        {{subSubItem.title}}
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ng-container>
         </ul>
       </aside>
 
       <!-- 主要内容区域 -->
-      <main class="wiki-content" #contentMain (scroll)="onContentScroll()">
+      <main class="wiki-content" #contentMain>
         <div>
           <!-- 标题区域 -->
           <header class="wiki-header">
@@ -45,7 +60,9 @@
           </header>
 
           <!-- 正文内容 -->
-          <div class="wiki-body" [innerHTML]="renderedContent | safeHtml"></div>
+          <div class="wiki-body">
+            <div [innerHTML]="renderedContent | safeHtml"></div>
+          </div>
         </div>
 
 
@@ -54,7 +71,8 @@
           <!-- 特色图片 -->
 
           <div class="featured-image">
-            <img [src]="imgs[0].url" alt="特色图片">
+            <img width="100%" *ngIf="item.documents" [src]="item.documents[0].thumbnail" alt="特色图片">
+            <img width="100%" *ngIf="item.images" [src]="imgs[0].url" alt="特色图片">
           </div>
 
           <!-- 属性信息 - 改用表格样式 -->

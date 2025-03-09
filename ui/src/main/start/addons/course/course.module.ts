@@ -7,12 +7,14 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { PathStylesDemoComponent } from './path-styles-demo.component';
 import { LearningPathComponent } from './app-learning-path.conponent';
 import { SafePipe } from 'src/pipes/safe.pipe';
+import { QuizComponent } from './quiz.component';
 
 @NgModule({
     declarations: [
         CourseComponent,
         PathStylesDemoComponent,
         LearningPathComponent,
+        QuizComponent,
         SafePipe
     ],
     imports: [

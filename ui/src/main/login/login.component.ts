@@ -55,8 +55,7 @@ export class LoginComponent implements OnInit {
             if (this.authService.isLoggedIn) {
               console.log('登录成功');
               const queryParams = { keyword: '' }; // 可以设置默认值或动态值
-              // let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.index}`;
-              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/start/chat`;
+              let redirect = this.authService.redirectUrl ? this.authService.redirectUrl : `/${environment.index}`;
               this.router.navigate([redirect], { queryParams });
             }
           },
