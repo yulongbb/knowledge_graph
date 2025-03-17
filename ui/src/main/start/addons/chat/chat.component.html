@@ -87,7 +87,7 @@
   <div class="chat-content">
     <div class="model-selector">
       <select id="modelSelect" [(ngModel)]="selectedModel">
-        <option *ngFor="let model of models" [value]="model">{{ model }}</option>
+        <option *ngFor="let model of models" [value]="model">{{ model.name }}</option>
       </select>
     </div>
     <div *ngIf="selectedSession === null" class="welcome-screen">
@@ -106,10 +106,10 @@
         <fa-icon [icon]="faUser" *ngIf="message.sender === 'user'" class="avatar"></fa-icon>
         <fa-icon [icon]="faRobot" *ngIf="message.sender === 'ai'" class="avatar"></fa-icon>
         <div *ngIf="message.sender === 'ai'" style="display: block; width: 100%;">
-          <div class="knowledge-cards" style="display: flex; overflow-x: auto;">
+          <!-- <div class="knowledge-cards" style="display: flex; overflow-x: auto;">
             <knowledge-card *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults" [keyword]="message.keyword || ''"></knowledge-card>
-          </div>
-          <image-list *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults"></image-list>
+          </div> -->
+          <!-- <image-list *ngIf="message.knowledgeResults && message.knowledgeResults.length > 0" [results]="message.knowledgeResults"></image-list> -->
           <div class="text" [innerHTML]="parseMarkdown(message.text)"></div>
         </div>
         <div *ngIf="message.sender !== 'ai'" class="text" [innerHTML]="parseMarkdown(message.text)"></div>
