@@ -1,8 +1,10 @@
 import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { Graph, Node, Shape } from '@antv/x6';
+import { ActivatedRoute, Router } from '@angular/router';
 import { sourceNodeConfig, transformNodeConfig, targetNodeConfig } from '../models/node-shapes';
 import { NodeConfigService } from '../services/node-config.service';
 import { FlowService } from '../services/flow.service';
+import { ProjectService } from '../services/project.service';
 
 @Component({
   selector: 'app-etl-graph',
@@ -10,7 +12,6 @@ import { FlowService } from '../services/flow.service';
     <div class="etl-container">
       <app-etl-toolbar
         (save)="saveFlow()"
-        (load)="loadFlow()"
         (execute)="executeFlow()">
       </app-etl-toolbar>
       <div class="workspace">
@@ -25,72 +26,42 @@ import { FlowService } from '../services/flow.service';
           <app-data-preview></app-data-preview>
         </div>
       </div>
+      <button class="btn btn-default back-button" (click)="goBack()">返回主页</button>
     </div>
   `,
-  styles: [`
-    .etl-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    .workspace {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 250px;
-      border-right: 1px solid #ddd;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    .graph-container {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-    }
-    .etl-graph {
-      width: 100%;
-      height: 100%;
-      min-height: 400px;
-      border: 1px solid #ddd;
-    }
-  `]
+  styleUrls: ['./etl-graph.component.scss']
 })
 export class EtlGraphComponent implements AfterViewInit {
   @ViewChild('container', { static: true }) containerRef!: ElementRef;
   private graph!: Graph;
+  private projectId!: string;
 
   constructor(
     private nodeConfigService: NodeConfigService,
-    private flowService: FlowService
-  ) {}
+    private flowService: FlowService,
+    private projectService: ProjectService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
 
   ngAfterViewInit() {
-    // 确保DOM已经加载完成
-    if (this.containerRef?.nativeElement) {
+    this.route.paramMap.subscribe(params => {
+      this.projectId = params.get('id')!;
       this.initGraph();
       this.setupDragAndDrop();
-    }
+      this.loadFlow();
+    });
   }
 
   async saveFlow() {
     const data = this.flowService.saveFlow(this.graph);
-    localStorage.setItem('etl-flow', JSON.stringify(data));
+    this.projectService.saveFlow(this.projectId, data);
   }
 
   async loadFlow() {
-    const savedData = localStorage.getItem('etl-flow');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      await this.flowService.loadFlow(this.graph, data);
+    const flow = await this.projectService.loadFlow(this.projectId);
+    if (flow) {
+      await this.flowService.loadFlow(this.graph, flow);
     }
   }
 
@@ -98,9 +69,13 @@ export class EtlGraphComponent implements AfterViewInit {
     await this.flowService.executeFlow(this.graph);
   }
 
+  goBack() {
+    this.router.navigate(['/etl']);
+  }
+
   private initGraph() {
     const container = this.containerRef.nativeElement;
-    
+
     if (!container) {
       console.error('Graph container not found');
       return;
@@ -180,7 +155,7 @@ export class EtlGraphComponent implements AfterViewInit {
 
   private validateConnection({ sourceCell, targetCell }: any) {
     if (!sourceCell || !targetCell) return false;
-    
+
     const sourceType = sourceCell.getData()?.type;
     const targetType = targetCell.getData()?.type;
 
@@ -195,14 +170,14 @@ export class EtlGraphComponent implements AfterViewInit {
   private setupDragAndDrop() {
     if (!this.containerRef?.nativeElement) return;
     const container = this.containerRef.nativeElement;
-    
+
     container.addEventListener('dragover', (e: DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
       if (e.dataTransfer) {
         e.dataTransfer.dropEffect = 'copy';
       }
-      
+
       // 添加拖拽悬停效果
       container.style.backgroundColor = 'rgba(24, 144, 255, 0.1)';
     });
@@ -217,7 +192,7 @@ export class EtlGraphComponent implements AfterViewInit {
       e.preventDefault();
       e.stopPropagation();
       container.style.backgroundColor = '';
-      
+
       const nodeType = e.dataTransfer?.getData('node-type');
       if (!nodeType) return;
 

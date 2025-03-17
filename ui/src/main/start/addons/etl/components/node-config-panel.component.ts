@@ -4,6 +4,8 @@ import { DataService } from '../services/data.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { CsvService } from '../services/csv.service';
+import { ProjectService } from '../services/project.service';
+import { ActivatedRoute } from '@angular/router';
 
 interface ConfigField {
   key: string;
@@ -59,6 +61,8 @@ interface ConfigField {
     </div>
   `,
   styles: [`
+     @import '../styles/shared.scss'; // Ensure the correct path to shared.scss
+
     .config-panel {
       padding: 16px;
       border: 1px solid #ddd;
@@ -148,11 +152,14 @@ export class NodeConfigPanelComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   previewData$ = this.dataService.previewData$;
   transformExamples = this.dataService.getTransformExamples();
+  private projectId!: string;
 
   constructor(
     private nodeConfigService: NodeConfigService,
     private dataService: DataService,
     private csvService: CsvService,
+    private projectService: ProjectService,
+    private route: ActivatedRoute,
     private fb: FormBuilder
   ) {
     this.configForm = this.fb.group({});
@@ -161,10 +168,15 @@ export class NodeConfigPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.subscription = this.selectedNode$.subscribe((node: NodeConfig | null) => {
+    this.route.paramMap.subscribe(params => {
+      this.projectId = params.get('id')!;
+    });
+
+    this.subscription = this.selectedNode$.subscribe(async (node: NodeConfig | null) => {
       this.currentNode = node;
       if (node) {
-        this.initForm(node);
+        const config = await this.projectService.loadNodeConfig(this.projectId, node.id);
+        this.initForm(node, config || {});
       }
     });
   }
@@ -173,10 +185,10 @@ export class NodeConfigPanelComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  private initForm(node: NodeConfig) {
+  private initForm(node: NodeConfig, config: any) {
     const formConfig: Record<string, any[]> = {};
     this.getConfigFields(node.type).forEach(field => {
-      formConfig[field.key] = [node.properties[field.key] || ''];
+      formConfig[field.key] = [config[field.key] || ''];
     });
     this.configForm = this.fb.group(formConfig);
   }
@@ -216,10 +228,9 @@ export class NodeConfigPanelComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.currentNode) {
-      this.nodeConfigService.updateNodeProperties(
-        this.currentNode.id,
-        this.configForm.value
-      );
+      const config = this.configForm.value;
+      this.nodeConfigService.updateNodeProperties(this.currentNode.id, config);
+      this.projectService.saveNodeConfig(this.projectId, this.currentNode.id, config);
     }
   }
 

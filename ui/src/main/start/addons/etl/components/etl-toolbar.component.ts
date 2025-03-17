@@ -8,9 +8,6 @@ import { Component, EventEmitter, Output } from '@angular/core';
         <button class="btn btn-primary" (click)="onSave()">
           <i>💾</i><span>保存</span>
         </button>
-        <button class="btn btn-default" (click)="onLoad()">
-          <i>📂</i><span>加载</span>
-        </button>
       </div>
       <div class="toolbar-group">
         <button class="btn btn-primary" (click)="onExecute()">
@@ -20,6 +17,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
     </div>
   `,
   styles: [`
+    @import '../styles/shared.scss'; // Ensure the correct path to shared.scss
+
     .etl-toolbar {
       padding: 16px 24px;
       background: white;
@@ -40,10 +39,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class EtlToolbarComponent {
   @Output() save = new EventEmitter<void>();
-  @Output() load = new EventEmitter<void>();
   @Output() execute = new EventEmitter<void>();
 
   onSave() { this.save.emit(); }
-  onLoad() { this.load.emit(); }
   onExecute() { this.execute.emit(); }
 }

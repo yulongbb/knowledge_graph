@@ -25,6 +25,8 @@ import { Component } from '@angular/core';
     </div>
   `,
   styles: [`
+    @import '../styles/shared.scss'; // Ensure the correct path to shared.scss
+
     .etl-toolbox {
       padding: 16px;
       background: #fff;
@@ -87,19 +89,19 @@ export class EtlToolboxComponent {
     if (event.dataTransfer) {
       event.dataTransfer.setData('node-type', nodeType);
       event.dataTransfer.effectAllowed = 'copy';
-      
+
       // 创建拖拽图像
       const dragImage = document.createElement('div');
       dragImage.className = `node-item ${nodeType}`;
       dragImage.style.width = '100px';
       dragImage.style.height = '40px';
-      dragImage.style.backgroundColor = nodeType === 'source' ? '#e6f7ff' 
-        : nodeType === 'transform' ? '#fff7e6' 
-        : '#f6ffed';
+      dragImage.style.backgroundColor = nodeType === 'source' ? '#e6f7ff'
+        : nodeType === 'transform' ? '#fff7e6'
+          : '#f6ffed';
       document.body.appendChild(dragImage);
-      
+
       event.dataTransfer.setDragImage(dragImage, 50, 20);
-      
+
       // 清理临时元素
       setTimeout(() => document.body.removeChild(dragImage), 0);
     }

@@ -58,59 +58,7 @@ import { Router } from '@angular/router';
       </div>
     </div>
   `,
-  styles: [`
-    .project-container {
-      padding: 24px;
-      background: #f5f5f5;
-      min-height: 100vh;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      h2 {
-        margin: 0;
-        font-size: 24px;
-        color: #262626;
-      }
-    }
-    .project-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 24px;
-    }
-    .project-card {
-      padding: 20px;
-    }
-    .project-info {
-      h3 {
-        margin: 0 0 8px 0;
-        color: #262626;
-        font-size: 18px;
-      }
-      p {
-        margin: 0 0 16px 0;
-        color: #595959;
-      }
-    }
-    .meta {
-      display: flex;
-      gap: 16px;
-      color: #8c8c8c;
-      font-size: 13px;
-      span {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-    }
-    .actions {
-      margin-top: 16px;
-      display: flex;
-      gap: 8px;
-    }
-  `]
+  styleUrls: ['./project-list.component.scss'] // Ensure the correct path to the SCSS file
 })
 export class ProjectListComponent {
   projects$ = this.projectService.projects$;
@@ -131,7 +79,7 @@ export class ProjectListComponent {
   createProject() {
     if (this.createForm.valid) {
       const { name, description } = this.createForm.value;
-      const project = this.projectService.createProject(name, description);
+      const project:any = this.projectService.createProject(name, description);
       this.showCreateDialog = false;
       this.createForm.reset();
       this.openProject(project.id);
