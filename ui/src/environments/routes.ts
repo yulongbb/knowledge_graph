@@ -65,6 +65,13 @@ export const mainRoutes: Routes = [
       import("../main/start/addons/chat/chat.module").then(x => x.ChatModule),
   },
 
+  {
+    path: "etl",
+    loadChildren: () =>
+      import("../main/start/addons/etl/etl.module").then(x => x.EtlModule),
+  },
+
+
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
 

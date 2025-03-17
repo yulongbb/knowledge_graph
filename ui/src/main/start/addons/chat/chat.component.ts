@@ -27,7 +27,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer: ElementRef | undefined;
   messages: { text: string, sender: string, avatar: any, knowledgeResults?: any[], keyword?: string }[] = [];
   userInput: string = '';
-  faPause =faPause;
+  faPause = faPause;
   faPuzzlePiece = faPuzzlePiece;
   faPencilSquare = faPencilSquare;
   faPaperPlane = faPaperPlane;
@@ -52,8 +52,9 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   sessionsVisible: boolean = false;
   knowledgesVisible: boolean = false;
   hots: any[] | undefined;
-  models: string[] = ['DeepSeek-R1','通义千问-Max-Latest',  'Baichuan2-开源版-7B'];
-  selectedModel: string = this.models[0];
+  // models: string[] = ['DeepSeek-R1','通义千问',  'Baichuan2-开源版-7B'];
+  models: any[] = [{ name: 'DeepSeek-R1', api: 'http://10.117.1.238:8106/chat/completions' }, { name: '通义千问', api: 'http://10.117.1.238:8100/chat/completions' }];
+  selectedModel: any = this.models[0].api;
   isAnswering: boolean = false;
   private reader: ReadableStreamDefaultReader | undefined;
   knowledgeResults: any;
@@ -187,6 +188,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
+   changeModel(api:any): void {
+    this.addSession();
+    this.selectedModel = api.target.value;
+
+  }
+
   private getAIResponse(userMessage: string): void {
     const headers = {
       'Content-Type': 'application/json',
@@ -204,7 +211,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
 
     // fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
-    fetch('http://10.117.1.238:8106/chat/completions', {
+    console.log(this.selectedModel);
+    fetch(this.selectedModel, {
       method: 'POST',
       headers: headers,
       body: JSON.stringify(body)
@@ -322,7 +330,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     session.isEditing = true;
   }
 
-  saveSession(session: { id: number, name: string, isEditing?: boolean, createdAt:string}): void {
+  saveSession(session: { id: number, name: string, isEditing?: boolean, createdAt: string }): void {
     this.updateSession(session.id, session.name);
     session.isEditing = false;
     const sessionDate = new Date(session.createdAt);

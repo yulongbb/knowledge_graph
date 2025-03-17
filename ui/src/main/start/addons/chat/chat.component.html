@@ -86,13 +86,13 @@
   </div>
   <div class="chat-content">
     <div class="model-selector">
-      <select id="modelSelect" [(ngModel)]="selectedModel">
-        <option *ngFor="let model of models" [value]="model">{{ model.name }}</option>
+      <select id="modelSelect" [(ngModel)]="selectedModel" (change)="changeModel($event)">
+        <option *ngFor="let model of models" [value]="model.api">{{ model.name }}</option>
       </select>
     </div>
     <div *ngIf="selectedSession === null" class="welcome-screen">
       <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
-      <h2>欢迎使用知识图谱AI助手</h2>
+      <h2>欢迎使用智能问答助手</h2>
       <p>快在下方聊天框输入问题开始聊天吧</p>
       <div class="recommended-knowledge">
         <div class="knowledge-item" *ngFor="let knowledge of hots" (click)="selectKnowledge(knowledge?.id)">
