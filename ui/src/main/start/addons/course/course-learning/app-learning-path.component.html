@@ -1,0 +1,102 @@
+<div class="container">
+
+  <div class="path-wrapper">
+    <div class="path-header">
+      <h3 class="path-title">
+        {{ chapters[selectedChapter].title }} -
+        {{ getViewModeTitle() }}
+      </h3>
+      <button class="back-btn" (click)="returnToPath()">
+        <i class="fas fa-arrow-left"></i>
+        返回
+      </button>
+    </div>
+
+    <!-- 知识图谱视图 -->
+    <div class="path-container" #pathContainer *ngIf="viewMode === 'path'">
+      <svg class="connection-lines">
+        <path *ngFor="let line of connectionLines" [attr.d]="line" class="connection-line">
+        </path>
+      </svg>
+      <div *ngFor="let point of chapters[selectedChapter]?.knowledgePoints; let i = index" class="knowledge-point"
+        [ngStyle]="getPointStyle(i)" [attr.data-point-id]="i">
+        <div class="point-content" [ngClass]="getPointClassList(point, i)"
+          [class.point-content-hidden]="selectedPoint !== i" [class.point-content-right]="isRightSide(i)"
+          [class.point-content-left]="!isRightSide(i)">
+          <div class="point-header">
+            <div class="point-title">{{ point.title }}</div>
+            <div class="point-status-icon" [title]="getStatusText(point)">
+              <i class="fas" [ngClass]="getStatusIcon(point)"></i>
+            </div>
+          </div>
+          <div class="point-desc">{{ point.description }}</div>
+          <div class="point-progress" *ngIf="point.mastery > 0">
+            掌握度: {{ point.mastery }}%
+          </div>
+          <div class="point-actions">
+            <button class="action-btn start-btn" (click)="startLearning(point)">
+              <i class="fas fa-play"></i>
+              开始学习
+            </button>
+            <button class="action-btn test-btn" [disabled]="!point.mastery" (click)="startTest(point)">
+              <i class="fas fa-tasks"></i>
+              知识测试
+            </button>
+          </div>
+        </div>
+        <div class="checkpoint" [ngClass]="{
+                 'completed': point.completed,
+                 'not-completed': !point.completed,
+                 'mastery-low': point.mastery > 0 && point.mastery < 60,
+                 'mastery-medium': point.mastery >= 60 && point.mastery < 80,
+                 'mastery-high': point.mastery >= 80
+               }" (click)="togglePoint(i)">
+          <svg class="progress-ring" width="60" height="60">
+            <circle class="checkpoint-background" cx="30" cy="30" r="26"
+              [attr.fill]="point.completed ? '#58cc02' : '#ccc'" />
+            <!-- 只对有学习进度的显示圆环 -->
+            <ng-container *ngIf="point.mastery > 0">
+              <circle class="progress-ring-background" cx="30" cy="30" r="26" fill="transparent" stroke-width="6" />
+              <circle class="progress-ring-circle" cx="30" cy="30" r="26" fill="transparent" stroke-width="6"
+                [style.strokeDasharray]="2 * PI * 26"
+                [style.strokeDashoffset]="2 * PI * 26 * (1 - point.mastery / 100)" />
+            </ng-container>
+          </svg>
+          <span class="checkpoint-number">{{ i + 1 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视频学习视图 -->
+    <div class="video-container" *ngIf="viewMode === 'video'">
+      <div class="video-wrapper">
+        <iframe [src]="currentPoint?.videoUrl | safe" frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+      </div>
+      <div class="video-info">
+        <h4>{{ currentPoint?.title }}</h4>
+        <p>{{ currentPoint?.description }}</p>
+      </div>
+    </div>
+
+    <!-- 修改测试题视图 -->
+    <div class="test-container" *ngIf="viewMode === 'test'">
+      <app-quiz [pointId]="currentPoint?.id" (quizComplete)="onQuizComplete($event)" (quizClose)="returnToPath()">
+      </app-quiz>
+    </div>
+  </div>
+  <div class="chapters-sidebar">
+    <h2 class="sidebar-title">课程大纲</h2>
+    <div class="chapter-list">
+      <div *ngFor="let chapter of chapters; let i = index" class="chapter-item"
+        [ngClass]="{'active': selectedChapter === i}" (click)="selectChapter(i)">
+        <div class="chapter-header">
+          <span class="chapter-number">{{ i + 1 }}</span>
+          <span class="chapter-title">{{ chapter.title }}</span>
+          <span class="chapter-progress">{{ getProgressText(chapter) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

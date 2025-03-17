@@ -1,13 +1,9 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-learning-path',
-  template: `
-  
-  `,
-  styles: [`
-   
-  `]
+  templateUrl: './app-learning-path.component.html',
+  styleUrls: ['./app-learning-path.component.scss']
 })
 export class LearningPathComponent implements AfterViewInit {
   // 添加视图模式

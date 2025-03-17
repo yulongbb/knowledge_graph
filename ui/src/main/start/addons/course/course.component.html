@@ -31,18 +31,20 @@
     <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === getPagesArray().length">下一页</button>
   </div>
   <div *ngIf="selectedCourse" class="course-details">
-    <h2>{{ selectedCourse.title }}</h2>
+
+
+
+    <app-course-detail [course]="selectedCourse"></app-course-detail>
+    <!-- <h2>{{ selectedCourse.title }}</h2>
     <p>{{ selectedCourse.description }}</p>
     <div class="course-video">
-      <!-- Remove app-path-styles-demo from here -->
     </div>
     <div class="course-path">
       <h3>学习路径</h3>
       <app-learning-path></app-learning-path>
-
     </div>
     <div class="course-quiz">
-      <!-- Display course quiz here -->
-    </div>
+      <app-all-path></app-all-path>
+    </div> -->
   </div>
 </div>

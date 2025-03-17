@@ -5,17 +5,23 @@ import { CourseComponent } from './course.component';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PathStylesDemoComponent } from './path-styles-demo.component';
-import { LearningPathComponent } from './app-learning-path.conponent';
 import { SafePipe } from 'src/pipes/safe.pipe';
 import { QuizComponent } from './quiz.component';
+import { AllPathComponent } from './all-path.component';
+import { CourseDetailComponent } from './course-detail/course-detail.component';
+import { CourseMapComponent } from './course-map/course-map.component';
+import { LearningPathComponent } from './course-learning/app-learning-path.component';
 
 @NgModule({
     declarations: [
         CourseComponent,
+        CourseDetailComponent,
         PathStylesDemoComponent,
         LearningPathComponent,
         QuizComponent,
-        SafePipe
+        SafePipe,
+        AllPathComponent,
+        CourseMapComponent
     ],
     imports: [
         CommonModule,
@@ -26,6 +32,11 @@ import { QuizComponent } from './quiz.component';
             { path: 'path-styles', component: PathStylesDemoComponent }  // 添加新路由
         ]),
     ],
-    exports: [CourseComponent]
+    exports: [
+        CourseComponent,
+        CourseDetailComponent,
+        CourseMapComponent,
+        LearningPathComponent
+    ]
 })
 export class CourseModule { }

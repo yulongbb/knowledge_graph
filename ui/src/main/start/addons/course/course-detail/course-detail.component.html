@@ -1,0 +1,104 @@
+<div class="course-detail">
+  <!-- 主内容区域 -->
+  <div *ngIf="!showLearningPath" class="main-content">
+    <div class="video-section">
+      <div class="map-container">
+        <app-course-map [course]="course"></app-course-map>
+      </div>
+      <div class="video-info">
+        <h1>{{course?.title}}</h1>
+        <p>{{course?.description}}</p>
+        <div class="action-buttons">
+          <button class="primary" (click)="toggleLearningPath()">开始学习</button>
+          <button class="favorite-btn">收藏课程</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 简化后的章节列表 -->
+    <div class="chapter-sidebar">
+      <h2 class="sidebar-title">课程大纲</h2>
+      <div class="chapter-list">
+        <div *ngFor="let path of course?.path; let i = index" 
+             class="chapter-item"
+             [class.active]="selectedChapter === i">
+          <div class="chapter-header" (click)="selectChapter(i)">
+            <span class="chapter-number">{{ i + 1 }}</span>
+            <span class="chapter-title">{{ path }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学习路径组件 -->
+  <app-learning-path *ngIf="showLearningPath"></app-learning-path>
+
+  <!-- 学习路径卡片 -->
+  <!-- <div class="content-card learning-path-card">
+    <h3 class="card-title">学习路径</h3>
+    <div class="path-flow">
+      <app-all-path></app-all-path>
+    </div>
+  </div> -->
+
+  <!-- 课程资料和实验任务并排 -->
+  <div class="resources-row">
+    <div class="content-card materials-card">
+      <h3 class="card-title">基本教材</h3>
+      <div class="book" *ngFor="let book of basicBooks">
+        <h4>{{book.title}}</h4>
+        <p>作者：{{book.author}}</p>
+        <p>出版社：{{book.publisher}}</p>
+        <p>出版年份：{{book.year}}</p>
+      </div>
+    </div>
+
+    <div class="content-card references-card">
+      <h3 class="card-title">参考书目</h3>
+      <div class="book" *ngFor="let book of referenceBooks">
+        <h4>{{book.title}}</h4>
+        <p>作者：{{book.author}}</p>
+        <p>出版社：{{book.publisher}}</p>
+        <p>出版年份：{{book.year}}</p>
+      </div>
+    </div>
+
+    <div class="content-card labs-card">
+      <h3 class="card-title">实验任务</h3>
+      <div class="lab" *ngFor="let lab of labs">
+        <h3>{{lab.title}}</h3>
+        <p>{{lab.description}}</p>
+        <span class="duration">预计用时：{{lab.duration}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 评论卡片 -->
+  <div class="content-card comments-card">
+    <h3 class="card-title">课程评价</h3>
+    <div class="course-rating">
+      <div class="rating-summary">
+        <div class="rating-score">4.8</div>
+        <div class="rating-stars">★★★★★</div>
+        <div>课程评分</div>
+      </div>
+      <div class="rating-distribution">
+        <!-- 评分分布统计 -->
+      </div>
+    </div>
+    <div class="comments-list">
+      <div class="comment-item" *ngFor="let comment of courseComments">
+        <div class="user-info">
+          <img [src]="comment.avatar" [alt]="comment.username" class="user-avatar">
+          <span class="username">{{comment.username}}</span>
+          <span class="user-rating">★★★★★</span>
+          <span class="comment-date">{{comment.date}}</span>
+        </div>
+        <div class="comment-content">
+          {{comment.content}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

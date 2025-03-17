@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { Addon } from './entities/addon.entity';
 
 @Injectable()
@@ -8,23 +9,72 @@ export class AddonService {
   constructor(
     @InjectRepository(Addon)
     private readonly addonRepository: Repository<Addon>,
+    private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
-  findAll(): Promise<Addon[]> {
+  private async createIndexWithAlias(addon: Addon): Promise<void> {
+    const indexName = `entity_${addon.id}`;
+    const aliasName = addon.name;
+
+    // Create index
+    await this.elasticsearchService.indices.create({
+      index: indexName,
+      body: {
+        mappings: {
+          properties: {
+            // 定义你的索引映射
+          }
+        }
+      }
+    });
+
+    // Add alias
+    await this.elasticsearchService.indices.putAlias({
+      index: indexName,
+      name: aliasName
+    });
+  }
+
+  private async updateIndexAlias(id: number, oldName: string, newName: string): Promise<void> {
+    const indexName = `entity_${id}`;
+    
+    // Remove old alias
+    await this.elasticsearchService.indices.deleteAlias({
+      index: indexName,
+      name: oldName
+    });
+
+    // Add new alias
+    await this.elasticsearchService.indices.putAlias({
+      index: indexName,
+      name: newName
+    });
+  }
+
+  async findAll(): Promise<Addon[]> {
     return this.addonRepository.find();
   }
 
-  findOne(id: number): Promise<Addon> {
+  async findOne(id: number): Promise<Addon> {
     return this.addonRepository.findOne({ where: { id } });
   }
 
-  create(addon: Addon): Promise<Addon> {
-    return this.addonRepository.save(addon);
+  async create(addon: Addon): Promise<Addon> {
+    const savedAddon = await this.addonRepository.save(addon);
+    await this.createIndexWithAlias(savedAddon);
+    return savedAddon;
   }
 
   async update(id: number, addon: Addon): Promise<Addon> {
+    const oldAddon = await this.findOne(id);
     await this.addonRepository.update(id, addon);
-    return this.addonRepository.findOne({ where: { id } });
+    const updatedAddon = await this.addonRepository.findOne({ where: { id } });
+    
+    if (oldAddon.name !== updatedAddon.name) {
+      await this.updateIndexAlias(id, oldAddon.name, updatedAddon.name);
+    }
+    
+    return updatedAddon;
   }
 
   async remove(id: number): Promise<void> {
@@ -39,7 +89,7 @@ export class AddonService {
     return categories.map(category => category.category);
   }
 
-  findByCategory(category: string): Promise<Addon[]> {
+  async findByCategory(category: string): Promise<Addon[]> {
     return this.addonRepository.find({ where: { category } });
   }
 }
