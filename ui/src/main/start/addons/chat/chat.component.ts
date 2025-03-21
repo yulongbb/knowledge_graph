@@ -191,7 +191,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
    changeModel(api:any): void {
     this.addSession();
     this.selectedModel = api.target.value;
-
   }
 
   private getAIResponse(userMessage: string): void {

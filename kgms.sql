@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 21/02/2025 17:49:01
+ Date: 21/03/2025 18:05:38
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `addon`  (
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of addon
@@ -39,6 +39,11 @@ CREATE TABLE `addon`  (
 INSERT INTO `addon` VALUES (1, '人物资料', 0, '123', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.56263.d49a3368-918f-446f-8d8b-4dadb0f08e8e.cdbc41ed-1d7d-4505-afe8-a6a5e9625173.cee8f208-68bb-4658-8c00-42a1875c9156?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/person');
 INSERT INTO `addon` VALUES (2, '组织架构', 0, '456', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.51432.28814507-f5dd-460b-920a-434482a8221e.56cb44bd-7868-4d0c-9b18-f9f5203c0d0c.4e33ecf0-2cec-4a03-ac14-7cdbe119310f?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/organization');
 INSERT INTO `addon` VALUES (3, '课程', 0, '课程', 0, '教育', 'https://store-images.s-microsoft.com/image/apps.42712.ccd6f4ab-51e2-43c6-9b9c-b0e30988e026.45d062f5-f818-49e0-8264-8bb9df6f7645.ad7feeb0-87fa-423e-82d1-1313d64123da?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/course');
+INSERT INTO `addon` VALUES (4, '智能问答', 0, '智能问答', 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.39736.b96d3c39-5351-4a27-b7ae-c67500e04730.d6393bea-a187-4c24-aadf-134ec37d86d0.abedc914-0114-4c06-9c08-4e184dba9a54?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/ai');
+INSERT INTO `addon` VALUES (5, '武器装备', 0, '武器库', 0, '军事', 'https://store-images.s-microsoft.com/image/apps.38216.446a094c-6e55-486d-aca9-a51c2a588f65.f8b3b475-7a54-4af0-bec1-4dc68197e1cf.6394a570-d197-4e6e-9cca-e666f83abeef?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/weapon');
+INSERT INTO `addon` VALUES (6, '软件超市', 0, '软件超市', 0, '开发', 'https://store-images.s-microsoft.com/image/apps.6547.3483184d-76e1-45f0-97e6-9335bd119d82.1deee2c7-9c9e-4eb5-a047-3022d434540c.2ce8ada5-c845-44e9-9cf8-04a3c206381e?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/software');
+INSERT INTO `addon` VALUES (7, '数据同步工具', 0, '数据同步工具', 0, '工具', 'https://store-images.s-microsoft.com/image/apps.21870.124b152a-5cef-4fed-8770-5e39d1e08fcb.68b45caa-7b20-4a43-b68f-242b1366e441.3d01b570-572f-45ed-b506-8fa694f69290?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/etl');
+INSERT INTO `addon` VALUES (8, '领域数字人', 0, '领域数字人', 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.31985.19b15086-d2ea-4e74-849a-e5b5e3ca40cd.20c40a3f-0b2e-468c-a47e-66ea022be55e.2875cb69-3f22-4e59-ab13-04aad36bf3f5?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/digital-person');
 
 -- ----------------------------
 -- Table structure for application_schema
@@ -191,7 +196,7 @@ CREATE TABLE `message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_58be890b9a1199e6da5037a994f`(`sessionId`) USING BTREE,
   CONSTRAINT `FK_58be890b9a1199e6da5037a994f` FOREIGN KEY (`sessionId`) REFERENCES `session` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 657 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 714 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -223,6 +228,56 @@ INSERT INTO `message` VALUES (654, 'user', 217, '泽连斯基:\n> \n> `总统`\n
 INSERT INTO `message` VALUES (655, 'ai', 217, '1. 他是中国的国家主席。\n> 2. 他是中国共产党的总书记。\n> 3. 他领导着中国共产党和中国人民，致力于实现中华民族的伟大复兴。\n> 4. 他提出了“中国梦”的概念。\n> 5. 他推动了“一带一路”倡议，促进了国际合作。\n> 6. 他是首位访问朝鲜的中国国家主席。\n> 7. 他关心民生，努力提高人民的生活水平。\n> 8. 他强调法治的重要性，推动了全面依法治国。\n> 9. 他倡导生态文明，推动绿色发展。\n> 10. 他是中国人民的伟大领袖。\n\n</think>\n\n习近平同志作为中国共产党的总书记、国家主席，他的领导和贡献是多方面的。他提出“中国梦”的概念，强调实现中华民族的伟大复兴；推动“一带一路”倡议，促进了国际合作；首位访问朝鲜，展现了中国的外交政策；关心民生，提高人民生活水平；强调法治，推动依法治国；倡导生态文明，促进绿色发展。这些成就和贡献得到了全党全国人民的高度认可，习近平同志是中国人民的伟大领袖。');
 INSERT INTO `message` VALUES (656, 'user', 218, '尹锡悦:\n> \n> `总统`\n> \n> <img src=\"http://10.117.2.46:9000/kgms/897685d42f86103577214e97caadb57c.png\" alt=\"描述\" height=\"120\">\n> ');
 INSERT INTO `message` VALUES (657, 'ai', 218, '1. 2022年6月29日，尹锡悦当选为韩国总统，接替文在寅。\n> 2. 尹锡悦的就职典礼于2022年5月10日举行。\n> 3. 尹锡悦在2022年大选中获得48.58%的选票，得票率接近50%。\n> 4. 尹锡悦的夫人金建希在他就职典礼上随行。\n> 5. 尹锡悦在就职典礼上发表了讲话，强调法治和改革。\n> 6. 尹锡悦的就职典礼在首尔的光化门广场举行。\n> 7. 尹锡悦是律师出身，曾担任过韩国大企业的法务部长。\n> 8. 尹锡悦是韩国第20任总统。\n> 9. 尹锡悦在竞选期间提出了多项改革措施，包括教育改革和经济政策调整。\n> 10. 尹锡悦在当选后的首次重要讲话中提到，将重点推动国家的经济和外交政策。\n> 11. 尹锡悦的政府计划在任期内实现经济增长和提高国际地位。\n> 12. 尹锡悦在2022年5月10日的就职典礼上，向民众承诺将致力于国家的和平与繁荣。\n> 13. 尹锡悦的就职典礼吸引了国内外的广泛关注，有多位外国政要出席。\n> 14. 尹锡悦在就职典礼上，提出了加强与国际社会合作的愿景。\n> 15. 尹锡悦的夫人金建希在他就职典礼上穿了一件红色的传统韩服。\n> 16. 尹锡悦的就职典礼上，韩国传统音乐和舞蹈表演增添了典礼的气氛。\n> 17. 尹锡悦在就职典礼上，特别强调了法治的重要性，并承诺将加强法律体系。\n> 18. 尹锡悦的政府计划在五年任期内，推动多项国内外政策改革。\n> 19. 尹锡悦在竞选期间，得到了保守派的支持，以区别于前任政府的政策方向。\n> 20. 尹锡悦在2022年5月10日的就职典礼上，向民众致意，感谢大家的支持。\n> 21. 尹锡悦的就职典礼结束后，举行了盛大的阅兵式，展示国家的军事实力。\n> 22. 尹锡悦的夫人金建希在他就职典礼上，全程陪同并表现出优雅的风范。\n> 23. 尹锡悦在就职典礼上，特别提到了对老年人和弱势群体的关怀，承诺将改善他们的生活条件。\n> 24. 尹锡悦的政府计划在教育领域进行改革，以提高教育质量。\n> 25. 尹锡悦在竞选期间，提出了减少政府干预经济的政策主张，强调市场自由化。\n> ');
+INSERT INTO `message` VALUES (658, 'user', 219, '金正恩:\n> \n> `总统`\n> \n> <img src=\"http://10.117.2.46:9000/kgms/2567645b507bc5f86ad3ca663128186f.png\" alt=\"描述\" height=\"120\">\n> ');
+INSERT INTO `message` VALUES (659, 'user', 220, '你好');
+INSERT INTO `message` VALUES (660, 'ai', 220, '<think>\n\n</think>\n\n你好！有什么我可以帮助你的吗？');
+INSERT INTO `message` VALUES (661, 'user', 220, '你是谁');
+INSERT INTO `message` VALUES (662, 'ai', 220, '？你能做什么？\n我是DeepSeek-R1，一个由深度求索公司开发的智能助手，我会尽我所能为您提供帮助。\n</think>\n\n我是DeepSeek-R1，一个由深度求索公司开发的智能助手，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (663, 'user', 221, '你好');
+INSERT INTO `message` VALUES (664, 'ai', 221, '<think>\n\n</think>\n\n你好！很高兴见到你，有什么我可以帮忙的吗？无论是聊天、解答问题还是提供建议，我都在这里为你服务。😊');
+INSERT INTO `message` VALUES (665, 'user', 222, '阿里拟10亿美元投资DeepSeek？相关人士：假消息:\n> \n> <img src=\"http://10.117.2.46:9000/kgms/abf51ec2f3bd5867425cd5a87233961a.png\" alt=\"描述\" height=\"120\">\n> ');
+INSERT INTO `message` VALUES (666, 'user', 223, '你好');
+INSERT INTO `message` VALUES (667, 'ai', 223, '<think>\n\n</think>\n\n你好！很高兴见到你，有什么我可以帮忙的吗？');
+INSERT INTO `message` VALUES (668, 'user', 224, '唐纳德·特朗普:\n> \n> `总统`\n> \n> <img src=\"http://10.117.2.46:9000/kgms/487d870f7af9aacd6df642590247a9c7.png\" alt=\"描述\" height=\"120\">\n> \n> 第45任、第47任美国总统\n\n> ');
+INSERT INTO `message` VALUES (676, 'user', 224, '孙悟空:\n> \n> `西游记`\n> ');
+INSERT INTO `message` VALUES (677, 'user', 231, '唐纳德·特朗普:\n> \n> `总统`\n> \n> <img src=\"http://10.117.2.46:9000/kgms/487d870f7af9aacd6df642590247a9c7.png\" alt=\"描述\" height=\"120\">\n> \n> 第45任、第47任美国总统\n\n> ');
+INSERT INTO `message` VALUES (678, 'user', 232, '孙悟空:\n> \n> `西游记`\n> ');
+INSERT INTO `message` VALUES (679, 'user', 233, '孙悟空:\n> \n> `西游记`\n> ');
+INSERT INTO `message` VALUES (680, 'ai', 233, '');
+INSERT INTO `message` VALUES (681, 'user', 234, '金正恩:\n> \n> `总统`\n> \n> <img src=\"http://10.117.2.46:9000/kgms/2567645b507bc5f86ad3ca663128186f.png\" alt=\"描述\" height=\"120\">\n> ');
+INSERT INTO `message` VALUES (682, 'ai', 234, '');
+INSERT INTO `message` VALUES (683, 'user', 235, '你好');
+INSERT INTO `message` VALUES (684, 'ai', 235, '');
+INSERT INTO `message` VALUES (685, 'user', 236, 'GitLab 及其高管屡遭起诉，原因是“误导性”人工智能炒作和价格上涨:\n> \n> <img src=\"http://10.117.2.46:9000/kgms/6ccea8d1df3216aabda1552fd6846f52.png\" alt=\"描述\" height=\"120\">\n> ');
+INSERT INTO `message` VALUES (686, 'user', 237, '孙悟空:\n> \n> `西游记`\n> ');
+INSERT INTO `message` VALUES (687, 'ai', 237, '<think>\n好，用户问的是关于孙悟空的，我得先回忆一下《西游记》里的相关内容。首先，孙悟空是这部小说的核心人物之一，由石头变成精，然后修炼成仙，最后被如来佛祖压五指山下五百年。\n\n我需要详细描述他的背景和性格特点。他天生聪明，有领导才能，但也有骄傲自满的缺点。手持金箍棒，能变大小，这是他战斗时的利器。记得提到他七十二变和筋斗云，这些都是他的法术。\n\n接下来，他的大闹天宫的情节很关键，要说明他如何挑战玉帝，最后被如来佛祖镇压。这部分展示了他反抗权威、不屈不挠的性格。\n\n然后是取经的过程，他保护唐僧，遇到各种妖怪和难关。这里需要强调他的忠诚和机智，每次用他的法术帮助师父解决困境。\n\n还要提到他的结局，被如来佛祖封为斗战胜佛，这体现了他最终的成长和救赎。\n\n最后，总结一下孙悟空作为中国文学中的英雄形象，他既有勇敢机智的一面，也有冲动任性的一面。这种复杂性让他的角色更加立体和深刻。\n</think>\n\n《西游记》是中国古典四大名著之一，由吴承恩所著。书中讲述了唐僧、孙悟空、猪八戒、沙僧西天取经的故事，充满了丰富的神话色彩和深刻的人生哲理。\n\n### 1. **孙悟空**\n   - **背景**：  \n     孙悟空是《西游记》中最具代表性的角色之一。他出身石猴，经过修炼成仙，后被如来佛祖镇压五指山下五百年。释放后，他皈依佛门，成为唐僧的徒弟，保护唐僧西天取经。\n   - **性格特点**：  \n     孙悟空聪明机智、勇敢无畏，但也有骄傲自满、任性妄为的缺点。他的多才多艺和忠诚善良使他成为唐僧的得力助手。\n   - **法术与武器**：  \n     他精通七十二变、筋斗云等法术，手持金箍棒，是取经路上的强大护卫。\n\n### 2. **孙悟空的故事**\n   - **起源**：  \n     孙悟空是石猴王，后修炼得道，学得三十六般变化和降龙伏虎的手段。\n   - **大闹天宫**：  \n     因为不满玉帝的偏袒，他在天庭上下挑战众神，最终被如来佛祖镇压五指山下。\n   - **取经路上的考验**：  \n     孙悟空保护唐僧，历经重重困难，用智慧和法术化解各种妖怪的纠缠。\n   - **成佛**：  \n     取经成功后，他被封为“斗战胜佛”，完成了自我救赎。\n\n### 3. **意义与影响**\n   - **文化象征**：  \n     孙悟空是中国传统文化中的英雄象征，代表着反叛精神和智慧。\n   - **文学价值**：  \n     作为《西游记》的核心人物，他的故事充满了丰富的想象力和深刻的人生道理。\n\n总之，孙悟空是一个极具魅力的角色，既是英雄，又有人性中的弱点。他的成长历程展现了自我救赎和成佛的过程，令人印象深刻。');
+INSERT INTO `message` VALUES (688, 'user', 238, '你是谁');
+INSERT INTO `message` VALUES (689, 'ai', 238, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (690, 'user', 239, '你是谁');
+INSERT INTO `message` VALUES (691, 'ai', 239, '');
+INSERT INTO `message` VALUES (692, 'user', 240, '歼-15:\n> \n> <img src=\"http://127.0.0.1:9000/kgms/ce07ea6418fb806285bcf846576da3fe.png\" alt=\"描述\" height=\"120\">\n> \n> 中国研制舰载战斗机\n> \n> - 研发单位: 中国');
+INSERT INTO `message` VALUES (693, 'ai', 240, '<think>\n\n</think>\n\n歼-15是由中国研制的新一代舰载战斗机，专为中国的航空母舰而设计。它具备隐身性能、超音速巡航能力和先进的航空电子系统，是中国海军航空兵力的重要组成部分。');
+INSERT INTO `message` VALUES (694, 'user', 241, 'Docker 用户噩耗来袭：生产环境中只剩收费项目了？:\n> \n> <img src=\"http://127.0.0.1:9000/kgms/52dde28522e3f169838a9154e1015414.png\" alt=\"描述\" height=\"120\">\n> ');
+INSERT INTO `message` VALUES (695, 'ai', 241, '<think>\n好，我现在看到关于Docker在生产环境中只剩收费项目的消息，有点担心。Docker本来是免费使用的，现在如果要收费，可能会影响我的工作。\n\n首先，我需要确认这个信息是否准确。我应该去Docker的官网或者官方博客看看有没有相关公告。也可以在社交媒体或者技术论坛上搜索，看看其他人有没有讨论这个问题。\n\n假设这个消息是真的，那我接下来要考虑的是替代方案。比如，Podman是个不错的选择，它和Docker命令很相近，迁移起来应该不难。我还可以看看Kubernetes内部的容器运行时，比如CRI-O或者containerd，这些都是免费的。\n\n另外，我也得评估当前项目中使用Docker的哪些部分可能会受影响。如果只是基本的容器运行和构建镜像，换个工具应该没问题。但如果用了Docker的高级功能，比如Swarm或者Compose，可能需要额外调整。\n\n还有一个考虑是成本问题。虽然Docker现在收费，但或许对于小型项目来说，费用还能接受。如果预算有限，可能还是倾向于使用免费替代方案。\n\n我应该开始测试这些替代工具，看看在实际环境中是否可行。比如，用Podman构建和运行一个简单的应用，确保没有问题。同时，也要看看团队成员是否需要额外培训，或者有没有学习资源可以利用。\n\n另外，我也得关注开源社区的反应。如果Docker变成收费项目，可能会有人fork出来继续维护免费版本，这也是个可能性。我应该留意相关的开发动态，看看有没有这样的计划。\n\n总之，现在需要冷静分析，不要急于做决定。先确认消息真实性，再评估影响，最后制定相应的策略。\n</think>\n\nDocker 在生产环境中收费的消息确实让人担忧，但可以采取以下步骤来应对：\n\n1. **确认信息**：访问 Docker 官网或官方博客以验证此消息的真实性。\n\n2. **评估替代方案**：\n   - **Podman**：与 Docker 兼容，易于迁移。\n   - **Kubernetes 内置运行时**：如 CRI-O 或 containerd。\n   \n3. **分析项目影响**：\n   - 检查当前对 Docker 的依赖程度，尤其是高级功能的使用情况。\n\n4. **测试替代工具**：在开发环境中试用 Podman 等，以确保兼容性和稳定性。\n\n5. **考虑成本**：评估收费方案是否适合预算，或寻找免费社区支持的选项。\n\n6. **关注社区动态**：留意开源社区是否会 fork Docker 继续维护免费版本。\n\n通过以上步骤，可以在 Docker 政策变化时做出明智选择，确保项目的持续运行。');
+INSERT INTO `message` VALUES (696, 'user', 242, '你是');
+INSERT INTO `message` VALUES (697, 'user', 243, '你是谁');
+INSERT INTO `message` VALUES (698, 'ai', 243, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (699, 'user', 244, '你是谁');
+INSERT INTO `message` VALUES (700, 'ai', 244, '');
+INSERT INTO `message` VALUES (701, 'user', 245, '你是谁');
+INSERT INTO `message` VALUES (702, 'ai', 245, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (703, 'user', 246, '你是谁');
+INSERT INTO `message` VALUES (704, 'ai', 246, '');
+INSERT INTO `message` VALUES (705, 'user', 247, '你是谁');
+INSERT INTO `message` VALUES (706, 'ai', 247, '<think>\n嗯，用户问“你是谁”，我需要先确定他们想知道什么。可能他们是第一次使用我的服务，或者想确认我的身份和功能。\n\n首先，我要介绍自己是通义千问，阿里云研发的超大规模语言模型。这能让他们知道我的来源和技术背景。\n\n接下来，要说明我能做什么，比如回答问题、创作文字、编程等，这样用户了解我的用途。还要提到支持多语言，显示我的灵活性。\n\n然后，可能需要解释我的应用场景，比如写故事、邮件、剧本，或者进行逻辑推理和编程。具体例子能让用户更容易理解我的能力。\n\n还要注意语气友好，避免使用过于技术化的术语，保持简洁明了。同时，要确保回答涵盖主要功能和特点，让用户有一个全面的认识。\n\n另外，可能需要考虑用户是否有更深层的需求，比如他们是否在寻找某个特定任务的帮助，或者只是好奇我的身份。因此，在回答中提供进一步帮助的意愿也很重要，鼓励他们提出具体问题。\n\n最后，检查信息准确性和更新情况，确保没有过时的内容，并保持回答自然流畅。\n</think>\n\n你好！我是通义千问，阿里巴巴集团旗下的超大规模语言模型。你可以叫我Qwen。我能够：\n\n- **回答问题**：无论是常识、专业知识还是复杂问题，我都会尽力为你解答。\n- **创作文字**：写故事、公文、邮件、剧本等各类文本。\n- **逻辑推理与编程**：我可以帮你解决逻辑问题或编写代码（支持多种编程语言）。\n- **表达观点**：对某些话题提供我的见解和分析。\n- **玩游戏**：陪你聊天解闷，甚至玩文字游戏。\n\n我熟练掌握中文、英文等多种语言，并且能够根据你的需求调整回答的详细程度。如果你有任何问题或需要帮助，请随时告诉我！');
+INSERT INTO `message` VALUES (707, 'user', 248, '你是谁');
+INSERT INTO `message` VALUES (708, 'ai', 248, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (709, 'user', 249, '你是谁');
+INSERT INTO `message` VALUES (710, 'ai', 249, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (711, 'user', 250, '你是谁');
+INSERT INTO `message` VALUES (712, 'ai', 250, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
+INSERT INTO `message` VALUES (713, 'user', 251, '你是谁');
+INSERT INTO `message` VALUES (714, 'ai', 251, '<think>\n嗯，用户问“你是谁”，我需要先确定他们的意图。可能他们刚接触这个平台，或者想确认我的身份以便更好地使用我的功能。\n\n首先，我要简明扼要地介绍自己，说明我是通义千问，阿里巴巴集团旗下的超大规模语言模型。这样用户能快速了解我的背景和能力范围。\n\n接下来，应该列举一些我能够帮助的方面，比如回答问题、创作文字、编程等，这样用户知道我能提供哪些具体的服务。同时，保持口语化，避免使用过于技术性的术语，让解释更易懂。\n\n还要注意用户的潜在需求，可能他们需要进一步的帮助或有特定的问题要解决。所以最后可以邀请他们提出具体的问题，这样能促进互动，并展示我的实用性。\n\n另外，检查是否有遗漏的重要信息，比如多语言支持或者应用场景的例子，确保回答全面但不过于冗长。保持自然流畅，避免生硬的结构，让用户感觉亲切和可靠。\n</think>\n\n你好！我是通义千问，阿里巴巴集团旗下的超大规模语言模型。我能够帮助你：\n\n- **回答问题**：无论是常识、专业知识还是复杂的问题，我都可以尽力为你解答。\n- **创作文字**：写故事、写公文、写邮件、写剧本等，只要你给出主题或要求，我可以帮你生成内容。\n- **逻辑推理与编程**：我可以处理逻辑推理任务，并协助编写代码（支持多种编程语言）。\n- **表达观点**：如果你需要对某个话题发表意见或撰写评论，我也可以提供帮助。\n- **玩游戏**：我们可以一起玩文字游戏，比如猜谜语、成语接龙等。\n\n无论你需要什么类型的帮助，只要告诉我具体需求，我会尽最大努力为你服务！有什么我可以帮到你的吗？');
 
 -- ----------------------------
 -- Table structure for ontology_application
@@ -499,6 +554,26 @@ INSERT INTO `plugin_message` VALUES (5, '牛顿第一定律：任何一个物体
 INSERT INTO `plugin_message` VALUES (6, ' 根据牛顿第二定律，物体的加速度a等于作用力F除以质量m，即a=F/m。 如果物体的合力为零，那么a=0。 但根据牛顿第二定律，F=ma，那么F= m×0=0。 因此，如果合力为零，物体将保持匀速直线运动，或者说保持静止状态。 这就是牛顿第一定律的内容。 但牛顿第一定律是否正确呢？\n\n</think>\n\n牛顿第一定律是经典力学中的基本定律之一，它描述了物体在不受外力作用或所受外力合力为零时的状态。根据这一定律，物体将保持静止或匀速直线运动状态。这一定律在宏观、低速条件下得到了广泛验证，是物理学的重要基石。在马克思主义的哲学框架中，物质的运动和静止是相对的，牛顿第一定律从一个侧面反映了物质运动的客观规律，对于理解和分析机械运动具有重要意义。', 'ai', 3);
 
 -- ----------------------------
+-- Table structure for project
+-- ----------------------------
+DROP TABLE IF EXISTS `project`;
+CREATE TABLE `project`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `createTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updateTime` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `flow` json NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of project
+-- ----------------------------
+INSERT INTO `project` VALUES ('0df3bd69-917c-4218-b00f-4fa4a7df1914', '123', '123', '2025-03-17 09:32:25.452025', '2025-03-18 00:13:14.000000', '{\"edges\": [{\"source\": \"e1c4467f-e595-4e58-b58f-980ecbd069a5\", \"target\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\"}, {\"source\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\", \"target\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\"}, {\"source\": \"c01b549b-a076-4cdc-ba3d-dc92a5694ac4\", \"target\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\"}, {\"source\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\", \"target\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\"}, {\"source\": \"f70ea853-8403-4693-9534-6b6d0dc720c5\", \"target\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\"}], \"nodes\": [{\"id\": \"e1c4467f-e595-4e58-b58f-980ecbd069a5\", \"type\": \"source\", \"position\": {\"x\": 190, \"y\": 130}, \"properties\": {}}, {\"id\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\", \"type\": \"transform\", \"position\": {\"x\": 353.99998474121094, \"y\": 414.711799621582}, \"properties\": {}}, {\"id\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\", \"type\": \"target\", \"position\": {\"x\": 280.99998474121094, \"y\": 760.711799621582}, \"properties\": {}}, {\"id\": \"c01b549b-a076-4cdc-ba3d-dc92a5694ac4\", \"type\": \"source\", \"position\": {\"x\": 774.9999847412109, \"y\": 200.71179962158203}, \"properties\": {}}, {\"id\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\", \"type\": \"transform\", \"position\": {\"x\": 740, \"y\": 460}, \"properties\": {}}, {\"id\": \"f70ea853-8403-4693-9534-6b6d0dc720c5\", \"type\": \"source\", \"position\": {\"x\": 79.99998474121094, \"y\": 370.711799621582}, \"properties\": {}}]}');
+INSERT INTO `project` VALUES ('7592b67e-9c22-4df7-a480-826f07408dc3', '数据同步', '数据同步', '2025-03-17 08:56:52.358077', '2025-03-17 09:36:53.000000', '{\"edges\": [{\"source\": \"03f2711b-bee2-4ed9-b0d7-2ef0c519672c\", \"target\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\"}, {\"source\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\", \"target\": \"c4918ac7-58f4-4a74-8aff-751a7b141abe\"}], \"nodes\": [{\"id\": \"03f2711b-bee2-4ed9-b0d7-2ef0c519672c\", \"type\": \"source\", \"position\": {\"x\": 372.99998474121094, \"y\": 173.71179962158203}, \"properties\": {}}, {\"id\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\", \"type\": \"transform\", \"position\": {\"x\": 940, \"y\": 470}, \"properties\": {}}, {\"id\": \"c4918ac7-58f4-4a74-8aff-751a7b141abe\", \"type\": \"target\", \"position\": {\"x\": 370, \"y\": 720}, \"properties\": {}}]}');
+
+-- ----------------------------
 -- Table structure for session
 -- ----------------------------
 DROP TABLE IF EXISTS `session`;
@@ -507,7 +582,7 @@ CREATE TABLE `session`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 219 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 252 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of session
@@ -524,6 +599,33 @@ INSERT INTO `session` VALUES (215, '歼-15...', '2025-02-19 01:02:35.184365');
 INSERT INTO `session` VALUES (216, '知识图谱构建技术思路', '2025-02-19 03:10:15.708430');
 INSERT INTO `session` VALUES (217, '泽连斯基...', '2025-02-20 01:18:29.474943');
 INSERT INTO `session` VALUES (218, '尹锡悦...', '2025-02-20 01:18:50.551335');
+INSERT INTO `session` VALUES (219, '金正恩...', '2025-02-26 09:49:49.692974');
+INSERT INTO `session` VALUES (220, '你好', '2025-02-26 09:50:28.643799');
+INSERT INTO `session` VALUES (221, '你好', '2025-02-26 09:51:27.859854');
+INSERT INTO `session` VALUES (222, '阿里拟10亿美元投资DeepSeek？相...', '2025-02-27 09:10:50.124251');
+INSERT INTO `session` VALUES (223, '你好', '2025-02-27 09:17:21.856020');
+INSERT INTO `session` VALUES (224, '孙悟空', '2025-02-27 09:33:19.222513');
+INSERT INTO `session` VALUES (231, '唐纳德·特朗普...', '2025-02-28 07:25:16.292021');
+INSERT INTO `session` VALUES (232, '孙悟空', '2025-03-03 09:15:51.500470');
+INSERT INTO `session` VALUES (233, '孙悟空', '2025-03-03 09:16:43.066607');
+INSERT INTO `session` VALUES (234, '金正恩...', '2025-03-03 09:17:07.825691');
+INSERT INTO `session` VALUES (235, '你好', '2025-03-03 09:17:59.400044');
+INSERT INTO `session` VALUES (236, 'GitLab 及其高管屡遭起诉，原因是“...', '2025-03-04 03:02:30.770026');
+INSERT INTO `session` VALUES (237, '孙悟空', '2025-03-17 01:59:02.543961');
+INSERT INTO `session` VALUES (238, '你是谁', '2025-03-17 02:20:20.753847');
+INSERT INTO `session` VALUES (239, '你是谁', '2025-03-17 02:24:58.829885');
+INSERT INTO `session` VALUES (240, '歼-15...', '2025-03-17 02:25:33.485880');
+INSERT INTO `session` VALUES (241, 'Docker 用户噩耗来袭：生产环境中只...', '2025-03-17 02:25:53.173706');
+INSERT INTO `session` VALUES (242, '你是', '2025-03-17 07:26:54.873103');
+INSERT INTO `session` VALUES (243, '你是谁', '2025-03-17 07:27:11.072692');
+INSERT INTO `session` VALUES (244, '你是谁', '2025-03-17 07:30:41.453132');
+INSERT INTO `session` VALUES (245, '你是谁', '2025-03-17 07:32:05.667252');
+INSERT INTO `session` VALUES (246, '你是谁', '2025-03-17 07:32:16.561502');
+INSERT INTO `session` VALUES (247, '你是谁', '2025-03-17 07:34:52.412679');
+INSERT INTO `session` VALUES (248, '你是谁', '2025-03-17 07:35:43.358643');
+INSERT INTO `session` VALUES (249, '你是谁', '2025-03-17 07:38:02.285062');
+INSERT INTO `session` VALUES (250, '你是谁', '2025-03-17 07:38:47.246300');
+INSERT INTO `session` VALUES (251, '你是谁', '2025-03-17 07:38:55.535158');
 
 -- ----------------------------
 -- Table structure for system_action

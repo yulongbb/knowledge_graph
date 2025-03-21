@@ -1,0 +1,35 @@
+<div class="digital-person-container">
+  <div class="character-section">
+    <div class="character-container">
+      <app-virtual-character #virtualCharacter [isAnswering]="isAnswering"></app-virtual-character>
+    </div>
+  </div>
+  
+  <div class="chat-section">
+    <div class="model-selector">
+      <select [(ngModel)]="selectedModel" (change)="changeModel($event)">
+        <option *ngFor="let model of models" [value]="model.api">{{ model.name }}</option>
+      </select>
+    </div>
+    <div class="chat-messages" #messagesContainer>
+      <div *ngFor="let message of messages" 
+           [ngClass]="{'user-message': message.isUser, 'bot-message': !message.isUser}"
+           class="message">
+        <div class="message-content" [innerHTML]="parseMarkdown(message.content)"></div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" 
+             [(ngModel)]="currentMessage" 
+             (keyup.enter)="sendMessage()"
+             [disabled]="isAnswering"
+             placeholder="请输入消息...">
+      <button (click)="sendMessage()" [disabled]="isAnswering || !currentMessage.trim()">
+        <fa-icon [icon]="faPaperPlane"></fa-icon>
+      </button>
+      <button *ngIf="isAnswering" (click)="stopResponse()" class="stop-button">
+        <fa-icon [icon]="faPause"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

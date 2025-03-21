@@ -1,0 +1,146 @@
+.digital-person-container {
+  display: flex;
+  height: 100%;
+  padding: 20px;
+  gap: 20px;
+
+  .character-section {
+    flex: 1;
+    border-radius: 8px;
+    background: #f5f5f5;
+    overflow: hidden; // 添加此行
+    
+    .character-container {
+      width: 100%;  // 添加此行
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      app-virtual-character {
+        width: 100%;  // 添加此行
+        height: 100%; // 添加此行
+        display: block; // 添加此行
+      }
+    }
+
+    .animation-control {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(0, 0, 0, 0.7);
+      }
+    }
+  }
+
+  .chat-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+
+      .message {
+        margin: 8px 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+        max-width: 80%;
+      }
+
+      .user-message {
+        background: #e3f2fd;
+        margin-left: auto;
+      }
+
+      .bot-message {
+        background: #f5f5f5;
+        margin-right: auto;
+      }
+
+      .message-content {
+        white-space: pre-wrap;
+        
+        :deep(pre) {
+          background: #f8f9fa;
+          padding: 1em;
+          border-radius: 4px;
+          overflow-x: auto;
+        }
+        
+        :deep(code) {
+          background: #f8f9fa;
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+        }
+      }
+    }
+
+    .chat-input {
+      padding: 20px;
+      display: flex;
+      gap: 10px;
+      border-top: 1px solid #e0e0e0;
+
+      input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background: #1976d2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background: #1565c0;
+        }
+      }
+
+      .stop-button {
+        background-color: #dc3545;
+        
+        &:hover {
+          background-color: #c82333;
+        }
+      }
+    }
+  }
+}
+
+.model-selector {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  
+  select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    min-width: 150px;
+    
+    &:focus {
+      outline: none;
+      border-color: #1976d2;
+    }
+  }
+}

@@ -71,6 +71,12 @@ export const mainRoutes: Routes = [
       import("../main/start/addons/etl/etl.module").then(x => x.EtlModule),
   },
 
+  {
+    path: "digital-person",
+    loadChildren: () =>
+      import("../main/start/addons/digital-person/digital-person.module").then(x => x.DigitalPersonModule),
+  },
+
 
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },

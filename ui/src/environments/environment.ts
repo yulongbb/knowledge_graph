@@ -12,7 +12,8 @@ export const environment = {
   // Api请求地址
   api: 'http://localhost:3000/',
   // ip: '10.117.2.46'
-  ip: '127.0.0.1'
+  ip: '127.0.0.1',
+  apiUrl: 'http://10.117.1.238:8106'
 };
 
 /*

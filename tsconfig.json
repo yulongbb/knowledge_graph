@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "three": ["./node_modules/@types/three"],
+      "three/*": ["./node_modules/@types/three/*"]
+    }
+  }
+}
