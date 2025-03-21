@@ -44,7 +44,7 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
   private animationFrameId: number = 0;
   private mixer: THREE.AnimationMixer | null = null;
   private clock: THREE.Clock = new THREE.Clock();
-  private modelPath = '/assets/models/character.fbx'; // 确保这个路径是正确的
+  private modelPath = '/assets/models/greeting.fbx'; // 确保这个路径是正确的
   private actions: THREE.AnimationAction[] = [];  // 存储所有动画action
   private currentAction: THREE.AnimationAction | null = null;  // 当前播放的动画
   private defaultAnimationPlaying: boolean = true;  // 添加默认动画状态控制

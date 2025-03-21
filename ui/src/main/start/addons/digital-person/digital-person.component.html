@@ -1,5 +1,42 @@
 <div class="digital-person-container">
   <div class="character-section">
+    <div class="character-selector">
+      <div class="character-info">
+        <h3>{{selectedCharacter.name}}</h3>
+        <span>{{selectedCharacter.role}}</span>
+      </div>
+      <div class="character-actions">
+        <button (click)="editCharacter(selectedCharacter)" class="edit-btn">
+          <fa-icon [icon]="faEdit"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- 角色编辑表单 -->
+    <div class="character-edit-form" *ngIf="showEditForm">
+      <div class="form-overlay">
+        <div class="form-content">
+          <h2>{{ editingCharacter?.name ? '编辑角色' : '新建角色' }}</h2>
+          <div class="form-group">
+            <label>名称</label>
+            <input type="text" [(ngModel)]="editingCharacter!.name">
+          </div>
+          <div class="form-group">
+            <label>角色</label>
+            <input type="text" [(ngModel)]="editingCharacter!.role">
+          </div>
+          <div class="form-group">
+            <label>问候语</label>
+            <textarea [(ngModel)]="editingCharacter!.greeting"></textarea>
+          </div>
+          <div class="form-actions">
+            <button (click)="saveCharacter()" class="save-btn">保存</button>
+            <button (click)="cancelEdit()" class="cancel-btn">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="character-container">
       <app-virtual-character #virtualCharacter [isAnswering]="isAnswering"></app-virtual-character>
     </div>

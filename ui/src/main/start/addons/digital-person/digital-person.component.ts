@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
-import { DigitalPersonService } from './digital-person.service';
-import { faPaperPlane, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { DigitalPersonService, CharacterConfig } from './digital-person.service';
+import { faPaperPlane, faPause, faPlay, faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { marked } from 'marked';
 import { VirtualCharacterComponent } from './virtual-character/virtual-character.component';
 
@@ -23,26 +23,37 @@ export class DigitalPersonComponent implements OnInit, AfterViewChecked {
   currentMessage: string = '';
   faPaperPlane = faPaperPlane;
   faPause = faPause;
+  faEdit = faEdit;
+  faTrash = faTrash;
+  faPlus = faPlus;
   isAnswering: boolean = false;
   private reader: ReadableStreamDefaultReader | undefined;
 
   // 添加模型选择相关属性
   models: any[] = [
-    { name: 'DeepSeek-R1', api: 'http://10.117.1.238:8106/chat/completions' }, 
-    { name: '通义千问', api: 'http://10.117.1.238:8100/chat/completions' }
+    { name: '通义千问', api: 'http://10.117.1.238:8100/chat/completions' }, 
+    { name: 'DeepSeek-R1', api: 'http://10.117.1.238:8106/chat/completions' }
   ];
   selectedModel: any = this.models[0].api;
+
+  characters: CharacterConfig[] = [];
+  selectedCharacter: CharacterConfig;
+
+  editingCharacter: CharacterConfig | null = null;
+  showEditForm = false;
 
   constructor(private digitalPersonService: DigitalPersonService) {
     marked.setOptions({
       breaks: true,
       gfm: true
     });
+    this.characters = this.digitalPersonService.getCharacters();
+    this.selectedCharacter = this.characters[0];
   }
 
   ngOnInit(): void {
     this.messages = [
-      { content: '你好！我是你的数字助手，有什么可以帮你的吗？', isUser: false, timestamp: new Date() }
+      { content: this.selectedCharacter.greeting, isUser: false, timestamp: new Date() }
     ];
   }
 
@@ -86,10 +97,13 @@ export class DigitalPersonComponent implements OnInit, AfterViewChecked {
 
       const body = {
         model: 'DeepSeek-R1-Distill-Qwen-14B',
-        messages: this.messages.map(message => ({
-          role: message.isUser ? 'user' : 'assistant',  // 修改system为assistant
-          content: message.content
-        })),
+        messages: [
+          { role: 'system', content: `你现在扮演的是${this.selectedCharacter.name}，一个${this.selectedCharacter.role}。请用这个身份来回答问题。` },
+          ...this.messages.map(message => ({
+            role: message.isUser ? 'user' : 'assistant',
+            content: message.content
+          }))
+        ],
         stream: true
       };
 
@@ -171,6 +185,30 @@ export class DigitalPersonComponent implements OnInit, AfterViewChecked {
     this.messages = [
       { content: '你好！我是你的数字助手，有什么可以帮你的吗？', isUser: false, timestamp: new Date() }
     ];
+  }
+
+  editCharacter(character: CharacterConfig): void {
+    this.editingCharacter = { ...character };
+    this.showEditForm = true;
+  }
+
+  saveCharacter(): void {
+    if (this.editingCharacter) {
+      this.digitalPersonService.updateCharacter(0, this.editingCharacter);
+      this.selectedCharacter = this.editingCharacter;
+      this.showEditForm = false;
+      this.editingCharacter = null;
+      
+      // 更新欢迎消息
+      this.messages = [
+        { content: this.selectedCharacter.greeting, isUser: false, timestamp: new Date() }
+      ];
+    }
+  }
+
+  cancelEdit(): void {
+    this.showEditForm = false;
+    this.editingCharacter = null;
   }
 
   parseMarkdown(text: string): string {
