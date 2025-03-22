@@ -196,6 +196,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   tableOfContents: any;
   currentSection: string = '';
 
+  isTocVisible: boolean = false;
+
   constructor(
     private sanitizer: DomSanitizer,
     private router: Router,
@@ -1146,9 +1148,20 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
+  toggleToc() {
+    this.isTocVisible = !this.isTocVisible;
+  }
+
+  closeToc() {
+    this.isTocVisible = false;
+  }
+
   scrollToSection(anchor: string) {
-    // 使用 URL hash 来触发滚动
-    window.location.hash = '#' + anchor;
+    this.closeToc(); // 点击目录项时关闭目录
+    const element = document.getElementById(anchor);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   onHashChange() {

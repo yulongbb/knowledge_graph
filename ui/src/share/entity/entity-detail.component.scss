@@ -462,14 +462,17 @@ html {
   width: 100%;
   position: relative; // 添加相对定位
   min-height: 100vh;
-  background: $github-bg;
+  margin-top: 60px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   overflow: hidden; // 防止双滚动条
 
   padding: 16px; // 减小容器边距
   gap: 24px;
 
-  // 根据是否有目录调整布局
+  // 修改容器布局，使其更灵活
+  display: block; // 改为块级布局
+  position: relative;
+
   &.no-toc {
     grid-template-columns: 1fr; // 没有目录时只有一列
 
@@ -480,18 +483,35 @@ html {
 
   // 左侧目录样式
   .wiki-toc {
-    position: fixed; // 改为固定定位
-    top: 75px;
-    left: 30px;
+    position: fixed;
+    top: 0;
+    right: -300px; // 初始隐藏
     width: 300px;
-    height: calc(100vh - 100px);
+    height: 100vh;
     background: #fff;
-    border: 1px solid $github-border;
-    border-radius: $github-radius;
-    box-shadow: $github-card-shadow;
-    overflow-y: auto;
+    border-left: 1px solid $github-border;
+    transition: right 0.3s ease;
+    z-index: 1000;
     padding: 20px;
-    z-index: 100;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+
+    &.show {
+      right: 0;
+    }
+
+    .toc-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: $github-bg;
+      }
+    }
 
     padding: 12px; // 减小目录内边距
 
@@ -587,18 +607,54 @@ html {
     }
   }
 
-  .wiki-content {
-    grid-template-columns: 1fr 350px; // 改为两列布局
-    display: grid;
-    position: relative;
+  .toc-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
     background: #fff;
     border: 1px solid $github-border;
-    border-radius: $github-radius;
-    box-shadow: $github-card-shadow;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 
-    margin: 40px 0 0 300px; // 调整边距
-    padding: 20px;
-    // 移除所有overflow和scroll相关样式
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    i {
+      font-size: 24px;
+      color: $github-text;
+    }
+  }
+
+  .toc-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+
+    &.show {
+      display: block;
+    }
+  }
+
+  .wiki-content {
+    grid-template-columns: 1fr; // 移除右侧栏
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1200px; // 限制最大宽度
+    // ...existing code...
   }
 
   .wiki-header {
@@ -661,6 +717,37 @@ html {
   .wiki-body {
     color: #202124;
     font-size: 16px;
+    width: 100%;
+    overflow-x: auto;  // 添加横向滚动条
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    
+    // 确保内容不会溢出
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    table {
+      max-width: 100%;
+      display: block;
+      overflow-x: auto;
+      white-space: normal;
+      
+      td, th {
+        word-break: break-word;
+        min-width: 100px; // 设置最小宽度避免内容过于挤压
+      }
+    }
+    
+    pre {
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
 
     h1,
     h2,
@@ -741,136 +828,6 @@ html {
       scroll-margin-top: 80px; // 调整滚动位置偏移
       padding-top: 10px;
       margin-bottom: 1rem;
-    }
-  }
-
-  .wiki-info {
-    position: sticky; // 改为固定定位
-    top: 0;
-    right: 0;
-    height: calc(100vh - 100px);
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid $github-border;
-    border-radius: $github-radius;
-    box-shadow: $github-card-shadow;
-
-    padding: 12px; // 减小信息栏内边距
-
-    // 添加半透明背景效果
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-
-    // 优化滚动条
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
-
-    // 右侧属性框样式
-    .property-box {
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #eee;
-      margin-top: 20px;
-
-      .property-group {
-        padding: 16px;
-        border-bottom: 1px solid #eee;
-
-        &:last-child {
-          border: none;
-        }
-
-        .group-title {
-          font-size: 15px;
-          font-weight: 500;
-          color: #202124;
-          margin: 0 0 12px;
-        }
-      }
-
-      .property-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      .property-item {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 8px;
-
-        .property-label {
-          font-size: 13px;
-          color: #5f6368;
-        }
-
-        .property-value {
-          margin-top: 4px;
-          color: #202124;
-        }
-      }
-
-      .info-table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid $github-border;
-        border-radius: $github-radius;
-        overflow: hidden;
-
-        td {
-          padding: 8px; // 减小表格单元格内边距
-        }
-
-        tr {
-          border-bottom: 1px solid var(--border-color);
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.02);
-            background: $github-bg;
-          }
-        }
-
-        td {
-          padding: 12px 8px;
-          line-height: 1.5;
-
-          &.property-label {
-            width: 30%;
-            color: var(--text-secondary);
-            font-size: 13px;
-            vertical-align: top;
-            color: #57606a;
-            font-size: 12px;
-            background: #f6f8fa;
-          }
-
-          &.property-value {
-            width: 70%;
-            color: var(--text-primary);
-            font-size: 14px;
-            word-break: break-word;
-            color: $github-text;
-          }
-        }
-      }
     }
   }
 }
