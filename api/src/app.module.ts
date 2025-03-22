@@ -13,6 +13,7 @@ import { ChatModule } from './chat/chat.module';
 import { PluginModule } from './plugin/plugin.module';
 import { AddonModule } from './addons/addon.module';
 import { ProjectModule } from './project/project.module';
+import { GptManagementModule } from './gpt-management/gpt-management.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -37,7 +38,8 @@ import { ProjectModule } from './project/project.module';
     ChatModule,
     PluginModule,
     AddonModule,
-    ProjectModule
+    ProjectModule,
+    GptManagementModule,
   ],
   controllers: [],
   providers: [],

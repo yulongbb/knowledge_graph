@@ -30,6 +30,7 @@
     "@nestjs/elasticsearch": "^10.0.1",
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^7.1.10",
     "@nestjs/typeorm": "^10.0.0",
     "arangojs": "^8.4.1",

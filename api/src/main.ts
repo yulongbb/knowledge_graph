@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
 
-  app.setGlobalPrefix("api")
+  app.setGlobalPrefix('api');
 
   // 使用NestJS的use方法添加中间件
   app.use(bodyParser.json({ limit: '100mb' }));

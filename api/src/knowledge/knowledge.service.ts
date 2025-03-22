@@ -160,7 +160,7 @@ export class KnowledgeService {
         if (!entity.type.id) {
           let schema = await this.schemasService.getByName(entity.type);
           if (!schema) {
-            let s = new Schema();
+            const s = new Schema();
             s.id = uuidv4();
             s.name = entity.type;
             s.label = entity.type;
@@ -234,7 +234,7 @@ export class KnowledgeService {
         //     });
         //   },
         // );
-        let source = {
+        const source = {
           type: entity.type.id,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
@@ -248,7 +248,7 @@ export class KnowledgeService {
           sources: entity?.sources,
           documents: entity?.documents,
         };
-        let data = await this.elasticsearchService.bulk(source);
+        const data = await this.elasticsearchService.bulk(source);
 
         console.log(JSON.stringify(data));
         document.document(doc['_key']).then((existingDocument) => {
@@ -263,11 +263,11 @@ export class KnowledgeService {
 
   async updateEntity(entity: any): Promise<any> {
     // 1. 获取现有文档
-    const existingDoc:any = await this.elasticsearchService.get(entity.id);
+    const existingDoc: any = await this.elasticsearchService.get(entity.id);
     if (!existingDoc) {
       throw new Error('Entity not found');
     }
-  
+
     // 2. 深度合并现有文档和更新内容
     const mergedDoc = {
       ...existingDoc._source,
@@ -289,15 +289,15 @@ export class KnowledgeService {
       items: existingDoc._source.items,
       type: entity.type || existingDoc._source.type,
       // 更新修改时间
-      modified: new Date().toISOString()
+      modified: new Date().toISOString(),
     };
-  
+
     // 3. 更新 Elasticsearch
     await this.elasticsearchService.bulk({
       id: entity.id,
-      ...mergedDoc
+      ...mergedDoc,
     });
-  
+
     // 4. 如果需要，更新 ArangoDB
     if (entity._key) {
       const myCollection = this.db.collection('entity');
@@ -309,19 +309,19 @@ export class KnowledgeService {
           labels: mergedDoc.labels,
           descriptions: mergedDoc.descriptions,
           aliases: mergedDoc.aliases,
-          tags: mergedDoc.tags
+          tags: mergedDoc.tags,
         };
         await myCollection.update(entity._key, arangoUpdate);
       }
     }
-  
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       message: 'Entity updated successfully',
-      data: mergedDoc
+      data: mergedDoc,
     };
   }
-  
+
   async deleteEntity(id: any): Promise<any> {
     return this.elasticsearchService.get(id).then((data: any) => {
       data['_source']['items'].forEach(async (item: any) => {
@@ -333,9 +333,6 @@ export class KnowledgeService {
           `;
 
         // 删除节点本身
-        const removeNodeQuery = `
-            REMOVE { _key: @item } IN entity
-          `;
 
         // 执行删除边的查询
         await this.db.query(removeEdgesQuery, { item });
@@ -434,10 +431,10 @@ export class KnowledgeService {
         });
         addedNodes.add(result[0]?.start?.id);
         await Promise.all(
-          result.map(async ({ vertex, edge, start, from, to }) => {
+          result.map(async ({ vertex, edge, from, to }) => {
             // 添加节点
             if (!addedNodes.has(vertex.id)) {
-              let data = await this.elasticsearchService.get(vertex.id);
+              const data = await this.elasticsearchService.get(vertex.id);
               cytoscapeData.elements.nodes.push({
                 data: {
                   _id: vertex['_id'],
@@ -525,14 +522,12 @@ export class KnowledgeService {
       console.log(knowledge);
       // 查询 Elasticsearch 获取知识详情
       if (!knowledge) {
-
         // 从 Redis 中删除该知识 ID
         await this.redis.zrem(hotKey, hotData[i]);
         return null; // 返回 null，表示知识不存在
       }
 
       console.log(knowledge);
-
 
       result.push({
         id: knowledge,
@@ -545,22 +540,24 @@ export class KnowledgeService {
 
   async renderTemplate(id: string): Promise<any> {
     try {
-      const entity:any = await this.elasticsearchService.get(id);
-      
+      const entity: any = await this.elasticsearchService.get(id);
+
       if (!entity?._source?.template) {
         return {
           success: true,
           content: '',
-          message: 'No template defined for this entity'
+          message: 'No template defined for this entity',
         };
       }
 
-      let sanitizedTemplate = entity._source.template
+      const sanitizedTemplate = entity._source.template
         .replace(/[\u200B-\u200D\uFEFF]/g, '')
         .replace(/(<h[1-6])/gi, '\n$1') // 确保标题标签前有换行
         .replace(/(<\/h[1-6]>)/gi, '$1\n') // 确保标题标签后有换行
         .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (match) => {
-          return match.replace(/{{/g, '&#123;&#123;').replace(/}}/g, '&#125;&#125;');
+          return match
+            .replace(/{{/g, '&#123;&#123;')
+            .replace(/}}/g, '&#125;&#125;');
         })
         .replace(/(<[^>]+>)\s*{{/g, '$1 {{')
         .replace(/}}\s*(<[^>]+>)/g, '}} $1');
@@ -568,15 +565,15 @@ export class KnowledgeService {
       // 编译模板
       let template;
       try {
-        template = Handlebars.compile(sanitizedTemplate, { 
+        template = Handlebars.compile(sanitizedTemplate, {
           strict: false,
-          noEscape: true 
+          noEscape: true,
         });
       } catch (compileError) {
         console.error('Template compilation failed:', compileError);
         return {
           success: false,
-          error: 'Template compilation failed: ' + compileError.message
+          error: 'Template compilation failed: ' + compileError.message,
         };
       }
 
@@ -588,7 +585,7 @@ export class KnowledgeService {
         console.error('Template rendering failed:', renderError);
         return {
           success: false,
-          error: 'Template rendering failed: ' + renderError.message
+          error: 'Template rendering failed: ' + renderError.message,
         };
       }
 
@@ -599,7 +596,7 @@ export class KnowledgeService {
         (match, level, text) => {
           const id = `heading-${++counter}`;
           return `<h${level} id="${id}" class="section-heading">${text}</h${level}>`;
-        }
+        },
       );
 
       // 添加样式
@@ -636,14 +633,14 @@ export class KnowledgeService {
 
       return {
         success: true,
-        content: contentWithStyle
+        content: contentWithStyle,
       };
     } catch (error) {
       console.error('Template rendering failed:', error);
       return {
         success: false,
-        error: 'Template processing failed: ' + error.message
-      }; 
+        error: 'Template processing failed: ' + error.message,
+      };
     }
   }
 }
