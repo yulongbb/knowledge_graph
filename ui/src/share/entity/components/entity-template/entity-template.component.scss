@@ -1,0 +1,94 @@
+.template {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  
+  &__header {
+    flex: none;
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__sidebar {
+    width: 250px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 1rem;
+    background: #fff;
+    overflow-y: auto;
+  }
+
+  &__editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+
+    ::ng-deep {
+      .ql-toolbar {
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .ql-container {
+        border: none;
+        flex: 1;
+        overflow: auto;
+      }
+    }
+  }
+
+  &__footer {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+    text-align: right;
+  }
+}
+
+.sidebar {
+  &__title {
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 1rem;
+  }
+
+  &__section {
+    margin-bottom: 1.5rem;
+
+    .section__title {
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .section__items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.text-item {
+  padding: 0.5rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  cursor: move;
+  font-size: 0.875rem;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}

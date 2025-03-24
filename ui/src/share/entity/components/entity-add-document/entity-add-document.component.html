@@ -1,0 +1,59 @@
+<div class="entity-add-document">
+  <x-page-header title="添加文档" (backClick)="back()">
+  </x-page-header>
+
+  <x-card class="document-card">
+    <!-- Upload Section -->
+    <div class="document-upload">
+      <x-upload 
+        action="http://localhost:3000/api/minio-client/uploadFile"
+        [text]="uploadText"
+        accept=".pdf,.doc,.docx"
+        (uploadSuccess)="onFileUpload($event)">
+      </x-upload>
+
+      <ng-template #uploadText>
+        <div class="upload-text">
+          <x-icon type="fto-upload"></x-icon>
+          <span>选择文档文件</span>
+          <small>支持 PDF、Word 格式</small>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Document Preview Grid -->
+    <div class="document-grid" *ngIf="documents.length">
+      <div class="document-item" *ngFor="let doc of documents; let i = index">
+        <div class="document-preview">
+          <img [src]="doc.thumbnail" [alt]="doc.label || '文档预览'">
+          <button class="document-remove" (click)="removeDocument(i)">×</button>
+        </div>
+        <div class="document-info">
+          <span class="document-name">{{doc.label || '未命名文档'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <x-form #form
+      [controls]="formControls"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="6rem"
+      width="100%"
+      labelAlign="end">
+    </x-form>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <x-buttons space="0.5">
+        <x-button (click)="back()">取消</x-button>
+        <x-button type="primary" 
+                  (click)="save()"
+                  [disabled]="!documents.length || form.formGroup.invalid">
+          保存
+        </x-button>
+      </x-buttons>
+    </div>
+  </x-card>
+</div>

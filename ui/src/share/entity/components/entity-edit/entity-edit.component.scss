@@ -1,0 +1,50 @@
+.entity-edit {
+  padding: 1rem;
+
+  x-collapse {
+    margin-bottom: 1rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+  }
+
+  // Property table styles
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 500;
+    }
+
+    .sticky-left {
+      position: sticky;
+      left: 0;
+      background: inherit;
+    }
+  }
+
+  // Map container styles
+  .map-container {
+    height: 300px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    margin: 1rem 0;
+  }
+
+  // ... other necessary styles ...
+}

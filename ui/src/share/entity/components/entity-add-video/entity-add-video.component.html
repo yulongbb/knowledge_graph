@@ -1,0 +1,54 @@
+<div class="entity-add-video">
+  <x-page-header title="新增视频" (backClick)="back()"></x-page-header>
+
+  <x-card class="upload-card">
+    <!-- Video Upload Section -->
+    <div class="upload-section">
+      <x-upload 
+        action="http://localhost:3000/api/minio-client/uploadFile"
+        [text]="uploadText"
+        (uploadSuccess)="uploadVideo($event)">
+      </x-upload>
+
+      <ng-template #uploadText>
+        <div class="upload-text">
+          <x-icon type="fto-upload"></x-icon>
+          <span>选择视频文件</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Video Preview Grid -->
+    <div class="video-grid" *ngIf="videos.length">
+      <div class="video-item" *ngFor="let video of videos">
+        <img [src]="'data:image/jpeg;base64,' + video.thumbnail" 
+             [alt]="video.label || '视频缩略图'">
+        <div class="video-info">
+          <span class="video-label">{{video.label || '未命名视频'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <x-form #form
+      [controls]="controls"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="6rem"
+      width="100%"
+      labelAlign="end">
+    </x-form>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <x-buttons space="0.5">
+        <x-button (click)="back()">取消</x-button>
+        <x-button type="primary" 
+                  (click)="save()"
+                  [disabled]="!videos.length">
+          保存
+        </x-button>
+      </x-buttons>
+    </div>
+  </x-card>
+</div>

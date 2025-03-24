@@ -1,0 +1,52 @@
+<div class="wiki-container">
+    <!-- 目录按钮 - 仅在有目录时显示 -->
+    <button class="toc-button" (click)="toggleToc()" *ngIf="tableOfContents.length > 0">
+        <i class="fas fa-list"></i>
+    </button>
+
+    <!-- 遮罩层 -->
+    <div class="toc-overlay" [class.show]="isTocVisible" (click)="closeToc()"></div>
+
+    <!-- 目录侧边栏 - 仅在有目录时显示 -->
+    <aside class="wiki-toc" [class.show]="isTocVisible" *ngIf="tableOfContents.length > 0">
+        <div class="toc-close" (click)="closeToc()">×</div>
+        <h3 class="toc-title">目录</h3>
+        <ul class="toc-list">
+            <ng-container *ngFor="let item of tableOfContents">
+                <li class="toc-item" [class]="'level-' + item.level">
+                    <a [class.active]="currentSection === item.anchor" (click)="scrollToSection(item.anchor)">
+                        {{item.title}}
+                    </a>
+                </li>
+            </ng-container>
+        </ul>
+    </aside>
+
+    <!-- 主要内容区域 -->
+    <main class="wiki-content" #contentMain>
+        <div>
+            <!-- 标题区域 -->
+            <header class="wiki-header">
+                <div class="wiki-title-row">
+                    <button class="edit-btn">编辑知识</button>
+                    <button class="edit-btn">编辑模板</button>
+                </div>
+                <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
+
+                <div class="wiki-meta">
+                    <span *ngIf="item?.descriptions?.zh?.value" class="description">
+                        {{item?.descriptions?.zh?.value}}
+                    </span>
+                    <div class="tags" *ngIf="tag()?.length">
+                        <span class="tag" *ngFor="let t of tag()">{{t}}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 正文内容 -->
+            <div class="wiki-body">
+                <div [innerHTML]="renderedContent | safeHtml"></div>
+            </div>
+        </div>
+    </main>
+</div>

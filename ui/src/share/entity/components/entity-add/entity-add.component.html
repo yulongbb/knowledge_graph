@@ -1,0 +1,28 @@
+<div class="entity-add">
+  <x-page-header title="新增" subTitle="知识" (backClick)="back()">
+  </x-page-header>
+
+  <x-card width="100%">
+    <x-form #form 
+      [controls]="controls"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="6rem"
+      width="100%"
+      labelAlign="end"
+      span="24"
+      space="2">
+    </x-form>
+
+    <div class="footer">
+      <x-buttons space="0.5">
+        <x-button (click)="back()">取消</x-button>
+        <x-button type="primary" 
+                  (click)="save()"
+                  [disabled]="formInvalid">
+          保存
+        </x-button>
+      </x-buttons>
+    </div>
+  </x-card>
+</div>

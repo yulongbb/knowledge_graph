@@ -1,0 +1,16 @@
+.entity-add {
+  padding: 1rem;
+
+  .footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+  }
+
+  x-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+}

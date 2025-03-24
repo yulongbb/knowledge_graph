@@ -1,0 +1,45 @@
+<div class="entity-add-map">
+  <x-page-header title="添加地理位置" (backClick)="back()">
+  </x-page-header>
+
+  <x-card class="map-card">
+    <!-- Map Container -->
+    <div class="map-container"
+         leaflet
+         [leafletOptions]="mapOptions"
+         (leafletClick)="onMapClick($event)"
+         [leafletLayers]="markers"
+         (leafletMapReady)="onMapReady($event)">
+    </div>
+
+    <!-- Selected Location Info -->
+    <div class="location-info" *ngIf="selectedLocation">
+      <p class="location-coordinates">
+        <span>纬度: {{selectedLocation.lat | number:'1.6-6'}}</span>
+        <span>经度: {{selectedLocation.lng | number:'1.6-6'}}</span>
+      </p>
+    </div>
+
+    <!-- Form Section -->
+    <x-form #form
+      [controls]="formControls"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="6rem"
+      width="100%"
+      labelAlign="end">
+    </x-form>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <x-buttons space="0.5">
+        <x-button (click)="back()">取消</x-button>
+        <x-button type="primary" 
+                  (click)="save(form.formGroup)"
+                  [disabled]="!selectedLocation || form.formGroup.invalid">
+          保存
+        </x-button>
+      </x-buttons>
+    </div>
+  </x-card>
+</div>
