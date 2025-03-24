@@ -126,10 +126,31 @@
       cursor: pointer;
       flex: 0 0 auto;
       transition: transform 0.2s;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
 
       &.selected {
         outline: 3px solid #1890ff;
         transform: scale(1.05);
+        border-color: #1890ff;
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(24, 144, 255, 0.3);
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #1890ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center/14px no-repeat;
+        }
+      }
+
+      &:hover {
+        border-color: #40a9ff;
+        transform: translateY(-2px);
       }
 
       img {

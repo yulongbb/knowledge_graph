@@ -48,6 +48,8 @@ export class EntityAddImageComponent {
   }
 
   onDragOver(event: DragEvent) {
+    console.log('onDragOver');
+    console.log(event);
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = true;
@@ -63,22 +65,39 @@ export class EntityAddImageComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
+    this.isUploading = true;
 
+    // 处理文件拖拽
     const files = event.dataTransfer?.files;
-    if (files) {
+    if (files && files.length > 0) {
       Array.from(files).forEach(file => {
         if (file.type.startsWith('image/')) {
           this.uploadFile(file);
         }
+      });
+      return;
+    }
+
+    // 处理网页图片拖拽
+    const items = event.dataTransfer?.items;
+    if (items) {
+      Array.from(items).forEach(item => {
+        item.getAsString(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const imgSrc = doc.querySelector('img')?.src;
+          if (imgSrc) {
+            this.uploadImageFromUrl(imgSrc);
+          }
+        });
       });
     }
   }
 
   uploadFile(file: File) {
     this.isUploading = true;
-    const uniqueFileName = this.generateUniqueFileName(file.name);
     const formData = new FormData();
-    formData.append('file', file, uniqueFileName);
+    formData.append('file', file, file.name);
 
     fetch('http://localhost:3000/api/minio-client/uploadFile', {
       method: 'POST',
@@ -97,8 +116,64 @@ export class EntityAddImageComponent {
       });
   }
 
+  async uploadImageFromUrl(url: string) {
+    try {
+      this.isUploading = true;
+      
+      // 直接使用后端代理接口获取图片
+      const proxyResponse = await fetch(`http://localhost:3000/api/minio-client/proxy-image?url=${encodeURIComponent(url)}`);
+      if (!proxyResponse.ok) {
+        throw new Error('无法获取图片');
+      }
+      
+      const blob = await proxyResponse.blob();
+      const fileName = this.generateUniqueFileNameFromUrl(url);
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+      this.uploadFile(file);
+    } catch (error) {
+      console.error('获取图片失败:', error);
+      this.message.error('无法获取网页图片，请尝试右键保存后上传');
+      this.isUploading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private generateUniqueFileNameFromUrl(url: string): string {
+    // 从URL中提取原始文件名
+    const urlParts = url.split('/');
+    let originalName = urlParts[urlParts.length - 1].split('?')[0];
+    
+    // 如果URL中没有有效的文件名，使用默认名称
+    if (!originalName || originalName.length < 4) {
+      originalName = 'image.jpg';
+    }
+    
+    // 生成带时间戳的唯一文件名
+    const timestamp = new Date().getTime();
+    const randomStr = Math.random().toString(36).substring(2, 8);
+    const extension = this.getExtensionFromUrl(url);
+    
+    return `web-${timestamp}-${randomStr}.${extension}`;
+  }
+
+  private getExtensionFromUrl(url: string): string {
+    // 首先尝试从URL路径中获取扩展名
+    const pathMatch = url.split('?')[0].match(/\.([^.]+)$/);
+    if (pathMatch && /^(jpg|jpeg|png|gif|webp|avif)$/i.test(pathMatch[1])) {
+      return pathMatch[1].toLowerCase();
+    }
+    
+    // 如果URL中没有有效的图片扩展名，返回默认扩展名
+    return 'jpg';
+  }
+
   selectImage(image: any) {
-    this.selectedImage = { ...image };
+    // 如果点击已选中的图片，则取消选中
+    if (this.selectedImage && this.selectedImage.url === image.url) {
+      this.selectedImage = null;
+    } else {
+      this.selectedImage = { ...image };
+    }
     this.cdr.detectChanges();
   }
 
@@ -107,62 +182,60 @@ export class EntityAddImageComponent {
   }
 
   uploadImage($event: any) {
-    const newImage = {
-      url: `http://localhost:9000/kgms/${$event.body.name}`,
-      label: '',
-      description: ''
-    };
-    this.imgs.push(newImage);
-    this.uploadedFiles = [...this.uploadedFiles, newImage];
-    this.selectImage(newImage);
-    this.cdr.detectChanges();
+    $event.url =`http://localhost:9000/kgms/${$event.body.name}`;
+    $event.label =$event.body.name;
+    $event.description ='';
+    this.selectImage($event);
+    console.log($event);
+    this.uploadedFiles.push($event);
   }
 
-  action(type: string) {
-    switch (type) {
-      case 'save':
-        if (!this.imgs.length) {
-          this.message.warning('请先上传图片');
-          return;
-        }
-
-        if (!this.selectedImage.label) {
-          this.message.warning('请输入图片标题');
-          return;
-        }
-
-        const item: any = {
-          images: this.imgs.map(img => ({
-            url: img.url.replace('http://localhost:9000/kgms/', ''),
-            label: img.label,
-            description: img.description
-          }))
-        };
-
-        this.entityService.post(item).subscribe({
-          next: () => {
-            this.message.success('图片添加成功！');
-            this.saved.emit();
-            this.back();
-          },
-          error: (error) => {
-            this.message.error('保存失败：' + error.message);
-          }
-        });
-        break;
-
-      case 'cancel':
-        this.back();
-        break;
+  save() {
+    if (!this.uploadedFiles.length) {
+      this.message.warning('请先上传图片');
+      return;
     }
+
+    if (!this.selectedImage?.label) {
+      this.message.warning('请输入图片标题');
+      return;
+    }
+
+    // 构建保存数据
+    const item: any = {
+      type: 'E4',
+      labels: {
+        zh: {
+          language: 'zh',
+          value: this.selectedImage.label
+        }
+      },
+      descriptions: {
+        zh: {
+          language: 'zh',
+          value: this.selectedImage.description || ''
+        }
+      },
+      // 处理图片数据
+      images: this.uploadedFiles.map(img => {
+        const url = img.url.replace('http://localhost:9000/kgms/', '');
+        return url;
+      })
+    };
+
+    // 发送请求
+    this.entityService.addItem(item).subscribe({
+      next: () => {
+        this.message.success('保存成功！');
+        this.saved.emit();
+        this.back();
+      },
+      error: (error) => {
+        this.message.error('保存失败：' + error.message);
+      }
+    });
   }
 
-  private generateUniqueFileName(originalName: string): string {
-    const timestamp = new Date().getTime();
-    const uniqueSuffix = Math.random().toString(36).substring(2, 10);
-    const extension = originalName.substring(originalName.lastIndexOf('.'));
-    return `${timestamp}-${uniqueSuffix}${extension}`;
-  }
 
   back() {
     this.canceled.emit();

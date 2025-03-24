@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { MinioModule } from 'nestjs-minio-client';
 import { MinioClientService } from './minio-client.service';
 import { MinioClientController } from './minio-client.controller';
@@ -7,6 +8,7 @@ import { ThumbnailService } from './thumbnail.service';
 
 @Module({
   imports: [
+    HttpModule,
     MinioModule.register({
       endPoint: MINIO_CONFIG.MINIO_ENDPOINT,
       port: MINIO_CONFIG.MINIO_PORT,
@@ -16,6 +18,7 @@ import { ThumbnailService } from './thumbnail.service';
     }),
   ],
   controllers: [MinioClientController],
-  providers: [MinioClientService,ThumbnailService],
+  providers: [MinioClientService, ThumbnailService],
+  exports: [MinioClientService],
 })
 export class MinioClientModule {}

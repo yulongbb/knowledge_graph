@@ -16,13 +16,16 @@ import { Response } from 'express';
 import { MinioClientService } from './minio-client.service';
 import { ThumbnailService } from './thumbnail.service';
 import * as path from 'path';
+import axios from 'axios';
+import { Query } from '@nestjs/common';
 
 @ApiTags('文件上传') // 分组
 @Controller('minio-client')
 export class MinioClientController {
-  constructor(private readonly minioClientService: MinioClientService,
-    private readonly thumbnailService: ThumbnailService
-  ) { }
+  constructor(
+    private readonly minioClientService: MinioClientService,
+    private readonly thumbnailService: ThumbnailService,
+  ) {}
 
   @Post('uploadFile')
   @UseInterceptors(FileInterceptor('file'))
@@ -44,8 +47,6 @@ export class MinioClientController {
     return await this.minioClientService.upload(file);
   }
 
-
-
   @Post('extract')
   @UseInterceptors(FileInterceptor('video'))
   async extractThumbnail(@UploadedFile() file: Express.Multer.File) {
@@ -53,20 +54,26 @@ export class MinioClientController {
     const ext = path.extname(file.originalname).toLowerCase();
 
     if (!allowedFormats.includes(ext)) {
-      throw new HttpException('Unsupported file format', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Unsupported file format',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     try {
-      const base64Thumbnail = await this.thumbnailService.extractThumbnail(file.buffer);
+      const base64Thumbnail = await this.thumbnailService.extractThumbnail(
+        file.buffer,
+      );
       return { thumbnail: base64Thumbnail };
     } catch (err) {
       console.error('Error extracting thumbnail:', err); // 记录错误日志
-      throw new HttpException('Failed to extract thumbnail', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to extract thumbnail',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-
-  
   @Post('cover')
   @UseInterceptors(FileInterceptor('pdf')) // 接收名为 "pdf" 的文件
   async getPdfCover(@UploadedFile() file: Express.Multer.File) {
@@ -79,7 +86,10 @@ export class MinioClientController {
       return { cover: base64Image };
     } catch (err) {
       console.error('Error extracting PDF cover:', err);
-      throw new HttpException('Failed to extract PDF cover', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to extract PDF cover',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -116,4 +126,33 @@ export class MinioClientController {
       );
     });
   }
-} 
+
+  @Get('proxy-image')
+  @ApiOperation({ summary: '代理获取远程图片' })
+  async proxyImage(@Query('url') url: string, @Res() res: Response) {
+    try {
+      // 设置超时时间
+      const response = await axios.get(url, {
+        responseType: 'arraybuffer',
+        timeout: 5000,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        },
+      });
+
+      // 设置响应头
+      res.set({
+        'Content-Type': response.headers['content-type'] || 'image/jpeg',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=300',
+      });
+
+      // 返回图片数据
+      return res.send(response.data);
+    } catch (error) {
+      console.error('Proxy image error:', error);
+      throw new HttpException('无法获取远程图片', HttpStatus.BAD_REQUEST);
+    }
+  }
+}
