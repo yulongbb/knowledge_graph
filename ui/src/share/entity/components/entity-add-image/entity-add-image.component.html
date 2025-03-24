@@ -1,0 +1,82 @@
+<div class="entity-add-image">
+  <x-page-header [title]="'新增'" [subTitle]="'图片'" (backClick)="back()"></x-page-header>
+  
+  <div class="upload-zone" 
+       [class.dragging]="isDragging"
+       [class.uploading]="isUploading"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave($event)"
+       (drop)="onDrop($event)"
+       (paste)="onImagePaste($event)">
+    <x-icon class="upload-icon" [type]="isUploading ? 'fto-loader' : 'fto-upload'"></x-icon>
+    <div class="upload-text">
+      <ng-container *ngIf="!isUploading">拖放图片到此处或点击上传</ng-container>
+      <ng-container *ngIf="isUploading">正在上传...</ng-container>
+    </div>
+    <x-upload action="http://localhost:3000/api/minio-client/uploadFile" 
+             [text]="textTpl"
+             [filesTpl]="filesTpl"
+             multiple
+             [(ngModel)]="uploadedFiles"
+             name="files"
+             (uploadSuccess)="uploadImage($event)"
+             [disabled]="isUploading"
+             multipleModel="add">
+      <ng-template #textTpl>
+        <x-button type="primary" [loading]="isUploading">
+          {{isUploading ? '上传中...' : '选择图片'}}
+        </x-button>
+      </ng-template>
+      <ng-template #filesTpl let-files="$files">
+        <div class="image-gallery">
+          <div class="image-item" 
+               *ngFor="let file of files"
+               [class.selected]="selectedImage === file"
+               (click)="selectImage(file)">
+            <img [src]="file.url" [alt]="file.label || '未命名图片'">
+            <div class="image-info" *ngIf="file.label">
+              <span class="image-label">{{file.label}}</span>
+            </div>
+          </div>
+          <div class="image-item upload-item">
+            <x-upload action="http://localhost:3000/api/minio-client/uploadFile" 
+                     [text]="textTpl"
+                     multiple
+                     [(ngModel)]="uploadedFiles"
+                     name="files"
+                     (uploadSuccess)="uploadImage($event)"
+                     [disabled]="isUploading"
+                     multipleModel="add">
+              <ng-template #textTpl>
+                <x-button type="primary" [loading]="isUploading">
+                  {{isUploading ? '上传中...' : '选择图片'}}
+                </x-button>
+              </ng-template>
+            </x-upload>
+          </div>
+        </div>
+      </ng-template>
+    </x-upload>
+  </div>
+
+  <x-card *ngIf="selectedImage" width="100%" style="margin-top: 1rem;">
+    <h3>图片信息</h3>
+    <div class="form-container">
+      <div class="form-group">
+        <label>标题：</label>
+        <x-input [(ngModel)]="selectedImage.label" name="label" required></x-input>
+      </div>
+      <div class="form-group">
+        <label>描述：</label>
+        <textarea [(ngModel)]="selectedImage.description" name="description" class="form-control"></textarea>
+      </div>
+    </div>
+    <div class="actions">
+      <x-buttons space="0.5">
+        <x-button (click)="cancelEdit()">返回</x-button>
+        <x-button type="primary" (click)="action('save')"
+                  [disabled]="!selectedImage.label">保存</x-button>
+      </x-buttons>
+    </div>
+  </x-card>
+</div>

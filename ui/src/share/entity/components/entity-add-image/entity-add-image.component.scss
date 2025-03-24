@@ -1,0 +1,213 @@
+.entity-add-video {
+  padding: 1rem;
+
+  .upload-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .upload-section {
+    margin-bottom: 1rem;
+    
+    .upload-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      
+      x-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+
+    .video-item {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+
+      .video-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+
+        .video-label {
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+
+  .actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+  }
+}
+
+.entity-add-image {
+  padding: 1rem;
+
+  .upload-zone {
+    min-height: 200px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: #fafafa;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &.dragging {
+      border-color: #1890ff;
+      background: #e6f7ff;
+    }
+
+    &.uploading {
+      background: #f0f7ff;
+      border-color: #1890ff;
+      pointer-events: none;
+
+      .upload-icon {
+        animation: spin 1s linear infinite;
+        color: #1890ff;
+      }
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      color: #999;
+    }
+
+    .upload-text {
+      color: #666;
+    }
+  }
+
+  .image-gallery {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .image-item {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: transform 0.2s;
+
+      &.selected {
+        outline: 3px solid #1890ff;
+        transform: scale(1.05);
+      }
+
+      img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+      }
+
+      .image-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0.5rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+
+        .image-label {
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .upload-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 150px;
+      height: 150px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 4px;
+      background: #fafafa;
+      cursor: pointer;
+    }
+  }
+
+  .form-container {
+    padding: 1rem 0;
+
+    .form-group {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      label {
+        width: 6rem;
+        text-align: right;
+        line-height: 32px;
+      }
+
+      x-input, textarea {
+        flex: 1;
+      }
+
+      textarea {
+        height: 100px;
+        resize: vertical;
+      }
+    }
+  }
+
+  .actions {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    text-align: right;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
