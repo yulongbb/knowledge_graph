@@ -1,5 +1,127 @@
 .entity-add {
-  padding: 1rem;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #f8fafc;
+  overflow: hidden;
+
+  .entity-form {
+    flex: 1;
+    background: #fff;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-section {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.template-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
+
+  .section-title {
+    margin: 0 0 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a202c;
+  }
+
+  .template-section {
+    flex: 1;
+    width: 100%;
+
+    ::ng-deep {
+      quill-editor {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        
+        .ql-container {
+          flex: 1;
+          font-size: 15px;
+          width: 100%;
+          height: auto !important;
+          overflow-y: auto;
+        }
+
+        .ql-toolbar {
+          width: 100%;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+          background: white;
+          border-top-left-radius: 6px;
+          border-top-right-radius: 6px;
+          border: 1.5px solid #cbd5e1;
+          border-bottom: none;
+        }
+
+        .ql-editor {
+          min-height: 0;
+          width: 100%;
+          background: white;
+          padding: 1.5rem;
+        }
+
+        // 修复工具栏和编辑区域的边框
+        .ql-container.ql-snow {
+          border: 1.5px solid #cbd5e1;
+          border-top: none;
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;
+        }
+      }
+    }
+  }
+
+  .actions {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    z-index: 100;
+  }
+
+  x-form {
+    ::ng-deep {
+      .x-row {
+        margin-bottom: 1rem;
+      }
+
+      .x-col {
+        padding: 0 0.5rem;
+      }
+
+      x-form-field {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
 
   .footer {
     margin-top: 1rem;
@@ -11,6 +133,328 @@
   x-card {
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .required-form-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    background: #f1f5f9;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+
+    .type-select {
+      width: 240px;
+      
+      select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #4a5568;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #2d3748;
+        background: white;
+        cursor: pointer;
+        
+        &:required:invalid {
+          color: #a0aec0;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #4299e1;
+          box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+      }
+    }
+
+    .name-input {
+      flex: 1;
+      
+      input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        font-weight: 500;
+        color: #2d3748;
+
+        &::placeholder {
+          color: #94a3b8;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+    }
+  }
+
+  .other-fields {
+    .form-group {
+      margin-bottom: 2rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.75rem;
+        color: #475569;
+        font-size: 0.925rem;
+        font-weight: 500;
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.925rem;
+        transition: all 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+      }
+
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+    }
+
+    .compact-fields {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+
+      .form-group {
+        margin-bottom: 0.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        input, textarea {
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #e2e8f0;
+          border-radius: 4px;
+          font-size: 0.875rem;
+          background: white;
+
+          &::placeholder {
+            color: #94a3b8;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: #3b82f6;
+          }
+        }
+
+        textarea {
+          min-height: 60px;
+          resize: vertical;
+        }
+      }
+    }
+  }
+
+  .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-size: 0.925rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: white;
+
+    &.primary {
+      background: #3b82f6;
+      color: white;
+      border: none;
+
+      &:hover:not(:disabled) {
+        background: #2563eb;
+      }
+
+      &:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+      }
+    }
+
+    &:not(.primary) {
+      border: 1.5px solid #cbd5e1;
+
+      &:hover {
+        background: #f1f5f9;
+      }
+    }
+  }
+
+  .custom-tree-select {
+    position: relative;
+    width: 100%;
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: #1a202c;
+      cursor: pointer;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+      }
+
+      &:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+    }
+
+    .tree-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      max-height: 400px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+                  0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+
+      .tree-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        max-height: 400px;
+      }
+
+      .tree-search {
+        padding: 0.75rem;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+
+        input {
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          font-size: 0.875rem;
+          background: #f8fafc;
+          padding-left: 2rem;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: 0.5rem center;
+          background-size: 1rem;
+
+          &:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background-color: white;
+          }
+        }
+      }
+
+      .tree-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem;
+        
+        &::-webkit-scrollbar {
+          width: 4px;
+          height: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: #e2e8f0;
+          border-radius: 4px;
+          
+          &:hover {
+            background-color: #cbd5e1;
+          }
+        }
+      }
+
+      .tree-item {
+        .tree-item-content {
+          padding: 0.5rem;
+          margin: 0.125rem 0;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          user-select: none;
+
+          &:hover {
+            background: #f1f5f9;
+          }
+
+          .tree-toggle {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            opacity: 0.5;
+            
+            .arrow {
+              border: solid #64748b;
+              border-width: 0 2px 2px 0;
+              padding: 2px;
+              transform: rotate(-45deg);
+              transition: transform 0.15s ease;
+            }
+
+            &.expanded .arrow {
+              transform: rotate(45deg) translate(-2px, -2px);
+            }
+          }
+
+          .tree-label {
+            font-size: 0.875rem;
+            color: #334155;
+            flex: 1;
+            
+            &.selected {
+              color: #2563eb;
+              font-weight: 500;
+            }
+          }
+        }
+
+        .tree-children {
+          margin: 0.25rem 0 0.25rem 1rem;
+          padding-left: 1rem;
+          border-left: 1px dashed #e2e8f0;
+        }
+      }
+    }
   }
 }

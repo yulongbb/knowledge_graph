@@ -28,10 +28,19 @@
             <!-- 标题区域 -->
             <header class="wiki-header">
                 <div class="wiki-title-row">
-                    <button class="edit-btn">编辑知识</button>
-                    <button class="edit-btn">编辑模板</button>
+                    <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
+                    <div class="button-group">
+                        <button class="icon-btn" (click)="editEntity()" title="编辑知识">
+                            <span>✎</span>
+                        </button>
+                        <button class="icon-btn" (click)="editTemplate()" title="编辑模板">
+                            <span>⚙</span>
+                        </button>
+                        <button class="icon-btn" (click)="deleteEntity()" title="删除知识">
+                            <span>✕</span>
+                        </button>
+                    </div>
                 </div>
-                <h1 class="wiki-title">{{item?.labels?.zh?.value}}</h1>
 
                 <div class="wiki-meta">
                     <span *ngIf="item?.descriptions?.zh?.value" class="description">

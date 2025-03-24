@@ -1,28 +1,81 @@
 <div class="entity-add">
-  <x-page-header title="新增" subTitle="知识" (backClick)="back()">
-  </x-page-header>
-
-  <x-card width="100%">
-    <x-form #form 
-      [controls]="controls"
-      direction="row"
-      labelSuffix=":"
-      labelWidth="6rem"
-      width="100%"
-      labelAlign="end"
-      span="24"
-      space="2">
-    </x-form>
-
-    <div class="footer">
-      <x-buttons space="0.5">
-        <x-button (click)="back()">取消</x-button>
-        <x-button type="primary" 
-                  (click)="save()"
-                  [disabled]="formInvalid">
-          保存
-        </x-button>
-      </x-buttons>
+  <div class="form-section">
+    <div class="required-form-row">
+      <div class="type-select">
+        <div class="custom-tree-select" (click)="toggleTypeSelect($event)">
+          <input type="text" [value]="selectedTypeName" readonly placeholder="请选择类型" required>
+          <div class="tree-dropdown" *ngIf="showTypeSelect">
+            <div class="tree-container">
+              <div class="tree-search">
+                <input type="text" [(ngModel)]="typeSearchText" placeholder="搜索类型...">
+              </div>
+              <div class="tree-list">
+                <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: typeTree }">
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="name-input">
+        <input type="text" [(ngModel)]="formData.label" 
+               placeholder="请输入名称" required>
+      </div>
     </div>
-  </x-card>
+
+    <div class="other-fields">
+      <div class="compact-fields">
+        <div class="form-group">
+          <input type="text" [(ngModel)]="formData.aliases" 
+                 placeholder="别名（多个别名用逗号分隔）">
+        </div>
+        <div class="form-group">
+          <input type="text" [(ngModel)]="formData.tags" 
+                 placeholder="标签（多个标签用#号分隔）">
+        </div>
+        <div class="form-group">
+          <textarea [(ngModel)]="formData.description" 
+                    rows="2" 
+                    placeholder="描述"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section template-section">
+    <h3 class="section-title">知识模板</h3>
+    <quill-editor [(ngModel)]="template" 
+                  [styles]="{width: '100%', height: '300px'}" 
+                  [modules]="editorModules"
+                  placeholder="请输入知识模板内容...">
+    </quill-editor>
+  </div>
+
+  <div class="actions">
+    <button class="btn" (click)="back()">取消</button>
+    <button class="btn primary" 
+            [disabled]="!isFormValid()" 
+            (click)="save()">保存</button>
+  </div>
 </div>
+
+<ng-template #treeNode let-nodes>
+  <ul class="tree-list">
+    <li *ngFor="let node of filterNodes(nodes)" class="tree-item">
+      <div class="tree-item-content" (click)="selectType(node, $event)">
+        <i class="tree-toggle" *ngIf="node.children?.length" 
+           [class.expanded]="node.expanded"
+           (click)="toggleNode(node, $event)">
+          <span class="arrow"></span>
+        </i>
+        <span class="tree-label" [class.selected]="node.id === formData.type">
+          {{ node.name }}
+        </span>
+      </div>
+      <div class="tree-children" *ngIf="node.children?.length && node.expanded">
+        <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: node.children }">
+        </ng-container>
+      </div>
+    </li>
+  </ul>
+</ng-template>

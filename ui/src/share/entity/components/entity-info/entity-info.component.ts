@@ -162,14 +162,24 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/start/search/template', this.id]);
     }
 
-
-
-
-
-
-
-
-
+    deleteEntity() {
+        if (confirm('确定要删除这个知识吗？此操作不可恢复。')) {
+            this.entityService.deleteItem(this.id).subscribe({
+                next: (response: any) => {
+                    if (response.success) {
+                        this.router.navigate(['/start/search'], {
+                            queryParams: { keyword: '' }
+                        });
+                    } else {
+                        alert('删除失败：' + response.message);
+                    }
+                },
+                error: (error) => {
+                    alert('删除失败：' + error.message);
+                }
+            });
+        }
+    }
 
     toggleToc() {
         this.isTocVisible = !this.isTocVisible;

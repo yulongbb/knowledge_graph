@@ -199,23 +199,41 @@ html {
 .wiki-title-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
 
-  .edit-btn {
-    padding: 8px 16px;
+  .wiki-title {
+    margin: 0;
+    flex: 1;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: 1px solid $github-border;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
-    
-    &:first-child {
-      margin-left: 0;
+    color: $github-text;
+
+    span {
+      font-size: 16px;
+      line-height: 1;
     }
-    
-    &:last-child {
-      margin-right: 0;
+
+    i {
+      font-size: 14px;
     }
 
     &:hover {

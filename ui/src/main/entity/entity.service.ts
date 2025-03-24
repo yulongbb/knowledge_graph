@@ -25,8 +25,8 @@ export class EntityService extends RepositoryService<Item> {
     return this.http.put(`${this.option.controller?.name}`, item);
   }
 
-  deleteItem(item: Item): Observable<Item> {
-    return this.http.delete(`${this.option.controller?.name}/${item}`, );
+  deleteItem(id: String): Observable<Item> {
+    return this.http.delete(`${this.option.controller?.name}/${id}`, );
   }
 
 

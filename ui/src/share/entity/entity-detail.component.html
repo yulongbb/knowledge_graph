@@ -3,26 +3,7 @@
     <app-entity-info [id]="id"></app-entity-info>
   </div>
   <div *ngSwitchCase="'add'">
-    <div class="row">
-      <x-page-header [title]="'新增'" [subTitle]="'知识'" (backClick)="back()">
-      </x-page-header>
-      <x-card width="100%">
-        <div class="row" *ngFor="let t of tags | keyvalue">
-          <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-            tag></x-checkbox>
-        </div>
-        <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-          width="100%" labelAlign="end" span="24" space="2"></x-form>
-        <br />
-        <div class="app-footer">
-          <x-buttons space="0.5">
-            <x-button (click)="action('cancel')">取消</x-button>
-            <x-button type="primary" (click)="!formInvalid && action('save')"
-              [disabled]="formInvalid || disabled">保存</x-button>
-          </x-buttons>
-        </div>
-      </x-card>
-    </div>
+   <app-entity-add [id]="id"></app-entity-add>
   </div>
   <div *ngSwitchCase="'add_image'" (paste)="onImagePaste($event)">
     <div class="row">

@@ -247,6 +247,7 @@ export class KnowledgeService {
           location: entity?.location,
           sources: entity?.sources,
           documents: entity?.documents,
+          template: entity?.template,
         };
         const data = await this.elasticsearchService.bulk(source);
 
