@@ -62,6 +62,16 @@
         ></x-input>
       </div>
       <div class="form-group">
+        <label>标签：</label>
+        <textarea
+        [(ngModel)]="selectedImage.tags"
+        name="tags"
+        class="form-control"
+        placeholder="标签（多个标签用#号分隔）"
+
+      ></textarea>
+      </div>
+      <div class="form-group">
         <label>描述：</label>
         <textarea
           [(ngModel)]="selectedImage.description"
@@ -77,7 +87,8 @@
           type="primary"
           (click)="save()"
           [disabled]="!selectedImage?.label"
-        >保存</x-button>
+          >保存</x-button
+        >
       </x-buttons>
     </div>
   </x-card>

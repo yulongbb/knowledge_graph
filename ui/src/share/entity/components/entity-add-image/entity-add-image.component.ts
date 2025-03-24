@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, ChangeDetectorRef } from '@angu
 import { XMessageService } from '@ng-nest/ui/message';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
+import { TagService } from 'src/main/ontology/tag/tag.sevice';
 
 @Component({
   selector: 'app-entity-add-image',
@@ -22,13 +23,17 @@ export class EntityAddImageComponent {
   selectedImage: any = null;
   isUploading = false;
   uploadedFiles: any[] = [];
+  tags: string[] = [];
+  tagSuggestions: string[] = [];
 
   constructor(
     private entityService: EntityService,
     private message: XMessageService,
     private location: Location,
-    private cdr: ChangeDetectorRef
-  ) { }
+    private cdr: ChangeDetectorRef,
+  ) {
+  }
+
 
   onImagePaste(event: ClipboardEvent) {
     const clipboardData = event.clipboardData || (window as any).clipboardData;
@@ -97,7 +102,8 @@ export class EntityAddImageComponent {
   uploadFile(file: File) {
     this.isUploading = true;
     const formData = new FormData();
-    formData.append('file', file, file.name);
+    
+    formData.append('file', file, this.generateUniqueFileName(file.name));
 
     fetch('http://localhost:3000/api/minio-client/uploadFile', {
       method: 'POST',
@@ -185,6 +191,7 @@ export class EntityAddImageComponent {
     $event.url =`http://localhost:9000/kgms/${$event.body.name}`;
     $event.label =$event.body.name;
     $event.description ='';
+    $event.tags ='';
     this.selectImage($event);
     console.log($event);
     this.uploadedFiles.push($event);
@@ -216,6 +223,7 @@ export class EntityAddImageComponent {
           value: this.selectedImage.description || ''
         }
       },
+      tags: this.selectedImage.tags?.split('#').filter((x:any) => x.trim() !== ''),
       // 处理图片数据
       images: this.uploadedFiles.map(img => {
         const url = img.url.replace('http://localhost:9000/kgms/', '');
@@ -234,6 +242,13 @@ export class EntityAddImageComponent {
         this.message.error('保存失败：' + error.message);
       }
     });
+  }
+
+  private generateUniqueFileName(originalName: string): string {
+    const timestamp = new Date().getTime();
+    const uniqueSuffix = Math.random().toString(36).substring(2, 10);
+    const extension = originalName.substring(originalName.lastIndexOf('.'));
+    return `${timestamp}-${uniqueSuffix}${extension}`;
   }
 
 
