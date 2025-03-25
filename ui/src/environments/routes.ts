@@ -82,10 +82,13 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/gpt-management/gpt-management.module").then(x => x.GptManagementModule),
   },
-
+  {
+    path: "redeem",
+    loadChildren: () =>
+      import("../main/start/addons/redeem/redeem.module").then(x => x.RedeemModule),
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
-
   ...shareRoutes
 ];
 

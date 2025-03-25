@@ -255,6 +255,14 @@ html {
   img {
     max-width: 100%;
     height: auto;
+    display: block;
+    margin: 0 auto; // Center images
+  }
+
+  p {
+    text-indent: 2em; // Indent paragraphs
+    line-height: 1.6; // Improve readability
+    font-family: "Segoe UI", Roboto, sans-serif; // Font style optimization
   }
 
   table {
@@ -281,6 +289,7 @@ html {
     font-weight: 400;
     color: #202124;
     position: relative;
+    font-family: "Segoe UI", Roboto, sans-serif; // Font style optimization
 
     &.section-heading {
       scroll-margin-top: 80px;

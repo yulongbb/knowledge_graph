@@ -14,7 +14,10 @@ export class EsService {
   async search(params: any) {
     const data = await this.elasticsearchService.search({
       index: this.defaultIndex,
-      body: params,
+      body: {
+        ...params,
+        sort: [{ modified: { order: 'desc' } }]
+      },
     });
     return {
       total: data['hits']['total']['value'],

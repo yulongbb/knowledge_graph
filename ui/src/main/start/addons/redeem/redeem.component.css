@@ -1,0 +1,28 @@
+.bing-redeem {
+  text-align: center;
+}
+
+.bing-redeem h1, .bing-redeem h2 {
+  color: #0078d4;
+}
+
+.bing-redeem ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.bing-redeem li {
+  margin: 10px 0;
+}
+
+.bing-redeem button {
+  background-color: #0078d4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.bing-redeem button:hover {
+  background-color: #005a9e;
+}
