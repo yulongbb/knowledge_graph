@@ -1,0 +1,40 @@
+<div class="gym-person-container">
+  <div class="model-section">
+    <app-virtual-character
+      (markerAdded)="onMarkerAdded($event)"
+      #virtualCharacter
+    ></app-virtual-character>
+
+    <div class="controls">
+      <button (click)="toggleMarkerMode()" [class.active]="isMarkerMode">
+        {{ isMarkerMode ? '完成标记' : '添加标记' }}
+      </button>
+    </div>
+
+    <div class="markers-list" *ngIf="markers.length > 0">
+      <h3>标记列表</h3>
+      <ul>
+        <li *ngFor="let marker of markers">
+          <div class="marker-info">
+            <span class="marker-label">{{ marker.label }}</span>
+            <span class="marker-date">{{ marker.createdAt | date:'short' }}</span>
+          </div>
+          <div class="marker-description" *ngIf="marker.description">
+            {{ marker.description }}
+          </div>
+          <button (click)="removeMarker(marker.id)" class="delete-btn">
+            删除
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="gallery-section">
+    <div class="image-grid">
+      <div class="image-card" *ngFor="let image of images">
+        <img [src]="image.url" [alt]="image.title">
+        <div class="image-title">{{image.title}}</div>
+      </div>
+    </div>
+  </div>
+</div>

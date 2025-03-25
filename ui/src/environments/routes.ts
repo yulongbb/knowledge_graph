@@ -87,6 +87,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/redeem/redeem.module").then(x => x.RedeemModule),
   },
+  {
+    path: "gym-person",
+    loadChildren: () =>
+      import("../main/start/addons/gym-person/gym-person.module").then(x => x.GymPersonModule),
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
   ...shareRoutes

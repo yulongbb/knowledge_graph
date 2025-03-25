@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SystemModule } from './system/system.module';
 import { DesignModule } from './design/design.module';
-
 import { AuthModule } from './auth/auth.module';
 import { OntologynModule } from 'src/ontology/ontology.module';
 import { MinioClientModule } from './minio/minio-client.module';
@@ -14,6 +13,8 @@ import { PluginModule } from './plugin/plugin.module';
 import { AddonModule } from './addons/addon.module';
 import { ProjectModule } from './project/project.module';
 import { GptManagementModule } from './gpt-management/gpt-management.module';
+import { MarkerModule } from './marker/marker.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -40,6 +41,7 @@ import { GptManagementModule } from './gpt-management/gpt-management.module';
     AddonModule,
     ProjectModule,
     GptManagementModule,
+    MarkerModule,
   ],
   controllers: [],
   providers: [],

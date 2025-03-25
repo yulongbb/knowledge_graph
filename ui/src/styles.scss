@@ -5,6 +5,7 @@
 @import 'src/styles/themes/default';
 @import 'src/styles/core/index';
 @import '~highlight.js/styles/github.css';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 @font-face {
   font-family: 'ubuntu';
   src: url('/src/assets/fonts/ubuntu.eot?#') format('eot'), url('/src/assets/fonts/ubuntu.ttf') format('truetype'),
