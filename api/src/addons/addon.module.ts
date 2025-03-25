@@ -5,6 +5,9 @@ import { AddonService } from './addon.service';
 import { AddonController } from './addon.controller';
 import { Addon } from './entities/addon.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Module({
   imports: [
@@ -20,6 +23,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           // },
         }),
       }),
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+    }),
   ],
   providers: [AddonService],
   controllers: [AddonController],

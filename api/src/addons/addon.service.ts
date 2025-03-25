@@ -69,11 +69,17 @@ export class AddonService {
     const oldAddon = await this.findOne(id);
     await this.addonRepository.update(id, addon);
     const updatedAddon = await this.addonRepository.findOne({ where: { id } });
-    
+
     if (oldAddon.name !== updatedAddon.name) {
       await this.updateIndexAlias(id, oldAddon.name, updatedAddon.name);
     }
-    
+
+    // Handle pinning logic
+    if (oldAddon.isPinned !== updatedAddon.isPinned) {
+      updatedAddon.isPinned = addon.isPinned;
+      await this.addonRepository.save(updatedAddon);
+    }
+
     return updatedAddon;
   }
 
@@ -91,5 +97,17 @@ export class AddonService {
 
   async findByCategory(category: string): Promise<Addon[]> {
     return this.addonRepository.find({ where: { category } });
+  }
+
+  async findPinned(): Promise<Addon[]> {
+    const pinnedExtensions = await this.addonRepository.find({ where: { isPinned: true } });
+    console.log('Pinned Extensions:', pinnedExtensions); // Add this log for debugging
+    return pinnedExtensions;
+  }
+
+  async togglePin(id: number): Promise<void> {
+    const addon = await this.findOne(id);
+    addon.isPinned = !addon.isPinned;
+    await this.addonRepository.save(addon);
   }
 }

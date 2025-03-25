@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 
 interface Extension {
   id?: number;
@@ -10,6 +10,8 @@ interface Extension {
   category: string;
   image: string;
   url: string;
+  isPinned: boolean; // Add this property
+  screenshots: string[]; // Add this property to store multiple screenshots
 }
 
 @Component({
@@ -29,20 +31,27 @@ export class AddonsComponent implements OnInit {
     reviews: 0,
     category: '',
     image: '',
-    url: ''
+    url: '',
+    isPinned: false,
+    screenshots: [] // Initialize the screenshots array
   };
   isCreating: boolean = false;
   isEditing: boolean = false;
+  pinnedExtensions: Extension[] = [];
+  currentSlide: number = 0;
+  currentScreenshot: number = 0;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.fetchExtensions();
     this.fetchCategories();
+    this.fetchPinnedExtensions();
   }
 
   fetchExtensions() {
     this.http.get<Extension[]>('/api/addons').subscribe(data => {
+      console.log(data);
       this.filteredExtensions = data;
     });
   }
@@ -53,9 +62,24 @@ export class AddonsComponent implements OnInit {
     });
   }
 
+  fetchPinnedExtensions() {
+    this.http.get<Extension[]>('/api/addons/pinned').subscribe(
+      data => {
+        console.log('Pinned Extensions:', data); // Log the response for debugging
+        this.pinnedExtensions = data || []; // Ensure it defaults to an empty array if null
+      },
+      error => {
+        console.error('Error fetching pinned extensions:', error); // Log any errors
+      }
+    );
+  }
+
   selectCategory(category: string) {
     this.selectedCategory = category;
-    this.selectedExtension = null;
+    this.selectedExtension = null; // Reset selected extension
+    this.isCreating = false; // Ensure the create form is hidden
+    this.isEditing = false; // Ensure the edit form is hidden
+
     if (category === '全部') {
       this.fetchExtensions();
     } else {
@@ -66,7 +90,12 @@ export class AddonsComponent implements OnInit {
   }
 
   viewDetails(extension: Extension) {
+    // Ensure screenshots array exists
+    if (!extension.screenshots) {
+      extension.screenshots = [];
+    }
     this.selectedExtension = extension;
+    this.currentScreenshot = 0; // Reset screenshot index
   }
 
   goBack() {
@@ -96,7 +125,9 @@ export class AddonsComponent implements OnInit {
         reviews: 0,
         category: '',
         image: '',
-        url: ''
+        url: '',
+        isPinned: false,
+        screenshots: [] // Initialize the screenshots array
       };
     });
   }
@@ -126,4 +157,84 @@ export class AddonsComponent implements OnInit {
       });
     }
   }
+
+  // Navigate to the previous slide
+  prevSlide() {
+    this.currentSlide = (this.currentSlide - 1 + this.pinnedExtensions.length) % this.pinnedExtensions.length;
+  }
+
+  // Navigate to the next slide
+  nextSlide() {
+    this.currentSlide = (this.currentSlide + 1) % this.pinnedExtensions.length;
+  }
+
+  onScreenshotUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.http.post('/api/addons/upload-screenshot', formData, {
+        reportProgress: true,
+        observe: 'events',
+      }).subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+          const response: any = event.body;
+          if (this.selectedExtension) {
+            this.selectedExtension.image = response.url; // Update the screenshot URL
+          }
+        }
+      });
+    }
+  }
+
+  onScreenshotsUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const formData = new FormData();
+      Array.from(input.files).forEach(file => {
+        formData.append('files', file);
+      });
+
+      this.http.post<{urls: string[]}>('/api/addons/upload-screenshots', formData).subscribe(
+        response => {
+          if (this.selectedExtension) {
+            // Initialize screenshots array if undefined
+            if (!this.selectedExtension.screenshots) {
+              this.selectedExtension.screenshots = [];
+            }
+            // Add new screenshots to existing ones
+            this.selectedExtension.screenshots = [
+              ...this.selectedExtension.screenshots,
+              ...response.urls
+            ];
+            console.log('Updated screenshots:', this.selectedExtension.screenshots);
+            // Trigger change detection
+            this.selectedExtension = {...this.selectedExtension};
+          }
+        },
+        error => {
+          console.error('Error uploading screenshots:', error);
+        }
+      );
+    }
+  }
+
+  // Navigate to the previous screenshot
+  prevScreenshot() {
+    if (this.selectedExtension?.screenshots) {
+      const maxIndex = Math.max(0, this.selectedExtension.screenshots.length - 2);
+      this.currentScreenshot = Math.max(0, this.currentScreenshot - 2);
+    }
+  }
+
+  // Navigate to the next screenshot
+  nextScreenshot() {
+    if (this.selectedExtension?.screenshots) {
+      const maxIndex = Math.max(0, this.selectedExtension.screenshots.length - 2);
+      this.currentScreenshot = Math.min(maxIndex, this.currentScreenshot + 2);
+    }
+  }
+
 }

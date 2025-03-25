@@ -11,7 +11,7 @@ export class Addon {
   @Column()
   rating: number;
 
-  @Column()
+  @Column({ type: 'text' })
   description: string;
 
   @Column()
@@ -25,5 +25,10 @@ export class Addon {
 
   @Column()
   url: string;
-  
+
+  @Column({ default: false })
+  isPinned: boolean;
+
+  @Column('simple-array', { nullable: true })
+  screenshots: string[]; // Add this property to store multiple screenshot URLs
 }

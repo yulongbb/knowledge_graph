@@ -18,9 +18,9 @@ export class LoginComponent implements OnInit {
   loading: boolean = false;
 
   userForm: UntypedFormGroup = this.formBuilder.group({
-    account: ['admin'],
-    password: ['admin123'],
-    database: ['kgms']
+    account: [''],
+    password: [''],
+    database: ['']
   });
   data = signal(['kgms', 'demo']);
 

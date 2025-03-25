@@ -1,6 +1,7 @@
 <div class="container">
   <!-- 左侧分类导航栏 -->
   <div class="sidebar">
+    <button class="create-button" (click)="startCreating()">创建新应用</button>
     <ul class="category-list">
       <li *ngFor="let category of categories" 
           (click)="selectCategory(category)" 
@@ -12,13 +13,34 @@
 
   <!-- 右侧内容区域 -->
   <div class="content">
+    <!-- Carousel for pinned applications -->
+    <div class="carousel" *ngIf="pinnedExtensions.length > 0 && (!selectedCategory || selectedCategory === '全部') && !isCreating && !isEditing && !selectedExtension">
+      <button class="carousel-nav prev" (click)="prevSlide()">&#10094;</button>
+      <div class="carousel-track" [style.transform]="'translateX(' + (-currentSlide * 100) + '%)'">
+        <div class="carousel-item" *ngFor="let extension of pinnedExtensions; let i = index" [class.active]="i === currentSlide">
+          <img [src]="extension.image" alt="{{ extension.name }}" />
+          <div class="carousel-info">
+            <h3>{{ extension.name }}</h3>
+            <p>{{ extension.description }}</p>
+            <a [href]="extension.url" target="_blank" class="visit-button">访问应用</a>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-nav next" (click)="nextSlide()">&#10095;</button>
+    </div>
     <a class="back-link" *ngIf="selectedExtension || isCreating || isEditing" (click)="goBack()">
       <i class="fas fa-arrow-left"></i> 返回
     </a>
     <div *ngIf="selectedExtension && !isEditing; else editForm">
       <div class="extension-details">
+        <div class="details-header">
+          <h3>{{ selectedExtension.name }}</h3>
+          <div class="action-buttons">
+            <button class="edit-button" (click)="startEditing()">编辑</button>
+            <button class="delete-button" (click)="deleteExtension(selectedExtension)">删除</button>
+          </div>
+        </div>
         <img [src]="selectedExtension.image" alt="{{ selectedExtension.name }}" />
-        <h3>{{ selectedExtension.name }}</h3>
         <div class="rating">
           <span *ngFor="let star of [1,2,3,4,5]">
             <span *ngIf="star <= selectedExtension.rating">★</span>
@@ -26,9 +48,24 @@
           </span>
           <span class="reviews">({{ selectedExtension.reviews }})</span>
         </div>
-        <p>{{ selectedExtension.description }}</p>
-        <button class="edit-button" (click)="startEditing()">编辑</button>
-        <button class="delete-button" (click)="deleteExtension(selectedExtension)">删除</button>
+        <div class="carousel screenshots-carousel" *ngIf="selectedExtension?.screenshots && selectedExtension.screenshots!.length > 0">
+          <button class="carousel-nav prev" (click)="prevScreenshot()" *ngIf="selectedExtension.screenshots.length > 2">&#10094;</button>
+          <div class="carousel-track" [style.transform]="'translateX(' + (-currentScreenshot * 50) + '%)'">
+            <div class="carousel-item" *ngFor="let screenshot of selectedExtension.screenshots; let i = index">
+              <img [src]="'http://localhost:4200/api/'+screenshot" [alt]="'Screenshot ' + (i + 1)" />
+            </div>
+          </div>
+          <button class="carousel-nav next" (click)="nextScreenshot()" *ngIf="selectedExtension.screenshots.length > 2">&#10095;</button>
+        </div>
+
+        <div class="screenshots-preview" *ngIf="selectedExtension?.screenshots && selectedExtension.screenshots!.length > 0">
+          <img *ngFor="let screenshot of selectedExtension.screenshots; let i = index" 
+               [src]="'http://localhost:4200/api/'+screenshot" 
+               [alt]="'Screenshot ' + (i + 1)"
+               [class.active]="i === currentScreenshot"
+               (click)="currentScreenshot = i" />
+        </div>
+        <p [innerHTML]="selectedExtension.description"></p>
       </div>
     </div>
     <ng-template #editForm>
@@ -40,8 +77,8 @@
             <input [(ngModel)]="selectedExtension.name" name="name" required />
           </label>
           <label>
-            描述:
-            <input [(ngModel)]="selectedExtension.description" name="description" />
+            详细介绍:
+            <quill-editor [(ngModel)]="selectedExtension.description" name="description"></quill-editor>
           </label>
           <label>
             类别:
@@ -55,6 +92,23 @@
             URL:
             <input [(ngModel)]="selectedExtension.url" name="url" />
           </label>
+          <label>
+            置顶:
+            <input type="checkbox" [(ngModel)]="selectedExtension.isPinned" name="isPinned" />
+          </label>
+          <label class="upload-label">
+            上传截图:
+            <input 
+              type="file" 
+              multiple 
+              accept="image/*" 
+              (change)="onScreenshotsUpload($event)" 
+              class="file-input" />
+            <span class="upload-button">选择图片</span>
+          </label>
+          <div class="screenshots">
+            <img *ngFor="let screenshot of selectedExtension.screenshots" [src]="'http://localhost:4200/api/'+screenshot" alt="Screenshot" />
+          </div>
           <button type="submit">保存</button>
         </form>
       </div>
@@ -76,7 +130,7 @@
                   <span class="reviews">({{ extension.reviews }})</span>
                 </div>
               </div>
-              <p class="description">{{ extension.description }}</p>
+              <p class="description" *ngIf="extension.description">{{ extension.description | slice:0:100 }}{{ extension.description.length > 100 ? '...' : '' }}</p>
               <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
               <button class="visit-button">访问应用</button>
             </div>
@@ -116,7 +170,6 @@
       <ng-container *ngTemplateOutlet="createForm"></ng-container>
     </div>
     <div *ngIf="!isCreating && !selectedExtension && !isEditing">
-      <button class="create-button" (click)="startCreating()">创建新应用</button>
       <div class="extension-grid one-column">
         <div *ngFor="let extension of filteredExtensions" class="extension-card">
           <img [src]="extension.image" alt="{{ extension.name }}" class="extension-image" />
@@ -131,7 +184,7 @@
                 <span class="reviews">({{ extension.reviews }})</span>
               </div>
             </div>
-            <p class="description">{{ extension.description }}</p>
+            <p class="description" *ngIf="extension.description">{{ extension.description | slice:0:100 }}{{ extension.description.length > 100 ? '...' : '' }}</p>
             <a class="details-link" (click)="viewDetails(extension)">查看详情</a>
             <a target="_blank" [href]="extension.url" class="visit-button">访问应用</a>
           </div>
