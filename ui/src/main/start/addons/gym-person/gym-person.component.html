@@ -2,38 +2,43 @@
   <div class="model-section">
     <app-virtual-character
       (markerAdded)="onMarkerAdded($event)"
+      (modelLoaded)="onModelLoaded($event)"
+      (markerClicked)="onMarkerClicked($event)"
+      [existingMarkers]="markers"
       #virtualCharacter
     ></app-virtual-character>
-
-    <div class="controls">
-      <button (click)="toggleMarkerMode()" [class.active]="isMarkerMode">
-        {{ isMarkerMode ? '完成标记' : '添加标记' }}
-      </button>
-    </div>
-
-    <div class="markers-list" *ngIf="markers.length > 0">
-      <h3>标记列表</h3>
-      <ul>
-        <li *ngFor="let marker of markers">
-          <div class="marker-info">
-            <span class="marker-label">{{ marker.label }}</span>
-            <span class="marker-date">{{ marker.createdAt | date:'short' }}</span>
-          </div>
-          <div class="marker-description" *ngIf="marker.description">
-            {{ marker.description }}
-          </div>
-          <button (click)="removeMarker(marker.id)" class="delete-btn">
-            删除
-          </button>
-        </li>
-      </ul>
-    </div>
   </div>
   <div class="gallery-section">
-    <div class="image-grid">
-      <div class="image-card" *ngFor="let image of images">
-        <img [src]="image.url" [alt]="image.title">
-        <div class="image-title">{{image.title}}</div>
+    <div class="tag-filter">
+      <label for="tagSelect">筛选标签:</label>
+      <select id="tagSelect" (change)="filterByTag($event)">
+        <option value="">全部</option>
+        <option *ngFor="let tag of availableTags" [value]="tag">{{ tag }}</option>
+      </select>
+    </div>
+    <div class="image-grid" *ngIf="searchResults.length > 0">
+      <div class="image-card" *ngFor="let result of searchResults">
+        <img [src]="result.imageUrl" [alt]="result.label" *ngIf="result.imageUrl" (click)="previewImage(result.imageUrl)">
+      </div>
+    </div>
+    <div class="loading-indicator" *ngIf="loading">
+      加载中...
+    </div>
+  </div>
+</div>
+
+<!-- 图片预览模态框 -->
+<div class="modal" tabindex="-1" role="dialog" *ngIf="previewImageUrl">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">图片预览</h5>
+        <button type="button" class="close" (click)="closePreview()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img [src]="previewImageUrl" alt="预览图片" style="width: 100%;">
       </div>
     </div>
   </div>

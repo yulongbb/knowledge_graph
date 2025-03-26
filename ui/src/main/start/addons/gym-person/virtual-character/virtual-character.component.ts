@@ -47,6 +47,9 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
   @Output() modelClicked = new EventEmitter<ClickPosition>();
   public loadingStatus: string = ''; // Changed to public
   @Output() markerAdded = new EventEmitter<any>();
+  @Input() existingMarkers: any[] = []; // 添加这个输入属性
+  @Output() modelLoaded = new EventEmitter<boolean>();
+  @Output() markerClicked = new EventEmitter<string>();  // 添加这行到组件属性中
 
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
@@ -253,6 +256,15 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
           this.controls.target.set(0, modelHeight * 0.5, 0);
           this.controls.update();
         }
+
+        // 在模型加载完成后发出事件
+        this.loadingStatus = '';
+        this.modelLoaded.emit(true);
+
+        // 初始化标记（如果存在）
+        if (this.existingMarkers.length > 0) {
+          this.initializeMarkers(this.existingMarkers);
+        }
       },
       (progress) => {
         // 加载进度
@@ -292,55 +304,74 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
   private setupClickDetection(): void {
     const canvas = this.canvasRef.nativeElement;
     
+    // 防止右键菜单
+    canvas.addEventListener('contextmenu', (event: Event) => {
+      event.preventDefault();
+    });
+    
+    // 处理左键点击
     canvas.addEventListener('click', (event: MouseEvent) => {
-      if (this.isAddingMarker) {
-        const rect = canvas.getBoundingClientRect();
-        this.mouse.x = ((event.clientX - rect.left) / canvas.clientWidth) * 2 - 1;
-        this.mouse.y = -((event.clientY - rect.top) / canvas.clientHeight) * 2 + 1;
-
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-
-        if (intersects.length > 0) {
-          const intersection = intersects[0];
-          const label = prompt('请输入标记名称：');
-          if (label) {
-            const position = intersection.point;
-            this.addMarker(position, label);
-          }
-        }
-      } else {
-        // 计算鼠标在画布中的标准化坐标
-        const rect = canvas.getBoundingClientRect();
-        this.mouse.x = ((event.clientX - rect.left) / canvas.clientWidth) * 2 - 1;
-        this.mouse.y = -((event.clientY - rect.top) / canvas.clientHeight) * 2 + 1;
-
-        // 更新射线
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        // 获取场景中所有可点击的物体
-        const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-
-        if (intersects.length > 0) {
-          const intersection = intersects[0];
-          const clickPosition: ClickPosition = {
-            x: intersection.point.x,
-            y: intersection.point.y,
-            z: intersection.point.z,
-            partName: intersection.object.name || '未命名部位'
-          };
-
-          // 创建或移动点击标记
-          this.showClickMarker(intersection.point);
-
-          // 发出点击事件
-          this.modelClicked.emit(clickPosition);
-          
-          console.log('点击位置:', clickPosition);
-          console.log('点击物体名称:', intersection.object.name);
-        }
+      if (event.button === 0) { // 左键点击
+        this.handleLeftClick(event);
       }
     });
+
+    // 处理右键点击
+    canvas.addEventListener('mouseup', (event: MouseEvent) => {
+      if (event.button === 2) { // 右键点击
+        this.handleRightClick(event);
+      }
+    });
+  }
+
+  private handleLeftClick(event: MouseEvent): void {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / this.canvasRef.nativeElement.clientWidth) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / this.canvasRef.nativeElement.clientHeight) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(Array.from(this.markers.values()), true);
+
+    if (intersects.length > 0) {
+      const sprite:any = intersects[0].object as THREE.Sprite;
+      if (sprite.userData && sprite.userData.label) {
+        this.markerClicked.emit(sprite.userData.label);
+        return;
+      }
+    }
+
+    // 如果没有点击到标记，则执行原来的点击逻辑
+    const modelIntersects = this.raycaster.intersectObjects(this.scene.children, true);
+    if (modelIntersects.length > 0) {
+      const intersection = modelIntersects[0];
+      const clickPosition: ClickPosition = {
+        x: intersection.point.x,
+        y: intersection.point.y,
+        z: intersection.point.z,
+        partName: intersection.object.name || '未命名部位'
+      };
+
+      this.showClickMarker(intersection.point);
+      this.modelClicked.emit(clickPosition);
+    }
+  }
+
+  private handleRightClick(event: MouseEvent): void {
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / this.canvasRef.nativeElement.clientWidth) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / this.canvasRef.nativeElement.clientHeight) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+    if (intersects.length > 0) {
+      const intersection = intersects[0];
+      const label = prompt('请输入标记名称：');
+      if (label) {
+        const position = intersection.point;
+        this.addMarker(position, label);
+      }
+    }
   }
 
   private showClickMarker(position: THREE.Vector3): void {
@@ -403,10 +434,30 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
     sprite.position.copy(position);
     sprite.scale.set(20, 20, 1);
     
+    // 添加用户数据
+    sprite.userData = { label };
+    
     return sprite;
   }
 
+  // 增加一个辅助方法来检查重复标记
+  private isMarkerDuplicate(position: THREE.Vector3, threshold: number = 20): boolean {
+    for (const sprite of this.markers.values()) {
+      const distance = position.distanceTo(sprite.position);
+      if (distance < threshold) {
+        alert('该位置附近已存在标记！');
+        return true;
+      }
+    }
+    return false;
+  }
+
   addMarker(position: THREE.Vector3, label: string): void {
+    // 检查是否存在重复标记
+    if (this.isMarkerDuplicate(position)) {
+      return;
+    }
+
     const id = `marker-${Date.now()}`;
     const sprite = this.createMarkerSprite(position, label);
     this.scene.add(sprite);
@@ -471,5 +522,25 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
       this.currentAction.timeScale = 1;
       this.currentAction.paused = false;
     }
+  }
+
+  public initializeMarkers(markers: any[]): void {
+    // 清除所有现有标记
+    this.markers.forEach((sprite, id) => {
+      this.scene.remove(sprite);
+    });
+    this.markers.clear();
+
+    // 初始化标记
+    markers.forEach(marker => {
+      const position = new THREE.Vector3(
+        marker.positionX,
+        marker.positionY,
+        marker.positionZ
+      );
+      const sprite = this.createMarkerSprite(position, marker.label);
+      this.scene.add(sprite);
+      this.markers.set(marker.id.toString(), sprite);
+    });
   }
 }
