@@ -110,4 +110,20 @@ export class AddonService {
     addon.isPinned = !addon.isPinned;
     await this.addonRepository.save(addon);
   }
+
+  async addRating(id: number, rating: number): Promise<Addon> {
+    const addon = await this.findOne(id);
+    
+    if (!addon.userRatings) {
+      addon.userRatings = [];
+    }
+    
+    addon.userRatings.push(rating);
+    addon.totalRatings++;
+    
+    // 计算新的平均评分
+    addon.rating = addon.userRatings.reduce((a, b) => a + b, 0) / addon.totalRatings;
+    
+    return this.addonRepository.save(addon);
+  }
 }

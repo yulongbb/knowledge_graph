@@ -31,4 +31,10 @@ export class Addon {
 
   @Column('simple-array', { nullable: true })
   screenshots: string[]; // Add this property to store multiple screenshot URLs
+
+  @Column('simple-array', { nullable: true })
+  userRatings: number[]; // 存储所有用户评分
+
+  @Column({ default: 0 })
+  totalRatings: number; // 总评分人数
 }

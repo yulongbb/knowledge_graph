@@ -12,6 +12,8 @@ interface Extension {
   url: string;
   isPinned: boolean; // Add this property
   screenshots: string[]; // Add this property to store multiple screenshots
+  userRatings?: number[]; // 添加用户评分数组
+  totalRatings: number;  // 添加总评分人数
 }
 
 @Component({
@@ -33,13 +35,18 @@ export class AddonsComponent implements OnInit {
     image: '',
     url: '',
     isPinned: false,
-    screenshots: [] // Initialize the screenshots array
+    screenshots: [], // Initialize the screenshots array
+    totalRatings: 0,  // 初始化总评分人数
+    userRatings: []   // 初始化用户评分数组
   };
   isCreating: boolean = false;
   isEditing: boolean = false;
   pinnedExtensions: Extension[] = [];
   currentSlide: number = 0;
   currentScreenshot: number = 0;
+  searchQuery: string = '';
+  allExtensions: Extension[] = [];
+  hoverRating: number = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -51,7 +58,7 @@ export class AddonsComponent implements OnInit {
 
   fetchExtensions() {
     this.http.get<Extension[]>('/api/addons').subscribe(data => {
-      console.log(data);
+      this.allExtensions = data;
       this.filteredExtensions = data;
     });
   }
@@ -79,14 +86,7 @@ export class AddonsComponent implements OnInit {
     this.selectedExtension = null; // Reset selected extension
     this.isCreating = false; // Ensure the create form is hidden
     this.isEditing = false; // Ensure the edit form is hidden
-
-    if (category === '全部') {
-      this.fetchExtensions();
-    } else {
-      this.http.get<Extension[]>(`/api/addons?category=${category}`).subscribe(data => {
-        this.filteredExtensions = data;
-      });
-    }
+    this.onSearch(); // 使用搜索方法来过滤结果
   }
 
   viewDetails(extension: Extension) {
@@ -108,6 +108,8 @@ export class AddonsComponent implements OnInit {
 
   startCreating() {
     this.isCreating = true;
+    this.selectedExtension = null; // Reset selected extension
+    this.isEditing = false; // Ensure editing mode is off
   }
 
   cancelCreating() {
@@ -127,13 +129,16 @@ export class AddonsComponent implements OnInit {
         image: '',
         url: '',
         isPinned: false,
-        screenshots: [] // Initialize the screenshots array
+        screenshots: [], // Initialize the screenshots array
+        totalRatings: 0,  // 初始化总评分人数
+        userRatings: []   // 初始化用户评分数组
       };
     });
   }
 
   startEditing() {
     this.isEditing = true;
+    this.isCreating = false; // 确保创建表单被隐藏
   }
 
   cancelEditing() {
@@ -145,6 +150,7 @@ export class AddonsComponent implements OnInit {
       this.http.put<Extension>(`/api/addons/${this.selectedExtension.id}`, this.selectedExtension).subscribe(() => {
         this.fetchExtensions();
         this.isEditing = false;
+        this.selectedExtension = null; // 返回列表视图
       });
     }
   }
@@ -160,12 +166,16 @@ export class AddonsComponent implements OnInit {
 
   // Navigate to the previous slide
   prevSlide() {
-    this.currentSlide = (this.currentSlide - 1 + this.pinnedExtensions.length) % this.pinnedExtensions.length;
+    if (this.pinnedExtensions.length > 0) {
+      this.currentSlide = (this.currentSlide - 1 + this.pinnedExtensions.length) % this.pinnedExtensions.length;
+    }
   }
 
   // Navigate to the next slide
   nextSlide() {
-    this.currentSlide = (this.currentSlide + 1) % this.pinnedExtensions.length;
+    if (this.pinnedExtensions.length > 0) {
+      this.currentSlide = (this.currentSlide + 1) % this.pinnedExtensions.length;
+    }
   }
 
   onScreenshotUpload(event: Event) {
@@ -235,6 +245,68 @@ export class AddonsComponent implements OnInit {
       const maxIndex = Math.max(0, this.selectedExtension.screenshots.length - 2);
       this.currentScreenshot = Math.min(maxIndex, this.currentScreenshot + 2);
     }
+  }
+
+  getMainImage(extension: Extension): string {
+    // 优先使用系统截图的第一张
+    if (extension.screenshots && extension.screenshots.length > 0) {
+      return 'http://localhost:4200/api/' + extension.screenshots[0];
+    }
+    // 如果没有系统截图则使用主图片
+    return extension.image;
+  }
+
+  getShortDescription(description: string): string {
+    // 移除所有HTML标签来计算实际文本长度
+    const plainText = description.replace(/<[^>]*>/g, '');
+    if (plainText.length <= 200) {
+      return description;
+    }
+    
+    // 查找最后一个完整单词的位置
+    let truncated = description.substring(0, 100);
+    let lastTagIndex = truncated.lastIndexOf('</');
+    let lastSpaceIndex = truncated.lastIndexOf(' ');
+    
+    // 如果在截取范围内有未闭合的标签
+    if (lastTagIndex > -1 && truncated.indexOf('>', lastTagIndex) === -1) {
+      truncated = truncated.substring(0, lastTagIndex);
+    }
+    
+    // 在最后一个完整单词处截断
+    if (lastSpaceIndex > -1) {
+      truncated = truncated.substring(0, lastSpaceIndex);
+    }
+    
+    return truncated + '...';
+  }
+
+  onSearch() {
+    if (!this.searchQuery.trim()) {
+      this.filteredExtensions = this.selectedCategory === '全部' ? 
+        this.allExtensions : 
+        this.allExtensions.filter(ext => ext.category === this.selectedCategory);
+      return;
+    }
+
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredExtensions = this.allExtensions.filter(ext => {
+      const matchesCategory = this.selectedCategory === '全部' || ext.category === this.selectedCategory;
+      const matchesSearch = ext.name.toLowerCase().includes(query) || 
+                          ext.description.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  get filteredCategories(): string[] {
+    return this.categories.filter(category => category !== '全部');
+  }
+
+  rateAddon(addon: Extension, rating: number) {
+    this.http.post<Extension>(`/api/addons/${addon.id}/rate`, { rating })
+      .subscribe(updatedAddon => {
+        this.selectedExtension = updatedAddon;
+      });
   }
 
 }

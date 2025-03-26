@@ -12,30 +12,104 @@ $white: white;
   display: flex;
   height: 100vh;
   padding-top: 60px;
+  width: 80%;
+  margin: 0 auto;
 
   // 左侧分类导航栏
   .sidebar {
     width: 250px;
-    background-color: #f5f5f5;
+    background-color: transparent;
 
-    .category-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .search-box {
+      padding: 8px;
+      margin: 0 auto 16px;
+      width: calc(100% - 16px);
 
-      li {
-        padding: 8px;
+      input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background-color: #f5f5f5;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          background-color: $white;
+          box-shadow: 0 2px 4px rgba($primary-color, 0.1);
+        }
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+    }
+
+    .nav-section {
+      .main-nav {
+        padding: 12px 16px;
+        margin: 0 8px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 500;
 
         &:hover {
-          background-color: $hover-color;
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+        }
+
+        &.selected {
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
         }
       }
 
-      li.selected {
-        background-color: $primary-color;
-        color: $white;
+      .category-section {
+        margin-top: 24px;
+        // ...existing code...
+      }
+    }
+
+    .category-section {
+      margin-top: 16px;
+
+      .category-header {
+        padding: 0 16px;
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: $light-text-color;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          padding: 8px 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+          margin: 0 8px;
+
+          &:hover {
+            background-color: rgba($primary-color, 0.1);
+            color: $primary-color;
+          }
+
+          &.selected {
+            background-color: rgba($primary-color, 0.1);
+            color: $primary-color;
+            font-weight: 500;
+          }
+        }
       }
     }
 
@@ -63,14 +137,13 @@ $white: white;
   .content {
     flex: 1;
     padding: 16px;
+    padding-left: 32px;
 
     h2 {
       margin-top: 0;
       font-size: 24px;
       font-weight: bold;
     }
-
-  
 
     // 最新列表 - 一列布局
     .extension-grid.one-column {
@@ -80,7 +153,7 @@ $white: white;
 
       .extension-card {
         display: flex;
-        align-items: center;
+        align-items: stretch;
         background-color: $white;
         border: 1px solid #ddd;
         border-radius: 8px;
@@ -90,85 +163,85 @@ $white: white;
         &:hover {
           transform: translateY(-4px);
           box-shadow: 0 4px 8px $card-hover-shadow;
-
-          .get-button {
-            opacity: 1;
-            visibility: visible;
-          }
-
-          .details-button {
-            opacity: 1;
-            visibility: visible;
-          }
         }
 
-        .extension-image {
-          width: 100px;
-          height: 100px;
-          object-fit: cover;
-          margin-right: 16px;
-        }
-
-        .card-content {
+        .main-content {
           flex: 1;
+          display: flex;
+          align-items: center;
           padding: 16px;
-          position: relative;
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
 
-          .card-header {
-            margin-bottom: 8px;
-
-            h3 {
-              margin: 0;
-              font-size: 18px;
-              font-weight: bold;
-            }
-
-            .rating {
-              display: flex;
-              align-items: center;
-
-              span {
-                color: #ffc107;
-                font-size: 16px;
-              }
-
-              .reviews {
-                margin-left: 8px;
-                color: $light-text-color;
-                font-size: 14px;
-              }
-            }
+          .extension-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 16px;
+            border-radius: 8px;
           }
 
-          .description {
-            margin: 8px 0;
-            color: $light-text-color;
-            font-size: 14px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.4;
-            max-height: 2.8em;
-          }
+          .card-content {
+            flex: 1;
 
-          .details-button {
-            background-color: $primary-color;
-            color: $white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            visibility: hidden;
-            position: absolute;
-            bottom: 16px;
-            right: 16px;
+            .card-header {
+              margin-bottom: 8px;
 
-            &:hover {
-              background-color: darken($primary-color, 10%);
+              h3 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: bold;
+                color: $text-color;
+              }
+
+              .rating {
+                display: flex;
+                align-items: center;
+                margin-top: 4px;
+
+                span {
+                  color: #ffc107;
+                  font-size: 16px;
+                }
+
+                .reviews {
+                  margin-left: 8px;
+                  color: $light-text-color;
+                  font-size: 14px;
+                }
+              }
             }
+
+            .card-description {
+              margin: 8px 0;
+              color: $light-text-color;
+              font-size: 14px;
+              line-height: 1.4;
+              max-height: 4.2em;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+            }
+          }
+        }
+
+        .visit-button {
+          align-self: center;
+          margin-right: 16px;
+          padding: 8px 16px;
+          background-color: $primary-color;
+          color: $white;
+          text-decoration: none;
+          font-weight: 500;
+          border-radius: 4px;
+          white-space: nowrap;
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: darken($primary-color, 10%);
           }
         }
       }
@@ -228,10 +301,11 @@ $white: white;
   p {
     font-size: 16px;
     color: $text-color;
-    max-width: 800px;
+    max-width: 100%; // Ensure it doesn't exceed the container width
     line-height: 1.6;
     white-space: pre-wrap;
-    word-wrap: break-word;
+    word-wrap: break-word; // Break long words
+    overflow-wrap: break-word; // Ensure proper wrapping for long words
     margin: 16px auto;
     text-align: left;
   }
@@ -242,10 +316,37 @@ $white: white;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 0 16px;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
 
-    h3 {
-      margin: 0;
+    .basic-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .app-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 0;
+      }
+
+      .info-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 24px;
+          text-align: left;
+        }
+
+        .rating {
+          display: none; // 隐藏原来的评分显示
+        }
+      }
     }
 
     .action-buttons {
@@ -254,6 +355,45 @@ $white: white;
       
       .edit-button, .delete-button {
         margin: 0;
+      }
+    }
+  }
+
+  // Remove the old image styles since we moved it to the header
+  > img {
+    display: none;
+  }
+
+  // Remove the duplicate rating styles
+  > .rating {
+    display: none;
+  }
+
+  .description-container {
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .description {
+    font-size: 16px;
+    color: $text-color;
+    max-width: 100%;
+    line-height: 1.6;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin: 16px 0;
+    text-align: left;
+    padding: 0 16px;
+
+    ::ng-deep {
+      p {
+        margin: 16px 0;
+      }
+      
+      a {
+        word-break: break-all;
       }
     }
   }
@@ -428,45 +568,181 @@ $white: white;
   }
 }
 
+.create-extension, .edit-extension {
+  form {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 16px;
+
+      input, quill-editor {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+    }
+
+    button {
+      align-self: flex-start;
+      background-color: $primary-color;
+      color: $white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+
 .carousel {
   position: relative;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  margin-bottom: 16px;
-  border: 1px solid #ddd;
+  margin-bottom: 24px;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: visible; // 改为visible以允许按钮超出容器
+  background: $white;
+  border: 1px solid #ddd;
 
-  .carousel-track {
+  .carousel-container {
     display: flex;
-    width: 100%;
-    transition: transform 0.5s ease-in-out;
+    height: 400px;
   }
 
-  .carousel-item {
-    flex: 0 0 100%;
+  .main-image {
+    flex: 2;
     position: relative;
-    display: none;
-
-    &.active {
-      display: block;
-    }
+    background: #f5f5f5;
+    border-right: 1px solid #ddd;
 
     img {
       width: 100%;
-      height: 300px;
+      height: 100%;
       object-fit: cover;
     }
+  }
 
-    .carousel-info {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+  .carousel-info {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .app-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      .app-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        object-fit: cover;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      h3 {
+        font-size: 24px;
+        margin: 0 0 16px 0;
+        color: $text-color;
+      }
+
+      .rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        span {
+          color: #ffc107;
+          font-size: 20px;
+        }
+
+        .reviews {
+          margin-left: 8px;
+          color: $light-text-color;
+          font-size: 14px;
+        }
+      }
+
+      .description {
+        font-size: 14px;
+        line-height: 1.6;
+        color: $light-text-color;
+        margin: 16px 0;
+        text-align: left;
+        max-height: 180px;
+        overflow-y: auto;
+        padding-right: 8px;
+
+        ::ng-deep {
+          p {
+            margin: 8px 0;
+          }
+          
+          a {
+            color: $primary-color;
+            text-decoration: none;
+            
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+
+          ul, ol {
+            margin: 8px 0;
+            padding-left: 20px;
+          }
+
+          img {
+            max-width: 100%;
+            height: auto;
+          }
+        }
+
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      }
+    }
+  }
+
+  .visit-button {
+    width: 100%;
+    padding: 12px 0;
+    background-color: $primary-color;
+    color: $white;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s;
+    font-weight: 500;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
     }
   }
 
@@ -474,29 +750,30 @@ $white: white;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: $white;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
     border: none;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
     cursor: pointer;
-    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1;
-
-    &.prev {
-      left: 10px;
-    }
-
-    &.next {
-      right: 10px;
-    }
+    font-size: 24px;
+    transition: all 0.3s;
+    z-index: 10;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.7);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    &.prev { 
+      left: -24px; 
+    }
+    &.next { 
+      right: -24px; 
     }
   }
 }
@@ -649,5 +926,57 @@ $white: white;
   img {
     background: #f5f5f5;
     border: 1px solid #ddd;
+  }
+}
+
+.rating-section {
+  margin: 8px 0;
+  text-align: left;
+
+  .rating-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+
+    span {
+      font-size: 20px;
+      color: #ddd;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.hover {
+        transform: scale(1.2);
+        color: #ffd700;
+      }
+
+      &.active {
+        color: #ffd700;
+      }
+    }
+  }
+
+  .rating-info {
+    font-size: 13px;
+    color: $light-text-color;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .rating-value {
+      color: #f5a623;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .rating-count {
+      color: $light-text-color;
+    }
+  }
+}
+
+.info-text {
+  // ...existing code...
+  .rating {
+    display: none; // 隐藏原来的评分显示
   }
 }

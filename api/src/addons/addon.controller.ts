@@ -69,4 +69,12 @@ export class AddonController {
     const urls = files.map(file => `/uploads/${file.filename}`);
     return { urls };
   }
+
+  @Post(':id/rate')
+  async rateAddon(
+    @Param('id') id: number,
+    @Body() data: { rating: number }
+  ): Promise<Addon> {
+    return this.addonService.addRating(id, data.rating);
+  }
 }
