@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, OnDestroy, HostListener } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { VirtualCharacterComponent, ClickPosition } from './virtual-character/virtual-character.component';
@@ -35,8 +35,20 @@ export class GymPersonComponent implements OnInit, OnDestroy {
   private currentSearchTerm = '';
 
   previewImageUrl: string | null = null;
+  currentImageIndex: number = 0;
 
   availableTags: string[] = ['标签1', '标签2', '标签3']; // 示例标签
+
+  private touchStartX: number = 0;
+  private touchEndX: number = 0;
+  private minSwipeDistance: number = 50;  // 最小滑动距离
+
+  private lastWheelTime: number = 0;
+  private wheelThrottleTime: number = 500; // 节流时间（毫秒）
+
+  translateX: number = 0;
+  private containerWidth: number = 0;
+  private loadedImages: Set<number> = new Set();
 
   constructor(
     private markerService: MarkerService,
@@ -234,11 +246,86 @@ export class GymPersonComponent implements OnInit, OnDestroy {
   }
 
   previewImage(url: string) {
+    if (!url) return;
     this.previewImageUrl = url;
+    this.currentImageIndex = this.searchResults.findIndex(result => result.imageUrl === url);
+    this.updateTranslateX();
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('wheel', this.handleWheel, { passive: false });
   }
 
   closePreview() {
     this.previewImageUrl = null;
+    document.body.style.overflow = 'auto';
+    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('wheel', this.handleWheel);
+  }
+
+  showPreviousImage() {
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+      this.updateTranslateX();
+    }
+  }
+
+  showNextImage() {
+    if (this.currentImageIndex < this.searchResults.length - 1) {
+      this.currentImageIndex++;
+      this.updateTranslateX();
+    }
+  }
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowLeft') {
+      this.showPreviousImage();
+    } else if (event.key === 'ArrowRight') {
+      this.showNextImage();
+    } else if (event.key === 'Escape') {
+      this.closePreview();
+    }
+  }
+
+  public handleWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    const currentTime = Date.now();
+    
+    // 节流处理，防止触控板滑动太灵敏
+    if (currentTime - this.lastWheelTime < this.wheelThrottleTime) {
+      return;
+    }
+
+    // deltaX > 0 表示向左滑动，显示下一张
+    // deltaX < 0 表示向右滑动，显示上一张
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+      if (event.deltaX > 30) {
+        this.showNextImage();
+      } else if (event.deltaX < -30) {
+        this.showPreviousImage();
+      }
+    }
+
+    this.lastWheelTime = currentTime;
+  }
+
+  handleTouchStart(event: TouchEvent) {
+    this.touchStartX = event.touches[0].clientX;
+  }
+
+  handleTouchEnd(event: TouchEvent) {
+    this.touchEndX = event.changedTouches[0].clientX;
+    this.handleSwipe();
+  }
+
+  private handleSwipe() {
+    const swipeDistance = this.touchEndX - this.touchStartX;
+    if (Math.abs(swipeDistance) >= this.minSwipeDistance) {
+      if (swipeDistance > 0) {
+        this.showPreviousImage();
+      } else {
+        this.showNextImage();
+      }
+    }
   }
 
   filterByTag(event: Event) {
@@ -251,7 +338,32 @@ export class GymPersonComponent implements OnInit, OnDestroy {
     }
   }
 
+  private updateTranslateX() {
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent) {
+      this.containerWidth = modalContent.clientWidth;
+      this.translateX = -this.currentImageIndex * this.containerWidth;
+    }
+  }
+
+  onImageLoad(index: number) {
+    this.loadedImages.add(index);
+    // 当前图片加载完成后更新位置
+    if (index === this.currentImageIndex) {
+      this.updateTranslateX();
+    }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    if (this.previewImageUrl) {
+      this.updateTranslateX();
+    }
+  }
+
   ngOnDestroy() {
     this.renderer?.dispose();
+    document.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('wheel', this.handleWheel);
   }
 }

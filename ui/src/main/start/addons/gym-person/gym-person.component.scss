@@ -144,3 +144,111 @@
     }
   }
 }
+
+.image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90vh;
+    touch-action: pan-x;  // 允许水平滑动
+    user-select: none;    // 禁止选择文本
+    -webkit-user-select: none;
+    
+    img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      pointer-events: none;  // 防止图片被拖拽
+    }
+
+    .image-slider {
+      width: 100%;
+      height: 90vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slider-track {
+      display: flex;
+      align-items: center;
+      transition: transform 0.3s ease-out;
+      height: 100%;
+      
+      img {
+        min-width: 100%;
+        height: 90vh;
+        object-fit: contain;
+        pointer-events: none;
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
+
+    .close-button {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      z-index: 2;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      &:disabled {
+        background: rgba(255, 255, 255, 0.1);
+        cursor: not-allowed;
+      }
+
+      &.prev {
+        left: -60px;
+      }
+
+      &.next {
+        right: -60px;
+      }
+
+      span {
+        display: block;
+        line-height: 0;
+      }
+    }
+  }
+}

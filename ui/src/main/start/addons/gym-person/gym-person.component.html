@@ -27,18 +27,27 @@
   </div>
 </div>
 
-<!-- 图片预览模态框 -->
-<div class="modal" tabindex="-1" role="dialog" *ngIf="previewImageUrl">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">图片预览</h5>
-        <button type="button" class="close" (click)="closePreview()">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <img [src]="previewImageUrl" alt="预览图片" style="width: 100%;">
+<!-- 图片预览弹框 -->
+<div class="image-preview-modal" *ngIf="previewImageUrl" (click)="closePreview()">
+  <div class="modal-content" 
+       (click)="$event.stopPropagation()"
+       (touchstart)="handleTouchStart($event)"
+       (touchend)="handleTouchEnd($event)"
+       (wheel)="handleWheel($event)">
+    <button class="close-button" (click)="closePreview()">×</button>
+    <button class="nav-button prev" (click)="showPreviousImage()" [disabled]="currentImageIndex === 0">
+      <span>&#10094;</span>
+    </button>
+    <button class="nav-button next" (click)="showNextImage()" [disabled]="currentImageIndex === searchResults.length - 1">
+      <span>&#10095;</span>
+    </button>
+    <div class="image-slider">
+      <div class="slider-track" [style.transform]="'translateX(' + translateX + 'px)'">
+        <img *ngFor="let result of searchResults; let i = index"
+             [src]="result.imageUrl"
+             [alt]="result.label"
+             [class.active]="i === currentImageIndex"
+             (load)="onImageLoad(i)">
       </div>
     </div>
   </div>
