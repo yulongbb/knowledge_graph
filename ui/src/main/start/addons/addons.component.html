@@ -34,14 +34,18 @@
         </div>
         <div class="carousel-info">
           <div class="app-info">
-            <img [src]="pinnedExtensions[currentSlide].image" alt="App logo" class="app-logo">
-            <h3>{{ pinnedExtensions[currentSlide].name }}</h3>
-            <div class="rating">
-              <span *ngFor="let star of [1,2,3,4,5]">
-                <span *ngIf="star <= pinnedExtensions[currentSlide].rating">★</span>
-                <span *ngIf="star > pinnedExtensions[currentSlide].rating">☆</span>
-              </span>
-              <span class="reviews">({{ pinnedExtensions[currentSlide].reviews }})</span>
+            <div class="header-row">
+              <img [src]="pinnedExtensions[currentSlide].image" alt="App logo" class="app-logo">
+              <div class="title-rating">
+                <h3>{{ pinnedExtensions[currentSlide].name }}</h3>
+                <div class="rating">
+                  <span *ngFor="let star of [1,2,3,4,5]">
+                    <span *ngIf="star <= pinnedExtensions[currentSlide].rating">★</span>
+                    <span *ngIf="star > pinnedExtensions[currentSlide].rating">☆</span>
+                  </span>
+                  <span class="reviews">({{ pinnedExtensions[currentSlide].reviews }})</span>
+                </div>
+              </div>
             </div>
             <div class="description" [innerHTML]="getShortDescription(pinnedExtensions[currentSlide].description)">
             </div>

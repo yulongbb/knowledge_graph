@@ -1,0 +1,12 @@
+<div class="knowledge-page">
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchText" placeholder="搜索知识...">
+    <button (click)="onSearch()">搜索</button>
+  </div>
+  
+  <app-knowledge-nav [categories]="categories"></app-knowledge-nav>
+  
+  <div class="content">
+    <!-- Content area -->
+  </div>
+</div>

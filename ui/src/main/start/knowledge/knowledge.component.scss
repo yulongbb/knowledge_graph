@@ -1,0 +1,40 @@
+.knowledge-page {
+  padding: 16px 24px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+  
+  .search-bar {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    
+    input {
+      padding: 8px 12px;
+      width: 320px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      margin-right: 12px;
+      transition: all 0.3s;
+      
+      &:focus {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        outline: none;
+      }
+    }
+    
+    button {
+      padding: 8px 16px;
+      background-color: #1890ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      &:hover {
+        background-color: #40a9ff;
+      }
+    }
+  }
+}

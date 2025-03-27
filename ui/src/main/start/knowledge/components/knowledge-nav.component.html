@@ -1,0 +1,21 @@
+<nav class="knowledge-nav">
+  <ul class="nav-list" *ngIf="categories?.length; else empty">
+    <!-- Fixed categories -->
+    <li *ngFor="let category of getFixedCategories()" 
+        [class.selected]="isSelected(category)"
+        (click)="selectCategory(category, 0)">
+      {{ category.name }}
+    </li>
+
+    <!-- Regular categories -->
+    <li *ngFor="let category of getCurrentLevelCategories()"
+        [class.selected]="isSelected(category)"
+        (click)="selectCategory(category, 0)">
+      {{ category.name }}
+    </li>
+  </ul>
+
+  <ng-template #empty>
+    <div class="empty-state">暂无分类数据</div>
+  </ng-template>
+</nav>

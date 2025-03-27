@@ -610,10 +610,11 @@ $white: white;
   overflow: visible; // 改为visible以允许按钮超出容器
   background: $white;
   border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); // 添加阴影效果
 
   .carousel-container {
     display: flex;
-    height: 400px;
+    height: 300px; // 将高度从400px改为300px
   }
 
   .main-image {
@@ -635,97 +636,56 @@ $white: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 300px;
+    overflow: hidden;
 
     .app-info {
+      flex: 1;
+      overflow: hidden;
+      padding-right: 8px;
+      margin-bottom: 16px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
 
-      .app-logo {
-        width: 80px;
-        height: 80px;
-        border-radius: 16px;
-        margin-bottom: 16px;
-        object-fit: cover;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-
-      h3 {
-        font-size: 24px;
-        margin: 0 0 16px 0;
-        color: $text-color;
-      }
-
-      .rating {
+      .header-row {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 12px;
+        margin-bottom: 12px;
 
-        span {
-          color: #ffc107;
-          font-size: 20px;
+        .app-logo {
+          width: 48px;
+          height: 48px;
+          margin: 0;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .reviews {
-          margin-left: 8px;
-          color: $light-text-color;
-          font-size: 14px;
+        .title-rating {
+          flex: 1;
+          text-align: left;
+
+          h3 {
+            font-size: 20px;
+            margin: 0 0 4px 0;
+            color: $text-color;
+          }
+
+          .rating {
+            margin: 0;
+          }
         }
       }
 
       .description {
         font-size: 14px;
-        line-height: 1.6;
-        color: $light-text-color;
-        margin: 16px 0;
+        line-height: 1.5;
+        margin: 12px 0;
         text-align: left;
-        max-height: 180px;
-        overflow-y: auto;
-        padding-right: 8px;
-
-        ::ng-deep {
-          p {
-            margin: 8px 0;
-          }
-          
-          a {
-            color: $primary-color;
-            text-decoration: none;
-            
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-
-          ul, ol {
-            margin: 8px 0;
-            padding-left: 20px;
-          }
-
-          img {
-            max-width: 100%;
-            height: auto;
-          }
-        }
-
-        &::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 2px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 2px;
-        }
-
-        &::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 6; // 增加显示行数
+        -webkit-box-orient: vertical;
       }
     }
   }
@@ -750,9 +710,9 @@ $white: white;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #666;
+    border: 1px solid #ddd;
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -763,9 +723,12 @@ $white: white;
     font-size: 24px;
     transition: all 0.3s;
     z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
     &:hover {
-      background: rgba(0, 0, 0, 0.7);
+      background: white;
+      color: $primary-color;
+      border-color: $primary-color;
       transform: translateY(-50%) scale(1.1);
     }
 

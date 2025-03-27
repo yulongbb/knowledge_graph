@@ -1,0 +1,141 @@
+.knowledge-nav {
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  .nav-list {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    margin: 0;
+    list-style: none;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto;
+    background-color: white;
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 16px;
+      cursor: pointer;
+      color: #666;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      margin-right: 16px;
+      
+      &:hover {
+        color: #1890ff;
+        border-color: #1890ff;
+      }
+      
+      &::before {
+        content: '←';
+        margin-right: 4px;
+      }
+    }
+    
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #e8e8e8;
+      border-radius: 3px;
+    }
+
+    li {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 8px;
+      padding: 6px 16px;
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+      border-radius: 4px;
+      transition: all 0.3s;
+      
+      // Special style for discover and following
+      &:nth-child(1), &:nth-child(2) {
+        color: #666;
+        margin-right: 16px;
+        
+        &:hover {
+          color: #1890ff;
+        }
+        
+        &.selected {
+          color: #1890ff;
+          font-weight: 500;
+          background-color: #e6f7ff;
+        }
+
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background-color: white;
+      }
+      
+      // Remove the separator
+      &:nth-child(2)::before {
+        display: none;
+      }
+      
+      // Regular categories
+      &:not(:nth-child(1)):not(:nth-child(2)) {
+        color: #666;
+        
+        &:hover {
+          color: #1890ff;
+        }
+        
+        &.selected {
+          color: #1890ff;
+          font-weight: 500;
+          background-color: #e6f7ff;
+        }
+      }
+
+      &.path-item {
+        color: #1890ff;
+        font-weight: 500;
+        margin-right: 16px;
+        
+        // Remove the separator
+        &:after {
+          display: none;
+        }
+
+        &.selected {
+          color: #1890ff;
+          font-weight: 500;
+          background-color: #e6f7ff;
+        }
+      }
+    }
+    
+    &.sub-list {
+      background-color: transparent;
+      
+      li {
+        &:hover {
+          color: #1890ff;
+        }
+        
+        &.selected {
+          color: #1890ff;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Remove unused styles
+  .sub-nav, .sub-sub-nav {
+    display: none;
+  }
+
+  .empty-state {
+    padding: 24px;
+    text-align: center;
+    color: #999;
+    background-color: #fafafa;
+  }
+}
