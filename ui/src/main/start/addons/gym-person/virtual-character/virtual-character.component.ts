@@ -142,9 +142,9 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
       2000
     );
     
-    // 调整相机位置，让模型更居中
-    this.camera.position.set(0, 150, 500);
-    this.camera.lookAt(0, 150, 0);
+    // 降低相机初始位置
+    this.camera.position.set(0, 50, 500);
+    this.camera.lookAt(0, 50, 0);
 
     // 优化灯光设置
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.5); // 增加环境光强度
@@ -215,8 +215,8 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
         const scale = 1.5;
         fbx.scale.setScalar(scale);
         
-        // 将模型放置在中心位置，稍微抬高，并调整旋转
-        fbx.position.set(0, size.y * scale * 0.1, 0);
+        // 将模型放置在更低的位置
+        fbx.position.set(0, -size.y * scale * 0.2, 0);
         fbx.rotation.set(0, 0, 0); // 修改这里：设置为(0, 0, 0)使模型面向摄像机
 
         this.scene.add(fbx);
@@ -248,12 +248,12 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
         // 调整相机位置适应模型大小，并确保正面观察
         const modelHeight = size.y * scale;
         const cameraDistance = modelHeight * 2;
-        this.camera.position.set(0, modelHeight * 0.7, cameraDistance);
-        this.camera.lookAt(0, modelHeight * 0.7, 0);
+        this.camera.position.set(0, modelHeight * 0.3, cameraDistance);
+        this.camera.lookAt(0, modelHeight * 0.3, 0);
 
         // 更新控制器的目标点
         if (this.controls) {
-          this.controls.target.set(0, modelHeight * 0.5, 0);
+          this.controls.target.set(0, modelHeight * 0.3, 0);
           this.controls.update();
         }
 
@@ -368,7 +368,9 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
       const intersection = intersects[0];
       const label = prompt('请输入标记名称：');
       if (label) {
-        const position = intersection.point;
+        // 计算偏移后的位置
+        const normal = intersection.face?.normal.clone() || new THREE.Vector3(0, 0, 1);
+        const position = intersection.point.clone().add(normal.multiplyScalar(5)); // 沿法线方向偏移30个单位
         this.addMarker(position, label);
       }
     }
@@ -427,14 +429,13 @@ export class VirtualCharacterComponent implements OnInit, AfterViewInit, OnDestr
     const spriteMaterial = new THREE.SpriteMaterial({
       map: texture,
       transparent: true,
-      depthTest: false
+      depthTest: true,  // 启用深度测试
+      depthWrite: true  // 启用深度写入
     });
     
     const sprite = new THREE.Sprite(spriteMaterial);
     sprite.position.copy(position);
-    sprite.scale.set(20, 20, 1);
-    
-    // 添加用户数据
+    sprite.scale.set(20, 20, 1); // 增大标记尺寸
     sprite.userData = { label };
     
     return sprite;
