@@ -15,6 +15,7 @@
         <div *ngFor="let node of treeNodes" class="tree-node">
           <div class="node-content" 
                (click)="toggleNode(node)" 
+               (contextmenu)="onContextMenu($event, node)"
                [class.selected]="node === selectedNode">
             <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
             <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
@@ -27,67 +28,238 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- 第二栏和第三栏的默认内容 -->
-    <div class="empty-content" *ngIf="!selectedNode?.type">
-      <div class="empty-icon">📚</div>
-      <h3>字典管理</h3>
-      <p>请从左侧选择属性来管理字典</p>
-      <div class="guide-steps">
-        <div class="step">
-          <span class="step-number">1</span>
-          <div class="step-content">
-            <h4>选择类型</h4>
-            <p>在左侧树中展开类型节点</p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-number">2</span>
-          <div class="step-content">
-            <h4>选择属性</h4>
-            <p>点击属性节点查看字典列表</p>
-          </div>
-        </div>
-        <div class="step">
-          <span class="step-number">3</span>
-          <div class="step-content">
-            <h4>管理字典</h4>
-            <p>添加、编辑或删除字典项</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 第二栏：字典列表 -->
-    <div class="dictionary-list" *ngIf="selectedNode?.type === 'property'">
-      <div class="dictionary-header">
-        <h2>字典列表 - {{selectedNode?.title}}</h2>
-        <button class="btn-icon" (click)="openForm()">
+      <!-- 添加根类型按钮 -->
+      <div class="tree-footer">
+        <button class="btn-add-root" (click)="addRootType()">
           <i class="icon-add">+</i>
+          <span>添加根类型</span>
         </button>
       </div>
-      <div class="dictionary-items">
-        <div class="dictionary-item" *ngFor="let item of dictionaryList" 
-             [class.selected]="item === editData"
-             (click)="selectDictionary(item)">
-          <div class="item-content">
-            <div class="item-header">
-              <h3>{{item.name}}</h3>
-              <div class="item-actions">
-                <button class="btn-link" (click)="$event.stopPropagation(); deleteDictionary(item.id)">
-                  <i class="icon-delete">×</i>
-                </button>
-              </div>
-            </div>
-            <p>{{item.description}}</p>
-          </div>
-        </div>
+    </div>
+
+    <!-- 添加右键菜单 -->
+    <div class="context-menu" 
+         *ngIf="contextMenuVisible"
+         [style.left.px]="contextMenuPosition.x"
+         [style.top.px]="contextMenuPosition.y">
+      <div class="menu-item" *ngFor="let item of menuItems" (click)="onMenuItemClick(item)">
+        <span class="menu-icon">{{item.icon}}</span>
+        <span class="menu-label">{{item.label}}</span>
       </div>
     </div>
 
-    <!-- 第三栏：字典编辑 -->
-    <div class="dictionary-form" *ngIf="showForm">
+    <!-- 修改右侧内容区域的显示逻辑 -->
+    <ng-container *ngIf="!showEditForm && !showAddForm">
+      <!-- 右侧默认显示内容 -->
+      <div class="empty-content" *ngIf="!selectedNode?.type">
+        <div class="empty-icon">📚</div>
+        <h3>字典管理</h3>
+        <p>请从左侧选择属性来管理字典</p>
+        <div class="guide-steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <h4>选择类型</h4>
+              <p>在左侧树中展开类型节点</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <h4>选择属性</h4>
+              <p>点击属性节点查看字典列表</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <h4>管理字典</h4>
+              <p>添加、编辑或删除字典项</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字典列表和编辑表单 -->
+      <div class="dictionary-list" *ngIf="selectedNode?.type === 'property'">
+        <div class="dictionary-header">
+          <h2>字典列表 - {{selectedNode?.title}}</h2>
+          <button class="btn-icon" (click)="openForm()">
+            <i class="icon-add">+</i>
+          </button>
+        </div>
+        <div class="dictionary-items">
+          <div class="dictionary-item" *ngFor="let item of dictionaryList" 
+               [class.selected]="item === editData"
+               (click)="selectDictionary(item)">
+            <div class="item-content">
+              <div class="item-header">
+                <h3>{{item.name}}</h3>
+                <div class="item-actions">
+                  <button class="btn-link" (click)="$event.stopPropagation(); deleteDictionary(item.id)">
+                    <i class="icon-delete">×</i>
+                  </button>
+                </div>
+              </div>
+              <p>{{item.description}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- 编辑类型或属性的表单 -->
+    <div class="dictionary-form" *ngIf="showEditForm">
+      <div class="form-header">
+        <h2>编辑{{editFormType === 'schema' ? '类型' : '属性'}}</h2>
+        <button class="btn-link" (click)="closeEditForm()">取消</button>
+      </div>
+      <form #editForm="ngForm" class="form-content">
+        <div class="form-group">
+          <label>名称：</label>
+          <input type="text" name="name" [(ngModel)]="editFormData.name" required>
+        </div>
+        <!-- Schema特有字段 -->
+        <ng-container *ngIf="editFormType === 'schema'">
+          <div class="form-group">
+            <label>标签：</label>
+            <input type="text" name="label" [(ngModel)]="editFormData.label">
+          </div>
+          <div class="form-group">
+            <label>描述：</label>
+            <textarea name="description" [(ngModel)]="editFormData.description"></textarea>
+          </div>
+          <div class="form-group">
+            <label>表名：</label>
+            <input type="text" name="collection" [(ngModel)]="editFormData.collection">
+          </div>
+          <div class="form-group">
+            <label>图标：</label>
+            <input type="text" name="icon" [(ngModel)]="editFormData.icon">
+          </div>
+          <div class="form-group">
+            <label>颜色：</label>
+            <input type="color" name="color" [(ngModel)]="editFormData.color">
+          </div>
+          <div class="form-group">
+            <label>排序：</label>
+            <input type="number" name="sort" [(ngModel)]="editFormData.sort">
+          </div>
+        </ng-container>
+        <!-- Property特有字段 -->
+        <ng-container *ngIf="editFormType === 'property'">
+          <div class="form-group">
+            <label>英文名称：</label>
+            <input type="text" name="enName" [(ngModel)]="editFormData.enName">
+          </div>
+          <div class="form-group">
+            <label>描述：</label>
+            <textarea name="description" [(ngModel)]="editFormData.description"></textarea>
+          </div>
+          <div class="form-group">
+            <label>英文描述：</label>
+            <textarea name="enDescription" [(ngModel)]="editFormData.enDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label>类型：</label>
+            <input type="text" name="type" [(ngModel)]="editFormData.type">
+          </div>
+          <div class="form-group">
+            <label>分组：</label>
+            <input type="text" name="group" [(ngModel)]="editFormData.group">
+          </div>
+          <div class="form-group">
+            <label>是否主要：</label>
+            <input type="checkbox" name="isPrimary" [(ngModel)]="editFormData.isPrimary">
+          </div>
+        </ng-container>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="saveEditForm()" [disabled]="!editForm.valid">
+            保存
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 新增子节点或属性的表单 -->
+    <div class="dictionary-form" *ngIf="showAddForm">
+      <div class="form-header">
+        <h2>新增{{addFormType === 'subtype' ? '子类型' : '属性'}}</h2>
+        <button class="btn-link" (click)="closeAddForm()">取消</button>
+      </div>
+      <form #addForm="ngForm" class="form-content">
+        <!-- Schema特有字段 -->
+        <ng-container *ngIf="addFormType === 'subtype'">
+          <div class="form-group">
+            <label>名称：</label>
+            <input type="text" name="name" [(ngModel)]="addFormData.name" required>
+          </div>
+          <div class="form-group">
+            <label>标签：</label>
+            <input type="text" name="label" [(ngModel)]="addFormData.label">
+          </div>
+          <div class="form-group">
+            <label>描述：</label>
+            <textarea name="description" [(ngModel)]="addFormData.description"></textarea>
+          </div>
+          <div class="form-group">
+            <label>表名：</label>
+            <input type="text" name="collection" [(ngModel)]="addFormData.collection">
+          </div>
+          <div class="form-group">
+            <label>图标：</label>
+            <input type="text" name="icon" [(ngModel)]="addFormData.icon">
+          </div>
+          <div class="form-group">
+            <label>颜色：</label>
+            <input type="color" name="color" [(ngModel)]="addFormData.color">
+          </div>
+          <div class="form-group">
+            <label>排序：</label>
+            <input type="number" name="sort" [(ngModel)]="addFormData.sort">
+          </div>
+        </ng-container>
+        <!-- Property特有字段 -->
+        <ng-container *ngIf="addFormType === 'property'">
+          <div class="form-group">
+            <label>名称：</label>
+            <input type="text" name="name" [(ngModel)]="addFormData.name" required>
+          </div>
+          <div class="form-group">
+            <label>英文名称：</label>
+            <input type="text" name="enName" [(ngModel)]="addFormData.enName">
+          </div>
+          <div class="form-group">
+            <label>描述：</label>
+            <textarea name="description" [(ngModel)]="addFormData.description"></textarea>
+          </div>
+          <div class="form-group">
+            <label>英文描述：</label>
+            <textarea name="enDescription" [(ngModel)]="addFormData.enDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label>类型：</label>
+            <input type="text" name="type" [(ngModel)]="addFormData.type">
+          </div>
+          <div class="form-group">
+            <label>分组：</label>
+            <input type="text" name="group" [(ngModel)]="addFormData.group">
+          </div>
+          <div class="form-group">
+            <label>是否主要：</label>
+            <input type="checkbox" name="isPrimary" [(ngModel)]="addFormData.isPrimary">
+          </div>
+        </ng-container>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="saveAddForm()" [disabled]="!addForm.valid">
+            保存
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 修改字典表单条件 -->
+    <div class="dictionary-form" *ngIf="showForm && !showAddForm && !showEditForm">
       <div class="form-header">
         <h2>{{editData?.id ? '编辑' : '新增'}}字典</h2>
         <button class="btn-link" (click)="closeForm()">取消</button>
@@ -115,6 +287,7 @@
   <div *ngFor="let node of nodes" class="tree-node">
     <div class="node-content" 
          (click)="node.isFolder ? toggleNode(node) : selectNode(node)"
+         (contextmenu)="onContextMenu($event, node)"
          [class.selected]="node === selectedNode">
       <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
       <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">

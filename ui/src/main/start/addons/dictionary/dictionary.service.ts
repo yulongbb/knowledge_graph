@@ -57,4 +57,20 @@ export class DictionaryService {
   deleteProperty(id: string): Observable<any> {
     return this.http.delete(`/api/properties/${id}`);
   }
+
+  updateSubtype(data: any): Observable<any> {
+    return this.http.put(`/api/schemas/${data.id}`, data);
+  }
+
+  updateProperty(data: any): Observable<any> {
+    return this.http.put(`/api/properties/${data.id}`, data);
+  }
+
+  getSchema(id: string): Observable<any> {
+    return this.http.get(`/api/schemas/${id}`);
+  }
+
+  getProperty(id: string): Observable<any> {
+    return this.http.get(`/api/properties/${id}`);
+  }
 }
