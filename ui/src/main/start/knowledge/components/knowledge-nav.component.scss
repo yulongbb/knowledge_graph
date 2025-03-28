@@ -1,6 +1,12 @@
 .knowledge-nav {
+  position: fixed;
+  top: 60px; // 紧贴顶部导航
+  left: 0;
+  right: 0;
+  z-index: 100;
   background-color: white;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
   .nav-list {
     display: flex;
     align-items: center;
@@ -90,6 +96,10 @@
           color: #1890ff;
           font-weight: 500;
           background-color: #e6f7ff;
+          
+          & + li {
+            margin-left: 16px; // Add spacing after selected category
+          }
         }
       }
 
@@ -108,6 +118,19 @@
           font-weight: 500;
           background-color: #e6f7ff;
         }
+      }
+      
+      // Add level indicators
+      &[data-level="1"] {
+        margin-left: 16px;
+      }
+      
+      &[data-level="2"] {
+        margin-left: 32px;
+      }
+      
+      &[data-level="3"] {
+        margin-left: 48px;
       }
     }
     

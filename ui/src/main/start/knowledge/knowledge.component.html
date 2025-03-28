@@ -1,12 +1,80 @@
 <div class="knowledge-page">
-  <div class="search-bar">
-    <input type="text" [(ngModel)]="searchText" placeholder="搜索知识...">
-    <button (click)="onSearch()">搜索</button>
+  <app-knowledge-nav 
+    [categories]="categories"
+    (categorySelected)="onCategorySelected($event)">
+  </app-knowledge-nav>
+
+  <div class="search-container">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" 
+             [(ngModel)]="searchText" 
+             placeholder="搜索知识..." 
+             (keyup.enter)="onSearch()"
+             [ngStyle]="{'padding-right': searchText ? '40px' : '20px'}"
+      >
+      <i class="fas fa-times clear-icon" 
+         *ngIf="searchText"
+         (click)="clearSearch()"
+      ></i>
+    </div>
   </div>
   
-  <app-knowledge-nav [categories]="categories"></app-knowledge-nav>
-  
-  <div class="content">
-    <!-- Content area -->
+  <div class="content" infiniteScroll
+       [infiniteScrollDistance]="2"
+       [infiniteScrollThrottle]="50"
+       (scrolled)="onScrollEntity()">
+    <!-- 知识卡片网格 -->
+    <div class="news-grid">
+      <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
+        <!-- 视频内容 -->
+        <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
+          <a [routerLink]="'/start/search/info/' + entity._id">
+            <img [src]="'data:image/jpeg;base64,' + entity['_source']?.videos[0].thumbnail"
+                 class="thumbnail" loading="lazy" style="width: 100%; border-radius: 4px"/>
+            <div class="play-icon">
+              <i class="fas fa-play"></i>
+            </div>
+            <div class="video-duration">
+              {{ entity["_source"]?.videos[0].duration || "00:00" }}
+            </div>
+          </a>
+          <div class="overlay-text">
+            <h3 [routerLink]="'/start/search/info/' + entity._id">
+              {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+              {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+            </h3>
+            <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+          </div>
+        </div>
+
+        <!-- 文档内容 -->
+        <div *ngIf="entity['_source']?.documents?.length > 0" class="thumbnail-container">
+          <a [routerLink]="'/start/search/info/' + entity._id">
+            <img [src]="entity['_source']?.documents[0].thumbnail"
+                 class="thumbnail" loading="lazy" style="width: 100%; border-radius: 4px"/>
+          </a>
+          <div class="overlay-text">
+            <h3 [routerLink]="'/start/search/info/' + entity._id">
+              {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+              {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+            </h3>
+            <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+          </div>
+        </div>
+
+        <!-- 图片内容 -->
+        <div *ngIf="!entity['_source']?.documents && !entity['_source']?.videos">
+          <img class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
+               [src]="image.startsWith('http') ? image : 'http://'+ip+':9000/kgms/' + image"
+               loading="lazy" style="width: 100%; border-radius: 4px; margin-bottom: 12px"/>
+          <h3 [routerLink]="'/start/search/info/' + entity._id">
+            {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+            {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+          </h3>
+          <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
