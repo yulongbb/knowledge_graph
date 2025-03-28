@@ -24,6 +24,7 @@ export class DictionaryComponent implements OnInit {
   editData: any = null;
   currentPropertyId: string | undefined;
   loading = false;
+  showForm = false;
 
   constructor(private dictionaryService: DictionaryService) {}
 
@@ -138,6 +139,21 @@ export class DictionaryComponent implements OnInit {
     this.editData = null;
   }
 
+  openForm() {
+    this.editData = { propertyId: this.currentPropertyId };
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.editData = null;
+  }
+
+  selectDictionary(item: any) {
+    this.editData = { ...item };
+    this.showForm = true;
+  }
+
   saveDictionary(formValue: any) {
     if (!formValue) return;
     
@@ -148,7 +164,7 @@ export class DictionaryComponent implements OnInit {
     
     this.dictionaryService.saveDictionary(data).subscribe(() => {
       this.loadDictionaryList();
-      this.closeModal();
+      this.closeForm();
     });
   }
 

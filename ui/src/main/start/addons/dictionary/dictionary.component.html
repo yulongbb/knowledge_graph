@@ -1,40 +1,129 @@
-<div class="dictionary-container">
-  <div class="tree-container">
-    <div *ngIf="loading" class="loading-overlay">
-      <span class="loading-text">Loading...</span>
-    </div>
-    <div class="tree-content">
-      <div *ngFor="let node of treeNodes" class="tree-node">
-        <div class="node-content" 
-             (click)="toggleNode(node)" 
-             [class.selected]="node === selectedNode">
-          <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
-          <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
-            {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
-          </span>
-          <span class="node-title">{{node.title}}</span>
-        </div>
-        <div *ngIf="node.expanded" class="node-children">
-          <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
+<div class="dictionary-layout">
+  <!-- 顶部导航条 -->
+  <div class="navbar">
+    <div class="navbar-title">字典管理</div>
+  </div>
+
+  <!-- 主内容区域 -->
+  <div class="dictionary-container">
+    <!-- 第一栏：树 -->
+    <div class="tree-container">
+      <div *ngIf="loading" class="loading-overlay">
+        <span class="loading-text">Loading...</span>
+      </div>
+      <div class="tree-content">
+        <div *ngFor="let node of treeNodes" class="tree-node">
+          <div class="node-content" 
+               (click)="toggleNode(node)" 
+               [class.selected]="node === selectedNode">
+            <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
+            <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
+              {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
+            </span>
+            <span class="node-title">{{node.title}}</span>
+          </div>
+          <div *ngIf="node.expanded" class="node-children">
+            <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- 第二栏和第三栏的默认内容 -->
+    <div class="empty-content" *ngIf="!selectedNode?.type">
+      <div class="empty-icon">📚</div>
+      <h3>字典管理</h3>
+      <p>请从左侧选择属性来管理字典</p>
+      <div class="guide-steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <div class="step-content">
+            <h4>选择类型</h4>
+            <p>在左侧树中展开类型节点</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <div class="step-content">
+            <h4>选择属性</h4>
+            <p>点击属性节点查看字典列表</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <div class="step-content">
+            <h4>管理字典</h4>
+            <p>添加、编辑或删除字典项</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二栏：字典列表 -->
+    <div class="dictionary-list" *ngIf="selectedNode?.type === 'property'">
+      <div class="dictionary-header">
+        <h2>字典列表 - {{selectedNode?.title}}</h2>
+        <button class="btn-icon" (click)="openForm()">
+          <i class="icon-add">+</i>
+        </button>
+      </div>
+      <div class="dictionary-items">
+        <div class="dictionary-item" *ngFor="let item of dictionaryList" 
+             [class.selected]="item === editData"
+             (click)="selectDictionary(item)">
+          <div class="item-content">
+            <div class="item-header">
+              <h3>{{item.name}}</h3>
+              <div class="item-actions">
+                <button class="btn-link" (click)="$event.stopPropagation(); deleteDictionary(item.id)">
+                  <i class="icon-delete">×</i>
+                </button>
+              </div>
+            </div>
+            <p>{{item.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第三栏：字典编辑 -->
+    <div class="dictionary-form" *ngIf="showForm">
+      <div class="form-header">
+        <h2>{{editData?.id ? '编辑' : '新增'}}字典</h2>
+        <button class="btn-link" (click)="closeForm()">取消</button>
+      </div>
+      <form #form="ngForm" class="form-content">
+        <div class="form-group">
+          <label>名称：</label>
+          <input type="text" name="name" [(ngModel)]="editData.name" required>
+        </div>
+        <div class="form-group">
+          <label>描述：</label>
+          <textarea name="description" [(ngModel)]="editData.description"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="saveDictionary(editData)" [disabled]="!form.valid">
+            保存
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-  
-  <ng-template #treeNodeTemplate let-nodes>
-    <div *ngFor="let node of nodes" class="tree-node">
-      <div class="node-content" 
-           (click)="node.isFolder ? toggleNode(node) : selectNode(node)"
-           [class.selected]="node === selectedNode">
-        <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
-        <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
-          {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
-        </span>
-        <span class="node-title">{{node.title}}</span>
-      </div>
-      <div *ngIf="node.expanded" class="node-children">
-        <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
-      </div>
-    </div>
-  </ng-template>
 </div>
+
+<ng-template #treeNodeTemplate let-nodes>
+  <div *ngFor="let node of nodes" class="tree-node">
+    <div class="node-content" 
+         (click)="node.isFolder ? toggleNode(node) : selectNode(node)"
+         [class.selected]="node === selectedNode">
+      <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
+      <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
+        {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
+      </span>
+      <span class="node-title">{{node.title}}</span>
+    </div>
+    <div *ngIf="node.expanded" class="node-children">
+      <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
+    </div>
+  </div>
+</ng-template>
