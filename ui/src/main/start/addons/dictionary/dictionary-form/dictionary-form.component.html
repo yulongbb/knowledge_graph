@@ -1,0 +1,23 @@
+<form [formGroup]="form">
+  <div class="form-item">
+    <label>名称</label>
+    <input formControlName="name" type="text" placeholder="请输入名称">
+    <div class="error-message" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+      请输入名称
+    </div>
+  </div>
+  <div class="form-item">
+    <label>编码</label>
+    <input formControlName="code" type="text" placeholder="请输入编码">
+    <div class="error-message" *ngIf="form.get('code')?.touched && form.get('code')?.invalid">
+      请输入编码
+    </div>
+  </div>
+  <div class="form-item">
+    <label>值</label>
+    <input formControlName="value" type="text" placeholder="请输入值">
+    <div class="error-message" *ngIf="form.get('value')?.touched && form.get('value')?.invalid">
+      请输入值
+    </div>
+  </div>
+</form>

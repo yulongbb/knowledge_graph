@@ -92,6 +92,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/gym-person/gym-person.module").then(x => x.GymPersonModule),
   },
+  {
+    path: "dictionary",
+    loadChildren: () =>
+      import("../main/start/addons/dictionary/dictionary.module").then(x => x.DictionaryModule),
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
   ...shareRoutes

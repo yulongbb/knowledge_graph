@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import cytoscape from 'cytoscape';
+import * as cytoscape from 'cytoscape';
 import { PropertyService } from '../property/property.service';
 
 @Component({

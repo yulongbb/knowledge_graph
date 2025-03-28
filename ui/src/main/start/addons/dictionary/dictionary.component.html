@@ -1,0 +1,40 @@
+<div class="dictionary-container">
+  <div class="tree-container">
+    <div *ngIf="loading" class="loading-overlay">
+      <span class="loading-text">Loading...</span>
+    </div>
+    <div class="tree-content">
+      <div *ngFor="let node of treeNodes" class="tree-node">
+        <div class="node-content" 
+             (click)="toggleNode(node)" 
+             [class.selected]="node === selectedNode">
+          <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
+          <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
+            {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
+          </span>
+          <span class="node-title">{{node.title}}</span>
+        </div>
+        <div *ngIf="node.expanded" class="node-children">
+          <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template #treeNodeTemplate let-nodes>
+    <div *ngFor="let node of nodes" class="tree-node">
+      <div class="node-content" 
+           (click)="node.isFolder ? toggleNode(node) : selectNode(node)"
+           [class.selected]="node === selectedNode">
+        <span class="expand-icon" *ngIf="node.isFolder">{{node.expanded ? '▼' : '▶'}}</span>
+        <span class="icon" [class.icon-folder]="node.isFolder" [class.icon-file]="!node.isFolder">
+          {{node.isFolder ? (node.expanded ? '📂' : '📁') : '📄'}}
+        </span>
+        <span class="node-title">{{node.title}}</span>
+      </div>
+      <div *ngIf="node.expanded" class="node-children">
+        <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
+      </div>
+    </div>
+  </ng-template>
+</div>

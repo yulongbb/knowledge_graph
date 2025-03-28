@@ -1,6 +1,7 @@
-import { Entity,JoinTable, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import { Entity, JoinTable, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany } from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { Qualify } from 'src/ontology/entities/qualify.entity';
+import { Dictionary } from './dictionary.entity';
 
 @Entity('ontology_property')
 export class Property {
@@ -31,8 +32,6 @@ export class Property {
   @ManyToMany(() => Schema, (schema) => schema.values)
   types: Schema[];
 
-
-  
   @ManyToMany(() => Qualify, (qualify) => qualify.properties)
   @JoinTable({
     name: 'ontology_qualify_property',
@@ -41,7 +40,9 @@ export class Property {
   })
   qualifiers: Qualify[];
 
-
   @Column('boolean', { nullable: true })
   isPrimary: string;
+
+  @OneToMany(() => Dictionary, (dictionary) => dictionary.property)
+  dictionaries: Dictionary[];
 }
