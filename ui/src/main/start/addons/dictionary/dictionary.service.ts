@@ -73,4 +73,6 @@ export class DictionaryService {
   getProperty(id: string): Observable<any> {
     return this.http.get(`/api/properties/${id}`);
   }
+
+
 }

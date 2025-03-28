@@ -70,11 +70,12 @@ export class DictionaryComponent implements OnInit, OnDestroy {
     const nodeMap = new Map<string, TreeNode>();
     const rootNodes: TreeNode[] = [];
 
+    // 第一次遍历：创建所有节点
     flatNodes.forEach(node => {
       nodeMap.set(node.id, {
         id: node.id,
         title: node.name || node.label,
-        type: node.type || 'schema',
+        type: 'schema',  // 所有节点都是schema类型，包括根节点和子节点
         children: [],
         expanded: false,
         isFolder: true,
@@ -82,18 +83,25 @@ export class DictionaryComponent implements OnInit, OnDestroy {
       });
     });
 
+    // 第二次遍历：构建树结构
     flatNodes.forEach(node => {
       const treeNode = nodeMap.get(node.id);
       if (node.pid) {
+        // 如果有父节点，添加到父节点的children中
         const parentNode = nodeMap.get(node.pid);
         if (parentNode) {
-          parentNode.children?.push(treeNode!);
+          // 合并现有的children（如果有的话）
+          parentNode.children = [...(parentNode.children || []), treeNode!];
+          // 保证children是有序的
+          parentNode.children = this.sortTreeNodes(parentNode.children);
         }
       } else {
+        // 如果没有父节点，作为根节点
         rootNodes.push(treeNode!);
       }
     });
 
+    // 对根节点排序
     return this.sortTreeNodes(rootNodes);
   }
 
@@ -102,37 +110,59 @@ export class DictionaryComponent implements OnInit, OnDestroy {
   }
 
   toggleNode(node: TreeNode) {
+    this.selectedNode = node;
+    this.dictionaryList = [];
+    this.currentPropertyId = undefined;
+
     if (node.isFolder) {
       node.expanded = !node.expanded;
-      if (node.expanded && (!node.children || node.children.length === 0)) {
-        this.loading = true;
-        this.dictionaryService.getProperties(node.id).subscribe(
-          response => {
-            node.children = response.list.map((prop: any) => ({
-              id: prop.id,
-              title: prop.name,
-              type: 'property',
-              propertyId: prop.id,
-              isFolder: false,
-              children: []
-            }));
-            node.children = this.sortTreeNodes(node.children);
-            this.loading = false;
-          },
-          error => {
-            console.error('Failed to load properties:', error);
-            this.loading = false;
-          }
-        );
-      }
+      this.loadNodeProperties(node);
+    }
+  }
+
+  loadNodeProperties(node: TreeNode) {
+    if (node.isFolder) {
+      this.loading = true;
+      this.dictionaryService.getProperties(node.id).subscribe(
+        response => {
+          // 将属性添加到节点的children中，不覆盖已有的子节点
+          const propertyNodes = response.list.map((prop: any) => ({
+            id: prop.id,
+            title: prop.name,
+            type: 'property',
+            propertyId: prop.id,
+            isFolder: false,
+            children: []
+          }));
+
+          // 保留现有的schema类型子节点
+          const existingChildren = node.children?.filter(child => child.type === 'schema') || [];
+          
+          // 合并schema节点和property节点
+          node.children = [...existingChildren, ...propertyNodes];
+          
+          // 重新排序
+          node.children = this.sortTreeNodes(node.children);
+          this.loading = false;
+        },
+        error => {
+          console.error('Failed to load properties:', error);
+          this.loading = false;
+        }
+      );
     }
   }
 
   selectNode(node: TreeNode) {
+    this.selectedNode = node;
+
     if (node.type === 'property') {
-      this.selectedNode = node;
       this.currentPropertyId = node.propertyId;
       this.loadDictionaryList();
+    } else if (node.type === 'schema') {
+      this.currentPropertyId = undefined;
+      this.dictionaryList = [];
+      this.loadNodeProperties(node);
     }
   }
 
@@ -195,7 +225,7 @@ export class DictionaryComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     
-    this.selectedNode = node; // 保存当前选中的节点
+    this.selectedNode = node;
     this.contextMenuPosition = {
       x: event.pageX,
       y: event.pageY
@@ -237,7 +267,7 @@ export class DictionaryComponent implements OnInit, OnDestroy {
         this.showAddForm = true;
         this.addFormType = 'subtype';
         this.addFormData = {
-          id: XGuid(), // 这里需要导入 XGuid
+          id: XGuid(),
           pid: this.selectedNode.id,
           name: '',
           label: '',
@@ -265,14 +295,11 @@ export class DictionaryComponent implements OnInit, OnDestroy {
         };
         break;
       case 'edit':
-        // 关闭其他表单
         this.showForm = false;
         this.showAddForm = false;
-        // 显示编辑表单
         this.showEditForm = true;
         this.editFormType = this.selectedNode.type === 'schema' ? 'schema' : 'property';
         if (this.editFormType === 'schema') {
-          // 获取完整的schema数据
           this.dictionaryService.getSchema(this.selectedNode.id).subscribe(data => {
             this.editFormData = {
               id: data.id,
@@ -286,7 +313,6 @@ export class DictionaryComponent implements OnInit, OnDestroy {
             };
           });
         } else {
-          // 获取完整的property数据
           this.dictionaryService.getProperty(this.selectedNode.id).subscribe(data => {
             this.editFormData = {
               id: data.id,
@@ -318,18 +344,30 @@ export class DictionaryComponent implements OnInit, OnDestroy {
   saveAddForm() {
     if (!this.addFormData.name) return;
 
-    const service = this.addFormType === 'subtype' ? 
-      this.dictionaryService.createSubtype(this.addFormData) :
-      this.dictionaryService.createProperty(this.addFormData);
-
-    service.subscribe(() => {
-      if (this.addFormType === 'subtype') {
+    if (this.addFormType === 'subtype') {
+      this.dictionaryService.createSubtype(this.addFormData).subscribe(() => {
         this.loadTreeData();
-      } else if (this.selectedNode?.expanded) {
-        this.toggleNode(this.selectedNode);
-      }
-      this.closeAddForm();
-    });
+        this.closeAddForm();
+      });
+    } else {
+      const propertyData = {
+        name: this.addFormData.name,
+        enName: this.addFormData.enName,
+        description: this.addFormData.description,
+        enDescription: this.addFormData.enDescription,
+        type: this.addFormData.type,
+        group: this.addFormData.group,
+        isPrimary: this.addFormData.isPrimary,
+        schemas: [{ id: this.selectedNode!.id }]
+      };
+
+      this.dictionaryService.createProperty(propertyData).subscribe(() => {
+        if (this.selectedNode?.expanded) {
+          this.toggleNode(this.selectedNode);
+        }
+        this.closeAddForm();
+      });
+    }
   }
 
   closeAddForm() {
@@ -362,7 +400,7 @@ export class DictionaryComponent implements OnInit, OnDestroy {
     this.addFormType = 'subtype';
     this.addFormData = {
       id: XGuid(),
-      pid: null, // 根节点没有父节点
+      pid: null,
       name: '',
       label: '',
       description: '',

@@ -24,6 +24,11 @@
             <span class="node-title">{{node.title}}</span>
           </div>
           <div *ngIf="node.expanded" class="node-children">
+            <!-- 在这里添加加载指示器 -->
+            <div *ngIf="loading && node === selectedNode" class="node-loading">
+              <span class="loading-spinner"></span>
+              <span class="loading-text">加载中...</span>
+            </div>
             <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
           </div>
         </div>
@@ -296,6 +301,11 @@
       <span class="node-title">{{node.title}}</span>
     </div>
     <div *ngIf="node.expanded" class="node-children">
+      <!-- 在这里添加加载指示器 -->
+      <div *ngIf="loading && node === selectedNode" class="node-loading">
+        <span class="loading-spinner"></span>
+        <span class="loading-text">加载中...</span>
+      </div>
       <ng-container *ngTemplateOutlet="treeNodeTemplate; context: { $implicit: node.children }"></ng-container>
     </div>
   </div>
