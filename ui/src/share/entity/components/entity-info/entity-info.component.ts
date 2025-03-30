@@ -18,6 +18,8 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
     entity: any;
     item: any;
     imgs: any = [];
+    videos: any[] = [];
+    pdfs: any[] = [];
     tag = signal([]);
     renderedContent: string = '';
     tableOfContents: any[] = []; // Initialize as empty array
@@ -100,11 +102,24 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         this.esService.getEntity(this.id).subscribe((x: any) => {
             this.entity = signal({ value: x });
             this.item = x._source;
+            console.log('Entity data:', this.item); // Debug log
             this.tag.set(this.item?.tags || []);
 
             // Handle images
             this.imgs = this.item?.images?.map((image: any) => ({
                 url: `http://localhost:9000/kgms/${image}`
+            })) || [];
+
+            // Handle videos
+            this.videos = this.item?.videos?.map((video: any) => ({
+                url: `http://localhost:9000/kgms/${video.url}`,
+                type: this.getVideoType(video.url)
+            })) || [];
+
+            // Handle PDFs
+            this.pdfs = this.item?.pdfs?.map((pdf: any) => ({
+                url: `http://localhost:9000/kgms/${pdf}`,
+                name: pdf.split('/').pop()
             })) || [];
 
             // Render content
@@ -152,7 +167,27 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         });
     }
 
+    hasMediaContent(): boolean {
+        return !!(this.imgs?.length || this.videos?.length || this.pdfs?.length);
+    }
 
+    openImage(url: string): void {
+        window.open(url, '_blank');
+    }
+
+    openPdf(url: string): void {
+        window.open(url, '_blank');
+    }
+
+    private getVideoType(filename: string): string {
+        const ext = filename.split('.').pop()?.toLowerCase();
+        switch (ext) {
+            case 'mp4': return 'video/mp4';
+            case 'webm': return 'video/webm';
+            case 'ogg': return 'video/ogg';
+            default: return 'video/mp4';
+        }
+    }
 
     editEntity() {
         this.router.navigate(['/start/search/edit', this.id]);

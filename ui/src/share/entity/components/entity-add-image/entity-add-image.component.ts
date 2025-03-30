@@ -3,6 +3,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import { TagService } from 'src/main/ontology/tag/tag.sevice';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-entity-add-image',
@@ -31,9 +32,9 @@ export class EntityAddImageComponent {
     private message: XMessageService,
     private location: Location,
     private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
   }
-
 
   onImagePaste(event: ClipboardEvent) {
     const clipboardData = event.clipboardData || (window as any).clipboardData;
@@ -224,7 +225,6 @@ export class EntityAddImageComponent {
         }
       },
       tags: this.selectedImage.tags?.split('#').filter((x:any) => x.trim() !== ''),
-      // 处理图片数据
       images: this.uploadedFiles.map(img => {
         const url = img.url.replace('http://localhost:9000/kgms/', '');
         return url;
@@ -235,8 +235,17 @@ export class EntityAddImageComponent {
     this.entityService.addItem(item).subscribe({
       next: () => {
         this.message.success('保存成功！');
+        // 清空表单信息
+        this.uploadedFiles = [];
+        this.selectedImage = null;
+        // 先触发保存成功事件
         this.saved.emit();
-        this.back();
+        // 使用 router 导航到指定路径，带上空的 keyword 参数
+        setTimeout(() => {
+          this.router.navigate(['/start/image'], { 
+            queryParams: { keyword: '' }
+          });
+        }, 300);
       },
       error: (error) => {
         this.message.error('保存失败：' + error.message);
@@ -251,9 +260,10 @@ export class EntityAddImageComponent {
     return `${timestamp}-${uniqueSuffix}${extension}`;
   }
 
-
   back() {
-    this.canceled.emit();
-    this.location.back();
+    // 直接使用 router 导航到指定路径，带上空的 keyword 参数
+    this.router.navigate(['/start/image'], {
+      queryParams: { keyword: '' }
+    });
   }
 }

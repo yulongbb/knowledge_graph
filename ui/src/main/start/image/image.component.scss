@@ -1,87 +1,3 @@
-// :host {
-
-//   x-input-group {
-//     display: block;
-//     width: 100%;
-//   }
-
-//   x-input-group:not(:first-child) {
-//     margin-top: 1rem;
-//   }
-
-//   .row:not(:first-child) {
-//     margin-top: 1rem;
-//   }
-
-//   .row x-card:not(:first-child) {
-//     margin-left: 2rem;
-//   }
-
-//   .row .card #header {
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-between;
-//   }
-
-
-
-//   .row:not(:first-child) {
-//     margin-top: 1rem;
-//   }
-
-//   .row x-card:not(:first-child) {
-//     margin-left: 2rem;
-//   }
-
-
-//   .row .card .bottom {
-//     padding: 0.625rem;
-//   }
-
-//   .row .card .bottom>p {
-//     margin: 0;
-//     font-size: 1rem;
-//   }
-
-//   .row .card .bottom>.time {
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-between;
-//   }
-
-//   .row .card .bottom>.time>span {
-//     color: var(--x-text-400);
-//   }
-
-//   ::ng-deep strong {
-//     color: brown;
-//   }
-
-//   // x-row {
-//   //   margin: 1rem 0;
-
-//   //   >x-col {
-//   //     margin: 0.5rem 0;
-
-//   //     >div {
-//   //       height: 300px;
-//   //       padding: 1rem;
-//   //       text-align: center;
-//   //       border-radius: 0.125rem;
-//   //       background-color: var(--x-info-400);
-//   //     }
-//   //   }
-
-//   //   &:first-child {
-//   //     margin-top: 0;
-//   //   }
-
-//   //   &:last-child {
-//   //     margin-bottom: 0;
-//   //   }
-//   // }
-
-
 .gallery {
   width: 100%;
   display: flex;
@@ -90,27 +6,34 @@
 .gallery .warp {
   width: 100%;
   display: grid;
-  grid-template-columns: 20% 20% 20% 20% auto;
-  grid-gap: 10px;
-  padding: 5px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); // 改为自适应列数
+  grid-gap: 20px; // 增加间距
+  padding: 10px;
   flex: none;
 }
 
 .gallery .thumbnail {
+  position: relative;
+  padding-bottom: 75%; // 保持 4:3 的宽高比
   border: 1px solid #CCC;
-  width: 100%;
-  height: 250px;
+  border-radius: 8px; // 添加圆角
   background-repeat: no-repeat;
-  /*background-size: contain;*/
   background-size: cover;
   background-position: center center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; // 添加过渡效果
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
 }
 
 .search-results {
-  height: 90%;
-  overflow: scroll;
+  min-height: calc(100vh - 200px); // 减去头部和底部的高度
+  overflow: visible; // 修改为 visible，移除滚动条
+  padding: 20px;
 }
-
 
 //全屏按钮
 video::-webkit-media-controls-fullscreen-button {
@@ -466,4 +389,35 @@ video::-webkit-media-controls-enclosure {
   color: #1a0dab;
   text-decoration: none;
   font-size: 14px;
+}
+
+.preview-dialog {
+  :host ::ng-deep {
+    .x-dialog-content {
+      padding: 0;
+      background: rgba(0, 0, 0, 0.9);
+      
+      .x-image-preview {
+        img {
+          max-width: 100%;
+          max-height: calc(100vh - 100px);
+          object-fit: contain;
+        }
+        
+        .preview-text {
+          color: #fff;
+          padding: 10px;
+          text-align: center;
+        }
+      }
+
+      .x-dialog-close {
+        color: #fff;
+      }
+
+      .x-dialog-arrow {
+        color: #fff;
+      }
+    }
+  }
 }

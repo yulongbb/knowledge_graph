@@ -12,7 +12,7 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, NavigationEnd } from '@angular/router';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import {
@@ -209,25 +209,48 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
-      this.id = x.get('id') as string;
-      this.type = x.get('type') as string;
-      if (this.type === 'info') {
-        this.title = '查看实体';
-        this.disabled = true;
-      } else if (this.type === 'add') {
-        this.title = '新增实体';
-      } else if (this.type === 'edit') {
-        this.title = '修改实体';
-      } else if (this.type === 'template') {
-        this.title = '修改模板';
+      const newId = x.get('id');
+      const newType = x.get('type');
+      if (newId !== this.id || newType !== this.type) {
+        this.id = newId as string;
+        this.type = newType as string;
+        // 当 ID 或类型改变时，强制重新加载数据
+        if (this.id) {
+          setTimeout(() => {
+            this.loadData();
+          });
+        }
       }
     });
+  }
+
+  // 新增加载数据的方法
+  loadData() {
+    if (this.type === 'info') {
+      this.esService.getEntity(this.id).subscribe({
+        next: (x: any) => {
+          // ...现有的数据加载逻辑...
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('加载数据失败:', error);
+          this.message.error('加载数据失败');
+        }
+      });
+    }
   }
 
   ngOnInit(): void {
     this.videos = [];
     this.action(this.type);
-  
+
+    // 添加导航事件监听
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // 当导航结束时重新加载数据
+        this.action(this.type);
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -1102,7 +1125,13 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-
+  onChildSaved() {
+    // 延迟执行数据刷新
+    setTimeout(() => {
+      this.loadData();
+      this.cdr.detectChanges();
+    }, 200);
+  }
 
   editEntity() {
     this.router.navigate(['/start/search/edit', this.id]);

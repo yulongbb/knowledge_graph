@@ -303,6 +303,87 @@ html {
   }
 }
 
+.media-content {
+  margin: 20px 0;
+  
+  .image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .image-item {
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      
+      img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  .video-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+
+    .video-item {
+      video {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    }
+  }
+
+  .pdf-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .pdf-item {
+      .pdf-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid $github-border;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        i {
+          font-size: 40px;
+          color: #ff4444;
+          margin-bottom: 10px;
+        }
+
+        span {
+          text-align: center;
+          word-break: break-word;
+        }
+
+        &:hover {
+          background-color: $github-bg;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+      }
+    }
+  }
+}
+
 // Animation
 @keyframes highlight-fade {
   0% { background-color: rgba(255, 255, 0, 0.2); }

@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { XDialogService, XImagePreviewComponent } from '@ng-nest/ui';
 import { EsService } from './es.service';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, NavigationEnd } from '@angular/router';
 import { OntologyService } from '../../ontology/ontology/ontology.service';
 import { PropertyService } from '../../ontology/property/property.service';
 import { forkJoin } from 'rxjs';
@@ -21,6 +21,8 @@ import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageDialogComponent } from './image-dialog/image.dialog.component';
 import { environment } from 'src/environments/environment';
+import { ChangeDetectorRef } from '@angular/core';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-image',
@@ -90,18 +92,56 @@ export class ImageComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     public propertyService: PropertyService,
     public dialog: MatDialog,
-    private dialogSewrvice: XDialogService
+    private dialogSewrvice: XDialogService,
+    private cdr: ChangeDetectorRef
   ) {
     this.activatedRoute.queryParamMap.subscribe((x: ParamMap) => {
-      // if (x.get('q') != null && x.get('q') != undefined && x.get('q') != '') {
       this.keyword = x.get('keyword') as string;
-      this.selectKeyword(this.keyword);
-      // } else {
-      //   this.router.navigate(['/']);
-      // }
+      this.loadData(); // 改为调用 loadData
     });
   }
-  ngOnInit(): void { }
+
+  ngOnInit(): void {
+    // 订阅路由事件
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.loadData(); // 导航结束后重新加载数据
+    });
+  }
+
+  // 修改加载数据的方法
+  loadData() {
+    console.log('Loading data with keyword:', this.keyword);
+    
+    // 构建基础查询，不需要外层的 query 字段
+    this.query = {
+      bool: {
+        filter: [
+          {
+            exists: {
+              field: "images"
+            }
+          }
+        ]
+      }
+    };
+
+    // 添加关键词搜索条件
+    if (this.keyword) {
+      if (!this.query.bool.must) {
+        this.query.bool.must = [];
+      }
+      this.query.bool.must.push({
+        match: {
+          'labels.zh.value': this.keyword
+        }
+      });
+    }
+
+    // 执行搜索
+    this.search();
+  }
 
   // 计算总页数
   get totalPages(): number {
@@ -239,7 +279,7 @@ export class ImageComponent implements OnInit {
 
   search() {
     this.service
-      .searchEntity(this.index, this.size, { bool: this.query })
+      .searchEntity(this.index, this.size, this.query)
       .subscribe((data: any) => {
         this.total = data.total;
         this.updateVisiblePages();
@@ -302,57 +342,49 @@ export class ImageComponent implements OnInit {
   selectKeyword(keyword: any) {
     this.keyword = keyword;
     this.index = 1;
-    if (keyword != '') {
-      if (this.way == '默认检索') {
-        this.query = {
-          must: [
-            {
-              match: {
-                'labels.zh.value': {
-                  query: keyword,
-                  operator: 'and',
-                },
-              },
-            },
-          ],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
+
+    // 构建查询条件
+    this.query = {
+      bool: {
+        filter: [
+          {
+            exists: {
+              field: "images"
             }
-          },
-          ],
-        };
-      } else if (this.way == '精确检索') {
-        this.query = {
-          must: [{ term: { 'labels.zh.value.keyword': keyword } }],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
-          ],
-        };
-      } else {
-        this.query = {
-          must: [{ match: { 'labels.zh.value': keyword } }],
-          should: [{
-            "exists": {
-              "field": "images"  // 确保 videos 字段存在
-            }
-          },
-          ],
-        };
-      }
-    } else {
-      this.query = {
-        should: [{
-          "exists": {
-            "field": "images"  // 确保 videos 字段存在
           }
-        },
-        ],
-      };
+        ]
+      }
+    };
+
+    if (keyword) {
+      if (!this.query.bool.must) {
+        this.query.bool.must = [];
+      }
+      
+      if (this.way == '默认检索') {
+        this.query.bool.must.push({
+          match: {
+            'labels.zh.value': {
+              query: keyword,
+              operator: 'and'
+            }
+          }
+        });
+      } else if (this.way == '精确检索') {
+        this.query.bool.must.push({
+          term: {
+            'labels.zh.value.keyword': keyword
+          }
+        });
+      } else {
+        this.query.bool.must.push({
+          match: {
+            'labels.zh.value': keyword
+          }
+        });
+      }
     }
+
     this.search();
   }
 
@@ -488,16 +520,21 @@ export class ImageComponent implements OnInit {
   }
 
   openDialog(index: number, images: Array<any>): void {
+    // 构建图片数据
+    const imageList = images.map(image => ({
+      url: image.image?.startsWith('http://') || image.image.startsWith('https://')
+        ? image.image 
+        : 'http://'+this.ip+':9000/kgms/' + image.image,
+      title: image.label
+    }));
+
+    // 打开自定义对话框
     this.dialog.open(ImageDialogComponent, {
+      width: '100%',
+      height: '100%',
+      panelClass: 'image-preview-dialog',
       data: {
-        images: images.map((image: any) => {
-          if (image.image?.startsWith('http://') || image.image.startsWith('https://')) {
-            return image.image;
-          } else {
-            // 如果不是完整的 URL，则添加前缀
-            return 'http://'+this.ip+':9000/kgms/' + image.image;
-          }
-        }),
+        images: imageList,
         currentIndex: index
       }
     });

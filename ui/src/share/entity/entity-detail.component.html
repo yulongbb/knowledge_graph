@@ -6,8 +6,7 @@
    <app-entity-add [id]="id"></app-entity-add>
   </div>
   <div *ngSwitchCase="'add_image'">
-    <app-entity-add-image [id]="id"></app-entity-add-image>
-    
+    <app-entity-add-image [id]="id" (saved)="onChildSaved()"></app-entity-add-image>
   </div>
   <div *ngSwitchCase="'add_video'">
     <div class="row">
