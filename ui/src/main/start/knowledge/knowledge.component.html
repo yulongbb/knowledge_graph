@@ -65,7 +65,7 @@
 
         <!-- 图片内容 -->
         <div *ngIf="!entity['_source']?.documents && !entity['_source']?.videos">
-          <img class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
+          <img [routerLink]="'/start/search/info/' + entity._id" class="image" *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
                [src]="image.startsWith('http') ? image : 'http://'+ip+':9000/kgms/' + image"
                loading="lazy" style="width: 100%; border-radius: 4px; margin-bottom: 12px"/>
           <h3 [routerLink]="'/start/search/info/' + entity._id">

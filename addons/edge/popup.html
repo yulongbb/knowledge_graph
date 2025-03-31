@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>知识图谱助手</title>
+  <style>
+    body {
+      width: 400px;  /* 增加宽度 */
+      padding: 25px;  /* 增加内边距 */
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .button-grid {
+      display: none; /* 隐藏按钮网格 */
+    }
+    .nav-button {
+      padding: 15px 0;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .nav-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .edit-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .edit-form {
+      display: none;
+      margin-top: 15px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    .save-button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 15px 0;
+      font-size: 18px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .button-container .nav-button {
+      flex: 1;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .tag-item {
+      background: #1e88e5;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tag-item .remove {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #tags {
+      border: 2px solid #1e88e5;
+      padding: 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      width: calc(100% - 24px);
+    }
+    #tags:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30,136,229,0.2);
+    }
+    .tags-label {
+      color: #2c3e50;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .properties-list {
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .property-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .property-label {
+      font-weight: bold;
+      min-width: 100px;
+    }
+    .property-value {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .add-property {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f0f8ff;
+      border-radius: 8px;
+    }
+    .property-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .property-select-group {
+      display: grid;
+      grid-template-columns: 2fr 2fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .property-select, .property-value-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .property-value-input:focus, .property-select:focus {
+      border-color: #1e88e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30,136,229,0.1);
+    }
+    .add-property-btn {
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .property-actions {
+      display: flex;
+      gap: 5px;
+    }
+    .property-action-btn {
+      cursor: pointer;
+      padding: 4px;
+      color: #666;
+    }
+    .property-action-btn:hover {
+      color: #1e88e5;
+    }
+  </style>
+</head>
+<body>
+  <h2>知识图谱助手</h2>
+  <div class="edit-section">
+    <div class="button-container">
+      <button class="nav-button" id="btn-edit">知识编辑</button>
+      <button class="nav-button" id="btn-tag">知识标注</button>
+      <button class="nav-button" id="btn-prop">属性编辑</button>
+    </div>
+    <div class="edit-form" id="editForm"> <!-- 改为div，移除form标签 -->
+      <!-- 编辑表单 -->
+      <div id="editFormContent">
+        <div class="form-group">
+          <label>标签 (中文)</label>
+          <input type="text" id="labelZh">
+        </div>
+        <div class="form-group">
+          <label>描述 (中文)</label>
+          <textarea id="descriptionZh"></textarea>
+        </div>
+        <div class="form-group">
+          <label>别名 (中文)</label>
+          <input type="text" id="aliasZh">
+        </div>
+      </div>
+      <!-- 标注表单 -->
+      <div id="tagFormContent" style="display: none;">
+        <div class="form-group" id="tagsGroup">
+          <label class="tags-label">标注</label>
+          <div class="tags-container" id="tagsContainer"></div>
+          <input type="text" id="tags" placeholder="输入标签后按回车添加">
+        </div>
+      </div>
+      <!-- 属性编辑表单 -->
+      <div id="propFormContent" style="display: none;">
+        <div class="form-group">
+          <div class="add-property">
+            <div class="property-form">
+              <div class="property-select-group">
+                <select id="propertySelect" class="property-select">
+                  <option value="">选择属性...</option>
+                </select>
+                <input type="text" id="propertyValue" class="property-value-input" placeholder="输入属性值">
+              </div>
+              <button id="addPropertyBtn" class="add-property-btn nav-button">添加属性</button>
+            </div>
+          </div>
+          <div class="properties-list" id="propertiesList"></div>
+        </div>
+      </div>
+      <button class="nav-button save-button" id="saveButton">保存</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
