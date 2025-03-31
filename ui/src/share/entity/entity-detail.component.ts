@@ -635,8 +635,14 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     if (index >= 0) {
       this.statements().splice(index, 1);
     }
-    this.nodeService.deleteEdge(row._key).subscribe(() => {
-      this.message.success('删除成功！');
+    this.nodeService.deleteEdge(row._key).subscribe({
+      next: () => {
+        this.message.success('删除成功！');
+        this.location.back();  // 删除成功后返回上一页
+      },
+      error: (error) => {
+        this.message.error('删除失败：' + error.message);
+      }
     });
   }
 

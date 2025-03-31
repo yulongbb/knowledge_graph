@@ -201,6 +201,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         if (confirm('确定要删除这个知识吗？此操作不可恢复。')) {
             this.entityService.deleteItem(this.id).subscribe({
                 next: (response: any) => {
+                    console.log('Delete response:', response); // Debug log
                     if (response.success) {
                         this.router.navigate(['/start/search'], {
                             queryParams: { keyword: '' }

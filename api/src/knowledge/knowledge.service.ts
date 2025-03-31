@@ -324,7 +324,13 @@ export class KnowledgeService {
   }
 
   async deleteEntity(id: any): Promise<any> {
-    return this.elasticsearchService.get(id).then((data: any) => {
+    return this.elasticsearchService.get(id).then(async (data: any) => {
+      // 从 Redis 删除相关数据
+      const viewsKey = `views:${id}`;
+      const hotKey = 'hot:knowledge';
+      await this.redis.del(viewsKey);
+      await this.redis.zrem(hotKey, id);
+
       data['_source']['items'].forEach(async (item: any) => {
         console.log(item);
         const removeEdgesQuery = `
@@ -333,17 +339,10 @@ export class KnowledgeService {
             REMOVE edge IN link
           `;
 
-        // 删除节点本身
-
-        // 执行删除边的查询
         await this.db.query(removeEdgesQuery, { item });
-
-        // // 执行删除节点的查询
-        // await this.db.query(removeNodeQuery, { item: item.split('/')[1] });
       });
-      this.elasticsearchService.delete(id).then((data: any) => {
-        return data;
-      });
+      
+      return this.elasticsearchService.delete(id);
     });
   }
 
