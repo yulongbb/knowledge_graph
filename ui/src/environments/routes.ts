@@ -97,6 +97,11 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/dictionary/dictionary.module").then(x => x.DictionaryModule),
   },
+  {
+    path: "3d-model",
+    loadChildren: () =>
+      import("../main/start/addons/3d-model/3d-model.module").then(x => x.ThreeDModelModule),
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
   ...shareRoutes

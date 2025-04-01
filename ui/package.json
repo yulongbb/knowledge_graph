@@ -30,7 +30,7 @@
     "@popperjs/core": "^2.11.8",
     "@types/marked": "^6.0.0",
     "@types/papaparse": "^5.3.15",
-    "@types/three": "^0.174.0",
+    "@types/three": "^0.139.0",
     "canvas-datagrid": "^0.4.7",
     "chart.js": "^4.4.8",
     "cytoscape": "^3.31.1",
@@ -59,7 +59,7 @@
     "sass": "^1.67.0",
     "style-loader": "^3.3.3",
     "swiper": "^11.2.6",
-    "three": "^0.174.0",
+    "three": "^0.139.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },

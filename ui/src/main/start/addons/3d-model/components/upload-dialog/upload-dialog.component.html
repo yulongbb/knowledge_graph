@@ -1,0 +1,89 @@
+<div class="dialog-overlay" (click)="onOverlayClick($event)">
+  <div class="dialog-content">
+    <h2 class="dialog-title">{{data ? 'Edit Model' : 'Upload 3D Model'}}</h2>
+    <div class="dialog-body">
+      <div class="upload-form">
+        <div class="file-upload" 
+             [class.has-file]="modelFile"
+             [class.dragging]="isDragging"
+             (click)="fileInput.click()"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)">
+          <ng-container *ngIf="!modelFile">
+            <div class="icon">⬆</div>
+            <div>Drag & drop your 3D model here<br>or click to select file</div>
+            <div class="upload-hint">Supported formats: .glb, .gltf, .fbx</div>
+          </ng-container>
+          <ng-container *ngIf="modelFile">
+            <div class="preview">
+              <span class="file-icon">📄</span>
+              <div class="file-info">
+                <div class="file-name">{{modelFile.name}}</div>
+                <div class="file-meta">
+                  {{modelFile.size | fileSize}} · {{modelFile.type || 'application/octet-stream'}}
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <input #fileInput type="file" hidden (change)="onFileSelected($event)" 
+               accept=".glb,.gltf,.fbx">
+        
+        <div class="form-group">
+          <label>Name <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="metadata.name" required
+                 placeholder="Enter model name">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="metadata.description"
+                    placeholder="Enter model description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="metadata.category">
+            <option value="">Select category</option>
+            <option *ngFor="let category of modelCategories" [value]="category">
+              {{category}}
+            </option>
+          </select>
+        </div>
+
+        <div class="tags-section">
+          <label>Tags <span class="hint">(Press Enter to add)</span></label>
+          <div class="tag-input">
+            <input type="text" [(ngModel)]="newTag" 
+                   (keyup)="onTagInput($event)"
+                   (keyup.enter)="addTag()"
+                   [placeholder]="metadata.tags.length ? 'Add another tag' : 'Add tags to improve searchability'">
+            <div class="suggestions" *ngIf="tagSuggestions.length">
+              <div class="suggestion-item" 
+                   *ngFor="let tag of tagSuggestions; let i = index"
+                   [class.active]="i === activeSuggestionIndex"
+                   (click)="selectTagSuggestion(tag)">
+                {{tag}}
+              </div>
+            </div>
+          </div>
+          <div class="tags-list">
+            <span class="tag" *ngFor="let tag of metadata.tags">
+              {{tag}}
+              <span class="tag-remove" (click)="removeTag(tag)">×</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn" (click)="close()">Cancel</button>
+      <button class="btn btn-primary" 
+              [disabled]="(!modelFile && !data) || !metadata.name"
+              (click)="upload()">
+        {{data ? 'Save' : 'Upload'}}
+      </button>
+    </div>
+  </div>
+</div>

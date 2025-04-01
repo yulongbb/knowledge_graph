@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SystemModule } from './system/system.module';
 import { DesignModule } from './design/design.module';
@@ -14,6 +14,7 @@ import { AddonModule } from './addons/addon.module';
 import { ProjectModule } from './project/project.module';
 import { GptManagementModule } from './gpt-management/gpt-management.module';
 import { MarkerModule } from './marker/marker.module';
+import { ThreeDModelModule } from './3d-model/3d-model.module';
 
 @Module({
   imports: [
@@ -42,8 +43,25 @@ import { MarkerModule } from './marker/marker.module';
     ProjectModule,
     GptManagementModule,
     MarkerModule,
+    ThreeDModelModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply((req: Request, res: any, next: Function) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        if (req.method === 'OPTIONS') {
+          res.sendStatus(200);
+        } else {
+          next();
+        }
+      })
+      .forRoutes('*');
+  }
+}
