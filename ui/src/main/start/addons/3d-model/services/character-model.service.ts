@@ -16,7 +16,11 @@ export class CharacterModelService {
     return this.http.get<CharacterModel[]>(this.apiUrl).pipe(
       map(response => {
         console.log('Got characters:', response);  // 添加日志
-        return response;
+        return response.map(character => ({
+          ...character,
+          previewUrl: character.previewUrl ? `http://localhost:9000/3d-models/${character.previewUrl}` : undefined,
+          thumbnailUrl: character.thumbnailUrl ? `http://localhost:9000/3d-models/${character.thumbnailUrl}` : undefined
+        }));
       }),
       catchError(error => {
         console.error('Get characters error:', error);  // 添加错误日志
@@ -57,8 +61,20 @@ export class CharacterModelService {
     if (filter.search) params = params.set('search', filter.search);
     if (filter.category) params = params.set('category', filter.category);
     if (filter.tags?.length) params = params.set('tags', filter.tags.join(','));
-    
-    return this.http.get<CharacterModel[]>(`${this.apiUrl}/search`, { params });
+
+    return this.http.get<CharacterModel[]>(`${this.apiUrl}/search`, { params }).pipe(
+      map(response => {
+        return response.map(character => ({
+          ...character,
+          previewUrl: character.previewUrl ? `http://localhost:9000/3d-models/${character.previewUrl}` : undefined,
+          thumbnailUrl: character.thumbnailUrl ? `http://localhost:9000/3d-models/${character.thumbnailUrl}` : undefined
+        }));
+      }),
+      catchError(error => {
+        console.error('Search characters error:', error); // 添加错误日志
+        throw error;
+      })
+    );
   }
 
   updateCharacter(id: string, character: CharacterModel): Observable<CharacterModel> {

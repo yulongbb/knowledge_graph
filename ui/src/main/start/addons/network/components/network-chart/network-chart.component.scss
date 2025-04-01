@@ -1,0 +1,18 @@
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px; /* Limit the maximum width for better readability */
+  margin: 0 auto 20px auto; /* Center the chart and add bottom margin */
+  padding: 20px; /* Add padding for spacing */
+  background-color: #f9f9f9; /* Optional: Add a light background for contrast */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+
+  canvas {
+    width: 100% !important;
+    height: auto !important; /* Maintain aspect ratio */
+    max-height: 80vh; /* Limit the height to 80% of the viewport height */
+  }
+}

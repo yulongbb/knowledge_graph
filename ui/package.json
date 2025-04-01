@@ -44,6 +44,7 @@
     "highlight.js": "^11.9.0",
     "leaflet": "^1.9.4",
     "marked": "^15.0.6",
+    "ng2-charts": "^4.1.1",
     "ngx-echarts": "^18.0.0",
     "ngx-infinite-scroll": "^18.0.0",
     "ngx-markdown": "^19.0.0",

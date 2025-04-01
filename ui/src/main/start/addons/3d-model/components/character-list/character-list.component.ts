@@ -3,8 +3,11 @@ import { CharacterFilter, CharacterModel } from '../../models/character-model';
 import { CharacterModelService } from '../../services/character-model.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UploadDialogComponent } from '../upload-dialog/upload-dialog.component';
+import { ModelPreviewModalComponent } from '../model-preview-modal/model-preview-modal.component';
 import { finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { Title } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-character-list',
@@ -20,13 +23,22 @@ export class CharacterListComponent implements OnInit {
   categories: string[] = [];
   isLoading = false;
   errorMessage = '';
+  pageTitle = '3D模型';
 
   constructor(
     private characterService: CharacterModelService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private titleService: Title,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    // Set the page title
+    this.route.data.subscribe(data => {
+      this.pageTitle = data['title'] || '3D模型';
+      this.titleService.setTitle(this.pageTitle);
+    });
+
     this.loadCharacters();
     this.loadCategories();
     this.loadTags();
@@ -41,6 +53,10 @@ export class CharacterListComponent implements OnInit {
       finalize(() => {
         this.isLoading = false;
         console.log('Characters loaded:', this.characters); // 添加日志
+        this.characters.forEach(character => {
+          console.log('Character previewUrl:', character.previewUrl);
+          console.log('Character thumbnailUrl:', character.thumbnailUrl);
+        });
       }),
       catchError(error => {
         this.errorMessage = error.message || '加载失败，请重试';
@@ -48,7 +64,11 @@ export class CharacterListComponent implements OnInit {
         return of([]);
       })
     ).subscribe(data => {
-      this.characters = data;
+      this.characters = data.map(character => ({
+        ...character,
+        previewUrl: character.previewUrl,
+        thumbnailUrl: character.thumbnailUrl
+      }));
       this.applyFilters(); // 应用当前筛选条件
     });
   }
@@ -137,5 +157,28 @@ export class CharacterListComponent implements OnInit {
         }
       });
     }
+  }
+
+  openModelPreview(character: CharacterModel) {
+    console.log('Opening preview for model:', character);
+    console.log('Model preview URL:', character.previewUrl);
+    
+    if (!character.previewUrl) {
+      console.warn('No preview URL available for this model');
+      return;
+    }
+    
+    // Use Object.assign to ensure a clean copy is passed to the modal
+    const modalData = Object.assign({}, character);
+    
+    this.dialog.open(ModelPreviewModalComponent, {
+      data: modalData,
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '90vh',
+      panelClass: 'model-preview-dialog',
+      autoFocus: false,
+      disableClose: false
+    });
   }
 }

@@ -1,0 +1,87 @@
+.monitoring-controls {
+  margin-bottom: 20px;
+  
+  button {
+    margin-right: 10px;
+  }
+}
+
+.network-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.status-indicator {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  
+  &.online {
+    background-color: #dff6dd;
+    color: #107c10;
+  }
+  
+  &.offline {
+    background-color: #fde7e9;
+    color: #d13438;
+  }
+}
+
+.monitoring-status {
+  margin-top: 20px;
+  
+  p {
+    margin-bottom: 8px;
+    color: #666;
+  }
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 20px;
+
+  .row {
+    display: flex;
+    gap: 20px;
+
+    .half-width {
+      flex: 1;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Center the chart horizontally */
+  }
+}
+
+.chart-card {
+  margin-bottom: 20px;
+}
+
+.table-container {
+  margin-top: 20px;
+}
+
+mat-tab-group {
+  margin-top: 20px;
+}
+
+.tab-navigation {
+  margin: 20px 0;
+  border-bottom: 1px solid #ddd;
+  
+  button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border-radius: 4px 4px 0 0;
+    
+    &.active {
+      background-color: #f0f0f0;
+      border-bottom: 2px solid #3f51b5;
+    }
+  }
+}

@@ -17,28 +17,68 @@ $grid-breakpoints: (
 .character-list {
   padding: $spacing-unit * 3;
 
-  .filters {
-    margin-bottom: $spacing-unit * 3;
+  .header-filter-bar {
     display: flex;
-    gap: 16px;
     align-items: center;
+    margin-bottom: $spacing-unit * 3;
+    padding: $spacing-unit * 2;
     background: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-radius: $border-radius;
     position: sticky;
     top: 0;
     z-index: 10;
-    padding: $spacing-unit * 2;
-    border-radius: $border-radius;
 
-    input, select {
-      padding: $spacing-unit;
-      border: 1px solid $border-color;
-      border-radius: $border-radius;
-      min-width: 200px;
+    .page-title {
+      font-size: 24px;
+      font-weight: 500;
+      color: $text-color;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .filters {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-left: auto; // This pushes the filters to the right
+      flex-wrap: wrap; // Allow wrapping on smaller screens
+      justify-content: flex-end; // Right align the filter elements
+
+      input, select {
+        padding: $spacing-unit;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        width: 180px; // Slightly reduced width
+        
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+        }
+      }
+
+      .tags-container {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        max-width: 300px; // Limit width to prevent overflow
+        overflow: hidden;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: map-get($grid-breakpoints, md)) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
       
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
+      .page-title {
+        margin-bottom: 8px;
+      }
+      
+      .filters {
+        margin-left: 0;
+        justify-content: flex-start;
       }
     }
   }
@@ -66,14 +106,16 @@ $grid-breakpoints: (
     }
 
     .preview {
-      height: 200px;
+      height: 300px; // Increased from 200px to 300px
       background-size: cover;
       background-position: center;
       position: relative;
+      cursor: pointer;
       
-      model-viewer {
+      app-model-viewer {
         width: 100%;
         height: 100%;
+        display: block; // Ensure it takes full space
       }
 
       &::before {
@@ -89,6 +131,33 @@ $grid-breakpoints: (
       }
       
       &:hover::before {
+        opacity: 1;
+      }
+
+      .preview-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 2;
+        
+        .preview-hint {
+          color: white;
+          background: rgba(0, 0, 0, 0.7);
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+        }
+      }
+      
+      &:hover .preview-overlay {
         opacity: 1;
       }
     }
@@ -201,5 +270,14 @@ $grid-breakpoints: (
         color: #d32f2f;
       }
     }
+  }
+}
+
+// Add a style for the preview dialog
+::ng-deep .model-preview-dialog {
+  .mat-dialog-container {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 8px;
   }
 }

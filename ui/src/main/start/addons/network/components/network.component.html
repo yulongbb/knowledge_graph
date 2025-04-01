@@ -1,0 +1,111 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>网络监控</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="tab-navigation">
+      <button mat-button [class.active]="activeTab === 'charts'" (click)="activeTab = 'charts'">图表</button>
+      <button mat-button [class.active]="activeTab === 'packets'" (click)="activeTab = 'packets'">网络数据包</button>
+    </div>
+
+    <div *ngIf="activeTab === 'charts'" class="charts-container">
+      <!-- Full-width chart -->
+      <mat-card class="chart-card full-width">
+        <mat-card-header>
+          <mat-card-title>IP 通信频率</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-network-chart
+            chartType="bar"
+            chartTitle="IP 通信对的前十名"
+            [frequencyData]="ipFrequencies"
+            [displayLimit]="10">
+          </app-network-chart>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Side-by-side charts -->
+      <div class="row">
+        <mat-card class="chart-card half-width">
+          <mat-card-header>
+            <mat-card-title>每周通信频率</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-network-chart
+              chartType="line"
+              chartTitle="每周通信对的前五名"
+              [timeBasedData]="weeklyFrequencies">
+            </app-network-chart>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card half-width">
+          <mat-card-header>
+            <mat-card-title>每小时通信频率</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <app-network-chart
+              chartType="line"
+              chartTitle="每小时通信对的前五名"
+              [timeBasedData]="hourlyFrequencies">
+            </app-network-chart>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'packets'" class="table-container">
+      <table mat-table [dataSource]="networkPackets" class="mat-elevation-z8 network-table">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let element">{{element.id}}</td>
+        </ng-container>
+        
+        <ng-container matColumnDef="netName">
+          <th mat-header-cell *matHeaderCellDef>网络接口</th>
+          <td mat-cell *matCellDef="let element">{{element.netName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="srcIp">
+          <th mat-header-cell *matHeaderCellDef>源 IP</th>
+          <td mat-cell *matCellDef="let element">{{element.srcIp}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="dstIp">
+          <th mat-header-cell *matHeaderCellDef>目标 IP</th>
+          <td mat-cell *matCellDef="let element">{{element.dstIp}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="protocol">
+          <th mat-header-cell *matHeaderCellDef>协议</th>
+          <td mat-cell *matCellDef="let element">{{element.protocol}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="srcPort">
+          <th mat-header-cell *matHeaderCellDef>源端口</th>
+          <td mat-cell *matCellDef="let element">{{element.srcPort}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="dstPort">
+          <th mat-header-cell *matHeaderCellDef>目标端口</th>
+          <td mat-cell *matCellDef="let element">{{element.dstPort}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>日期</th>
+          <td mat-cell *matCellDef="let element">{{element.date | date:'medium'}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50, 100]"
+        (page)="onPageChange($event)"
+        aria-label="选择网络数据包的页码">
+      </mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>

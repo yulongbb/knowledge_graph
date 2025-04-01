@@ -8,13 +8,16 @@ import { CharacterModelService } from './services/character-model.service';
 import { ModelViewerComponent } from './components/model-viewer/model-viewer.component';
 import { RouterModule } from '@angular/router';
 import { FileSizePipe } from './pipes/file-size.pipe';
+import { ModelPreviewModalComponent } from './components/model-preview-modal/model-preview-modal.component';
+import { Title } from '@angular/platform-browser';
 
 @NgModule({
     declarations: [
         CharacterListComponent,
         UploadDialogComponent,
         ModelViewerComponent,
-        FileSizePipe
+        FileSizePipe,
+        ModelPreviewModalComponent
     ],
     imports: [
         CommonModule,
@@ -25,12 +28,13 @@ import { FileSizePipe } from './pipes/file-size.pipe';
             {
                 path: '',
                 component: CharacterListComponent,
+                data: { title: '3D模型' }
             },
-
         ]),
     ],
     providers: [
-        CharacterModelService
+        CharacterModelService,
+        Title
     ],
     exports: [
         CharacterListComponent

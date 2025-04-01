@@ -1,0 +1,36 @@
+<div class="preview-modal">
+  <div class="preview-header">
+    <h2>{{model.name}}</h2>
+    <button class="close-btn" (click)="close()">×</button>
+  </div>
+  
+  <div class="model-container">
+    <div *ngIf="modelLoading" class="loading-indicator">
+      <span>Loading model...</span>
+    </div>
+    <div *ngIf="!model.previewUrl" class="error-message">
+      No preview URL available for this model
+    </div>
+    <app-model-viewer 
+      *ngIf="model.previewUrl"
+      [modelUrl]="model.previewUrl" 
+      [showControls]="true"
+      (modelLoaded)="onModelLoaded($event)">
+    </app-model-viewer>
+  </div>
+  
+  <div class="preview-footer">
+    <div class="model-details">
+      <h3>{{model.name}}</h3>
+      <p>{{model.description}}</p>
+      <div class="model-metadata">
+        <span><strong>Format:</strong> {{model.format.toUpperCase()}}</span>
+        <span><strong>Size:</strong> {{model.fileSize | fileSize}}</span>
+        <span><strong>Category:</strong> {{model.category}}</span>
+      </div>
+      <div class="tags">
+        <span class="tag" *ngFor="let tag of model.tags">{{tag}}</span>
+      </div>
+    </div>
+  </div>
+</div>
