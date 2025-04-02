@@ -235,6 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     editBtn.addEventListener('click', async () => {
         try {
+            // Hide file upload section when edit button is clicked
+            const fileUploadSection = document.getElementById('fileUploadSection');
+            fileUploadSection.style.display = 'none';
+            
             editFormContent.style.display = 'block';
             tagFormContent.style.display = 'none';
             propFormContent.style.display = 'none';
@@ -289,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const aliasZh = document.getElementById('aliasZh');
 
             if (labelZh) labelZh.value = currentData._source?.labels?.zh?.value || '';
-            if (descriptionZh) labelZh.value = currentData._source?.descriptions?.zh?.value || '';
+            if (descriptionZh) descriptionZh.value = currentData._source?.descriptions?.zh?.value || '';
             if (aliasZh) aliasZh.value = currentData._source?.aliases?.zh?.[0]?.value || '';
             
             currentTags = new Set(currentData._source?.tags || []);
@@ -303,6 +307,10 @@ document.addEventListener('DOMContentLoaded', function() {
     tagBtn.addEventListener('click', async () => {
         if (tagBtn.disabled) return;
         try {
+            // Hide file upload section when tag button is clicked
+            const fileUploadSection = document.getElementById('fileUploadSection');
+            fileUploadSection.style.display = 'none';
+            
             editFormContent.style.display = 'none';
             tagFormContent.style.display = 'block';
             propFormContent.style.display = 'none';
@@ -346,6 +354,10 @@ document.addEventListener('DOMContentLoaded', function() {
     propBtn.addEventListener('click', async () => {
         if (propBtn.disabled) return;
         try {
+            // Hide file upload section when property button is clicked
+            const fileUploadSection = document.getElementById('fileUploadSection');
+            fileUploadSection.style.display = 'none';
+            
             editFormContent.style.display = 'none';
             tagFormContent.style.display = 'none';
             propFormContent.style.display = 'block';
@@ -515,6 +527,258 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('保存失败:', error);
             alert(`保存失败: ${error.message}`);
+        }
+    });
+
+    // Initialize file upload section
+    document.getElementById('btn-upload-file').addEventListener('click', () => {
+        const fileUploadSection = document.getElementById('fileUploadSection');
+        
+        // Toggle display of file upload section
+        if (fileUploadSection.style.display === 'none' || !fileUploadSection.style.display) {
+            fileUploadSection.style.display = 'block';
+            // Hide edit form when showing file upload
+            if (editForm) {
+                editForm.style.display = 'none';
+            }
+            // After showing file upload section, focus the paste area
+            setTimeout(() => pasteArea.focus(), 100);
+            
+            // Initialize file tags input handling
+            initializeFileTagEvents();
+        } else {
+            fileUploadSection.style.display = 'none';
+        }
+        
+        // Add file change event listener
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+                fileName.style.display = 'block';
+            } else {
+                fileName.textContent = '未选择文件';
+                fileName.style.display = 'none';
+            }
+        });
+        
+        // Also handle pasted file
+        document.addEventListener('paste', function() {
+            if (pastedFile) {
+                fileName.textContent = pastedFile.name || '已粘贴图片';
+                fileName.style.display = 'block';
+            }
+        });
+    });
+
+    // Store file tags
+    let fileTagsList = [];
+
+    // Add tag functionality for file upload section
+    function initializeFileTagEvents() {
+        const fileTagsInput = document.getElementById('fileTags');
+        const fileTagsContainer = document.getElementById('fileTagsContainer');
+        
+        if (fileTagsInput && fileTagsContainer) {
+            // Clear existing event listeners
+            fileTagsInput.removeEventListener('keydown', handleFileTagKeydown);
+            // Add new event listener
+            fileTagsInput.addEventListener('keydown', handleFileTagKeydown);
+            
+            // Render existing tags if any
+            renderFileTags();
+        }
+    }
+
+    function handleFileTagKeydown(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const tag = e.target.value.trim();
+            if (tag) {
+                if (!fileTagsList.includes(tag)) {
+                    fileTagsList.push(tag);
+                    e.target.value = '';
+                    renderFileTags();
+                }
+            }
+        }
+    }
+
+    function renderFileTags() {
+        const fileTagsContainer = document.getElementById('fileTagsContainer');
+        fileTagsContainer.innerHTML = '';
+        
+        fileTagsList.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tag}
+                <span class="remove" data-tag="${tag}">×</span>
+            `;
+            fileTagsContainer.appendChild(tagElement);
+        });
+        
+        // Add click event to remove tags
+        fileTagsContainer.querySelectorAll('.remove').forEach(removeBtn => {
+            removeBtn.addEventListener('click', (e) => {
+                const tagToRemove = e.target.dataset.tag;
+                fileTagsList = fileTagsList.filter(tag => tag !== tagToRemove);
+                renderFileTags();
+            });
+        });
+    }
+
+    // Image paste handling
+    const pasteArea = document.getElementById('pasteArea');
+    const imagePreview = document.getElementById('imagePreview');
+    let pastedFile = null;
+    
+    // Make the entire document listen for paste events
+    document.addEventListener('paste', handlePaste);
+    
+    // Focus on paste area when clicked
+    pasteArea.addEventListener('click', () => {
+        pasteArea.focus();
+    });
+    
+    function handlePaste(e) {
+        // Only process paste events if the file upload section is visible
+        if (document.getElementById('fileUploadSection').style.display !== 'block') {
+            return;
+        }
+        
+        const items = e.clipboardData.items;
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                // Get the image as a file
+                const file = items[i].getAsFile();
+                pastedFile = file;
+                
+                // Show image preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Create or reuse image element
+                    let img = imagePreview.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        imagePreview.appendChild(img);
+                    }
+                    
+                    img.src = event.target.result;
+                    img.style.display = 'block';
+                    
+                    // Update the paste area text
+                    pasteArea.querySelector('p').textContent = '图片已粘贴，点击重新粘贴';
+                };
+                reader.readAsDataURL(file);
+                
+                break; // Only process the first image
+            }
+        }
+    }
+
+    // Prevent popup from closing when clicking outside
+    document.addEventListener('mousedown', (event) => {
+        const popup = document.querySelector('body');
+        if (!popup.contains(event.target)) {
+            event.preventDefault();
+        }
+    });
+
+    document.getElementById('uploadFileButton').addEventListener('click', async () => {
+        const fileInput = document.getElementById('fileInput');
+        const tags = fileTagsList;
+        // Use either the file input or the pasted file
+        const file = fileInput.files[0] || pastedFile;
+
+        if (!file) {
+            alert('请选择一个文件上传或粘贴图片');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('tags', JSON.stringify(tags));
+
+        try {
+            const response = await fetch('http://localhost:3000/api/minio-client/uploadFile', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                // Parse response to get the actual filename from the server
+                const responseData = await response.json();
+                const serverFileName = responseData.name || file.name;
+                
+                alert('文件上传成功');
+                
+                // Create a knowledge entry for the uploaded file
+                try {
+                    const knowledgeData = {
+                        labels: {
+                            zh: {
+                                language: "zh",
+                                value: serverFileName // Use server-provided name
+                            }
+                        },
+                        descriptions: {
+                            zh: {
+                                language: "zh",
+                                value: `通过浏览器扩展上传的文件: ${serverFileName}`
+                            }
+                        },
+                        aliases: {
+                            zh: [{
+                                language: "zh",
+                                value: serverFileName
+                            }]
+                        },
+                        tags: tags,
+                        type: "327991d8-5d75-46b9-909f-65daa8bf5eb2",
+                        template: "",
+                        images: [serverFileName] // Add images array with the file name
+                    };
+                    
+                    const knowledgeResponse = await fetch('http://localhost:4200/api/knowledge', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': '*/*',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(knowledgeData)
+                    });
+                    
+                    if (knowledgeResponse.ok) {
+                        console.log('成功创建文件相关知识条目');
+                    } else {
+                        console.error('创建知识条目失败:', await knowledgeResponse.text());
+                    }
+                } catch (knowledgeError) {
+                    console.error('创建知识条目时出错:', knowledgeError);
+                }
+                
+                // Reset the form
+                fileInput.value = '';
+                fileTagsList = [];
+                renderFileTags();
+                pastedFile = null;
+                // Clear the image preview
+                const img = imagePreview.querySelector('img');
+                if (img) img.style.display = 'none';
+                pasteArea.querySelector('p').textContent = '点击此处粘贴图片或截图 (Ctrl+V)';
+                
+                // Hide file name display when cleared
+                document.getElementById('fileName').style.display = 'none';
+            } else {
+                alert('文件上传失败');
+            }
+        } catch (error) {
+            console.error('上传文件时出错:', error);
+            alert('文件上传失败');
         }
     });
 });

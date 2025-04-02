@@ -190,12 +190,112 @@
     .property-action-btn:hover {
       color: #1e88e5;
     }
+    .file-upload-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .file-upload-section h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 18px;
+    }
+    .file-upload-section input[type="file"] {
+      margin-bottom: 10px;
+    }
+    .paste-area {
+      margin: 15px 0;
+      padding: 20px;
+      border: 2px dashed #1e88e5;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .paste-area:hover, .paste-area:focus {
+      background: #f0f7ff;
+    }
+    .paste-area p {
+      color: #666;
+      margin: 0;
+    }
+    .image-preview {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow: hidden;
+    }
+    .image-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 4px;
+      display: none;
+    }
+    /* Custom file input styling */
+    .file-input-container {
+      position: relative;
+      display: block;
+      margin-bottom: 15px;
+    }
+    .file-input-container input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .file-input-button {
+      display: block;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    .file-input-button:hover {
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+    .file-name {
+      margin-top: 8px;
+      padding: 8px;
+      background: #f0f7ff;
+      border-radius: 4px;
+      color: #1565c0;
+      font-size: 14px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: none;
+    }
+    #uploadFileButton {
+      margin-top: 15px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      width: 100%;
+      font-size: 16px;
+    }
+    #uploadFileButton:hover {
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+    }
   </style>
 </head>
 <body>
   <h2>知识图谱助手</h2>
+  
+  <!-- Knowledge Edit Section -->
   <div class="edit-section">
     <div class="button-container">
+      <button class="nav-button" id="btn-upload-file">文件上传</button>
       <button class="nav-button" id="btn-edit">知识编辑</button>
       <button class="nav-button" id="btn-tag">知识标注</button>
       <button class="nav-button" id="btn-prop">属性编辑</button>
@@ -244,6 +344,28 @@
       <button class="nav-button save-button" id="saveButton">保存</button>
     </div>
   </div>
+
+  <!-- File Upload Section (Hidden by default) -->
+  <div class="file-upload-section" id="fileUploadSection" style="display: none;">
+    <h3>文件上传</h3>
+    <div class="file-input-container">
+      <input type="file" id="fileInput">
+      <div class="file-input-button">选择文件</div>
+      <div class="file-name" id="fileName">未选择文件</div>
+    </div>
+    <div class="form-group">
+      <label>文件标签</label>
+      <div class="tags-container" id="fileTagsContainer"></div>
+      <input type="text" id="fileTags" placeholder="输入标签后按回车添加">
+    </div>
+    <!-- Add paste area for images -->
+    <div class="paste-area" id="pasteArea">
+      <p>点击此处粘贴图片或截图 (Ctrl+V)</p>
+      <div class="image-preview" id="imagePreview"></div>
+    </div>
+    <button class="nav-button" id="uploadFileButton">上传文件</button>
+  </div>
+  
   <script src="popup.js"></script>
 </body>
 </html>
