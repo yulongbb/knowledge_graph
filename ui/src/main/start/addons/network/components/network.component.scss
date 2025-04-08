@@ -1,87 +1,259 @@
-.monitoring-controls {
-  margin-bottom: 20px;
+// Custom variables
+$primary-color: #3366ff;
+$secondary-color: #598bff;
+$text-color: #222b45;
+$light-text: #8f9bb3;
+$border-color: #e4e9f2;
+$light-bg: #f7f9fc;
+$success-color: #00d68f;
+$danger-color: #ff3d71;
+$card-shadow: 0 0.5rem 1rem 0 rgba(44, 51, 73, 0.1);
+
+// Card styles
+.card {
+  background-color: white;
+  border-radius: 0.25rem;
+  box-shadow: $card-shadow;
+  margin-bottom: 1.5rem;
   
-  button {
-    margin-right: 10px;
+  .card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    
+    h5, h6 {
+      margin: 0;
+      font-weight: 600;
+      color: $text-color;
+    }
+  }
+  
+  .card-body {
+    padding: 1.5rem;
   }
 }
 
+// Tabs
+.tabs-container {
+  .tabs-header {
+    display: flex;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: 1.5rem;
+    
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: $light-text;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        color: $text-color;
+      }
+      
+      &.active {
+        color: $primary-color;
+        border-bottom-color: $primary-color;
+      }
+    }
+  }
+  
+  .tab-pane {
+    display: none;
+    
+    &.active {
+      display: block;
+    }
+  }
+}
+
+// Button styles
+.btn {
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &.btn-default {
+    background-color: #f5f7fc;
+    border-color: $border-color;
+    color: $text-color;
+    
+    &:hover:not([disabled]) {
+      background-color: darken(#f5f7fc, 5%);
+    }
+    
+    &[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Select styles
+.select-container {
+  position: relative;
+  display: inline-block;
+  min-width: 100px;
+  
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0.65rem 2rem 0.65rem 1rem;
+    border: 1px solid $border-color;
+    border-radius: 0.25rem;
+    background-color: white;
+    color: $text-color;
+    cursor: pointer;
+    width: 100%;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+  
+  label {
+    margin-left: 0.5rem;
+    color: $light-text;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid $light-text;
+    pointer-events: none;
+  }
+}
+
+// Table and grid
 .network-table {
   width: 100%;
-  margin-bottom: 20px;
+  height: 400px;
+  margin-bottom: 1.25rem;
+  border: 1px solid $border-color;
 }
 
-.status-indicator {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 500;
+// Table styles
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.25rem;
   
-  &.online {
-    background-color: #dff6dd;
-    color: #107c10;
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
   }
   
-  &.offline {
-    background-color: #fde7e9;
-    color: #d13438;
+  thead {
+    th {
+      background-color: $light-bg;
+      font-weight: 600;
+      color: $text-color;
+      border-bottom: 2px solid $border-color;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+  }
+  
+  tbody {
+    tr {
+      &:hover {
+        background-color: rgba($primary-color, 0.05);
+      }
+      
+      td {
+        color: $text-color;
+      }
+    }
+  }
+  
+  .no-data {
+    text-align: center;
+    padding: 2rem;
+    color: $light-text;
   }
 }
 
-.monitoring-status {
-  margin-top: 20px;
-  
-  p {
-    margin-bottom: 8px;
-    color: #666;
-  }
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
 }
 
+// Charts
 .charts-container {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  gap: 20px;
+  gap: 1.5rem;
+  padding: 1rem 0;
 
   .row {
     display: flex;
-    gap: 20px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 
     .half-width {
       flex: 1;
+      min-width: calc(50% - 1.5rem);
     }
   }
 
   .full-width {
     width: 100%;
-    display: flex;
-    justify-content: center; /* Center the chart horizontally */
   }
 }
 
 .chart-card {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
 
-.table-container {
-  margin-top: 20px;
-}
-
-mat-tab-group {
-  margin-top: 20px;
-}
-
-.tab-navigation {
-  margin: 20px 0;
-  border-bottom: 1px solid #ddd;
+// Pagination
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 0.5rem 0;
   
-  button {
-    padding: 10px 20px;
-    margin-right: 10px;
-    border-radius: 4px 4px 0 0;
+  .pagination-info {
+    margin: 0 1rem;
+    color: $light-text;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .charts-container .row {
+    flex-direction: column;
+  }
+
+  .charts-container .row .half-width {
+    width: 100%;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
     
-    &.active {
-      background-color: #f0f0f0;
-      border-bottom: 2px solid #3f51b5;
+    .pagination-info {
+      order: -1;
+      margin-bottom: 0.5rem;
     }
   }
 }

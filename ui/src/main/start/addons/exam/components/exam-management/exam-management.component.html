@@ -1,0 +1,178 @@
+<div class="container-fluid exam-container">
+  <div class="row">
+    <!-- Left Panel - Input Area -->
+    <div class="col-md-6 col-lg-5 left-panel">
+      <div class="card">
+        <div class="card-header sticky-top">
+          <h2>试卷文本解析</h2>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <div class="form-group flex-grow-1">
+            <label for="examText">粘贴试卷文本</label>
+            <textarea id="examText" class="form-control exam-text-area" [(ngModel)]="examText"
+              placeholder="请粘贴试卷文本，格式需包含填空题、判断题、单选题、多选题、简答题等部分..."></textarea>
+          </div>
+
+          <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+          </div>
+
+          <div class="text-center mt-3">
+            <button type="button" class="btn btn-primary btn-lg" (click)="parseExamText()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-2" role="status"
+                aria-hidden="true"></span>
+              <i *ngIf="!isLoading" class="fas fa-magic mr-2"></i>
+              {{ isLoading ? '解析中...' : '解析试卷' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Preview Area -->
+    <div class="col-md-6 col-lg-7 right-panel">
+      <!-- Loading indicator for preview area -->
+      <div class="card" *ngIf="isLoading">
+        <div class="card-body empty-preview">
+          <div class="text-center text-muted">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <h3 class="mt-3">正在解析试卷...</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty preview state - only shown when not loading and no parsed exam -->
+      <div class="card" *ngIf="!isLoading && !parsedExam">
+        <div class="card-body empty-preview">
+          <div class="text-center text-muted">
+            <i class="fas fa-file-alt preview-icon"></i>
+            <h3>试卷预览</h3>
+            <p>在左侧粘贴试卷文本并点击"解析试卷"按钮</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Debug info for troubleshooting -->
+      <div *ngIf="!isLoading && parsedExam && (!parsedExam.fillBlankQuestions || !parsedExam.fillBlankQuestions.length) && 
+                (!parsedExam.trueFalseQuestions || !parsedExam.trueFalseQuestions.length) && 
+                (!parsedExam.singleChoiceQuestions || !parsedExam.singleChoiceQuestions.length) && 
+                (!parsedExam.multipleChoiceQuestions || !parsedExam.multipleChoiceQuestions.length) && 
+                (!parsedExam.shortAnswerQuestions || !parsedExam.shortAnswerQuestions.length)"
+        class="alert alert-warning">
+        试卷解析完成，但未找到任何题目。请检查试卷格式是否符合要求。
+      </div>
+
+      <!-- Parsed exam preview -->
+      <div class="card" *ngIf="!isLoading && parsedExam">
+        <div class="card-header sticky-top preview-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0 exam-title">{{parsedExam.title || '未命名试卷'}}</h3>
+            <button class="btn btn-success" (click)="saveExam()" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm mr-1" role="status"
+                aria-hidden="true"></span>
+              <i *ngIf="!isLoading" class="fas fa-save mr-1"></i>
+              {{ isLoading ? '保存中...' : '保存试卷' }}
+            </button>
+          </div>
+        </div>
+        <div class="card-body exam-preview">
+          <!-- Fill-in-the-blank Questions -->
+          <div class="question-section"
+            *ngIf="parsedExam.fillBlankQuestions && parsedExam.fillBlankQuestions.length > 0">
+            <h3 class="section-title">一、填空题 (共{{parsedExam.fillBlankQuestions.length}}题)</h3>
+            <div class="question-item" *ngFor="let question of parsedExam.fillBlankQuestions; let i = index">
+              <div class="question-header">
+                <p><strong>{{i+1}}. </strong>{{question.title}}</p>
+                <div class="answer-section">
+                  <p><strong>答案:</strong>
+                    <span *ngFor="let answer of question.answers; let j = index">
+                      {{j > 0 ? '、' : ''}}{{answer}}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- True/False Questions -->
+          <div class="question-section"
+            *ngIf="parsedExam.trueFalseQuestions && parsedExam.trueFalseQuestions.length > 0">
+            <h3 class="section-title">二、判断题 (共{{parsedExam.trueFalseQuestions.length}}题)</h3>
+            <div class="question-item" *ngFor="let question of parsedExam.trueFalseQuestions; let i = index">
+              <div class="question-header">
+                <p><strong>{{i+1}}. </strong>{{question.title}}</p>
+                <div class="answer-section">
+                  <p><strong>答案:</strong> {{question.answer ? '√' : '×'}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Single Choice Questions -->
+          <div class="question-section"
+            *ngIf="parsedExam.singleChoiceQuestions && parsedExam.singleChoiceQuestions.length > 0">
+            <h3 class="section-title">三、单项选择题 (共{{parsedExam.singleChoiceQuestions.length}}题)</h3>
+            <div class="question-item" *ngFor="let question of parsedExam.singleChoiceQuestions; let i = index">
+              <div class="question-header">
+                <p><strong>{{i+1}}. </strong>{{question.title}}</p>
+                <div class="options-section" *ngIf="question.options && question.options.length > 0">
+                  <p *ngFor="let option of question.options">
+                    <strong>{{option.id}}.</strong> {{option.content}}
+                  </p>
+                </div>
+                <div class="answer-section">
+                  <p><strong>答案:</strong> {{question.answer}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multiple Choice Questions -->
+          <div class="question-section"
+            *ngIf="parsedExam.multipleChoiceQuestions && parsedExam.multipleChoiceQuestions.length > 0">
+            <h3 class="section-title">四、多选题 (共{{parsedExam.multipleChoiceQuestions.length}}题)</h3>
+            <div class="question-item" *ngFor="let question of parsedExam.multipleChoiceQuestions; let i = index">
+              <div class="question-header">
+                <p><strong>{{i+1}}. </strong>{{question.title}}</p>
+                <div class="options-section" *ngIf="question.options && question.options.length > 0">
+                  <p *ngFor="let option of question.options">
+                    <strong>{{option.id}}.</strong> {{option.content}}
+                  </p>
+                </div>
+                <div class="answer-section">
+                  <p><strong>答案:</strong> {{question.answers.join(', ')}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Short Answer Questions -->
+          <div class="question-section"
+            *ngIf="parsedExam.shortAnswerQuestions && parsedExam.shortAnswerQuestions.length > 0">
+            <h3 class="section-title">五、简答题 (共{{parsedExam.shortAnswerQuestions.length}}题)</h3>
+            <div class="question-item" *ngFor="let question of parsedExam.shortAnswerQuestions; let i = index">
+              <div class="question-header">
+                <p><strong>{{i+1}}. </strong>{{question.title}}</p>
+                <div class="answer-section">
+                  <p><strong>参考答案:</strong></p>
+                  <p class="suggested-answer">{{question.suggestedAnswer}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Section -->
+          <div class="summary-section" *ngIf="parsedExam.totalScore">
+            <div class="card">
+              <div class="card-body">
+                <p class="mb-0"><strong>总分:</strong> {{parsedExam.totalScore}} 分</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

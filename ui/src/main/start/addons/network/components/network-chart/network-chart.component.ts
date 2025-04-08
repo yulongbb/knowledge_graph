@@ -1,6 +1,5 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { EChartsOption } from 'echarts';
 import { IpFrequency, TimeBasedFrequency } from '../../models/network.model';
 
 @Component({
@@ -15,65 +14,117 @@ export class NetworkChartComponent implements OnChanges {
   @Input() timeBasedData: TimeBasedFrequency | null = null;
   @Input() displayLimit: number = 10;
   
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  
-  public chartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: ''
-      }
-    }
-  };
-  
-  public chartData: ChartData = {
-    labels: [],
-    datasets: []
-  };
+  chartOptions: EChartsOption = {};
+  updateOptions: EChartsOption = {};
 
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chartOptions && this.chartOptions.plugins && this.chartOptions.plugins.title) {
-      this.chartOptions.plugins.title.text = this.chartTitle;
+    if (changes['chartTitle'] || changes['chartType']) {
+      this.initChartOptions();
     }
     
     if (changes['frequencyData'] || changes['displayLimit']) {
-      this.updateFrequencyChart();
+      if (this.frequencyData && this.frequencyData.length > 0) {
+        this.updateFrequencyChart();
+      }
     }
     
     if (changes['timeBasedData'] || changes['displayLimit']) {
-      this.updateTimeBasedChart();
+      if (this.timeBasedData) {
+        this.updateTimeBasedChart();
+      }
     }
+  }
+
+  private initChartOptions(): void {
+    this.chartOptions = {
+      title: {
+        text: this.chartTitle,
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      legend: {
+        data: [],
+        top: 'bottom'
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: []
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: []
+    };
   }
 
   private updateFrequencyChart(): void {
     if (!this.frequencyData || this.frequencyData.length === 0) return;
 
     const limitedData = this.frequencyData.slice(0, this.displayLimit);
+    const labels = limitedData.map(item => `${item.srcIp} → ${item.dstIp}`);
+    const values = limitedData.map(item => item.count);
     
-    this.chartData = {
-      labels: limitedData.map(item => `${item.srcIp} → ${item.dstIp}`),
-      datasets: [{
-        data: limitedData.map(item => item.count),
-        label: 'Communication Count',
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)'
-        ]
-      }]
-    };
-    
-    if (this.chart) {
-      this.chart.update();
+    const colors = [
+      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+      '#FF9F40', '#8C9EFF', '#DCE775', '#81C784', '#BA68C8'
+    ];
+
+    if (this.chartType === 'bar') {
+      this.updateOptions = {
+        xAxis: {
+          type: 'category',
+          data: labels
+        },
+        series: [{
+          name: 'Communication Count',
+          type: 'bar',
+          data: values,
+          itemStyle: {
+            color: (params: any) => {
+              return colors[params.dataIndex % colors.length];
+            }
+          }
+        }]
+      };
+    } else if (this.chartType === 'pie') {
+      const pieData = limitedData.map((item, index) => {
+        return {
+          name: `${item.srcIp} → ${item.dstIp}`,
+          value: item.count,
+          itemStyle: {
+            color: colors[index % colors.length]
+          }
+        };
+      });
+
+      this.updateOptions = {
+        series: [{
+          type: 'pie',
+          radius: '60%',
+          center: ['50%', '50%'],
+          data: pieData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }]
+      };
     }
   }
 
@@ -81,8 +132,7 @@ export class NetworkChartComponent implements OnChanges {
     if (!this.timeBasedData) return;
     
     const timeKeys = Object.keys(this.timeBasedData);
-    const datasets: any[] = [];
-    const topIpPairs = new Map<string, { srcIp: string, dstIp: string, counts: number[] }>();
+    const topIpPairs = new Map<string, { counts: number[] }>();
     
     // Gather top IP pairs across all time periods
     timeKeys.forEach(timeKey => {
@@ -92,8 +142,6 @@ export class NetworkChartComponent implements OnChanges {
         const pairKey = `${pair.srcIp} → ${pair.dstIp}`;
         if (!topIpPairs.has(pairKey)) {
           topIpPairs.set(pairKey, {
-            srcIp: pair.srcIp,
-            dstIp: pair.dstIp,
             counts: new Array(timeKeys.length).fill(0)
           });
         }
@@ -111,34 +159,34 @@ export class NetworkChartComponent implements OnChanges {
       });
     });
     
-    // Create a dataset for each top IP pair
+    // Create a series for each top IP pair
+    const series: any[] = [];
     const colors = [
-      'rgba(255, 99, 132, 0.6)',
-      'rgba(54, 162, 235, 0.6)',
-      'rgba(255, 206, 86, 0.6)',
-      'rgba(75, 192, 192, 0.6)',
-      'rgba(153, 102, 255, 0.6)'
+      '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
     ];
     
     let colorIndex = 0;
     topIpPairs.forEach((value, key) => {
-      datasets.push({
+      series.push({
+        name: key,
+        type: 'line',
         data: value.counts,
-        label: key,
-        backgroundColor: colors[colorIndex % colors.length],
-        borderColor: colors[colorIndex % colors.length].replace('0.6', '1'),
-        fill: false
+        itemStyle: {
+          color: colors[colorIndex % colors.length]
+        }
       });
       colorIndex++;
     });
     
-    this.chartData = {
-      labels: timeKeys,
-      datasets: datasets
+    this.updateOptions = {
+      xAxis: {
+        type: 'category',
+        data: timeKeys
+      },
+      legend: {
+        data: Array.from(topIpPairs.keys())
+      },
+      series: series
     };
-    
-    if (this.chart) {
-      this.chart.update();
-    }
   }
 }

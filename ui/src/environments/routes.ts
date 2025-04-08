@@ -107,6 +107,16 @@ export const mainRoutes: Routes = [
     loadChildren: () =>
       import("../main/start/addons/network/network.module").then(x => x.NetworkModule),
   },
+  {
+    path: "nebular",
+    loadChildren: () =>
+      import("../main/start/addons/nebular/nebular.module").then(x => x.NebularModule),
+  },
+  {
+    path: "exam",
+    loadChildren: () =>
+      import("../main/start/addons/exam/exam.module").then(x => x.ExamModule),
+  },
   // 如果路由为空就指向 index
   { path: "", redirectTo: environment.index, pathMatch: "full" },
   ...shareRoutes

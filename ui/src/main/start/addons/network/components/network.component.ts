@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NetworkService } from '../services/network.service';
 import { Subscription, interval } from 'rxjs';
-import { PageEvent } from '@angular/material/paginator';
 import { 
   ApiResponse, 
   IpFrequency, 
@@ -9,11 +8,13 @@ import {
   NetworkPacketPage, 
   TimeBasedFrequency 
 } from '../models/network.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-network',
   templateUrl: './network.component.html',
-  styleUrls: ['./network.component.scss']
+  styleUrls: ['./network.component.scss'],
+  providers: [DatePipe]
 })
 export class NetworkComponent implements OnInit, OnDestroy {
   // Packets data
@@ -35,7 +36,10 @@ export class NetworkComponent implements OnInit, OnDestroy {
   private monitoringSubscription: Subscription | null = null;
   displayedColumns: string[] = ['id', 'netName', 'srcIp', 'dstIp', 'protocol', 'srcPort', 'dstPort', 'date'];
 
-  constructor(private networkService: NetworkService) { }
+  constructor(
+    private networkService: NetworkService,
+    private datePipe: DatePipe
+  ) {}
 
   ngOnInit(): void {
     this.refreshNetworkData();
@@ -89,9 +93,29 @@ export class NetworkComponent implements OnInit, OnDestroy {
       });
   }
 
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
+  onPreviousPage(): void {
+    if (this.pageIndex > 0) {
+      this.pageIndex--;
+      this.loadNetworkPackets();
+    }
+  }
+
+  onNextPage(): void {
+    if ((this.pageIndex + 1) * this.pageSize < this.totalElements) {
+      this.pageIndex++;
+      this.loadNetworkPackets();
+    }
+  }
+
+  onSelectPageSize(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.onPageSizeChange(target.value);
+  }
+
+  onPageSizeChange(value: any): void {
+    // Convert string to number if needed
+    this.pageSize = typeof value === 'string' ? parseInt(value, 10) : value;
+    this.pageIndex = 0; // Reset to first page when changing page size
     this.loadNetworkPackets();
   }
 

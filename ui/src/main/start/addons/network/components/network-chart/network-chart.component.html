@@ -1,7 +1,9 @@
 <div class="chart-container">
-  <canvas baseChart
-    [type]="chartType"
-    [data]="chartData"
-    [options]="chartOptions">
-  </canvas>
+  <div 
+    echarts 
+    [options]="chartOptions" 
+    [merge]="updateOptions"
+    class="echarts-container" 
+    [loading]="!(frequencyData.length || timeBasedData)"
+  ></div>
 </div>

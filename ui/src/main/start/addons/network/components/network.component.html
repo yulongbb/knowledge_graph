@@ -1,111 +1,123 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>网络监控</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <div class="tab-navigation">
-      <button mat-button [class.active]="activeTab === 'charts'" (click)="activeTab = 'charts'">图表</button>
-      <button mat-button [class.active]="activeTab === 'packets'" (click)="activeTab = 'packets'">网络数据包</button>
-    </div>
+<div class="card">
+  <header class="card-header">
+    <h5>网络监控</h5>
+  </header>
+  <div class="card-body">
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'charts'"
+          (click)="activeTab = 'charts'">图表</button>
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'packets'"
+          (click)="activeTab = 'packets'">网络数据包</button>
+      </div>
+      
+      <div class="tab-content">
+        <!-- Charts Tab -->
+        <div class="tab-pane" [class.active]="activeTab === 'charts'">
+          <div class="charts-container">
+            <!-- Full-width chart -->
+            <div class="card chart-card full-width">
+              <div class="card-header">
+                <h6>IP 通信频率</h6>
+              </div>
+              <div class="card-body">
+                <app-network-chart
+                  chartType="bar"
+                  chartTitle="IP 通信对的前十名"
+                  [frequencyData]="ipFrequencies"
+                  [displayLimit]="10">
+                </app-network-chart>
+              </div>
+            </div>
 
-    <div *ngIf="activeTab === 'charts'" class="charts-container">
-      <!-- Full-width chart -->
-      <mat-card class="chart-card full-width">
-        <mat-card-header>
-          <mat-card-title>IP 通信频率</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <app-network-chart
-            chartType="bar"
-            chartTitle="IP 通信对的前十名"
-            [frequencyData]="ipFrequencies"
-            [displayLimit]="10">
-          </app-network-chart>
-        </mat-card-content>
-      </mat-card>
+            <!-- Side-by-side charts -->
+            <div class="row">
+              <div class="card chart-card half-width">
+                <div class="card-header">
+                  <h6>每周通信频率</h6>
+                </div>
+                <div class="card-body">
+                  <app-network-chart
+                    chartType="line"
+                    chartTitle="每周通信对的前五名"
+                    [timeBasedData]="weeklyFrequencies">
+                  </app-network-chart>
+                </div>
+              </div>
 
-      <!-- Side-by-side charts -->
-      <div class="row">
-        <mat-card class="chart-card half-width">
-          <mat-card-header>
-            <mat-card-title>每周通信频率</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-network-chart
-              chartType="line"
-              chartTitle="每周通信对的前五名"
-              [timeBasedData]="weeklyFrequencies">
-            </app-network-chart>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="chart-card half-width">
-          <mat-card-header>
-            <mat-card-title>每小时通信频率</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <app-network-chart
-              chartType="line"
-              chartTitle="每小时通信对的前五名"
-              [timeBasedData]="hourlyFrequencies">
-            </app-network-chart>
-          </mat-card-content>
-        </mat-card>
+              <div class="card chart-card half-width">
+                <div class="card-header">
+                  <h6>每小时通信频率</h6>
+                </div>
+                <div class="card-body">
+                  <app-network-chart
+                    chartType="line"
+                    chartTitle="每小时通信对的前五名"
+                    [timeBasedData]="hourlyFrequencies">
+                  </app-network-chart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Network Packets Tab -->
+        <div class="tab-pane" [class.active]="activeTab === 'packets'">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>网络接口</th>
+                  <th>源 IP</th>
+                  <th>目标 IP</th>
+                  <th>协议</th>
+                  <th>源端口</th>
+                  <th>目标端口</th>
+                  <th>日期</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let packet of networkPackets">
+                  <td>{{packet.id}}</td>
+                  <td>{{packet.netName}}</td>
+                  <td>{{packet.srcIp}}</td>
+                  <td>{{packet.dstIp}}</td>
+                  <td>{{packet.protocol}}</td>
+                  <td>{{packet.srcPort}}</td>
+                  <td>{{packet.dstPort}}</td>
+                  <td>{{packet.date | date:'medium'}}</td>
+                </tr>
+                <tr *ngIf="networkPackets.length === 0">
+                  <td colspan="8" class="no-data">暂无数据</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination-container">
+              <button class="btn btn-default" [disabled]="pageIndex === 0" (click)="onPreviousPage()">
+                上一页
+              </button>
+              <span class="pagination-info">
+                第 {{pageIndex + 1}} 页，每页 {{pageSize}} 条，共 {{totalElements}} 条
+              </span>
+              <button class="btn btn-default" [disabled]="(pageIndex + 1) * pageSize >= totalElements" (click)="onNextPage()">
+                下一页
+              </button>
+              <div class="select-container">
+                <select [(ngModel)]="pageSize" (change)="onSelectPageSize($event)">
+                  <option *ngFor="let size of [5, 10, 20, 50, 100]" [value]="size">{{size}}</option>
+                </select>
+                <label>每页显示</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div *ngIf="activeTab === 'packets'" class="table-container">
-      <table mat-table [dataSource]="networkPackets" class="mat-elevation-z8 network-table">
-        <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>ID</th>
-          <td mat-cell *matCellDef="let element">{{element.id}}</td>
-        </ng-container>
-        
-        <ng-container matColumnDef="netName">
-          <th mat-header-cell *matHeaderCellDef>网络接口</th>
-          <td mat-cell *matCellDef="let element">{{element.netName}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="srcIp">
-          <th mat-header-cell *matHeaderCellDef>源 IP</th>
-          <td mat-cell *matCellDef="let element">{{element.srcIp}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="dstIp">
-          <th mat-header-cell *matHeaderCellDef>目标 IP</th>
-          <td mat-cell *matCellDef="let element">{{element.dstIp}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="protocol">
-          <th mat-header-cell *matHeaderCellDef>协议</th>
-          <td mat-cell *matCellDef="let element">{{element.protocol}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="srcPort">
-          <th mat-header-cell *matHeaderCellDef>源端口</th>
-          <td mat-cell *matCellDef="let element">{{element.srcPort}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="dstPort">
-          <th mat-header-cell *matHeaderCellDef>目标端口</th>
-          <td mat-cell *matCellDef="let element">{{element.dstPort}}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef>日期</th>
-          <td mat-cell *matCellDef="let element">{{element.date | date:'medium'}}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-      <mat-paginator
-        [length]="totalElements"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20, 50, 100]"
-        (page)="onPageChange($event)"
-        aria-label="选择网络数据包的页码">
-      </mat-paginator>
-    </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>

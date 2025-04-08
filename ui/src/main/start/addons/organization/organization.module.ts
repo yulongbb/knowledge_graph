@@ -6,12 +6,12 @@ import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [OrganizationComponent],
-  imports: [CommonModule, FormsModule,  RouterModule.forChild([
-              {
-                  path: '',
-                  component: OrganizationComponent,
-              },
-          ]),],
+  imports: [CommonModule, FormsModule, RouterModule.forChild([
+    {
+      path: '',
+      component: OrganizationComponent,
+    },
+  ]),],
   exports: [OrganizationComponent]
 })
-export class OrganizationModule {}
+export class OrganizationModule { }
