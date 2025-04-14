@@ -11,7 +11,9 @@ import { extname } from 'path';
 
 @Module({
   imports: [
+    // 导入TypeOrm模块以支持数据库操作
     TypeOrmModule.forFeature([Addon]),
+    // 配置Elasticsearch模块
     ElasticsearchModule.registerAsync({
         imports: [ConfigModule],
         inject: [ConfigService],
@@ -23,6 +25,7 @@ import { extname } from 'path';
           // },
         }),
       }),
+    // 配置Multer模块以支持文件上传
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
@@ -33,6 +36,7 @@ import { extname } from 'path';
       }),
     }),
   ],
+  // 提供服务和控制器
   providers: [AddonService],
   controllers: [AddonController],
 })

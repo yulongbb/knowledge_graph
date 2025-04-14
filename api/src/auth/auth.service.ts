@@ -13,7 +13,7 @@ import { map, uniqBy, union, split } from 'lodash';
 @Injectable()
 export class AuthService {
   user: User;
-  expires: number = 3600;
+  expires: number = 3600; // Token 有效期（秒）
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -25,23 +25,28 @@ export class AuthService {
     private readonly actionRepository: Repository<Action>
   ) {}
 
+  // 创建 JWT Token
   async createToken(id: string): Promise<any> {
     const user: JwtPayload = { id: id };
     return jwt.sign(user, 'secretKey', { expiresIn: this.expires });
   }
 
+  // 验证用户账号
   async validateAccount(payload: JwtPayload): Promise<any> {
     return this.userRepository.findOneBy({ id: payload.id });
   }
 
+  // 根据账号查找用户
   async finduserByAccount(account: string): Promise<User> {
     return this.userRepository.findOneBy({ account: account });
   }
 
+  // 获取用户菜单
   async menus(): Promise<Menu[]> {
     return this.menuRepository.find();
   }
 
+  // 用户登录逻辑
   async login(account: string, password: string): Promise<any> {
     this.user = await this.userRepository.findOne({ where: { account: account }, relations: ['roles'] });
     if (this.user != undefined && this.user.password == password) {
@@ -56,6 +61,7 @@ export class AuthService {
     }
   }
 
+  // 获取用户权限（菜单和操作）
   private async getPermissions(user: User): Promise<{ actions: Action[]; menus: Menu[] }> {
     let actions = await this.actionRepository
       .createQueryBuilder('action')
