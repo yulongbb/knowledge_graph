@@ -27,8 +27,6 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@ionic/angular": "^8.5.2",
-    "@nebular/eva-icons": "^15.0.0",
-    "@nebular/theme": "^15.0.0",
     "@ng-nest/ui": "^17.0.12",
     "@popperjs/core": "^2.11.8",
     "@types/marked": "^6.0.0",

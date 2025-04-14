@@ -11,9 +11,8 @@
       <div class="category-section">
         <h3 class="category-header">分类导航</h3>
         <ul class="category-list">
-          <li *ngFor="let category of filteredCategories" 
-              (click)="selectCategory(category)" 
-              [class.selected]="category === selectedCategory">
+          <li *ngFor="let category of filteredCategories" (click)="selectCategory(category)"
+            [class.selected]="category === selectedCategory">
             {{ category }}
           </li>
         </ul>
@@ -69,12 +68,9 @@
               <h3>{{ selectedExtension.name }}</h3>
               <div class="rating-section">
                 <div class="rating-stars">
-                  <span *ngFor="let star of [1,2,3,4,5]" 
-                        (click)="rateAddon(selectedExtension!, star)"
-                        (mouseenter)="hoverRating = star"
-                        (mouseleave)="hoverRating = 0"
-                        [class.hover]="star <= hoverRating"
-                        [class.active]="star <= selectedExtension.rating">
+                  <span *ngFor="let star of [1,2,3,4,5]" (click)="rateAddon(selectedExtension!, star)"
+                    (mouseenter)="hoverRating = star" (mouseleave)="hoverRating = 0" [class.hover]="star <= hoverRating"
+                    [class.active]="star <= selectedExtension.rating">
                     ★
                   </span>
                 </div>

@@ -336,7 +336,7 @@ $white: white;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        
+
         h3 {
           margin: 0 0 8px 0;
           font-size: 24px;
@@ -352,20 +352,21 @@ $white: white;
     .action-buttons {
       display: flex;
       gap: 8px;
-      
-      .edit-button, .delete-button {
+
+      .edit-button,
+      .delete-button {
         margin: 0;
       }
     }
   }
 
   // Remove the old image styles since we moved it to the header
-  > img {
+  >img {
     display: none;
   }
 
   // Remove the duplicate rating styles
-  > .rating {
+  >.rating {
     display: none;
   }
 
@@ -391,7 +392,7 @@ $white: white;
       p {
         margin: 16px 0;
       }
-      
+
       a {
         word-break: break-all;
       }
@@ -568,7 +569,8 @@ $white: white;
   }
 }
 
-.create-extension, .edit-extension {
+.create-extension,
+.edit-extension {
   form {
     display: flex;
     flex-direction: column;
@@ -576,7 +578,8 @@ $white: white;
     label {
       margin-bottom: 16px;
 
-      input, quill-editor {
+      input,
+      quill-editor {
         width: 100%;
         padding: 8px;
         border: 1px solid #ddd;
@@ -658,7 +661,7 @@ $white: white;
           height: 48px;
           margin: 0;
           border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .title-rating {
@@ -732,11 +735,12 @@ $white: white;
       transform: translateY(-50%) scale(1.1);
     }
 
-    &.prev { 
-      left: -24px; 
+    &.prev {
+      left: -24px;
     }
-    &.next { 
-      right: -24px; 
+
+    &.next {
+      right: -24px;
     }
   }
 }
@@ -744,7 +748,7 @@ $white: white;
 .upload-label {
   display: block;
   margin-bottom: 16px;
-  
+
   .file-input {
     display: none;
   }
@@ -790,7 +794,7 @@ $white: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
-  
+
   .carousel-track {
     display: flex;
     transition: transform 0.5s ease-in-out;
@@ -938,6 +942,7 @@ $white: white;
 }
 
 .info-text {
+
   // ...existing code...
   .rating {
     display: none; // 隐藏原来的评分显示
