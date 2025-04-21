@@ -19,27 +19,31 @@ import { DataImportService } from './data-import.queue';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      connection: {
-        host: 'localhost',
-        port: 6379,
-      },
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('REDIS_HOST'),
+          port: parseInt(configService.get('REDIS_PORT')),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+      }),
     }),
     // 注册队列
     BullModule.registerQueue({
       name: 'data-import-queue',
     }),
-    ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Schema, Property]),
     ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         node: configService.get('ELASTICSEARCH_NODE'),
-        // auth: {
-        //   username: configService.get('ELASTICSEARCH_USER'),
-        //   password: configService.get('ELASTICSEARCH_PASSWORD'),
-        // },
+        auth: {
+          username: configService.get('ELASTICSEARCH_USER'),
+          password: configService.get('ELASTICSEARCH_PASSWORD'),
+        },
       }),
     }),
   ],
@@ -51,7 +55,7 @@ import { DataImportService } from './data-import.queue';
       useFactory: (configService: ConfigService) =>
         new Database({
           url: configService.get('ARANGODB_URL'),
-          databaseName: configService.get('ARANGODB_NAME', 'kgms'),
+          databaseName: configService.get('ARANGODB_NAME'),
           auth: {
             username: configService.get('ARANGODB_USER'),
             password: configService.get('ARANGODB_PASSWORD'),
@@ -62,7 +66,7 @@ import { DataImportService } from './data-import.queue';
     {
       provide: 'DEFAULT_INDEX',
       useFactory: (configService: ConfigService) =>
-        configService.get('ELASTICSEARCH_INDEX', 'entity'),
+        configService.get('ELASTICSEARCH_INDEX'),
       inject: [ConfigService],
     },
     DataImportService,

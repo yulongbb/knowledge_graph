@@ -1,280 +1,199 @@
-Angular 和 Nestjs 构建的开源后台管理系统，基于 @ng-nest/ui 组件库
+# 知识图谱管理系统
 
+## 项目简介
 
-npm run start
+知识图谱管理系统是一个基于 NestJS 和多种数据库技术构建的综合性知识管理平台，旨在提供高效、可扩展的知识存储、检索和可视化服务。系统结合了关系型数据库、图数据库、搜索引擎和缓存服务，形成一个完整的知识管理生态系统。
 
-docker build -t api .
+## 系统架构
 
-docker run --name api --restart=always -d -p 3333:3000 api
+系统采用模块化设计，由以下核心组件构成：
 
+- **API服务层**：基于 NestJS 框架，提供 RESTful API
+- **数据存储层**：
+  - MySQL：存储结构化数据和本体模型
+  - ArangoDB：支持图数据存储和查询
+  - Elasticsearch：提供全文搜索和知识检索
+  - Redis：缓存服务和队列管理
+- **文件存储**：基于 MinIO 的对象存储服务
+- **用户认证**：JWT 基于令牌的认证机制
 
-docker build -t ui .
+## 多环境支持
 
+系统支持多环境配置，包括：
 
-docker run --name ui  --restart=always -d -p 80:80 ui
+- **开发环境**（development）
+- **测试环境**（test）
+- **生产环境**（production）
 
-docker-compose up -d
+通过 `.env.[environment]` 文件进行环境特定配置，实现不同环境的灵活切换。
 
-ng build --configuration production
+## 核心功能
 
-ng serve --proxy-config proxy.conf.json
+### 系统管理
 
-"entity": {
-  
-      "includeAllFields": true,
+- **用户管理**：用户的创建、查询、更新和删除
+- **角色管理**：基于角色的权限控制
+- **组织管理**：组织机构树形结构管理
+- **菜单管理**：系统菜单和操作权限管理
 
-    }
+### 本体建模
 
-.\arangoimp.exe --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.database kgms --file D:\download\wikidata\entity.jsonl --type jsonl --create-collection true --create-collection-type document --overwrite true --collection "entity"
+- **模式管理**：知识图谱本体模式定义
+- **属性管理**：知识实体属性配置
+- **限定词管理**：知识描述的限定词管理
+- **标签管理**：知识分类标签体系
 
-wikidata数据dump到arangodb的方法
+### 知识管理
 
-第一步：下载wikidata全量数据压缩包
-第二步：使用python脚本提取实体到entity.json，提取属性信息到statement.json
-第三步：通过arangodb导入json的命令将数据导入到库中
+- **知识创建与编辑**：支持多种知识实体的创建和编辑
+- **知识融合**：相似知识的自动发现与融合
+- **知识关联**：实体间关系的建立与管理
+- **知识可视化**：基于图的知识展示
+- **模板系统**：支持自定义内容模板
 
-arangoimport --threads 4  --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password root --server.database kgms --file "\mnt\entity.json" --type json --collection "entity" --batch-size 33554432
-arangoimport --threads 4  --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password root --server.database kgms --file "\mnt\link.json" --type json --collection "link" --batch-size 33554432
+### 文件管理
 
-arangodb初始化库方法
+- **文件上传**：支持图片、视频、文档等多媒体文件
+- **缩略图生成**：视频和PDF缩略图自动生成
+- **远程图片代理**：远程图片的安全获取与缓存
 
-第一步：创建数据库
-第二部：创建数据表
-第三步：创建图
-第四步：创建视图
+### 数据应用
 
-需求：批量筛选实体列表导出属性到excel
+- **数据导入**：批量数据导入队列处理
+- **热点分析**：基于Redis的知识热度统计
+- **插件扩展**：支持功能插件扩展
 
-1. 筛选实体
-方法一：通过关键词检索entity表
-方法二：通过属性和值筛选link表
-结果，返回实体id数组
+## 快速开始
 
-[ "Q22099965","Q21040218"]
+### 环境要求
 
-2. 配置属性
-通过多个实体id获取属性并集，勾选需要导出的属性
+- Node.js >= 16.x
+- MySQL >= 8.0
+- ArangoDB >= 3.8
+- Elasticsearch >= 7.10
+- Redis >= 6.0
+- MinIO 服务
 
-```
-RETURN UNIQUE(FOR l IN link
-FILTER l['_from'] IN ["entity/Q22099965","entity/Q21040218"]
-RETURN l.mainsnak.property)
-```
-[
-    "P31",
-    "P569",
-    "P106",
-    "P21",
-    "P39",
-    "P69",
-    "P734",
-    "P102",
-    "P3373",
-    "P27",
-    "P19"
-]
+### 安装依赖
 
-3. 转换到excel
-
-
-```
-FOR l IN link
-FILTER l['_from'] IN ["entity/Q22099965","entity/Q21040218"]
-FILTER l.mainsnak.property IN [
-    "P31",
-    "P569",
-    "P106",
-    "P21",
-    "P39",
-    "P69",
-    "P734",
-    "P102",
-    "P3373",
-    "P27",
-    "P19"
-]
-
-COLLECT id=l['_from']  INTO groups
-
-LET gs = (
-    FOR g IN groups
-    LET value = g.l.mainsnak.datavalue.type=='wikibase-entityid' ? g.l.mainsnak.datavalue.value.id : (g.l.mainsnak.datavalue.type=='time' ? g.l.mainsnak.datavalue.value.time : g.l.mainsnak.datavalue.value)
-    RETURN {[g.l.mainsnak.property]: value}
-)
-
-
-RETURN MERGE(gs)
+```bash
+npm install
 ```
 
-总结
+### 配置环境
 
-```
-let items = ["entity/Q22099965","entity/Q21040218","entity/Q21040220"]
+1. 根据环境创建或修改配置文件：`.env.development`、`.env.test` 或 `.env.production`
+2. 设置数据库连接、外部服务地址等配置项
 
-let properties = (RETURN UNIQUE(FOR l IN link FILTER l['_from'] IN items RETURN {id:l.mainsnak.property, label:DOCUMENT(CONCAT('entity/',l.mainsnak.property))['labels']['zh']['value']}))[0]
+### 启动服务
 
-FOR i in items
-let values = (FOR p in properties LET value = (FOR l IN link FILTER l['_from'] == i AND l.mainsnak.property==p.id RETURN l.mainsnak.datavalue) RETURN value[0]['type']=='wikibase-entityid'? TO_ARRAY(DOCUMENT(CONCAT('entity/',value[0]['value']['id']))['labels']['zh']['value']): value[0]['type']=='time'?value[0]['value']['time']:value)
+开发环境：
 
-RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNION( [DOCUMENT(i)['_key'], TO_ARRAY(DOCUMENT(i).labels.zh.value), TO_ARRAY(DOCUMENT(i).descriptions.zh.value), DOCUMENT(i).aliases.zh[*].value],values))
-```
-
-
-实体
-
-1. 模糊搜索
-提供通过关键词搜索实体目标的标签、描述、别名信息
-要求：不区分大小写、不区分繁简
-
-```
-FOR doc IN entity_view
-SEARCH LIKE(doc.labels.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.labels.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.labels.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.labels.en.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.descriptions.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.descriptions.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.descriptions.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.descriptions.en.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.aliases.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.aliases.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.aliases.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.aliases.ne.value, TOKENS(@keyword, "norm_en")[0])
-SORT LENGTH(doc.labels)+LENGTH(doc.descriptions)+LENGTH(doc.aliases) DESC
-LIMIT 100
-RETURN {
-    title: doc.labels.zh.value,
-    description: doc.descriptions.zh.value,
-    title_en: doc.labels.en.value,
-    description_en: doc.descriptions.en.value,
-    aliases:  doc.aliases.zh,
-    aliases_en:  doc.aliases.en,
-}
-```  
-
-
-值
-
-1. 查询年龄等于80的人物
-
-分析：首先筛选属性值是数量类型且值等于80的边，在筛选属性是年龄
-
-```
-FOR document IN link
-FILTER document.mainsnak.property=='P2044'
-FILTER document.mainsnak.datatype=='quantity'
-FILTER document.mainsnak.datavalue.value.amount=='+20'
-LIMIT 10
-RETURN {id: document['_from'], property: document.mainsnak.property,document:document.mainsnak.datavalue.value}
+```bash
+npm run start:dev
 ```
 
+生产环境：
 
-
-```
-FOR doc IN entity 
-FILTER doc.labels
-LIMIT 100
-RETURN {id:doc['_key'], label: doc.labels.zh.value}
-```
-
-```
-FOR e IN entity
-FILTER e['_key']==@id
-RETURN e
+```bash
+# 先构建
+npm run build:prod
+# 再运行
+npm run start:prod
 ```
 
-```
-FOR v, e, p IN 0..1 OUTBOUND @id GRAPH "graph"
-FILTER e!=null
-SORT e.mainsnak.property
-LIMIT 0, 10
-RETURN e
+测试环境：
+
+```bash
+npm run start:test
 ```
 
+### 访问API文档
+
+启动服务后，访问 Swagger UI 界面：
 
 ```
-FOR l IN link
-FILTER l.mainsnak.datatype=='globe-coordinate'
-SORT  GEO_DISTANCE([l.mainsnak.datavalue.value.latitude, l.mainsnak.datavalue.value.longitude], GEO_POINT(74,40)) ASC
-LIMIT 100
-RETURN {l:DOCUMENT('entity',l['_from']).labels.zh.value, loc: [l.mainsnak.datavalue.value.latitude, l.mainsnak.datavalue.value.longitude]}
+http://localhost:3000/api
 ```
 
+## 项目结构
 
 ```
-FOR document IN FULLTEXT(link, 'mainsnak.datavalue.value', '123') 
-FILTER document.mainsnak.datavalue.type=='string'
-RETURN {id: document['_from'], property: document.mainsnak.property,document:document.mainsnak.datavalue.value}
+api/
+├── src/
+│   ├── addons/              # 插件扩展模块
+│   ├── auth/                # 认证授权模块
+│   ├── config/              # 配置管理模块
+│   ├── core/                # 核心功能模块
+│   ├── knowledge/           # 知识管理模块
+│   ├── minio/               # MinIO文件存储模块
+│   ├── ontology/            # 本体建模模块
+│   ├── redis/               # Redis缓存模块
+│   ├── system/              # 系统管理模块
+│   ├── app.module.ts        # 应用主模块
+│   └── main.ts              # 应用入口
+├── .env.development         # 开发环境配置
+├── .env.production          # 生产环境配置
+├── .env.test                # 测试环境配置
+├── nest-cli.json            # NestJS CLI配置
+├── package.json             # 项目依赖配置
+└── README.md                # 项目文档
 ```
 
+## 模块详解
 
-```
-FOR doc IN entity OPTIONS { indexHint: "idx_1778095045005541376", forceIndexHint: true }
-FILTER LIKE(doc.labels.zh.value, TOKENS("b", "norm_en")[0])
-RETURN doc.labels.zh
-```
+### 系统管理模块
 
+- **用户管理**：用户增删改查和权限分配
+- **角色管理**：角色定义和菜单权限分配
+- **组织管理**：树形组织结构管理
+- **菜单管理**：系统菜单和按钮权限配置
+- **操作管理**：系统操作权限定义
 
-```
-SEARCH doc.labels.zh.value LIKE @keyword
-OR doc.labels.en.value LIKE @keyword
-OR doc.descriptions.zh.value LIKE @keyword
-OR doc.descriptions.en.value LIKE @keyword
-OR doc.aliases.zh.value LIKE @keyword
-OR doc.aliases.en.value LIKE @keyword
-```
+### 本体建模模块
 
-检索并导出
+- **Schema管理**：定义知识类型和结构
+- **Property管理**：定义知识属性和约束
+- **Qualify管理**：定义属性的限定词
+- **Tag管理**：知识标签体系
+- **Application管理**：知识应用场景定义
 
-```
-let langulage = 'zh'
+### 知识管理模块
 
-let items = (FOR doc IN entity_view
-SEARCH LIKE(doc.labels.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.labels.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.labels.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.labels.en.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.descriptions.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.descriptions.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.descriptions.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.descriptions.en.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.aliases.zh.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.aliases.zh.value, TOKENS(@keyword, "norm_en")[0])
-OR LIKE(doc.aliases.en.value, TOKENS(@keyword, "en")[0])
-OR LIKE(doc.aliases.ne.value, TOKENS(@keyword, "norm_en")[0])
-SORT LENGTH(doc.labels) DESC
-LIMIT 10
-RETURN doc['_id'])
-  
+- **节点管理**：知识实体的增删改查
+- **边管理**：知识关系的管理
+- **知识融合**：相似知识的合并
+- **知识检索**：基于Elasticsearch的知识搜索
+- **知识可视化**：基于图的知识展示
+- **数据导入**：基于队列的批量数据导入
 
-let properties = (RETURN UNIQUE(FOR l IN link FILTER l['_from'] IN items RETURN {id:l.mainsnak.property, label:DOCUMENT(CONCAT('entity/',l.mainsnak.property))['labels'][langulage]['value']}))[0]
+### 文件存储模块
 
-FOR i in items
-let values = (FOR p in properties LET value = (FOR l IN link FILTER l['_from'] == i AND l.mainsnak.property==p.id RETURN l.mainsnak.datavalue) RETURN value[0]['type']=='wikibase-entityid'? TO_ARRAY(DOCUMENT(CONCAT('entity/',value[0]['value']['id']))['labels'][langulage]['value']): value[0]['type']=='time'?TO_ARRAY(value[0]['value']['time']):value[0]['type']=='string'? TO_ARRAY(value[0]['value']): value[0]['type']=='quantity'?TO_ARRAY(value[*]['value']['amount']):value)
+- **文件上传**：文件的上传和管理
+- **文件预览**：图片、视频、文档的预览
+- **缩略图生成**：视频和PDF文件的缩略图生成
+- **远程资源代理**：安全获取远程资源
 
-RETURN ZIP(UNION(['ID', '标签', '描述', '别名'],properties[*].label), UNION( [TO_ARRAY(DOCUMENT(i)['_key']), TO_ARRAY(DOCUMENT(i).labels[langulage].value), TO_ARRAY(DOCUMENT(i).descriptions[langulage].value), DOCUMENT(i).aliases[langulage][*].value],values))
-```
+## 技术栈
 
+- **后端框架**：NestJS
+- **数据库**：MySQL、ArangoDB、Elasticsearch、Redis
+- **文件存储**：MinIO
+- **认证鉴权**：Passport、JWT
+- **队列处理**：BullMQ
+- **API文档**：Swagger
+- **ORM**：TypeORM
+- **自然语言处理**：nodejieba
 
+## 贡献指南
 
+1. Fork 项目仓库
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交修改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
 
+## 许可证
 
-FOR e IN entity_view
-SEARCH STARTS_WITH(e['_key'], 'P')
-SORT +SUBSTRING(e['_key'], 1)
-LIMIT 100
-RETURN {id: e['_key'], label: e['labels']['zh']}
-
-
-python设置国内源
-
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-
-
-cannot import name 'XXX' from partially initialized module
-
-文件名重名
-
-
-openEI不支持中文
+项目采用 MIT 许可证 - 详见 LICENSE 文件
 

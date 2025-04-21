@@ -1,9 +1,12 @@
-export const MINIO_CONFIG = {
-    MINIO_ENDPOINT: 'localhost',
-    MINIO_PORT: 9000,
-    MINIO_ACCESSKEY: 'NQVvaroIkaCFNQx7sW7M',
-    MINIO_SECRETKEY: '7Odt6K0Kocpef4ZwMOM0fYRuxr59xx0Si4gKR3bu',
-    // MINIO_ACCESSKEY: 'MfRX0XK1cuRy96Qbt1um',
-    // MINIO_SECRETKEY: 'uL6vkgTXBFezxIgr3gxXLXWxqETLlYRLvgxsy5T8',
-    MINIO_BUCKET: 'kgms',
+import { ConfigService } from '@nestjs/config';
+
+export const getMinioConfig = (configService: ConfigService) => {
+  return {
+    MINIO_ENDPOINT: configService.get('MINIO_ENDPOINT'),
+    MINIO_PORT: parseInt(configService.get('MINIO_PORT')),
+    MINIO_ACCESSKEY: configService.get('MINIO_ACCESSKEY'),
+    MINIO_SECRETKEY: configService.get('MINIO_SECRETKEY'),
+    MINIO_USE_SSL: configService.get('MINIO_USE_SSL') === 'true',
+    MINIO_BUCKET: configService.get('MINIO_BUCKET'),
+  };
 };

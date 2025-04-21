@@ -11,6 +11,12 @@ import {
 } from '../interfaces';
 import { orderBy, slice, map } from 'lodash';
 
+/**
+ * 通用仓库服务基类
+ * 提供基础的CRUD操作和查询功能
+ * @typeparam Entity 实体类型，必须继承XId
+ * @typeparam Query 查询参数类型，必须继承XQuery
+ */
 @Injectable()
 export class XRepositoryService<Entity extends XId, Query extends XQuery> {
   constructor(
@@ -18,6 +24,13 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     private dataSouce: DataSource,
   ) {}
 
+  /**
+   * 获取分页列表数据
+   * @param index 页码
+   * @param size 每页大小
+   * @param query 查询条件
+   * @returns 分页结果，包含总数和数据列表
+   */
   async getList(
     index: number,
     size: number,
@@ -29,6 +42,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
       let total: number = 0;
       this.setFilter(qb, query.filter);
       if (query.group) {
+        // 分组查询
         let group = await this.setGroup(qb, query.group);
         const sort = this.transformSort(query.sort, '');
         group = orderBy(
@@ -41,6 +55,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
         list = slice(group, start, end);
         total = group.length;
       } else {
+        // 普通查询
         this.setSort(qb, query.sort);
         list = await qb
           .skip(size * (index - 1))
@@ -56,12 +71,19 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
       x(result);
     });
   }
+
+  /**
+   * 设置查询过滤条件
+   * @param rep 查询构建器
+   * @param filter 过滤条件数组
+   */
   private setFilter(rep: SelectQueryBuilder<Entity>, filter: XFilter[]) {
     if (filter && filter.length > 0) {
       const param = {};
       filter.forEach((x, index) => {
         param[`param${index}`] = x.value;
         if (x.relation) {
+          // 关联查询
           rep = rep.leftJoin(`entity.${x.relation}`, x.relation);
           switch (x.operation) {
             case '=':
@@ -72,6 +94,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
               break;
           }
         } else {
+          // 普通查询
           switch (x.operation) {
             case '=':
               rep.andWhere(`entity.${x.field} = :param${index}`);
@@ -92,7 +115,7 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
               rep.andWhere(`entity.${x.field} IN (:...param${index})`);
               break;
             default:
-              // '%'
+              // '%'模糊查询
               rep.andWhere(`entity.${x.field} LIKE concat('%', :param${index}, '%')`);
               break;
           }
@@ -102,14 +125,29 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     }
   }
 
+  /**
+   * 获取单个实体
+   * @param id 实体ID
+   * @returns 实体对象
+   */
   async get(id: XIdType): Promise<Entity> {
     return await this.repository.findOneBy({ id });
   }
 
+  /**
+   * 创建实体
+   * @param entity 实体对象
+   * @returns 创建后的实体
+   */
   async post(entity: any): Promise<Entity> {
     return await this.repository.save(entity);
   }
 
+  /**
+   * 更新实体
+   * @param entity 实体对象
+   * @returns 更新后的实体
+   */
   async put(entity: Entity): Promise<Entity> {
     const index = await this.repository.findOneBy({ id: entity.id });
     if (index) {
@@ -124,13 +162,22 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     }
   }
 
+  /**
+   * 删除实体
+   * @param id 实体ID
+   * @returns 被删除的实体
+   */
   async delete(id: XIdType): Promise<Entity> {
     const entity = await this.repository.findOneBy({ id });
     return await this.repository.remove(entity);
   }
 
-  
-
+  /**
+   * 设置分组查询
+   * @param rep 查询构建器
+   * @param group 分组字段
+   * @returns 分组结果
+   */
   private async setGroup(rep: SelectQueryBuilder<Entity>, group: string) {
     let result = [];
     if (group) {
@@ -149,6 +196,12 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     return result;
   }
 
+  /**
+   * 设置排序条件
+   * @param rep 查询构建器
+   * @param sort 排序条件数组
+   * @returns 查询构建器
+   */
   private setSort(rep: SelectQueryBuilder<Entity>, sort: XSort[]) {
     if (sort && sort.length > 0) {
       rep = rep.orderBy(this.transformSort(sort));
@@ -156,6 +209,12 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
     return rep;
   }
 
+  /**
+   * 转换排序条件为TypeORM格式
+   * @param sort 排序条件数组
+   * @param entity 实体别名
+   * @returns 处理后的排序对象
+   */
   private transformSort(sort: XSort[], entity = 'entity'): any {
     const condition: { [prop: string]: 'ASC' | 'DESC' } = {};
     if (sort && sort.length > 0) {

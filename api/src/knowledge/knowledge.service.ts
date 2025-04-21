@@ -8,6 +8,7 @@ import { Schema } from 'src/ontology/entities/schema.entity';
 import { v4 as uuidv4 } from 'uuid';
 import Redis from 'ioredis';
 import * as Handlebars from 'handlebars';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class KnowledgeService {
@@ -18,12 +19,13 @@ export class KnowledgeService {
     private elasticsearchService: EsService,
     private propertiesService: PropertiesService,
     private readonly schemasService: SchemasService,
+    private configService: ConfigService,
   ) {
     this.redis = new Redis({
-      host: 'localhost', // Redis 服务器的主机名
-      port: 6379, // Redis 服务器的端口
-      password: 'root',
-      db: 1,
+      host: this.configService.get('REDIS_HOST'),
+      port: parseInt(this.configService.get('REDIS_PORT')),
+      password: this.configService.get('REDIS_PASSWORD'),
+      db: parseInt(this.configService.get('REDIS_DB')),
     });
   }
 

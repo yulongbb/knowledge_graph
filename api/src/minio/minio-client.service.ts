@@ -1,13 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MinioService } from 'nestjs-minio-client';
-import { MINIO_CONFIG } from './config';
+import { ConfigService } from '@nestjs/config';
+import { getMinioConfig } from './config';
 
 @Injectable()
 export class MinioClientService {
-  private readonly baseBucket = MINIO_CONFIG.MINIO_BUCKET;
+  private readonly baseBucket: string;
 
-  constructor(private readonly minio: MinioService) { }
+  constructor(
+    private readonly minio: MinioService,
+    private readonly configService: ConfigService
+  ) {
+    const minioConfig = getMinioConfig(this.configService);
+    this.baseBucket = minioConfig.MINIO_BUCKET;
+  }
 
   get client() {
     return this.minio.client;

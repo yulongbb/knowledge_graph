@@ -9,11 +9,14 @@ import { Menu } from '../system/menus/entities/menu.entity';
 import { Role } from '../system/roles/entities/role.entity';
 import { Action } from '../system/actions/entities/action.entity';
 import { map, uniqBy, union, split } from 'lodash';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   user: User;
-  expires: number = 3600; // Token 有效期（秒）
+  expires: number;
+  jwtSecret: string;
+  
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -22,13 +25,17 @@ export class AuthService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(Action)
-    private readonly actionRepository: Repository<Action>
-  ) {}
+    private readonly actionRepository: Repository<Action>,
+    private configService: ConfigService
+  ) {
+    this.expires = parseInt(this.configService.get('JWT_EXPIRES'));
+    this.jwtSecret = this.configService.get('JWT_SECRET');
+  }
 
   // 创建 JWT Token
   async createToken(id: string): Promise<any> {
     const user: JwtPayload = { id: id };
-    return jwt.sign(user, 'secretKey', { expiresIn: this.expires });
+    return jwt.sign(user, this.jwtSecret, { expiresIn: this.expires });
   }
 
   // 验证用户账号

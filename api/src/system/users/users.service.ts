@@ -14,6 +14,11 @@ export class UsersService extends XRepositoryService<User, XQuery> {
     super(usersRepository, dataSource);
   }
 
+  /**
+   * 获取用户详情
+   * @param id 用户ID
+   * @returns 用户实体，包含角色和组织关系
+   */
   async get(id: XIdType): Promise<User> {
     return await this.usersRepository.findOne({ where: { id }, relations: ['roles', 'organizations'] });
   }

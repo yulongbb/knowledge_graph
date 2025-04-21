@@ -7,19 +7,31 @@ import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { AddonModule } from './addons/addon.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: '127.0.0.1',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'kgms',
-      entities: ['dist/**/*.entity{.ts,.js}'],
-      synchronize: true,
-      logging: ['query', 'error'],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // 根据 NODE_ENV 加载对应的环境配置文件，默认为开发环境
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      // 允许使用默认.env作为备用
+      ignoreEnvFile: false,
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        entities: ['dist/**/*.entity{.ts,.js}'],
+        synchronize: configService.get('DB_SYNC') === 'true',
+        logging: configService.get('DB_LOGGING').split(','),
+      }),
     }),
     SystemModule,
     OntologynModule,
