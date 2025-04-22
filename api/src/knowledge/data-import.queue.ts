@@ -7,40 +7,51 @@ import { PropertiesService } from 'src/ontology/services/properties.service';
 import { EsService } from './es.service';
 const axios = require('axios');
 
+/**
+ * 数据导入服务
+ * 负责处理大批量数据的异步导入，通过队列方式管理导入任务
+ */
 @Injectable()
 export class DataImportService implements OnModuleInit, OnApplicationShutdown {
-    private worker: Worker;
+    private worker: Worker; // 队列工作者
 
     constructor(
-        @InjectQueue('data-import-queue') private readonly queue: Queue,
-        private readonly knowledgeService: KnowledgeService,
-        private readonly propertiesService: PropertiesService,
-        private readonly elasticsearchService: EsService,
-
-        private readonly edgeService: EdgeService,
+        @InjectQueue('data-import-queue') private readonly queue: Queue, // 注入队列
+        private readonly knowledgeService: KnowledgeService, // 知识服务，用于处理实体
+        private readonly propertiesService: PropertiesService, // 属性服务，用于处理属性
+        private readonly elasticsearchService: EsService, // ES服务，用于搜索
+        private readonly edgeService: EdgeService, // 边服务，用于处理实体间关系
     ) { }
 
+    /**
+     * 模块初始化时创建工作者
+     */
     async onModuleInit() {
         this.worker = new Worker(
             'data-import-queue',
             async (job: Job) => {
-
-                // 这里是实际的数据导入逻辑
+                // 执行实际的数据导入逻辑
                 await this.performImport(job);
-
                 return { success: true };
             },
             { connection: this.queue.opts.connection }, // 使用队列的连接选项
         );
 
-        // 监听事件，如完成、失败等
+        // 监听工作者完成事件
         this.worker.on('completed', (job) => {
+            console.log(`任务 ${job.id} 已完成`);
         });
 
+        // 监听工作者失败事件
         this.worker.on('failed', (job, err) => {
+            console.error(`任务 ${job.id} 失败:`, err);
         });
     }
 
+    /**
+     * 执行数据导入处理
+     * @param job 队列任务
+     */
     private async performImport(job: Job) {
         // 初始化进度为0
         job.updateProgress(0);
@@ -51,11 +62,13 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
             let completedItems = 0;
 
             for (const d of dataItems) {
-                // 新增起始节点
-                let from = await this.knowledgeService.addEntity(d); // 确保这是个异步操作
+                // 新增起始节点实体
+                let from = await this.knowledgeService.addEntity(d); 
+                
+                // 处理实体的所有声明(claims)
                 Object.keys(d.claims).forEach(key => {
                     d.claims[key].forEach(async (statement: any) => {
-                        // 新增目标节点
+                        // 新增目标节点，默认类型为"其他"
                         const target = {
                             type: { id: 'E4', name: '其他' },
                             labels: { zh: { language: 'zh', value: statement.mainsnak.datavalue.value } },
@@ -65,11 +78,12 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             aliases: { zh: [{ language: 'zh', value: statement.mainsnak.datavalue.value }] },
                         };
 
+                        // 获取属性
                         let prop = await this.propertiesService.getPropertyByName(statement.mainsnak.property);
 
                         if (!prop) {
                             try {
-                                // 调用外部接口查询属性
+                                // 调用外部接口查询属性信息
                                 const url = `http://127.0.0.1:5555/property?name=${encodeURIComponent(statement.mainsnak.property)}`;
                                 const response = await axios.get(url);
                     
@@ -112,12 +126,14 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             }
                         }
 
-
-
+                        // 更新语句中的属性ID
                         statement['mainsnak']['property'] = 'P' + prop?.id;
 
+                        // 根据属性类型处理不同的值类型
                         if (prop?.type == 'wikibase-item') {
+                            // 处理实体引用类型属性
                             let to: any;
+                            // 查询是否已存在同名实体
                             let knowledge: any = await this.elasticsearchService.query(
                                 {
                                     "size": 1,
@@ -131,15 +147,18 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                             console.log(knowledge)
 
                             if (knowledge) {
+                                // 如果存在，使用现有实体
                                 to = knowledge;
                                 statement['_to'] = to['_source']['items'][0];
                             } else {
-                                to = await this.knowledgeService.addEntity(target); // 确保这是个异步操作
+                                // 否则创建新实体
+                                to = await this.knowledgeService.addEntity(target); 
                                 statement['_to'] = to['_id']
                             }
-                            // 创建关系
+                            // 设置关系的源实体
                             statement['_from'] = from['_id']
 
+                            // 设置数据类型和值格式
                             statement.mainsnak.datatype = 'wikibase-item';
                             statement.mainsnak.datavalue.type = "wikibase-entityid"
                             statement.mainsnak.datavalue.value = {
@@ -147,7 +166,7 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                                 "id": to['_key']
                             }
                         } else if (prop?.type == 'quantity') {
-                            // 创建关系
+                            // 处理数量类型属性
                             statement['_from'] = from['_id']
                             statement['_to'] = from['_id']
                             statement.mainsnak.datatype = 'quantity';
@@ -157,28 +176,32 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
                                 "unit": "1"
                             }
                         } else if (prop?.type == 'monolingualtext') {
-                            // 创建关系
+                            // 处理单语言文本类型属性
                             statement['_from'] = from['_id']
                             statement['_to'] = from['_id']
                             statement.mainsnak.datatype = 'monolingualtext';
                             statement.mainsnak.datavalue.type = "string"
                             statement.mainsnak.datavalue.value = statement.mainsnak.datavalue.value
                         } else {
-                            // 创建关系
+                            // 处理字符串类型属性
                             statement['_from'] = from['_id']
                             statement['_to'] = from['_id']
                             statement.mainsnak.datatype = 'string';
                             statement.mainsnak.datavalue.type = "string"
                             statement.mainsnak.datavalue.value = statement.mainsnak.datavalue.value
                         }
-                        await this.edgeService.addEdge(statement); // 确保这是个异步操作
+                        
+                        // 创建边关系
+                        await this.edgeService.addEdge(statement); 
                     });
                 });
+                
+                // 更新进度
                 completedItems++;
-                // 更新进度，假设每个数据项完成都增加相同的进度比例
                 job.updateProgress(Math.round((completedItems / totalItems) * 100));
             }
-            // 如果所有项目都成功处理，则设置进度为100%
+            
+            // 所有项目处理完成，设置进度为100%
             job.updateProgress(100);
         } catch (error) {
             console.error('Error during data import:', error);
@@ -188,12 +211,19 @@ export class DataImportService implements OnModuleInit, OnApplicationShutdown {
         }
     }
 
-
+    /**
+     * 添加数据导入任务到队列
+     * @param data 要导入的数据
+     * @returns 创建的队列任务
+     */
     async addDataToQueue(data) {
         // 将数据作为任务添加到队列中
         return this.queue.add('data-import-job', data);
     }
 
+    /**
+     * 应用关闭时清理资源
+     */
     async onApplicationShutdown(signal?: string) {
         if (this.worker) {
             await this.worker.close();

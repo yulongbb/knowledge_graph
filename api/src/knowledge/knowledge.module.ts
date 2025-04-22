@@ -17,8 +17,13 @@ import { NLPService } from './nlp.service';
 import { BullModule } from '@nestjs/bullmq';
 import { DataImportService } from './data-import.queue';
 
+/**
+ * 知识图谱模块
+ * 整合了知识图谱的所有功能，包括实体管理、关系管理、搜索、NLP等
+ */
 @Module({
   imports: [
+    // 配置BullMQ队列
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,11 +35,13 @@ import { DataImportService } from './data-import.queue';
         },
       }),
     }),
-    // 注册队列
+    // 注册数据导入队列
     BullModule.registerQueue({
       name: 'data-import-queue',
     }),
+    // 导入实体关系模型
     TypeOrmModule.forFeature([Schema, Property]),
+    // 配置Elasticsearch连接
     ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -50,6 +57,7 @@ import { DataImportService } from './data-import.queue';
   controllers: [KnowledgeController],
   exports: [EsService, DataImportService],
   providers: [
+    // 配置ArangoDB连接
     {
       provide: 'ARANGODB',
       useFactory: (configService: ConfigService) =>
@@ -63,21 +71,22 @@ import { DataImportService } from './data-import.queue';
         }),
       inject: [ConfigService],
     },
+    // 默认索引名称
     {
       provide: 'DEFAULT_INDEX',
       useFactory: (configService: ConfigService) =>
         configService.get('ELASTICSEARCH_INDEX'),
       inject: [ConfigService],
     },
-    DataImportService,
-    NodeService,
-    EdgeService,
-    EsService,
-    NLPService,
-    KnowledgeService,
-    PropertiesService,
-    EsService,
-    SchemasService,
+    // 各种服务注册
+    DataImportService, // 数据导入服务
+    NodeService,       // 节点服务
+    EdgeService,       // 边服务
+    EsService,         // ES搜索服务
+    NLPService,        // 自然语言处理服务
+    KnowledgeService,  // 知识管理服务
+    PropertiesService, // 属性服务
+    SchemasService,    // 模式服务
   ],
 })
 export class KnowledgeModule {}

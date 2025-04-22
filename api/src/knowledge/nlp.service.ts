@@ -3,15 +3,22 @@ import * as nodejieba from 'nodejieba';
 import * as path from 'path';
 import * as fs from 'fs';
 
+/**
+ * 自然语言处理服务
+ * 提供中文分词和实体识别功能
+ */
 @Injectable()
 export class NLPService {
-    private customWordSet: Array<any>;
+    private customWordSet: Array<any>; // 存储自定义词库
 
     constructor() {
         nodejieba.load();  // 加载默认词典
     }
 
-    // 加载自定义词汇
+    /**
+     * 加载自定义词汇字典
+     * 从output.txt文件中读取知识实体作为自定义词典
+     */
     private loadCustomDict() {
         const dictPath = path.join('output.txt');
    
@@ -23,23 +30,29 @@ export class NLPService {
         const lines = data.split('\n');
         console.log(lines);
 
+        // 解析每行数据，格式为"id,word"
         lines.forEach(line => {
-          this.customWordSet.push({id: line.trim().split(',')[0].trim(), word:line.trim().split(',')[1].trim()});
-          nodejieba.insertWord(line.trim().split(',')[1].trim());  // 动态插入到jieba的词典
-        
+          if (line.trim()) {
+            this.customWordSet.push({id: line.trim().split(',')[0].trim(), word:line.trim().split(',')[1].trim()});
+            nodejieba.insertWord(line.trim().split(',')[1].trim());  // 动态插入到jieba的词典
+          }
         });
-    
-
-      
     }
+    
+    /**
+     * 从文本中提取实体
+     * @param text 输入文本
+     * @returns 识别到的实体列表
+     */
     extractEntities(text: string): string[] {
         this.loadCustomDict();  // 加载自定义词典
 
         // 使用 nodejieba 进行分词
         const result = nodejieba.cut(text);
         console.log(this.customWordSet);
-        // 过滤掉不在自定义词库中的词汇
-        const filteredWords =  this.customWordSet.filter(word => result.filter(w=> w == word.word).length>0);
+        
+        // 过滤掉不在自定义词库中的词汇，只保留已知实体
+        const filteredWords = this.customWordSet.filter(word => result.filter(w => w == word.word).length > 0);
         console.log(new Set(filteredWords));
 
         return filteredWords;
