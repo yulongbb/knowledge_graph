@@ -8,7 +8,6 @@ import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { AddonModule } from './addons/addon.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatasetModule } from './dataset/dataset.module';
 
 @Module({
   imports: [
