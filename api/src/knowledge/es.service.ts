@@ -3,6 +3,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import * as fs from 'fs';
+import { Entity, SearchHit, SearchQuery, SearchResponse, ElasticsearchSource } from './models';
 
 /**
  * Elasticsearch服务
@@ -20,7 +21,7 @@ export class EsService {
    * @param params 搜索参数
    * @returns 搜索结果，包含总数、列表和聚合信息
    */
-  async search(params: any) {
+  async search(params: Record<string, any>): Promise<SearchResponse> {
     const data = await this.elasticsearchService.search({
       index: this.defaultIndex,
       body: {
@@ -28,12 +29,24 @@ export class EsService {
         sort: [{ modified: { order: 'desc' } }]
       },
     });
-    return {
+    
+    // 确保每个命中项都符合 SearchHit 接口要求
+    const hits = data.hits.hits.map(hit => ({
+      _id: hit._id || '',  // 确保 _id 存在
+      _score: hit._score,
+      _source: hit._source,
+      highlight: hit.highlight
+    })) as SearchHit[];
+    
+    // 转换为我们定义的响应格式
+    const response: SearchResponse = {
       total: data['hits']['total']['value'],
-      list: data['hits']['hits'],
-      types: data['aggregations']['types']['buckets'],
-      tags: data['aggregations']['tags']['buckets'],
+      list: hits,
+      types: data['aggregations']?.['types']?.['buckets'],
+      tags: data['aggregations']?.['tags']?.['buckets'],
     };
+    
+    return response;
   }
 
   /**
@@ -41,12 +54,24 @@ export class EsService {
    * @param params 查询参数
    * @returns 查询结果
    */
-  async query(params: any) {
+  async query(params: Record<string, any>): Promise<SearchHit<ElasticsearchSource> | null> {
     const data = await this.elasticsearchService.search({
       index: this.defaultIndex,
       body: params,
     });
-    return data.hits.hits[0];
+    
+    if (data.hits.hits.length === 0) {
+      return null;
+    }
+    
+    // Convert to the correct type
+    const hit = data.hits.hits[0];
+    return {
+      _id: hit._id,
+      _score: hit._score,
+      _source: hit._source,
+      highlight: hit.highlight
+    };
   }
 
   /**
@@ -55,7 +80,7 @@ export class EsService {
    * @param doc 更新的字段
    * @returns 更新结果
    */
-  async update(id: any, doc: any) {
+  async update(id: string, doc: Partial<Entity>): Promise<any> {
     return await this.elasticsearchService.update({
       index: this.defaultIndex,
       id: id,
@@ -70,7 +95,7 @@ export class EsService {
    * @param doc 文档数据
    * @returns 批量操作结果
    */
-  async bulk(doc: any) {
+  async bulk(doc: Partial<Entity>): Promise<any> {
     return await this.elasticsearchService.bulk({
       body: [
         // 指定索引和ID
@@ -85,7 +110,7 @@ export class EsService {
    * @param id 文档ID
    * @returns 文档数据
    */
-  async get(id: any) {
+  async get(id: string): Promise<any> {
     return await this.elasticsearchService.get({
       index: this.defaultIndex,
       id: id,
@@ -97,7 +122,7 @@ export class EsService {
    * @param id 文档ID
    * @returns 删除结果
    */
-  async delete(id: any) {
+  async delete(id: string): Promise<any> {
     return await this.elasticsearchService.delete({
       index: this.defaultIndex,
       id: id,
@@ -109,7 +134,7 @@ export class EsService {
    * @param params 聚合参数
    * @returns 聚合结果
    */
-  async aggs(params: any) {
+  async aggs(params: Record<string, any>): Promise<{ aggs: any }> {
     const data = await this.elasticsearchService.search(params);
     return { aggs: data['aggregations'] };
   }

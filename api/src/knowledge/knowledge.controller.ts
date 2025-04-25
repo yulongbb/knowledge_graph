@@ -19,6 +19,18 @@ import { EdgeService } from './edge.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { DataImportService } from './data-import.queue';
+import { 
+  Entity, 
+  EntityWithExtracted, 
+  Edge, 
+  SearchQuery, 
+  SearchResponse,
+  KnowledgeGraph,
+  JobStatusInfo,
+  ImportResponse,
+  TemplateRenderResponse
+} from './models';
+import { ExtendedEdge } from './edge.service';
 
 @Controller('knowledge')
 @ApiTags('知识融合') // 分组
@@ -34,9 +46,9 @@ export class KnowledgeController {
 
   @Post('')
   @ApiOperation({ summary: '添加知识实体', description: '创建一个新的知识实体到系统中' })
-  @ApiBody({ description: '知识实体数据，包含标签、描述、别名等信息' })
-  @ApiResponse({ status: 201, description: '知识实体创建成功' })
-  async addEntity(@Body() entity: any): Promise<any> {
+  @ApiBody({ description: '知识实体数据，包含标签、描述、别名等信息', type: Entity })
+  @ApiResponse({ status: 201, description: '知识实体创建成功', type: Entity })
+  async addEntity(@Body() entity: Entity): Promise<Entity> {
     return await this.knowledgeService.addEntity(entity);
   }
 
@@ -51,9 +63,9 @@ export class KnowledgeController {
 
   @Put('')
   @ApiOperation({ summary: '更新知识实体', description: '更新现有的知识实体信息' })
-  @ApiBody({ description: '更新的知识实体数据，需包含实体ID' })
-  @ApiResponse({ status: 200, description: '知识实体更新成功' })
-  async updateEntity(@Body() entity: any): Promise<any> {
+  @ApiBody({ description: '更新的知识实体数据，需包含实体ID', type: Entity })
+  @ApiResponse({ status: 200, description: '知识实体更新成功', type: Entity })
+  async updateEntity(@Body() entity: Entity): Promise<any> {
     return await this.knowledgeService.updateEntity(entity);
   }
 
@@ -64,15 +76,15 @@ export class KnowledgeController {
   })
   @ApiParam({ name: 'index', description: '页码，从1开始' })
   @ApiParam({ name: 'size', description: '每页数量' })
-  @ApiBody({ description: '搜索条件，Elasticsearch查询DSL格式' })
-  @ApiResponse({ status: 200, description: '搜索结果，包含实体列表和聚合数据' })
+  @ApiBody({ description: '搜索条件，Elasticsearch查询DSL格式', type: SearchQuery })
+  @ApiResponse({ status: 200, description: '搜索结果，包含实体列表和聚合数据', type: SearchResponse })
   async searchEntity(
     @Param('index', new ParseIntPipe())
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 20,
     @Body() bool: any,
-  ) {
+  ): Promise<SearchResponse> {
     return await this.elasticsearchService.search({
       size: size,
       from: (index - 1) * size,
@@ -116,8 +128,8 @@ export class KnowledgeController {
   @Get('get/:id')
   @ApiOperation({ summary: '获取知识实体详情', description: '根据ID获取知识实体的详细信息' })
   @ApiParam({ name: 'id', description: '知识实体的唯一标识' })
-  @ApiResponse({ status: 200, description: '知识实体详细信息，包含自动提取的实体' })
-  async get(@Param('id') id: any) {
+  @ApiResponse({ status: 200, description: '知识实体详细信息，包含自动提取的实体', type: EntityWithExtracted })
+  async get(@Param('id') id: any): Promise<EntityWithExtracted> {
     return await this.elasticsearchService.get(id).then((data: any) => {
       if (data._source.descriptions) {
         let entities = this.nlpSevice.extractEntities(
@@ -135,7 +147,7 @@ export class KnowledgeController {
     description: '将多个知识实体融合为一个，合并其属性和关系' 
   })
   @ApiBody({ description: '需要融合的实体信息，包含多个实体ID' })
-  @ApiResponse({ status: 200, description: '融合后的知识实体信息' })
+  @ApiResponse({ status: 200, description: '融合后的知识实体信息', type: Entity })
   async fusion(@Body() entity: any): Promise<any> {
     return await this.knowledgeService.fusion({ entity });
   }
@@ -166,10 +178,11 @@ export class KnowledgeController {
     summary: '添加关系', 
     description: '在两个知识实体之间建立关系' 
   })
-  @ApiBody({ description: '关系信息，包含源实体、目标实体和关系类型' })
-  @ApiResponse({ status: 201, description: '关系创建成功' })
-  async addEdge(@Body() edge: any): Promise<any> {
-    return await this.edgeService.addEdge(edge);
+  @ApiBody({ description: '关系信息，包含源实体、目标实体和关系类型', type: Edge })
+  @ApiResponse({ status: 201, description: '关系创建成功', type: Edge })
+  async addEdge(@Body() edge: Edge): Promise<Edge> {
+    // Cast to any as an intermediate step to allow flexibility between Edge and ExtendedEdge
+    return await this.edgeService.addEdge(edge as any);
   }
 
   @Put('link')
@@ -177,10 +190,11 @@ export class KnowledgeController {
     summary: '更新关系', 
     description: '更新两个知识实体之间的关系' 
   })
-  @ApiBody({ description: '更新的关系信息' })
-  @ApiResponse({ status: 200, description: '关系更新成功' })
-  async updateEdge(@Body() edge: any): Promise<any> {
-    return await this.edgeService.updateEdge(edge);
+  @ApiBody({ description: '更新的关系信息', type: Edge })
+  @ApiResponse({ status: 200, description: '关系更新成功', type: Edge })
+  async updateEdge(@Body() edge: Edge): Promise<Edge> {
+    // Cast to any as an intermediate step to allow flexibility between Edge and ExtendedEdge
+    return await this.edgeService.updateEdge(edge as any);
   }
 
   @Delete('link/:id')
@@ -202,7 +216,7 @@ export class KnowledgeController {
   @ApiParam({ name: 'id', description: '知识实体的唯一标识' })
   @ApiParam({ name: 'index', description: '页码，从1开始' })
   @ApiParam({ name: 'size', description: '每页数量' })
-  @ApiBody({ description: '查询条件，可选' })
+  @ApiBody({ description: '查询条件，可选', type: SearchQuery })
   @ApiResponse({ status: 200, description: '实体关系列表' })
   async link(
     @Param('id') id: XIdType,
@@ -210,7 +224,7 @@ export class KnowledgeController {
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
-    @Body() query: any,
+    @Body() query: SearchQuery,
   ): Promise<any> {
     console.log(id);
     return this.knowledgeService.link(id, index, size, query);
@@ -224,16 +238,16 @@ export class KnowledgeController {
   @ApiParam({ name: 'id', description: '中心知识实体的唯一标识' })
   @ApiParam({ name: 'index', description: '页码，从1开始' })
   @ApiParam({ name: 'size', description: '每页关系数量' })
-  @ApiBody({ description: '图谱查询条件，可选' })
-  @ApiResponse({ status: 200, description: '知识图谱数据，包含节点和边信息' })
+  @ApiBody({ description: '图谱查询条件，可选', type: SearchQuery })
+  @ApiResponse({ status: 200, description: '知识图谱数据，包含节点和边信息', type: KnowledgeGraph })
   async graph(
     @Param('id') id: XIdType,
     @Param('index', new ParseIntPipe())
     index: number = 1,
     @Param('size', new ParseIntPipe())
     size: number = 10,
-    @Body() query: any,
-  ): Promise<any> {
+    @Body() query: SearchQuery,
+  ): Promise<KnowledgeGraph> {
     console.log(id);
     return this.knowledgeService.graph(id, index, size, query);
   }
@@ -243,8 +257,8 @@ export class KnowledgeController {
     summary: '获取队列任务状态', 
     description: '获取数据导入队列中的任务状态列表' 
   })
-  @ApiResponse({ status: 200, description: '队列任务状态列表' })
-  async getQueueStatus() {
+  @ApiResponse({ status: 200, description: '队列任务状态列表', type: [JobStatusInfo] })
+  async getQueueStatus(): Promise<JobStatusInfo[]> {
     const jobs = await this.queue.getJobs([
       'waiting',
       'active',
@@ -264,17 +278,21 @@ export class KnowledgeController {
     summary: '导入数据', 
     description: '提交批量数据导入任务到队列中异步处理' 
   })
-  @ApiBody({ description: '需要导入的数据列表' })
-  @ApiResponse({ status: 201, description: '数据导入任务已提交' })
-  async importData(@Body() data: any) {
-    if (!data || Object.keys(data).length === 0) {
+  @ApiBody({ description: '需要导入的数据列表', type: [Entity] })
+  @ApiResponse({ status: 201, description: '数据导入任务已提交', type: ImportResponse })
+  async importData(@Body() data: Entity[]): Promise<ImportResponse> {
+    if (!data || data.length === 0) {
       throw new HttpException('No data provided', HttpStatus.BAD_REQUEST);
     }
 
     // 将数据添加到队列中
-    await this.dataImportService.addDataToQueue(data);
+    const job = await this.dataImportService.addDataToQueue(data);
 
-    return { message: 'Data import request has been submitted successfully.' };
+    return { 
+      success: true, 
+      message: 'Data import request has been submitted successfully.',
+      jobId: job.id
+    };
   }
 
   @Post('view')
@@ -282,9 +300,9 @@ export class KnowledgeController {
     summary: '记录知识浏览', 
     description: '记录用户浏览知识的行为，用于统计热门知识' 
   })
-  @ApiBody({ description: '被浏览的知识实体信息' })
+  @ApiBody({ description: '被浏览的知识实体信息', type: Entity })
   @ApiResponse({ status: 200, description: '浏览记录已保存' })
-  async recordView(@Body() knowledge: any): Promise<void> {
+  async recordView(@Body() knowledge: Entity): Promise<void> {
     console.log(knowledge);
     await this.knowledgeService.recordView(knowledge);
   }
@@ -294,8 +312,8 @@ export class KnowledgeController {
     summary: '获取热门知识', 
     description: '获取根据用户浏览量统计的热门知识列表' 
   })
-  @ApiResponse({ status: 200, description: '热门知识列表，包含浏览量' })
-  async getHotKnowledge() {
+  @ApiResponse({ status: 200, description: '热门知识列表，包含浏览量', type: [Entity] })
+  async getHotKnowledge(): Promise<{ id: string; score: number }[]> {
     const hotKnowledge = await this.knowledgeService.getHotKnowledge();
     return hotKnowledge;
   }
@@ -306,8 +324,8 @@ export class KnowledgeController {
     description: '使用Handlebars渲染知识实体的模板，生成HTML内容' 
   }) 
   @ApiParam({ name: 'id', description: '知识实体的唯一标识' })
-  @ApiResponse({ status: 200, description: '渲染后的HTML内容' })
-  async renderTemplate(@Param('id') id: string) {
+  @ApiResponse({ status: 200, description: '渲染后的HTML内容', type: TemplateRenderResponse })
+  async renderTemplate(@Param('id') id: string): Promise<TemplateRenderResponse> {
     try {
       const result = await this.knowledgeService.renderTemplate(id);
       if (!result.success) {

@@ -9,6 +9,27 @@ import { v4 as uuidv4 } from 'uuid';
 import Redis from 'ioredis';
 import * as Handlebars from 'handlebars';
 import { ConfigService } from '@nestjs/config';
+import { Entity, KnowledgeGraph, TemplateRenderResponse } from './models';
+
+interface FusionResult {
+  _id: string;
+  _index: string;
+  _primary_term: number;
+  _seq_no: number;
+  _version: number;
+  result: string;
+}
+
+interface UpdateEntityResult {
+  success: boolean;
+  message: string;
+  data: Record<string, any>;
+}
+
+interface HotKnowledgeItem {
+  id: any;
+  score: number;
+}
 
 @Injectable()
 export class KnowledgeService {
@@ -29,12 +50,12 @@ export class KnowledgeService {
     });
   }
 
-  async fusion({ entity }: { entity: any }): Promise<any> {
+  async fusion({ entity }: { entity: any }): Promise<FusionResult> {
     console.log(entity);
     // 获取集合（Collection）
-    entity.ids.forEach((id: any) => {
-      this.elasticsearchService.delete(id.toString());
-    });
+    for (const id of entity.ids) {
+      await this.elasticsearchService.delete(id.toString());
+    }
 
     // 插入数据
     const document = {
@@ -46,35 +67,20 @@ export class KnowledgeService {
       modified: new Date().toISOString(),
     };
 
-    return this.elasticsearchService
-      .bulk({
-        body: [
-          // 指定的数据库为news, 指定的Id = 1
-          { index: { _index: 'entity' } },
-          document,
-        ],
-      })
-      .then((doc: any) => {
-        const myCollection = this.db.collection('entity');
-        entity.items.forEach((item: any) => {
-          myCollection
-            .document(item.split('/')[1])
-            .then((existingDocument) => {
-              // Update the document fields
-              existingDocument.id = doc['items'][0]['index']['_id'];
-              return myCollection.update(
-                existingDocument._key,
-                existingDocument,
-              );
-            })
-            .then(
-              (updatedDocument) =>
-                console.log('Document updated:', updatedDocument),
-              (err) => console.error('Failed to update document:', err),
-            );
-        });
-        return doc['items'][0]['index'];
-      });
+    const result = await this.elasticsearchService.bulk(document);
+    const myCollection = this.db.collection('entity');
+    
+    for (const item of entity.items) {
+      try {
+        const existingDocument = await myCollection.document(item.split('/')[1]);
+        existingDocument.id = result['items'][0]['index']['_id'];
+        await myCollection.update(existingDocument._key, existingDocument);
+      } catch (err) {
+        console.error('Failed to update document:', err);
+      }
+    }
+    
+    return result['items'][0]['index'];
   }
 
   async restore({ entity }: { entity: any }): Promise<any> {
@@ -94,13 +100,10 @@ export class KnowledgeService {
             modified: new Date().toISOString(),
             items: [item],
           };
-          this.elasticsearchService.bulk({
-            body: [
-              // 指定的数据库为news, 指定的Id = 1
-              { index: { _index: 'entity', _id: existingDocument['_key'] } },
-              document,
-            ],
-          });
+          
+          // Fixed bulk call
+          this.elasticsearchService.bulk(document);
+          
           existingDocument.id = existingDocument['_key'];
           return myCollection.update(existingDocument._key, existingDocument);
         })
@@ -264,7 +267,7 @@ export class KnowledgeService {
     );
   }
 
-  async updateEntity(entity: any): Promise<any> {
+  async updateEntity(entity: Partial<Entity>): Promise<UpdateEntityResult> {
     // 1. 获取现有文档
     const existingDoc: any = await this.elasticsearchService.get(entity.id);
     if (!existingDoc) {
@@ -303,18 +306,22 @@ export class KnowledgeService {
 
     // 4. 如果需要，更新 ArangoDB
     if (entity._key) {
-      const myCollection = this.db.collection('entity');
-      const arangoDoc = await myCollection.document(entity._key);
-      if (arangoDoc) {
-        const arangoUpdate = {
-          type: 'item',
-          modified: mergedDoc.modified,
-          labels: mergedDoc.labels,
-          descriptions: mergedDoc.descriptions,
-          aliases: mergedDoc.aliases,
-          tags: mergedDoc.tags,
-        };
-        await myCollection.update(entity._key, arangoUpdate);
+      try {
+        const myCollection = this.db.collection('entity');
+        const arangoDoc = await myCollection.document(entity._key);
+        if (arangoDoc) {
+          const arangoUpdate = {
+            type: 'item',
+            modified: mergedDoc.modified,
+            labels: mergedDoc.labels,
+            descriptions: mergedDoc.descriptions,
+            aliases: mergedDoc.aliases,
+            tags: mergedDoc.tags,
+          };
+          await myCollection.update(entity._key, arangoUpdate);
+        }
+      } catch (error) {
+        console.error('Failed to update ArangoDB document:', error);
       }
     }
 
@@ -387,7 +394,7 @@ export class KnowledgeService {
     size: number,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     query: any,
-  ): Promise<any> {
+  ): Promise<KnowledgeGraph> {
     try {
       const start = size * (index - 1);
       const end = start + size;
@@ -497,6 +504,7 @@ export class KnowledgeService {
       });
     } catch (error) {
       console.error('Query Error:', error);
+      return { elements: { nodes: [], edges: [] } };
     }
   }
 
@@ -513,12 +521,12 @@ export class KnowledgeService {
   }
 
   // 获取热度排名前 10 的知识
-  async getHotKnowledge(): Promise<{ id: string; score: number }[]> {
+  async getHotKnowledge(): Promise<HotKnowledgeItem[]> {
     const hotKey = 'hot:knowledge';
 
     // 获取前 10 热门知识
     const hotData = await this.redis.zrevrange(hotKey, 0, 9, 'WITHSCORES');
-    const result = [];
+    const result: HotKnowledgeItem[] = [];
     for (let i = 0; i < hotData.length; i += 2) {
       const knowledge = await this.elasticsearchService.get(hotData[i]);
       console.log(knowledge);
@@ -526,7 +534,7 @@ export class KnowledgeService {
       if (!knowledge) {
         // 从 Redis 中删除该知识 ID
         await this.redis.zrem(hotKey, hotData[i]);
-        return null; // 返回 null，表示知识不存在
+        continue;
       }
 
       console.log(knowledge);
@@ -540,7 +548,7 @@ export class KnowledgeService {
     return result;
   }
 
-  async renderTemplate(id: string): Promise<any> {
+  async renderTemplate(id: string): Promise<TemplateRenderResponse> {
     try {
       const entity: any = await this.elasticsearchService.get(id);
 
