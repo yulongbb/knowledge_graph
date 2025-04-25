@@ -1,0 +1,151 @@
+<div class="namespace-manager">
+  <!-- Namespace selection header -->
+  <div class="namespace-header">
+    <h3>命名空间管理</h3>
+    <div class="namespace-selection-area">
+      <x-select
+        [(ngModel)]="selectedNamespaceId"
+        placeholder="请选择命名空间"
+        [data]="namespaceOptions"
+        (ngModelChange)="onNamespaceSelected($event)"
+        [style.width.%]="60"
+      ></x-select>
+      <x-button type="primary" icon="fto-plus" (click)="action('add')" title="新增命名空间">新增命名空间</x-button>
+      <x-button *ngIf="selectedNamespace" icon="fto-edit" (click)="action('edit', selectedNamespace)" title="编辑当前命名空间">编辑</x-button>
+      <x-button *ngIf="selectedNamespace && selectedNamespace.name !== 'default'" icon="fto-trash-2" (click)="action('delete', selectedNamespace)" title="删除当前命名空间">删除</x-button>
+    </div>
+
+    <div class="selected-namespace-info" *ngIf="selectedNamespace">
+      <div><strong>前缀:</strong> {{ selectedNamespace.prefix }}</div>
+      <div><strong>URI:</strong> {{ selectedNamespace.uri || '无' }}</div>
+      <div><strong>描述:</strong> {{ selectedNamespace.description || '无' }}</div>
+    </div>
+  </div>
+
+  <!-- Management Area -->
+  <div class="entity-manager" *ngIf="selectedNamespace">
+    <!-- Management tabs -->
+    <div class="management-tabs">
+      <x-buttons space="0.5">
+        <x-button 
+          *ngFor="let tab of tabs" 
+          [type]="activeTab === tab.id ? 'primary' : undefined"
+          (click)="switchTab(tab.id)"
+        >
+          {{ tab.label }}
+        </x-button>
+      </x-buttons>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tab-content">
+      <!-- Ontology management -->
+      <div *ngIf="activeTab === 'ontologies'" class="tab-pane">
+        <div class="entity-header">
+          <h3>本体管理</h3>
+          <x-button type="primary" icon="fto-plus" (click)="addEntity('ontology')">新增本体</x-button>
+        </div>
+        <div class="entity-content" *ngIf="ontologyDataLoaded">
+          <x-tree
+            [data]="ontologyData"
+            expandedLevel="0"
+            [nodeHeight]="1.875"
+            [actions]="ontologyActions"
+            (activatedChange)="handleOntologyAction('info', $event)"
+          ></x-tree>
+        </div>
+        <div class="loading-placeholder" *ngIf="!ontologyDataLoaded">
+          <p>加载中...</p>
+        </div>
+      </div>
+
+      <!-- Property management -->
+      <div *ngIf="activeTab === 'properties'" class="tab-pane">
+        <div class="entity-header">
+          <h3>属性管理</h3>
+          <x-button type="primary" icon="fto-plus" (click)="addEntity('property')">新增属性</x-button>
+        </div>
+        <div class="entity-content" *ngIf="propertyDataLoaded">
+          <x-table
+            [columns]="propertyColumns"
+            [rowHeight]="35"
+            [data]="propertyData"
+            [size]="propertyPageSize"
+            [index]="propertyPageIndex"
+            [bodyColumnTpl]="{ actions: propertyActionsTpl }"
+            loading
+          ></x-table>
+        </div>
+      </div>
+
+      <!-- Qualifier management -->
+      <div *ngIf="activeTab === 'qualifiers'" class="tab-pane">
+        <div class="entity-header">
+          <h3>限定管理</h3>
+          <x-button type="primary" icon="fto-plus" (click)="addEntity('qualifier')">新增限定</x-button>
+        </div>
+        <div class="entity-content" *ngIf="qualifierDataLoaded">
+          <x-table
+            [columns]="qualifierColumns"
+            [rowHeight]="35"
+            [data]="qualifierData"
+            [size]="qualifierPageSize"
+            [index]="qualifierPageIndex"
+            [bodyColumnTpl]="{ actions: qualifierActionsTpl }"
+            loading
+          ></x-table>
+        </div>
+      </div>
+
+      <!-- Tag dictionary management -->
+      <div *ngIf="activeTab === 'tags'" class="tab-pane">
+        <div class="entity-header">
+          <h3>标签字典管理</h3>
+          <x-button type="primary" icon="fto-plus" (click)="addEntity('tag')">新增标签</x-button>
+        </div>
+        <div class="entity-content" *ngIf="tagDataLoaded">
+          <x-table
+            [columns]="tagColumns"
+            [rowHeight]="35"
+            [data]="tagData"
+            [size]="tagPageSize"
+            [index]="tagPageIndex"
+            [bodyColumnTpl]="{ actions: tagActionsTpl }"
+            loading
+          ></x-table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-namespace-selected" *ngIf="!selectedNamespace">
+    <div class="message">请选择一个命名空间以管理相关实体</div>
+  </div>
+</div>
+
+<!-- Templates for property actions -->
+<ng-template #propertyActionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-eye" (click)="handlePropertyAction('info', row)" title="查看"></x-link>
+    <x-link icon="fto-edit" (click)="handlePropertyAction('edit', row)" title="修改"></x-link>
+    <x-link icon="fto-trash-2" (click)="handlePropertyAction('delete', row)" title="删除"></x-link>
+  </div>
+</ng-template>
+
+<!-- Templates for qualifier actions -->
+<ng-template #qualifierActionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-eye" (click)="handleQualifierAction('info', row)" title="查看"></x-link>
+    <x-link icon="fto-edit" (click)="handleQualifierAction('edit', row)" title="修改"></x-link>
+    <x-link icon="fto-trash-2" (click)="handleQualifierAction('delete', row)" title="删除"></x-link>
+  </div>
+</ng-template>
+
+<!-- Templates for tag actions -->
+<ng-template #tagActionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-eye" (click)="handleTagAction('info', row)" title="查看"></x-link>
+    <x-link icon="fto-edit" (click)="handleTagAction('edit', row)" title="修改"></x-link>
+    <x-link icon="fto-trash-2" (click)="handleTagAction('delete', row)" title="删除"></x-link>
+  </div>
+</ng-template>

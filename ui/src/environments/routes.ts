@@ -127,10 +127,20 @@ export const layoutRoutes: Routes = [
 
   // 本体
   {
+    path: "namespace",
+    loadChildren: () =>
+      import("../main/ontology/namespace/namespace.module").then(x => x.NamespaceModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
+
+  // 本体
+  {
     path: "ontology",
     loadChildren: () =>
       import("../main/ontology/ontology/ontology.module").then(x => x.OntologyModule),
-    canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
@@ -141,7 +151,6 @@ export const layoutRoutes: Routes = [
     path: "property",
     loadChildren: () =>
       import("../main/ontology/property/property.module").then(x => x.PropertyModule),
-    canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
@@ -152,7 +161,6 @@ export const layoutRoutes: Routes = [
     path: "qualify",
     loadChildren: () =>
       import("../main/ontology/qualify/qualify.module").then(x => x.QualifyModule),
-    canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
@@ -163,7 +171,6 @@ export const layoutRoutes: Routes = [
     path: "tag",
     loadChildren: () =>
       import("../main/ontology/tag/tag.module").then(x => x.TagModule),
-    canLoad: [AuthGuard],
     data: {
       shouldReuse: true
     }
