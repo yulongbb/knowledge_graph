@@ -1,6 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { XControllerService, XQuery } from '@ng-nest/api/core';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { DictionaryService } from '../services/dictionary.service';
 import { Dictionary } from '../entities/dictionary.entity';
 
@@ -12,7 +12,18 @@ export class DictionaryController extends XControllerService<Dictionary, XQuery>
   }
 
   @Get('property/:propertyId')
-  findByPropertyId(@Param('propertyId') propertyId: string): Promise<Dictionary[]> {
+  findByPropertyId(
+    @Param('propertyId') propertyId: string,
+    @Query('namespaceId') namespaceId?: string
+  ): Promise<Dictionary[]> {
+    if (namespaceId) {
+      return this.dictionaryService.findByPropertyIdAndNamespace(propertyId, namespaceId);
+    }
     return this.dictionaryService.findByPropertyId(propertyId);
+  }
+  
+  @Get('namespace/:namespaceId')
+  async findAllByNamespace(@Param('namespaceId') namespaceId: string): Promise<Dictionary[]> {
+    return this.dictionaryService.findAllByNamespace(namespaceId);
   }
 }

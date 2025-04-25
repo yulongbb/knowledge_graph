@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Property } from './property.entity';
+import { Namespace } from './namespace.entity';
 
 @Entity('ontology_dictionary')
 export class Dictionary {
@@ -20,4 +21,10 @@ export class Dictionary {
 
   @Column('text', { nullable: true })
   propertyId: string;
+
+  @ManyToOne(() => Namespace, (namespace) => namespace.dictionaries, { nullable: true })
+  namespace: Namespace;
+
+  @Column({ nullable: true })
+  namespaceId: string;
 }

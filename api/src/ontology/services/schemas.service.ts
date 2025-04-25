@@ -27,6 +27,18 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     return schema;
   }
 
+  async getByNameAndNamespace(name: string, namespaceId?: string): Promise<Schema> {
+    const query = { name };
+    if (namespaceId) {
+      return this.schemasRepository.findOne({ where: { ...query, namespaceId } });
+    }
+    return this.schemasRepository.findOne({ where: query });
+  }
+
+  async findAllByNamespace(namespaceId: string): Promise<Schema[]> {
+    return this.schemasRepository.find({ where: { namespaceId } });
+  }
+
   async getChildren(schemaId: string): Promise<string[]> {
     const children: any = [];
     await this.getChildrenIdsRecursively(schemaId, children);

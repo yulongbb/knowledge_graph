@@ -1,6 +1,6 @@
-import { Entity,   JoinTable,
-    PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import { Entity, JoinTable, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne } from 'typeorm';
 import { Property } from 'src/ontology/entities/property.entity';
+import { Namespace } from './namespace.entity';
 
 @Entity('ontology_qualify')
 export class Qualify {
@@ -25,5 +25,9 @@ export class Qualify {
     @Column('text', { nullable: true })
     type: string;
 
+    @ManyToOne(() => Namespace, (namespace) => namespace.qualifiers, { nullable: true })
+    namespace: Namespace;
 
+    @Column({ nullable: true })
+    namespaceId: string;
 }

@@ -10,6 +10,7 @@ import {
 import { Property } from 'src/ontology/entities/property.entity';
 import { Tag } from './tag.entity';
 import { Application } from './application.entity';
+import { Namespace } from './namespace.entity';
 
 @Entity('ontology_schema')
 export class Schema {
@@ -47,6 +48,11 @@ export class Schema {
   @OneToMany(() => Schema, (schema) => schema.parent)
   children: Schema[];
 
+  @ManyToOne(() => Namespace, (namespace) => namespace.schemas, { nullable: true })
+  namespace: Namespace;
+
+  @Column({ nullable: true })
+  namespaceId: string;
 
   @ManyToMany(() => Property, (property) => property.schemas)
   @JoinTable({
@@ -64,7 +70,6 @@ export class Schema {
   })
   values: Property[];
 
-
   @ManyToMany(() => Tag, (tag) => tag.schemas)
   @JoinTable({
     name: 'ontology_schema_tag',
@@ -73,8 +78,6 @@ export class Schema {
   })
   tags: Tag[];
 
-
-  
   @ManyToMany(() => Application, (application) => application.schemas)
   @JoinTable({
     name: 'ontology_schema_application',
@@ -82,6 +85,4 @@ export class Schema {
     inverseJoinColumn: { name: 'applicationId' },
   })
   applications: Application[];
-
-
 }

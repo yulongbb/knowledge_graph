@@ -18,10 +18,13 @@ import { ApplicationsService } from './services/applications.service';
 import { Dictionary } from './entities/dictionary.entity';
 import { DictionaryService } from './services/dictionary.service';
 import { DictionaryController } from './controllers/dictionary.controller';
+import { Namespace } from './entities/namespace.entity';
+import { NamespaceService } from './services/namespace.service';
+import { NamespaceController } from './controllers/namespace.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Schema, Property, Qualify, Tag, Application, Dictionary])],
-  controllers: [SchemasController, PropertiesController, QualifiersController, TagsController, ApplicationsController, DictionaryController],
-  providers: [SchemasService, PropertiesService, QualifiersService, TagsService, ApplicationsService, DictionaryService]
+  imports: [TypeOrmModule.forFeature([Schema, Property, Qualify, Tag, Application, Dictionary, Namespace])],
+  controllers: [SchemasController, PropertiesController, QualifiersController, TagsController, ApplicationsController, DictionaryController, NamespaceController],
+  providers: [SchemasService, PropertiesService, QualifiersService, TagsService, ApplicationsService, DictionaryService, NamespaceService]
 })
 export class OntologynModule { }

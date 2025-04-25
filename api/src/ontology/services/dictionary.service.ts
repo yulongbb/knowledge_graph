@@ -19,4 +19,16 @@ export class DictionaryService extends XRepositoryService<Dictionary, XQuery> {
       where: { propertyId }
     });
   }
+  
+  async findByPropertyIdAndNamespace(propertyId: string, namespaceId?: string): Promise<Dictionary[]> {
+    const query = { propertyId };
+    if (namespaceId) {
+      return this.dictionaryRepository.find({ where: { ...query, namespaceId } });
+    }
+    return this.dictionaryRepository.find({ where: query });
+  }
+  
+  async findAllByNamespace(namespaceId: string): Promise<Dictionary[]> {
+    return this.dictionaryRepository.find({ where: { namespaceId } });
+  }
 }

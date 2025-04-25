@@ -1,7 +1,8 @@
-import { Entity, JoinTable, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany } from 'typeorm';
+import { Entity, JoinTable, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany, ManyToOne } from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { Qualify } from 'src/ontology/entities/qualify.entity';
 import { Dictionary } from './dictionary.entity';
+import { Namespace } from './namespace.entity';
 
 @Entity('ontology_property')
 export class Property {
@@ -45,4 +46,10 @@ export class Property {
 
   @OneToMany(() => Dictionary, (dictionary) => dictionary.property)
   dictionaries: Dictionary[];
+
+  @ManyToOne(() => Namespace, (namespace) => namespace.properties, { nullable: true })
+  namespace: Namespace;
+
+  @Column({ nullable: true })
+  namespaceId: string;
 }
