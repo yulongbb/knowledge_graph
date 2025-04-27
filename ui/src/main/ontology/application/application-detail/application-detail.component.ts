@@ -53,7 +53,7 @@ export class ApplicationDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup()?.invalid;
+    return this.form?.formGroup?.invalid;
   }
   disabled = false;
   query: any;
@@ -103,7 +103,7 @@ export class ApplicationDetailComponent implements OnInit {
               console.log(x);
               console.log(y.list);
               x['schemas'] = y.list;
-              this.form.formGroup().patchValue(x);
+              this.form.formGroup.patchValue(x);
             });
         });
         break;
@@ -114,16 +114,16 @@ export class ApplicationDetailComponent implements OnInit {
         if (this.type === 'add') {
           console.log('新增单个');
           this.applicationService
-            .post(this.form.formGroup().value)
+            .post(this.form.formGroup.value)
             .subscribe((x) => {
               this.message.success('新增成功！');
               this.router.navigate(['/index/applications']);
             });
         } else if (this.type === 'edit') {
-          this.form.formGroup().value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup().value);
+          this.form.formGroup.value['id'] = Number.parseInt(this.id);
+          console.log(this.form.formGroup.value);
 
-          this.applicationService.put(this.form.formGroup().value).subscribe((x) => {
+          this.applicationService.put(this.form.formGroup.value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
             this.router.navigate(['/index/applications']);

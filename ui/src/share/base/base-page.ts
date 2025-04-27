@@ -14,8 +14,8 @@ export class PageBase {
   }
 
   baseInit() {
-    this.menu = this.indexService.auth.user.permissions?.menus?.find((x) => x.router == this.indexService.session.activatedPage);
-    this.actions = this.indexService.auth.user.permissions?.actions?.filter((x) => x.menuId == this.menu?.id);
+    this.menu = this.indexService.auth.user.permissions?.menus?.find((x:any) => x.router == this.indexService.session.activatedPage);
+    this.actions = this.indexService.auth.user.permissions?.actions?.filter((x:any) => x.menuId == this.menu?.id);
     this.actions?.forEach((x) => (this.auth[x.code as string] = true));
   }
 

@@ -79,8 +79,8 @@ export class EntityAddDocumentComponent {
       this.documents.push({
         url: `http://localhost:9000/kgms/${documentFile}`,
         thumbnail: data.cover,
-        label: this.form.formGroup().value.label,
-        description: this.form.formGroup().value.description
+        label: this.form.formGroup.value.label,
+        description: this.form.formGroup.value.description
       });
     })
     .catch(error => {
@@ -103,7 +103,7 @@ export class EntityAddDocumentComponent {
       return;
     }
 
-    const formValue = this.form.formGroup().value;
+    const formValue = this.form.formGroup.value;
     const documentData: DocumentFormData = {
       label: formValue.label,
       description: formValue.description,

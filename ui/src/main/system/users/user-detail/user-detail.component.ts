@@ -46,7 +46,7 @@ export class UserDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup()?.invalid;
+    return this.form?.formGroup?.invalid;
   }
   disabled = false;
   constructor(
@@ -78,7 +78,7 @@ export class UserDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.usersService.get(this.id).subscribe((x) => {
-          this.form.formGroup().patchValue(x);
+          this.form.formGroup.patchValue(x);
         });
         break;
       case 'edit':
@@ -86,13 +86,13 @@ export class UserDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup().value)
-          this.usersService.post(this.form.formGroup().value).subscribe((x) => {
+          console.log(this.form.formGroup.value)
+          this.usersService.post(this.form.formGroup.value).subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/users']);
           });
         } else if (this.type === 'edit') {
-          this.usersService.put(this.form.formGroup().value).subscribe((x) => {
+          this.usersService.put(this.form.formGroup.value).subscribe((x) => {
             this.message.success('修改成功！');
             this.router.navigate(['/index/users']);
           });

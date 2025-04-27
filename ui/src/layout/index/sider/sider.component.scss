@@ -8,31 +8,17 @@ app-sider {
   left: 0;
   z-index: 11;
   transition: width $transition-duration, background-color $transition-duration;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   @include silder;
-  
   > ul {
     overflow-y: auto;
     height: calc(100% - #{$header-height});
     position: relative;
     z-index: 10;
-    padding: 0.5rem 0;
-    
     &::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
-    
-    &:hover::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.3);
+      width: 0;
+      height: 0;
     }
   }
-  
   > app-header {
     // background-color: $header-background-color;
     color: $header-color;
@@ -46,29 +32,23 @@ app-sider {
     box-sizing: border-box;
     position: relative;
     z-index: 10;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    
     > .logo {
       display: flex;
       align-items: center;
-      
       img {
         width: 2rem;
-        transition: all $transition-duration ease;
+        transition: width $transition-duration, padding $transition-duration;
       }
-      
       .title {
         font-size: $--x-font-size-big;
         margin-left: 0.625rem;
         visibility: inherit;
         text-overflow: ellipsis;
         white-space: nowrap;
-        transition: all $transition-duration ease;
-        font-weight: 500;
+        transition: visibility $transition-duration, opacity $transition-duration;
       }
     }
   }
-  
   > .silder-image {
     position: absolute;
     z-index: 1;
@@ -80,7 +60,6 @@ app-sider {
     background-size: cover;
     background-position: 50%;
     // background-image: url(/assets/img/sider/sider-1.jpg);
-    
     &:after {
       position: absolute;
       z-index: 3;
@@ -99,7 +78,7 @@ app-float-node {
     padding: 0.5rem 0;
     max-width: $sider-width;
     min-width: $sider-width - 2rem;
-    border-radius: 4px;
+    box-shadow: $--x-box-shadow-light;
   }
   @include silder;
 }

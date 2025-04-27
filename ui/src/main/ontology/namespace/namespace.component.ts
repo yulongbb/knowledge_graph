@@ -8,7 +8,7 @@ import {
   XTableComponent,
   XTreeAction,
   XOperation,
-  XControl
+  XControl,
 } from '@ng-nest/ui';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { UntypedFormGroup } from '@angular/forms';
@@ -42,9 +42,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   query: any;
 
   data = (index: number, size: number, query: any) =>
-    this.namespaceService.getList(index, size, query).pipe(
-      map((x: any) => x)
-    );
+    this.namespaceService.getList(index, size, query).pipe(map((x: any) => x));
 
   columns: XTableColumn[] = [
     { id: 'id', label: '序号', flex: 0.4, left: 0 },
@@ -126,7 +124,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   // Add these new properties to the NamespaceComponent class:
   selectedOntology: any = null;
   selectedProperty: any = null;
-  isItemProperty = true;  // true for item properties (show qualifiers), false for non-item properties (show tags)
+  isItemProperty = true; // true for item properties (show qualifiers), false for non-item properties (show tags)
   propertyLoading = false;
   qualifierLoading = false;
   tagLoading = false;
@@ -144,14 +142,19 @@ export class NamespaceComponent extends PageBase implements OnInit {
     { control: 'input', id: 'name', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     { control: 'input', id: 'label', label: '标签' },
-    { control: 'select', id: 'namespace', label: '命名空间', data: [] as any[] }
+    {
+      control: 'select',
+      id: 'namespace',
+      label: '命名空间',
+      data: [] as any[],
+    },
   ];
 
   // Add property form related variables
   propertyFormMode: 'add' | 'edit' | 'view' | null = null;
   propertyForm = new UntypedFormGroup({});
   propertyControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID', hidden: true },
+    { control: 'input', id: 'id', label: 'ID' , required: true },
     { control: 'input', id: 'name', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     {
@@ -177,17 +180,17 @@ export class NamespaceComponent extends PageBase implements OnInit {
         'wikibase-lexeme',
         'wikibase-form',
         'wikibase-sense',
-      ]
+      ],
     },
     { control: 'input', id: 'group', label: '分组' },
-    { control: 'switch', id: 'isPrimary', label: '是否为主属性' }
+    { control: 'switch', id: 'isPrimary', label: '是否为主属性' },
   ];
 
   // Add qualifier form related variables
   qualifierFormMode: 'add' | 'edit' | 'view' | null = null;
   qualifierForm = new UntypedFormGroup({});
   qualifierControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID', hidden: true },
+    { control: 'input', id: 'id', label: 'ID' },
     { control: 'input', id: 'label', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     {
@@ -213,24 +216,24 @@ export class NamespaceComponent extends PageBase implements OnInit {
         'wikibase-lexeme',
         'wikibase-form',
         'wikibase-sense',
-      ]
+      ],
     },
-    { control: 'switch', id: 'isPrimary', label: '是否为主限定' }
+    { control: 'switch', id: 'isPrimary', label: '是否为主限定' },
   ];
 
   // Add tag form related variables
   tagFormMode: 'add' | 'edit' | 'view' | null = null;
   tagForm = new UntypedFormGroup({});
   tagControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID', hidden: true },
+    { control: 'input', id: 'id', label: 'ID' },
     { control: 'input', id: 'name', label: '名称', required: true },
     {
       control: 'select',
       id: 'type',
       label: '类型',
       required: true,
-      data: ['string', 'number', 'date', 'object', 'array', 'boolean']
-    }
+      data: ['string', 'number', 'date', 'object', 'array', 'boolean'],
+    },
   ];
 
   constructor(
@@ -250,20 +253,23 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
   ngOnInit() {
     // Load namespaces for the dropdown in the ontology form
-    this.namespaceService.getList(1, 1000).subscribe(response => {
-      const namespaceControl = this.ontologyControls.find(c => c.id === 'namespace');
+    this.namespaceService.getList(1, 1000).subscribe((response) => {
+      const namespaceControl = this.ontologyControls.find(
+        (c) => c.id === 'namespace'
+      );
       if (namespaceControl) {
-        namespaceControl['data'] = (response.list || []).map(ns => ({
+        namespaceControl['data'] = (response.list || []).map((ns) => ({
           label: ns.name,
-          value: ns.id
+          value: ns.id,
         }));
       }
     });
 
     // First ensure the default namespace exists, then load all namespaces
-    this.namespaceService.ensureDefaultNamespace()
+    this.namespaceService
+      .ensureDefaultNamespace()
       .pipe(
-        catchError(error => {
+        catchError((error) => {
           console.error('Failed to ensure default namespace:', error);
           return of(null);
         })
@@ -275,49 +281,60 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
   // Load namespaces for the dropdown
   loadNamespaces() {
-    this.namespaceService.getDefault().pipe(
-      catchError(error => {
-        console.warn('Could not fetch default namespace directly, falling back to list:', error);
-        return of(null);
-      }),
-      switchMap(defaultNamespace => {
-        return this.namespaceService.getList(1, 1000).pipe(
-          map((response: any) => {
-            return { defaultNamespace, response };
-          })
-        );
-      })
-    ).subscribe({
-      next: ({ defaultNamespace, response }) => {
-        this.namespaces = response.list || [];
-        this.namespaceOptions = this.namespaces.map(ns => ({
-          label: ns.name as string,
-          value: String(ns.id)
-        }));
+    this.namespaceService
+      .getDefault()
+      .pipe(
+        catchError((error) => {
+          console.warn(
+            'Could not fetch default namespace directly, falling back to list:',
+            error
+          );
+          return of(null);
+        }),
+        switchMap((defaultNamespace) => {
+          return this.namespaceService.getList(1, 1000).pipe(
+            map((response: any) => {
+              return { defaultNamespace, response };
+            })
+          );
+        })
+      )
+      .subscribe({
+        next: ({ defaultNamespace, response }) => {
+          this.namespaces = response.list || [];
+          this.namespaceOptions = this.namespaces.map((ns) => ({
+            label: ns.name as string,
+            value: String(ns.id),
+          }));
 
-        console.log('Namespace options:', this.namespaceOptions);
+          console.log('Namespace options:', this.namespaceOptions);
 
-        if (defaultNamespace) {
-          console.log('Using default namespace from API:', defaultNamespace);
-          this.selectNamespace(defaultNamespace);
-        } else {
-          const defaultNs = this.namespaces.find(ns => ns.name === 'default');
-          if (defaultNs) {
-            console.log('Found default namespace in list:', defaultNs);
-            this.selectNamespace(defaultNs);
-          } else if (this.namespaces.length > 0) {
-            console.log('No default namespace found, using first one:', this.namespaces[0]);
-            this.selectNamespace(this.namespaces[0]);
+          if (defaultNamespace) {
+            console.log('Using default namespace from API:', defaultNamespace);
+            this.selectNamespace(defaultNamespace);
           } else {
-            console.warn('No namespaces available');
+            const defaultNs = this.namespaces.find(
+              (ns) => ns.name === 'default'
+            );
+            if (defaultNs) {
+              console.log('Found default namespace in list:', defaultNs);
+              this.selectNamespace(defaultNs);
+            } else if (this.namespaces.length > 0) {
+              console.log(
+                'No default namespace found, using first one:',
+                this.namespaces[0]
+              );
+              this.selectNamespace(this.namespaces[0]);
+            } else {
+              console.warn('No namespaces available');
+            }
           }
-        }
-      },
-      error: error => {
-        console.error('Failed to load namespaces:', error);
-        this.message.error('加载命名空间失败');
-      }
-    });
+        },
+        error: (error) => {
+          console.error('Failed to load namespaces:', error);
+          this.message.error('加载命名空间失败');
+        },
+      });
   }
 
   // Select a namespace and update the dropdown
@@ -338,7 +355,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
       return;
     }
 
-    const selectedNs = this.namespaces.find(ns => String(ns.name) === namespaceId);
+    const selectedNs = this.namespaces.find(
+      (ns) => String(ns.name) === namespaceId
+    );
     if (selectedNs) {
       this.selectedNamespace = selectedNs;
       console.log('Found and set selected namespace:', selectedNs);
@@ -348,40 +367,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
       console.error('Namespace not found with ID:', namespaceId);
       this.message.error('未找到对应的命名空间');
     }
-  }
-
-  // Fix: New separate method to handle default namespace selection
-  private selectDefaultNamespace(namespace: Namespace) {
-    console.log('Selecting default namespace:', namespace);
-    console.log('Namespace ID:', namespace.id);
-
-    // Set the namespace object first
-    this.selectedNamespace = namespace;
-
-    // Set the ID as string for the dropdown
-    this.selectedNamespaceId = String(namespace.id);
-
-    console.log('Selected namespace ID:', this.selectedNamespaceId);
-    console.log('Selected namespace:', this.selectedNamespace);
-
-    // Load data for the selected namespace
-    this.loadOntologyData();
-  }
-
-  // Helper method to select a namespace and load its data
-  private selectNamespaceAndLoadData(namespace: Namespace) {
-    // Important: Set selectedNamespace first
-    this.selectedNamespace = namespace;
-    // Then set selectedNamespaceId to trigger the UI update
-    this.selectedNamespaceId = String(namespace.id);
-
-    // Force Angular change detection by using setTimeout
-    setTimeout(() => {
-      // Now Angular should have updated the UI with the selected namespace
-      console.log('Selected namespace ID in dropdown:', this.selectedNamespaceId);
-      this.switchTab(this.activeTab);
-      this.message.success(`已选择命名空间: ${namespace.name}`);
-    }, 0);
   }
 
   // Clear all tab data
@@ -407,7 +392,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
   }
 
   searchDescription(description: any) {
-    this.query.filter = [{ field: 'description', value: description as string }];
+    this.query.filter = [
+      { field: 'description', value: description as string },
+    ];
     this.tableCom.change(1);
   }
 
@@ -431,7 +418,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
       return;
     }
 
-    console.log(`Loading data for tab ${tabId} with namespace:`, this.selectedNamespace);
+    console.log(
+      `Loading data for tab ${tabId} with namespace:`,
+      this.selectedNamespace
+    );
 
     switch (tabId) {
       case 'ontologies':
@@ -453,9 +443,21 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadOntologyData() {
     this.ontologyDataLoaded = false;
 
-    const filter = this.selectedNamespace.name === 'default'
-      ? [{ field: 'namespaceId', value: '', operation: 'isNull' as XOperation }]
-      : [{ field: 'namespaceId', value: this.selectedNamespace.id.toString() }];
+    const filter =
+      this.selectedNamespace.name === 'default'
+        ? [
+            {
+              field: 'namespaceId',
+              value: '',
+              operation: 'isNull' as XOperation,
+            },
+          ]
+        : [
+            {
+              field: 'namespaceId',
+              value: this.selectedNamespace.id.toString(),
+            },
+          ];
 
     this.ontologyService
       .getList(1, Number.MAX_SAFE_INTEGER, {
@@ -482,7 +484,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to load ontology data:', error);
           this.message.error('加载本体数据失败');
-        }
+        },
       });
   }
 
@@ -494,14 +496,14 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
     // Create a map of all nodes by ID
     const nodeMap = new Map();
-    data.forEach(node => nodeMap.set(node.id, { ...node, children: [] }));
+    data.forEach((node) => nodeMap.set(node.id, { ...node, children: [] }));
 
     // Identify root nodes and build hierarchy
     const roots: any[] = [];
-    nodeMap.forEach(node => {
+    nodeMap.forEach((node) => {
       if (!node.pid) {
         // This is a root node
-        node.icon = 'fto-layers';  // Root node icon
+        node.icon = 'fto-layers'; // Root node icon
         node.className = 'ontology-main';
         roots.push(node);
       } else {
@@ -542,9 +544,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     this.loadPropertiesForOntology(ontology);
   }
 
-
-
-
   // New method to load qualifiers for a property
   loadQualifiersForProperty(property: any) {
     if (!property) return;
@@ -555,8 +554,13 @@ export class NamespaceComponent extends PageBase implements OnInit {
     // Build a query to find qualifiers related to this property
     const query: any = {
       filter: [
-        { field: 'id', value: property.id, relation: 'properties', operation: '=' as XOperation }
-      ]
+        {
+          field: 'id',
+          value: property.id,
+          relation: 'properties',
+          operation: '=' as XOperation,
+        },
+      ],
     };
 
     this.qualifyService.getList(1, 100, query).subscribe({
@@ -571,7 +575,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         console.error('Failed to load qualifiers for property:', error);
         this.message.error('加载属性限定失败');
         this.qualifierLoading = false;
-      }
+      },
     });
   }
 
@@ -585,8 +589,13 @@ export class NamespaceComponent extends PageBase implements OnInit {
     // Build a query to find tags related to this property
     const query: any = {
       filter: [
-        { field: 'id', value: property.id, relation: 'properties', operation: '=' as XOperation }
-      ]
+        {
+          field: 'id',
+          value: property.id,
+          relation: 'properties',
+          operation: '=' as XOperation,
+        },
+      ],
     };
 
     this.tagService.getList(1, 100, query).subscribe({
@@ -601,7 +610,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         console.error('Failed to load tags for property:', error);
         this.message.error('加载属性标签失败');
         this.tagLoading = false;
-      }
+      },
     });
   }
 
@@ -629,7 +638,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
     switch (type) {
       case 'property':
         this.router.navigate(['/index/properties/add'], {
-          queryParams: { ontologyId: ontology.id }
+          queryParams: { ontologyId: ontology.id },
         });
         break;
     }
@@ -642,13 +651,13 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'qualifier':
         console.log('Adding qualifier for property:', property);
         this.router.navigate(['/index/qualifiers/add'], {
-          queryParams: { propertyId: property.id }
+          queryParams: { propertyId: property.id },
         });
         break;
       case 'tag':
         console.log('Adding tag for property:', property);
         this.router.navigate(['/index/tags/add'], {
-          queryParams: { propertyId: property.id }
+          queryParams: { propertyId: property.id },
         });
         break;
     }
@@ -658,39 +667,56 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadPropertyData() {
     this.propertyDataLoaded = false;
     this.propertyData = (index: number, size: number, query: any) => {
-      const filter = this.selectedNamespace.name === 'default'
-        ? [{ field: 'namespaceId', value: '', operation: 'isNull' as XOperation }]
-        : [{ field: 'namespaceId', value: this.selectedNamespace.id.toString() }];
+      const filter =
+        this.selectedNamespace.name === 'default'
+          ? [
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
+          : [
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
-        filter: [
-          ...(query.filter || []),
-          ...filter
-        ]
+        filter: [...(query.filter || []), ...filter],
       };
       return this.propertyService.getList(index, size, finalQuery);
     };
     this.propertyDataLoaded = true;
   }
 
-
-
   // Qualifier data loading and actions
   loadQualifierData() {
     this.qualifierDataLoaded = false;
     this.qualifierData = (index: number, size: number, query: any) => {
-      const filter = this.selectedNamespace.name === 'default'
-        ? [{ field: 'namespaceId', value: '', operation: 'isNull' as XOperation }]
-        : [{ field: 'namespaceId', value: this.selectedNamespace.id.toString() }];
+      const filter =
+        this.selectedNamespace.name === 'default'
+          ? [
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
+          : [
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
-        filter: [
-          ...(query.filter || []),
-          ...filter
-        ]
+        filter: [...(query.filter || []), ...filter],
       };
+      console.log('Qualifier query:', finalQuery);
       return this.qualifyService.getList(index, size, finalQuery);
     };
     this.qualifierDataLoaded = true;
@@ -698,12 +724,40 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
   handleQualifierAction(type: string, item: any) {
     switch (type) {
-      case 'info':
-        this.message.info(`查看限定: ${item.label}`);
+      case 'add':
+        const newId = this.generateUniqueQualifierId();
+        this.qualifierFormMode = 'add';
+        this.qualifierForm.reset();
+
+        this.qualifierForm.patchValue({
+          namespace: this.selectedNamespace.id,
+          namespaceId: this.selectedNamespace.id,
+          properties: this.selectedProperty ? [this.selectedProperty] : [],
+
+        });
         break;
+
       case 'edit':
-        this.message.info(`编辑限定: ${item.label}`);
+        this.qualifierFormMode = 'edit';
+        this.qualifierForm.reset();
+        
+        this.qualifyService.get(item.id).subscribe((data: any) => {
+          this.qualifierForm.patchValue({
+            ...data,
+            namespace: data.namespaceId
+          });
+        });
         break;
+
+      case 'info':
+        this.qualifierFormMode = 'view';
+        this.qualifierForm.reset();
+        
+        this.qualifyService.get(item.id).subscribe((data) => {
+          this.qualifierForm.patchValue(data);
+        });
+        break;
+
       case 'delete':
         this.msgBox.confirm({
           title: '确认删除',
@@ -713,8 +767,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
             if (action === 'confirm') {
               this.qualifyService.delete(item.id).subscribe({
                 next: () => {
-                  this.message.success(`删除限定成功`);
-                  this.loadQualifierData(); // Reload data
+                  this.message.success('删除限定成功');
+                  this.loadQualifiersForProperty(this.selectedProperty);
                 },
                 error: (error) => {
                   console.error('Failed to delete qualifier:', error);
@@ -726,6 +780,61 @@ export class NamespaceComponent extends PageBase implements OnInit {
         });
         break;
     }
+  }
+
+  // Add save qualifier method
+  saveQualifier() {
+    if (this.qualifierForm.invalid) {
+      this.message.warning('请填写必填字段');
+      return;
+    }
+
+    const formData = this.qualifierForm.value;
+    const qualifierData = {
+      ...formData,
+      properties: this.selectedProperty ? [this.selectedProperty] : [],
+      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null)
+    };
+
+    if (this.qualifierFormMode === 'add') {
+      console.log('Adding new qualifier with data:', qualifierData);
+      this.qualifyService.post(qualifierData).subscribe({
+        next: () => {
+          this.message.success('新增限定成功');
+          this.cancelQualifierForm();
+          this.loadQualifiersForProperty(this.selectedProperty);
+        },
+        error: (error) => {
+          console.error('Failed to add qualifier:', error);
+          this.message.error('新增限定失败: ' + error.message);
+        }
+      });
+    } else if (this.qualifierFormMode === 'edit') {
+      this.qualifyService.put(qualifierData).subscribe({
+        next: () => {
+          this.message.success('编辑限定成功');
+          this.cancelQualifierForm();
+          this.loadQualifiersForProperty(this.selectedProperty);
+        },
+        error: (error) => {
+          console.error('Failed to edit qualifier:', error);
+          this.message.error('编辑限定失败: ' + error.message);
+        }
+      });
+    }
+  }
+
+  // Add cancel qualifier form method
+  cancelQualifierForm() {
+    this.qualifierFormMode = null;
+    this.qualifierForm.reset();
+  }
+
+  // Add method to generate unique qualifier ID
+  private generateUniqueQualifierId(): string {
+    const timestamp = new Date().getTime();
+    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return `qual-${timestamp}-${randomPart}`;
   }
 
   // Add new entity based on active tab
@@ -782,14 +891,91 @@ export class NamespaceComponent extends PageBase implements OnInit {
                 this.loadNamespaces();
 
                 // If currently selected namespace is deleted, clear selection
-                if (this.selectedNamespace && this.selectedNamespace.id === item.id) {
+                if (
+                  this.selectedNamespace &&
+                  this.selectedNamespace.id === item.id
+                ) {
                   this.selectedNamespace = null;
                   this.selectedNamespaceId = null;
                   this.clearTabData();
                 }
               });
             }
+          },
+        });
+        break;
+    }
+  }
+
+  // Update cancelOntologyForm to clear the form
+  cancelOntologyForm() {
+    this.ontologyFormMode = null;
+    this.ontologyForm.reset();
+  }
+
+  // Handle ontology actions (modify to use ontologyForm)
+  handleOntologyAction(type: string, ontology?: any) {
+    switch (type) {
+      case 'add':
+        // Generate a unique ID for the new ontology
+        const newId = this.generateUniqueId();
+
+        this.ontologyFormMode = 'add';
+        this.ontologyForm.reset();
+
+        // Pre-select current namespace and set the generated ID
+        // If an ontology is selected, make the new one a child of it
+        if (this.selectedNamespace) {
+          const pidValue = this.selectedOntology
+            ? this.selectedOntology.id
+            : null;
+
+          this.ontologyForm.patchValue({
+            id: newId, // Set the auto-generated ID
+            namespace: this.selectedNamespace.id,
+            namespaceId: this.selectedNamespace.id,
+            pid: pidValue, // Set parent ID if a parent ontology is selected
+          });
+
+          console.log('Creating new ontology with ID:', newId);
+          if (pidValue) {
+            console.log('As child of ontology:', pidValue);
+            console.log('Selected parent ontology:', this.selectedOntology);
           }
+          console.log('In namespace:', this.selectedNamespace.id);
+        }
+        break;
+
+      // ...existing code for other cases...
+      case 'edit':
+        this.ontologyFormMode = 'edit';
+        this.ontologyForm.reset();
+        this.ontologyService.get(ontology.id).subscribe((data) => {
+          this.ontologyForm.patchValue({
+            ...data,
+            namespace: data['namespaceId'],
+          });
+        });
+        break;
+      case 'delete':
+        this.msgBox.confirm({
+          title: '确认删除',
+          content: `确定要删除本体 "${ontology.name || ontology.label}" 吗？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            if (action === 'confirm') {
+              this.ontologyService.delete(ontology.id).subscribe({
+                next: () => {
+                  this.message.success('删除本体成功');
+                  this.loadOntologyData(); // Reload data
+                },
+                error: (error) => {
+                  console.error('Failed to delete ontology:', error);
+                  this.message.error('删除本体失败');
+                },
+              });
+            }
+          },
         });
         break;
     }
@@ -814,8 +1000,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
     // and preserve the parent ID for hierarchical structure
     const ontologyData = {
       ...formData,
-      pid: this.selectedOntology.id || null, // Ensure pid is included in the data
-      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null)
+      pid: this.selectedOntology?.id || null, // Ensure pid is included in the data
+      namespaceId:
+        formData.namespace ||
+        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     console.log('Saving ontology with data:', ontologyData);
@@ -828,7 +1016,11 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
           // If this was added as a child of a selected ontology
           if (ontologyData.pid && this.selectedOntology) {
-            this.message.info(`已创建为 "${this.selectedOntology.name || this.selectedOntology.label}" 的子本体`);
+            this.message.info(
+              `已创建为 "${
+                this.selectedOntology.name || this.selectedOntology.label
+              }" 的子本体`
+            );
           }
 
           this.loadOntologyData();
@@ -836,7 +1028,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to add ontology:', error);
           this.message.error('新增本体失败: ' + error.message);
-        }
+        },
       });
     } else if (this.ontologyFormMode === 'edit') {
       this.ontologyService.put(ontologyData).subscribe({
@@ -848,80 +1040,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to edit ontology:', error);
           this.message.error('编辑本体失败: ' + error.message);
-        }
+        },
       });
-    }
-  }
-
-  // Update cancelOntologyForm to clear the form
-  cancelOntologyForm() {
-    this.ontologyFormMode = null;
-    this.ontologyForm.reset();
-  }
-
-  // Handle ontology actions (modify to use ontologyForm)
-  handleOntologyAction(type: string, ontology?: any) {
-    switch (type) {
-      case 'add':
-        // Generate a unique ID for the new ontology
-        const newId = this.generateUniqueId();
-
-        this.ontologyFormMode = 'add';
-        this.ontologyForm.reset();
-
-        // Pre-select current namespace and set the generated ID
-        // If an ontology is selected, make the new one a child of it
-        if (this.selectedNamespace) {
-          const pidValue = this.selectedOntology ? this.selectedOntology.id : null;
-
-          this.ontologyForm.patchValue({
-            id: newId, // Set the auto-generated ID
-            namespace: this.selectedNamespace.id,
-            namespaceId: this.selectedNamespace.id,
-            pid: pidValue // Set parent ID if a parent ontology is selected
-          });
-
-          console.log('Creating new ontology with ID:', newId);
-          if (pidValue) {
-            console.log('As child of ontology:', pidValue);
-            console.log('Selected parent ontology:', this.selectedOntology);
-          }
-          console.log('In namespace:', this.selectedNamespace.id);
-        }
-        break;
-
-      // ...existing code for other cases...
-      case 'edit':
-        this.ontologyFormMode = 'edit';
-        this.ontologyForm.reset();
-        this.ontologyService.get(ontology.id).subscribe(data => {
-          this.ontologyForm.patchValue({
-            ...data,
-            namespace: data['namespaceId']
-          });
-        });
-        break;
-      case 'delete':
-        this.msgBox.confirm({
-          title: '确认删除',
-          content: `确定要删除本体 "${ontology.name || ontology.label}" 吗？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            if (action === 'confirm') {
-              this.ontologyService.delete(ontology.id).subscribe({
-                next: () => {
-                  this.message.success('删除本体成功');
-                  this.loadOntologyData(); // Reload data
-                },
-                error: (error) => {
-                  console.error('Failed to delete ontology:', error);
-                  this.message.error('删除本体失败');
-                }
-              });
-            }
-          }
-        });
-        break;
     }
   }
 
@@ -929,7 +1049,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
   private generateUniqueId(): string {
     // Generate a random UUID-like string
     const timestamp = new Date().getTime();
-    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `ont-${timestamp}-${randomPart}`;
   }
 
@@ -945,8 +1067,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
         // Set default values
         this.propertyForm.patchValue({
+          namespace: this.selectedNamespace.id,
           namespaceId: this.selectedNamespace.id,
-          schemas: this.selectedOntology ? [this.selectedOntology] : []
+          schemas: this.selectedOntology ? [this.selectedOntology] : [],
         });
         break;
 
@@ -956,7 +1079,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.propertyService.get(item.id).subscribe((data: any) => {
           this.propertyForm.patchValue({
             ...data,
-            namespace: data.namespaceId
+            namespace: data.namespaceId,
           });
         });
         break;
@@ -965,7 +1088,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.propertyFormMode = 'view';
         this.propertyForm.reset();
 
-        this.propertyService.get(item.id).subscribe(data => {
+        this.propertyService.get(item.id).subscribe((data) => {
           this.propertyForm.patchValue(data);
         });
         break;
@@ -989,10 +1112,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
                 error: (error) => {
                   console.error('Failed to delete property:', error);
                   this.message.error('删除属性失败');
-                }
+                },
               });
             }
-          }
+          },
         });
         break;
     }
@@ -1008,16 +1131,23 @@ export class NamespaceComponent extends PageBase implements OnInit {
     // Get form data
     const formData = this.propertyForm.value;
 
-    console.log(formData)
+    console.log(formData);
 
     // Make sure property is associated with the current ontology if selected
     if (this.selectedOntology && !formData.schemas) {
       formData.schemas = [this.selectedOntology];
     }
 
+    const propertyData = {
+      ...formData,
+      namespaceId:
+        formData.namespace ||
+        (this.selectedNamespace ? this.selectedNamespace.id : null),
+    };
 
     if (this.propertyFormMode === 'add') {
-      this.propertyService.post(formData).subscribe({
+      console.log('Adding new property with data:', propertyData);
+      this.propertyService.post(propertyData).subscribe({
         next: () => {
           this.message.success('新增属性成功');
           this.cancelPropertyForm();
@@ -1031,10 +1161,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to add property:', error);
           this.message.error('新增属性失败: ' + error.message);
-        }
+        },
       });
     } else if (this.propertyFormMode === 'edit') {
-      this.propertyService.put(formData).subscribe({
+      this.propertyService.put(propertyData).subscribe({
         next: () => {
           this.message.success('编辑属性成功');
           this.cancelPropertyForm();
@@ -1048,7 +1178,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to edit property:', error);
           this.message.error('编辑属性失败: ' + error.message);
-        }
+        },
       });
     }
   }
@@ -1063,7 +1193,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
   private generateUniquePropertyId(): string {
     // Generate a random UUID-like string
     const timestamp = new Date().getTime();
-    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `prop-${timestamp}-${randomPart}`;
   }
 
@@ -1071,61 +1203,38 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadTagData() {
     this.tagDataLoaded = false;
     this.tagData = (index: number, size: number, query: any) => {
-      const filter = this.selectedNamespace.name === 'default'
-        ? [{ field: 'namespaceId', value: '', operation: 'isNull' as XOperation }]
-        : [{ field: 'namespaceId', value: this.selectedNamespace.id.toString() }];
+      const filter =
+        this.selectedNamespace.name === 'default'
+          ? [
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
+          : [
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
-        filter: [
-          ...(query.filter || []),
-          ...filter
-        ]
+        filter: [...(query.filter || []), ...filter],
       };
       return this.tagService.getList(index, size, finalQuery);
     };
     this.tagDataLoaded = true;
   }
 
-  // Add the missing handleTagAction method
-  handleTagAction(type: string, item: any) {
-    switch (type) {
-      case 'info':
-        this.message.info(`查看标签: ${item.name}`);
-        break;
-      case 'edit':
-        this.message.info(`编辑标签: ${item.name}`);
-        break;
-      case 'delete':
-        this.msgBox.confirm({
-          title: '确认删除',
-          content: `确定要删除标签 "${item.name}" 吗？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            if (action === 'confirm') {
-              this.tagService.delete(item.id).subscribe({
-                next: () => {
-                  this.message.success(`删除标签成功`);
-                  this.loadTagData(); // Reload data
-                },
-                error: (error) => {
-                  console.error('Failed to delete tag:', error);
-                  this.message.error('删除标签失败');
-                }
-              });
-            }
-          }
-        });
-        break;
-    }
-  }
 
   // Add methods for adding qualifiers and tags associated with a selected property
   addQualifierForProperty(property: any) {
     if (!property) return;
     console.log('Adding qualifier for property:', property);
     this.router.navigate(['/index/qualifiers/add'], {
-      queryParams: { propertyId: property.id }
+      queryParams: { propertyId: property.id },
     });
   }
 
@@ -1133,10 +1242,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
     if (!property) return;
     console.log('Adding tag for property:', property);
     this.router.navigate(['/index/tags/add'], {
-      queryParams: { propertyId: property.id }
+      queryParams: { propertyId: property.id },
     });
   }
-
 
   // Modify the property table to trigger the selection event
   loadPropertiesForOntology(ontology: any) {
@@ -1147,8 +1255,13 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
     const query: any = {
       filter: [
-        { field: 'id', value: ontology.id, relation: 'schemas', operation: '=' as XOperation }
-      ]
+        {
+          field: 'id',
+          value: ontology.id,
+          relation: 'schemas',
+          operation: '=' as XOperation,
+        },
+      ],
     };
 
     this.propertyService.getList(1, 100, query).subscribe({
@@ -1171,7 +1284,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         console.error('Failed to load properties for ontology:', error);
         this.message.error('加载本体属性失败');
         this.propertyLoading = false;
-      }
+      },
     });
   }
 
@@ -1181,14 +1294,129 @@ export class NamespaceComponent extends PageBase implements OnInit {
     this.selectedProperty = property;
 
     // Determine if this is an item property (should show qualifiers) or a value property (should show tags)
-    this.isItemProperty = property.type === 'wikibase-item';
+    // this.isItemProperty = property.type === 'wikibase-item';
+
+    this.loadQualifiersForProperty(property);
 
     // if (this.isItemProperty) {
-    //   this.loadQualifiersForProperty(property);
-    //   this.clearTagData();
+      // this.loadQualifiersForProperty(property);
+      // this.clearTagData();
     // } else {
-    //   this.loadTagsForProperty(property);
-    //   this.clearQualifierData();
+      // this.loadTagsForProperty(property);
+      // this.clearQualifierData();
     // }
+    // this.loadTagsForProperty(property);
+  }
+
+  // Add these methods for tag handling
+  handleTagAction(type: string, item: any) {
+    switch (type) {
+      case 'add':
+        const newId = this.generateUniqueTagId();
+        this.tagFormMode = 'add';
+        this.tagForm.reset();
+
+        this.tagForm.patchValue({
+          id: newId,
+          namespace: this.selectedNamespace.id,
+          namespaceId: this.selectedNamespace.id,
+          properties: this.selectedProperty ? [this.selectedProperty] : []
+        });
+        break;
+
+      case 'edit':
+        this.tagFormMode = 'edit';
+        this.tagForm.reset();
+        
+        this.tagService.get(item.id).subscribe((data: any) => {
+          this.tagForm.patchValue({
+            ...data,
+            namespace: data.namespaceId
+          });
+        });
+        break;
+
+      case 'info':
+        this.tagFormMode = 'view';
+        this.tagForm.reset();
+        
+        this.tagService.get(item.id).subscribe((data) => {
+          this.tagForm.patchValue(data);
+        });
+        break;
+
+      case 'delete':
+        this.msgBox.confirm({
+          title: '确认删除',
+          content: `确定要删除标签 "${item.name}" 吗？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            if (action === 'confirm') {
+              this.tagService.delete(item.id).subscribe({
+                next: () => {
+                  this.message.success('删除标签成功');
+                  this.loadTagsForProperty(this.selectedProperty);
+                },
+                error: (error) => {
+                  console.error('Failed to delete tag:', error);
+                  this.message.error('删除标签失败');
+                }
+              });
+            }
+          }
+        });
+        break;
+    }
+  }
+
+  saveTag() {
+    if (this.tagForm.invalid) {
+      this.message.warning('请填写必填字段');
+      return;
+    }
+
+    const formData = this.tagForm.value;
+    const tagData = {
+      ...formData,
+      properties: this.selectedProperty ? [this.selectedProperty] : [],
+      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null)
+    };
+
+    if (this.tagFormMode === 'add') {
+      this.tagService.post(tagData).subscribe({
+        next: () => {
+          this.message.success('新增标签成功');
+          this.cancelTagForm();
+          this.loadTagsForProperty(this.selectedProperty);
+        },
+        error: (error) => {
+          console.error('Failed to add tag:', error);
+          this.message.error('新增标签失败: ' + error.message);
+        }
+      });
+    } else if (this.tagFormMode === 'edit') {
+      this.tagService.put(tagData).subscribe({
+        next: () => {
+          this.message.success('编辑标签成功');
+          this.cancelTagForm();
+          this.loadTagsForProperty(this.selectedProperty);
+        },
+        error: (error) => {
+          console.error('Failed to edit tag:', error);
+          this.message.error('编辑标签失败: ' + error.message);
+        }
+      });
+    }
+  }
+
+  cancelTagForm() {
+    this.tagFormMode = null;
+    this.tagForm.reset();
+  }
+
+  private generateUniqueTagId(): string {
+    const timestamp = new Date().getTime();
+    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return `tag-${timestamp}-${randomPart}`;
   }
 }

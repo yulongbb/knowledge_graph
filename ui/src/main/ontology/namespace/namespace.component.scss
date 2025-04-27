@@ -363,3 +363,26 @@
     }
   }
 }
+
+// Add styles for qualifier form
+.qualifier-section {
+  .form-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--x-border);
+    
+    h4 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--x-border);
+  }
+}

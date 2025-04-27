@@ -374,10 +374,10 @@ export class OntologyComponent extends PageBase {
       case 'save':
         if (this.type === 'add' || this.type === 'add-root') {
           console.log(this.formGroup.value);
-          if (this.form.formGroup().value.ontologies) {
-            this.form.formGroup().value.ontologies = this.form.formGroup().value.ontologies?.split('\n').filter((t: any) => t != '');
+          if (this.form.formGroup.value.ontologies) {
+            this.form.formGroup.value.ontologies = this.form.formGroup.value.ontologies?.split('\n').filter((t: any) => t != '');
             let arr: any = []
-            this.form.formGroup().value.ontologies.forEach((t: any) => {
+            this.form.formGroup.value.ontologies.forEach((t: any) => {
               arr.push(this.service.post({ id: XGuid(), name: t, label: t, pid: this.selected.id }))
             });
             forkJoin(arr).subscribe(() => {
