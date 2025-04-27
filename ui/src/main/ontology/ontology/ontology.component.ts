@@ -135,6 +135,9 @@ export class OntologyComponent extends PageBase {
   ];
   cy: any; // Cytoscape instance
 
+  // Add properties to track form mode and data
+  ontologyFormMode: 'add' | 'edit' | 'view' | null = null;
+  ontologyFormData: any = null;
 
   constructor(
     private service: OntologyService,
@@ -371,10 +374,10 @@ export class OntologyComponent extends PageBase {
       case 'save':
         if (this.type === 'add' || this.type === 'add-root') {
           console.log(this.formGroup.value);
-          if (this.form.formGroup.value.ontologies) {
-            this.form.formGroup.value.ontologies = this.form.formGroup.value.ontologies?.split('\n').filter((t: any) => t != '');
+          if (this.form.formGroup().value.ontologies) {
+            this.form.formGroup().value.ontologies = this.form.formGroup().value.ontologies?.split('\n').filter((t: any) => t != '');
             let arr: any = []
-            this.form.formGroup.value.ontologies.forEach((t: any) => {
+            this.form.formGroup().value.ontologies.forEach((t: any) => {
               arr.push(this.service.post({ id: XGuid(), name: t, label: t, pid: this.selected.id }))
             });
             forkJoin(arr).subscribe(() => {
@@ -428,5 +431,95 @@ export class OntologyComponent extends PageBase {
         });
         break;
     }
+  }
+
+  // Handle ontology actions
+  handleOntologyAction(type: string, ontology?: any) {
+    switch (type) {
+      case 'add':
+        this.ontologyFormMode = 'add';
+        this.ontologyFormData = { name: '', description: '' }; // Initialize empty form
+        break;
+      case 'edit':
+        this.ontologyFormMode = 'edit';
+        this.ontologyFormData = { ...ontology }; // Populate form with existing data
+        break;
+      case 'view':
+        this.ontologyFormMode = 'view';
+        this.ontologyFormData = { ...ontology }; // Populate form with existing data
+        break;
+      case 'delete':
+        this.msgBox.confirm({
+          title: '确认删除',
+          content: `确定要删除本体 "${ontology.name}" 吗？`,
+          type: 'warning',
+          callback: (action: XMessageBoxAction) => {
+            if (action === 'confirm') {
+              this.service.delete(ontology.id).subscribe({
+                next: () => {
+                  this.message.success('删除本体成功');
+                  this.loadOntologyData(); // Reload data
+                },
+                error: (error) => {
+                  console.error('Failed to delete ontology:', error);
+                  this.message.error('删除本体失败');
+                }
+              });
+            }
+          }
+        });
+        break;
+    }
+  }
+
+  // Save ontology data
+  saveOntology() {
+    if (this.ontologyFormMode === 'add') {
+      this.service.post(this.ontologyFormData).subscribe({
+        next: () => {
+          this.message.success('新增本体成功');
+          this.ontologyFormMode = null;
+          this.loadOntologyData(); // Reload data
+        },
+        error: (error) => {
+          console.error('Failed to add ontology:', error);
+          this.message.error('新增本体失败');
+        }
+      });
+    } else if (this.ontologyFormMode === 'edit') {
+      this.service.put(this.ontologyFormData).subscribe({
+        next: () => {
+          this.message.success('编辑本体成功');
+          this.ontologyFormMode = null;
+          this.loadOntologyData(); // Reload data
+        },
+        error: (error) => {
+          console.error('Failed to edit ontology:', error);
+          this.message.error('编辑本体失败');
+        }
+      });
+    }
+  }
+
+  // Cancel ontology form
+  cancelOntologyForm() {
+    this.ontologyFormMode = null;
+    this.ontologyFormData = null;
+  }
+
+  // Load ontology data
+  loadOntologyData() {
+    this.data = () =>
+      this.service
+        .getList(1, Number.MAX_SAFE_INTEGER, {
+          sort: [
+            { field: 'pid', value: 'asc' },
+            { field: 'sort', value: 'asc' },
+          ],
+        })
+        .pipe(
+          tap((x) => console.log(x)),
+          map((x) => x.list)
+        );
   }
 }

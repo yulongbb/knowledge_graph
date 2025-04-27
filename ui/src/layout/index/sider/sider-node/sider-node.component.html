@@ -5,6 +5,7 @@
   [routerLinkActive]="'active'"
   [title]="option.label"
   [style.padding-left.rem]="0.875 * level"
+  class="menu-item"
 >
   <ng-container *ngTemplateOutlet="itemTemp; context: { option: option }"></ng-container>
 </a>
@@ -13,20 +14,25 @@
   (click)="toggle($event, option)"
   [title]="option.label"
   [ngStyle]="{ 'padding-left.rem': 0.875 * level }"
+  class="menu-item"
+  [class.has-children]="child.length > 0"
 >
   <ng-container *ngTemplateOutlet="itemTemp; context: { option: option }"></ng-container>
 </a>
 <ul
   *ngIf="(child.length > 0 ? true : false) && option.childrenShow"
   [ngClass]="{ 'first-node': level == 1 && indexService.local.siderShrink }"
+  class="child-menu"
 >
   <li app-sider-node *ngFor="let item of child" [option]="item" [level]="level" [float]="float"></li>
 </ul>
 
 <ng-template #itemTemp let-opt="option">
-  <x-icon [type]="opt.icon"></x-icon>
-  <span>{{ opt.label }}</span>
+  <span class="menu-icon"><x-icon [type]="opt.icon"></x-icon></span>
+  <span class="menu-label">{{ opt.label }}</span>
   <ng-container *ngIf="child.length > 0 ? true : false">
-    <x-icon class="sider-arrow" [class.show]="opt.childrenShow" type="fto-chevron-right"></x-icon>
+    <span class="menu-arrow">
+      <x-icon class="sider-arrow" [class.show]="opt.childrenShow" type="fto-chevron-right"></x-icon>
+    </span>
   </ng-container>
 </ng-template>

@@ -2,61 +2,62 @@
   display: block;
   height: 100%;
   padding: 1rem;
-  
-  > x-container:not(first-child) {
+
+  >x-container:not(first-child) {
     margin-top: 1rem;
   }
+
   x-container {
     height: 100%;
   }
-  
+
   x-input-group {
     display: block;
     width: 100%;
   }
-  
+
   x-input-group:not(:first-child) {
     margin-top: 1rem;
   }
-  
+
   .namespace-manager {
     display: flex;
     flex-direction: column;
     height: 100%;
-    
+
     .namespace-header {
       margin-bottom: 1.5rem;
-      
+
       h3 {
         margin-top: 0;
         margin-bottom: 1rem;
         font-size: 1.4rem;
       }
-      
+
       .namespace-selection-area {
         display: flex;
         align-items: center;
         gap: 1rem;
         margin-bottom: 1rem;
       }
-      
+
       .selected-namespace-info {
         margin-top: 1rem;
         padding: 0.8rem;
         background-color: var(--x-background);
         border-radius: 4px;
         border-left: 4px solid var(--x-primary);
-        
+
         div {
           margin-bottom: 0.4rem;
-          
+
           &:last-child {
             margin-bottom: 0;
           }
         }
       }
     }
-    
+
     .entity-manager {
       flex: 1;
       display: flex;
@@ -64,91 +65,301 @@
       border: 1px solid var(--x-border);
       border-radius: 4px;
       padding: 1rem;
-      
-      .selected-namespace {
+      overflow: hidden;
+
+      .three-panel-container {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: var(--x-success);
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--x-border);
-      }
-      
-      .management-tabs {
-        margin-bottom: 1rem;
-      }
-      
-      .tab-content {
-        flex: 1;
-        overflow: auto;
-        
-        .tab-pane {
-          height: 100%;
-          
-          .entity-header {
+        height: 100%;
+        gap: 1rem;
+
+        .panel {
+          display: flex;
+          flex-direction: column;
+          border: 1px solid var(--x-border);
+          border-radius: 4px;
+          overflow: hidden;
+
+          &.ontology-panel {
+            width: 25%;
+
+            // Enhanced styles for the ontology tree
+            ::ng-deep {
+              .x-tree {
+                height: 100%;
+                
+                .x-tree-node {
+                  transition: all 0.2s ease;
+                  border-radius: 4px;
+                  margin: 2px 0;
+                  
+                  &:hover {
+                    background-color: rgba(0, 0, 0, 0.03);
+                  }
+                  
+                  &.x-activated {
+                    background-color: var(--x-primary-a100);
+                    
+                    > .x-tree-node-content {
+                      color: var(--x-primary);
+                      font-weight: 500;
+                    }
+                  }
+                  
+                  .x-tree-node-content {
+                    padding: 0.35rem 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    
+                    .x-tree-node-label {
+                      margin-left: 0.5rem;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                    
+                    .x-tree-node-toggle {
+                      transition: transform 0.2s ease;
+                      
+                      &.x-tree-node-open {
+                        transform: rotate(90deg);
+                      }
+                    }
+                  }
+                  
+                  .x-tree-node-actions {
+                    .x-link {
+                      opacity: 0.7;
+                      transition: opacity 0.2s ease;
+                      
+                      &:hover {
+                        opacity: 1;
+                      }
+                    }
+                  }
+                }
+                
+                // Style for child nodes to show hierarchy
+                .x-tree-node-children {
+                  position: relative;
+                  
+                  &:before {
+                    content: '';
+                    position: absolute;
+                    left: 10px;
+                    top: 0;
+                    height: 100%;
+                    width: 1px;
+                    background-color: rgba(0, 0, 0, 0.1);
+                    z-index: 0;
+                  }
+                }
+              }
+            }
+          }
+
+          &.property-panel,
+          &.property-form-panel {
+            width: 35%;
+          }
+
+          &.qualifier-tag-panel {
+            flex: 1;
+          }
+
+          &.ontology-form-panel {
+            width: 45%; // Make it wider to accommodate the form
+
+            .form-actions {
+              display: flex;
+              justify-content: flex-end;
+              padding: 1rem;
+              margin-top: 1rem;
+              border-top: 1px solid var(--x-border);
+            }
+          }
+
+          &.property-form-panel {
+            .form-actions {
+              display: flex;
+              justify-content: flex-end;
+              padding: 1rem;
+              margin-top: 1rem;
+              border-top: 1px solid var(--x-border);
+            }
+          }
+
+          &.qualifier-form-panel,
+          &.tag-form-panel {
+            flex: 1; // Take remaining space
+
+            .form-actions {
+              display: flex;
+              justify-content: flex-end;
+              padding: 1rem;
+              margin-top: 1rem;
+              border-top: 1px solid var(--x-border);
+            }
+          }
+
+          // Add a class to hide panels when form is active
+          &.hidden {
+            display: none;
+          }
+
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 70%;
+        }
+
+        .qualifier-tag-panel {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+
+          .qualifier-section,
+          .tag-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--x-border);
+            border-radius: 4px;
+            padding: 1rem;
+            background-color: var(--x-background);
+          }
+
+          .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            
-            h3 {
+
+            h4 {
               margin: 0;
+              font-size: 1.2rem;
+              font-weight: 500;
+            }
+
+            .section-actions {
+              display: flex;
+              gap: 0.5rem;
             }
           }
-          
-          .entity-content {
-            height: calc(100% - 3rem);
-            overflow: auto;
-          }
-          
-          .loading-placeholder {
+
+          .empty-message {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 200px;
             color: var(--x-text-300);
+            text-align: center;
+            padding: 1rem;
           }
         }
       }
-    }
-    
-    .no-namespace-selected {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--x-border);
-      border-radius: 4px;
-      
-      .message {
-        color: var(--x-warning);
-        font-size: 1.2rem;
+
+      .panel-content {
+        flex: 1;
+        overflow: auto;
+        padding: 0.5rem;
+      }
+
+      .loading-placeholder,
+      .empty-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: var(--x-text-300);
         text-align: center;
-        padding: 2rem;
+        padding: 1rem;
       }
     }
   }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--x-background);
+  border-bottom: 1px solid var(--x-border);
   
-  .tab-container {
-    margin: 1rem 0;
-    
-    .namespace-select-info {
-      color: var(--x-warning);
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-    
-    .selected-namespace {
-      color: var(--x-success);
-      margin-bottom: 0.5rem;
-    }
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
   }
   
-  .au-table-actions {
-    x-link:not(:last-child) {
-      margin-right: 0.5rem;
+  .panel-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+.no-namespace-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--x-border);
+  border-radius: 4px;
+
+  .message {
+    color: var(--x-warning);
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+.tab-container {
+  margin: 1rem 0;
+
+  .namespace-select-info {
+    color: var(--x-warning);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .selected-namespace {
+    color: var(--x-success);
+    margin-bottom: 0.5rem;
+  }
+}
+
+.au-table-actions {
+  x-link:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
+
+// Property panel styling adjustments
+.property-panel {
+  width: 35%;
+
+  .panel-content {
+    padding: 0 !important; // Remove padding for tables
+    
+    x-table {
+      height: 100%;
+    }
+  }
+}
+
+// Define selected row styling for the property table
+::ng-deep {
+  .property-panel {
+    .x-table-row.selected {
+      background-color: var(--x-primary-a100);
+      color: var(--x-primary);
+      font-weight: 500;
     }
   }
 }

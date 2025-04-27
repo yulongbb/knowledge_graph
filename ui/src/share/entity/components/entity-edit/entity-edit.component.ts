@@ -67,7 +67,7 @@ export class EntityEditComponent implements OnInit {
       return;
     }
 
-    const formValue = this.form.formGroup.value;
+    const formValue = this.form.formGroup().value;
     const updateData = this.prepareUpdateData(formValue);
 
     this.entityService.put(updateData).subscribe({

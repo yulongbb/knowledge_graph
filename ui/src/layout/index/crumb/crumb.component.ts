@@ -35,14 +35,6 @@ export class CrumbComponent implements OnInit {
     this.indexService.portal = this.portal.attach({
       content: FloatNodeComponent,
       viewContainerRef: this.viewContainerRef,
-      overlayConfig: {
-        hasBackdrop: true,
-        positionStrategy: this.overlay
-          .position()
-          .flexibleConnectedTo(new ElementRef(event.event.srcElement))
-          .withPositions([{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }]),
-        backdropClass: ''
-      },
       injector: this.portal.createInjector([
         {
           provide: FLOAT_NODE_OPTION,

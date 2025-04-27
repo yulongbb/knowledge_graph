@@ -58,8 +58,8 @@ export class EntityAddVideoComponent {
       this.videos.push({
         url: `http://localhost:9000/kgms/${videoFile}`,
         thumbnail: data.thumbnail,
-        label: this.form.formGroup.value.label,
-        description: this.form.formGroup.value.description
+        label: this.form.formGroup().value.label,
+        description: this.form.formGroup().value.description
       });
     })
     .catch(error => {
@@ -73,7 +73,7 @@ export class EntityAddVideoComponent {
       return;
     }
 
-    const formValue = this.form.formGroup.value;
+    const formValue = this.form.formGroup().value;
     const item = {
       videos: this.videos,
       label: formValue.label,

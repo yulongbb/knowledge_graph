@@ -49,7 +49,7 @@ export class NamespaceDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
 
@@ -83,7 +83,7 @@ export class NamespaceDetailComponent implements OnInit {
       case 'info':
       case 'edit':
         this.namespaceService.get(this.id as string).subscribe((x: any) => {
-          this.form.formGroup.patchValue(x);
+          this.form.formGroup().patchValue(x);
           if (x.name === 'default' && this.type === 'edit') {
             this.message.warning('默认命名空间的名称和前缀不能修改！');
          
@@ -93,13 +93,13 @@ export class NamespaceDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           this.namespaceService
-            .post(this.form.formGroup.value)
+            .post(this.form.formGroup().value)
             .subscribe(() => {
               this.message.success('新增成功！');
               this.router.navigate(['/index/namespaces']);
             });
         } else if (this.type === 'edit') {
-          const formData = this.form.formGroup.value;
+          const formData = this.form.formGroup().value;
           formData.id = this.id;
           this.namespaceService.put(formData).subscribe(() => {
             this.message.success('修改成功！');

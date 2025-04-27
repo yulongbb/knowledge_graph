@@ -64,10 +64,10 @@ export class TagDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
-  query: XQuery = { filter: [] };
+  query: any
 
   constructor(
     private ontologyService: OntologyService,
@@ -114,7 +114,7 @@ export class TagDetailComponent implements OnInit {
               console.log(x);
               console.log(y.list);
               x['schemas'] = y.list;
-              this.form.formGroup.patchValue(x);
+              this.form.formGroup().patchValue(x);
 
             });
         });
@@ -124,20 +124,20 @@ export class TagDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          this.form.formGroup.value.tags = this.form.formGroup.value.tags.split('\n').filter((t: any) => t != '');
+          this.form.formGroup().value.tags = this.form.formGroup().value.tags.split('\n').filter((t: any) => t != '');
 
-          if (this.form.formGroup.value.tags.length == 0) {
+          if (this.form.formGroup().value.tags.length == 0) {
             console.log('新增单个');
             this.tagService
-              .post(this.form.formGroup.value)
+              .post(this.form.formGroup().value)
               .subscribe((x) => {
                 this.message.success('新增成功！');
                 this.router.navigate(['/index/tag']);
               });
           } else {
             let arr: any = []
-            this.form.formGroup.value.tags.forEach((t: any) => {
-              arr.push(this.tagService.post({name: t, type: this.form.formGroup.value.type, schemas:this.form.formGroup.value.schemas}))
+            this.form.formGroup().value.tags.forEach((t: any) => {
+              arr.push(this.tagService.post({name: t, type: this.form.formGroup().value.type, schemas:this.form.formGroup().value.schemas}))
             });
             forkJoin(arr).subscribe(() => {
               this.message.success('新增成功！');
@@ -147,10 +147,10 @@ export class TagDetailComponent implements OnInit {
 
 
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup.value);
+          this.form.formGroup().value['id'] = Number.parseInt(this.id);
+          console.log(this.form.formGroup().value);
 
-          this.tagService.put(this.form.formGroup.value).subscribe((x) => {
+          this.tagService.put(this.form.formGroup().value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
             this.router.navigate(['/index/tag']);

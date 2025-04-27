@@ -51,10 +51,10 @@ export class DatasetDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
-  query: XQuery = { filter: [] };
+  query: any
 
   constructor(
     private datasetService: DatasetService,
@@ -101,19 +101,19 @@ export class DatasetDetailComponent implements OnInit {
         this.action('info');
         break;
       case 'save':
-        console.log(this.form.formGroup.value)
+        console.log(this.form.formGroup().value)
         if (this.type === 'add') {
           this.datasetService
-          .post(this.form.formGroup.value)
+          .post(this.form.formGroup().value)
           .subscribe((x) => {
             this.message.success('新增成功！');
             this.router.navigate(['/index/dataset']);
           });
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup.value);
+          this.form.formGroup().value['id'] = Number.parseInt(this.id);
+          console.log(this.form.formGroup().value);
 
-          this.datasetService.put(this.form.formGroup.value).subscribe((x) => {
+          this.datasetService.put(this.form.formGroup().value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
             this.router.navigate(['/index/dataset']);
@@ -128,8 +128,8 @@ export class DatasetDetailComponent implements OnInit {
 
   uploadSuccess($event: any) {
     console.log($event.body.name)
-    this.form.formGroup.value['files'] = [$event.body.name]
-    console.log(this.form.formGroup.value)
+    this.form.formGroup().value['files'] = [$event.body.name]
+    console.log(this.form.formGroup().value)
 
   }
 }

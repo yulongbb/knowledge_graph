@@ -47,9 +47,9 @@ export class ConfigService {
 
   setTheme() {
     if (this.dark) {
-      this.configService.setDarkTheme({ colors: X_THEME_DARK_COLORS });
+      this.configService.setDarkTheme();
     } else {
-      this.configService.setLightTheme({ colors: X_THEME_COLORS });
+      this.configService.setLightTheme();
     }
   }
 

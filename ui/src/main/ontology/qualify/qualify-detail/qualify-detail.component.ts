@@ -77,10 +77,10 @@ export class QualifyDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
-  query: XQuery = { filter: [] };
+  query: any
 
   constructor(
     private propertyService: PropertyService,
@@ -113,7 +113,7 @@ export class QualifyDetailComponent implements OnInit {
       case 'info':
         console.log(this.id);
         this.qualifyService.get(this.id as string).subscribe((x: any) => {
-          this.form.formGroup.patchValue(x);
+          this.form.formGroup().patchValue(x);
         });
         break;
       case 'edit':
@@ -122,14 +122,14 @@ export class QualifyDetailComponent implements OnInit {
       case 'save':
         if (this.type === 'add') {
           this.qualifyService
-            .post(this.form.formGroup.value)
+            .post(this.form.formGroup().value)
             .subscribe((x) => {
               this.message.success('新增成功！');
               this.router.navigate(['/index/qualify']);
             });
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          this.qualifyService.put(this.form.formGroup.value).subscribe((x) => {
+          this.form.formGroup().value['id'] = Number.parseInt(this.id);
+          this.qualifyService.put(this.form.formGroup().value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
             this.router.navigate(['/index/qualify']);

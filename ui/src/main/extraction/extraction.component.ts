@@ -27,7 +27,7 @@ export class ExtractionComponent extends PageBase {
   type: any;
   index = 1;
   keyword: any = '';
-  query: XQuery = { filter: [] };
+  query: any
   items: any = signal([]);
   activated = signal(0);
   datasets = (index: number, size: number, query: any) =>

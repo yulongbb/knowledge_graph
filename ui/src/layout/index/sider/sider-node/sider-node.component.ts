@@ -11,6 +11,7 @@ import { ConfigService } from 'src/services/config.service';
 @Component({
   selector: '[app-sider-node]',
   templateUrl: './sider-node.component.html',
+  styleUrls: ['./sider-node.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class SiderNodeComponent implements OnInit {
@@ -62,24 +63,24 @@ export class SiderNodeComponent implements OnInit {
   toggle(event: Event, option: Menu) {
     event.stopPropagation();
     if (this.indexService.local.siderShrink && this.level == 1 && !this.float) {
-      this.indexService.portal = this.portal.attach({
-        content: FloatNodeComponent,
-        viewContainerRef: this.viewContainerRef,
-        overlayConfig: {
-          hasBackdrop: true,
-          positionStrategy: this.overlay
-            .position()
-            .flexibleConnectedTo(this.elementRef)
-            .withPositions([{ originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }]),
-          backdropClass: ''
-        },
-        injector: this.portal.createInjector([
-          {
-            provide: FLOAT_NODE_OPTION,
-            useValue: this.indexService.floatChild(this.child)
-          }
-        ])
-      });
+      // this.indexService.portal = this.portal.attach({
+      //   content: FloatNodeComponent,
+      //   viewContainerRef: this.viewContainerRef,
+      //   overlayConfig: {
+      //     hasBackdrop: true,
+      //     positionStrategy: this.overlay
+      //       .position()
+      //       .flexibleConnectedTo(this.elementRef)
+      //       .withPositions([{ originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top' }]),
+      //     backdropClass: ''
+      //   },
+      //   injector: this.portal.createInjector([
+      //     {
+      //       provide: FLOAT_NODE_OPTION,
+      //       useValue: this.indexService.floatChild(this.child)
+      //     }
+      //   ])
+      // });
       this.indexService.floatNode = this.option;
       this.option.floatShow = true;
       this.indexService.portal.overlayRef?.backdropClick().subscribe(() => {

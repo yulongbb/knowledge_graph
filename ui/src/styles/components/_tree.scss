@@ -1,0 +1,108 @@
+// Global tree component styling
+
+// Enhanced tree styles
+.x-tree {
+  .x-tree-node {
+    position: relative;
+    
+    // Tree node hover effect
+    &:hover:not(.x-activated) {
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    
+    // Selected/active node
+    &.x-activated {
+      background-color: var(--x-primary-a100, #e3f2fd);
+      
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: var(--x-primary, #1976d2);
+      }
+    }
+    
+    // Custom styling for ontology nodes
+    .ontology-node {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      
+      .node-icon {
+        color: var(--x-text-400);
+        margin-right: 0.5rem;
+        font-size: 1rem;
+      }
+      
+      .node-label {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    
+    // Actions area (buttons)
+    .x-tree-node-actions {
+      padding-right: 0.5rem;
+      
+      .x-link {
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.2s ease;
+      }
+    }
+    
+    &:hover .x-tree-node-actions .x-link {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    // Node toggle icon (expand/collapse)
+    .x-tree-node-toggle {
+      transition: transform 0.3s ease;
+      
+      &.x-tree-node-open {
+        transform: rotate(90deg);
+      }
+    }
+  }
+  
+  // Child nodes container
+  .x-tree-node-children {
+    position: relative;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      height: 100%;
+      width: 1px;
+      background-color: rgba(0, 0, 0, 0.1);
+      z-index: 0;
+    }
+  }
+}
+
+// Customize tree nodes based on node type
+.ontology-main {
+  .node-icon {
+    color: var(--x-primary) !important;
+  }
+}
+
+.ontology-child {
+  .node-icon {
+    color: var(--x-success) !important;
+  }
+}
+
+.ontology-leaf {
+  .node-icon {
+    color: var(--x-info) !important;
+  }
+}

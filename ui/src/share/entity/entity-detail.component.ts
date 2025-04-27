@@ -60,7 +60,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
 
@@ -785,7 +785,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           this.ontologyService.get(x._source.type).subscribe((type: any) => {
             this.schema = type;
             if (this.type == 'edit') {
-              this.form.formGroup.patchValue({
+              this.form.formGroup().patchValue({
                 _key: x?._id,
                 label: this.item?.labels?.zh?.value,
                 aliases: this.item?.aliases?.zh
@@ -914,8 +914,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           };
 
           // 如果表单存在，添加表单数据
-          if (this.form?.formGroup.value) {
-            const formValue = this.form.formGroup.value;
+          if (this.form?.formGroup().value) {
+            const formValue = this.form.formGroup().value;
             Object.assign(updateData, {
               labels: {
                 zh: {
@@ -992,15 +992,15 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           this.type === 'add_document') {
           // ...现有的添加逻辑保持不变...
           let item: any = {
-            _key: this.form.formGroup.value._key,
+            _key: this.form.formGroup().value._key,
             labels: {
               zh: {
                 language: 'zh',
-                value: this.form.formGroup.value.label,
+                value: this.form.formGroup().value.label,
               },
             },
             aliases: {
-              zh: this.form.formGroup.value.aliases
+              zh: this.form.formGroup().value.aliases
                 ?.split(',')
                 .map((aliase: any) => {
                   return {
@@ -1012,15 +1012,15 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
             descriptions: {
               zh: {
                 language: 'zh',
-                value: this.form.formGroup.value.description,
+                value: this.form.formGroup().value.description,
               },
             },
-            type: this.form.formGroup.value.type,
-            tags: this.form.formGroup.value.tags.split('#').filter((x: any) => x != ''),
+            type: this.form.formGroup().value.type,
+            tags: this.form.formGroup().value.tags.split('#').filter((x: any) => x != ''),
             // 其他字段
             ...(this.item?.location ? { location: this.item.location } : {}), // 如果 location 存在，生成 location 字段
-            ...(this.form.formGroup.value.source
-              ? { sources: [this.form.formGroup.value.source] }
+            ...(this.form.formGroup().value.source
+              ? { sources: [this.form.formGroup().value.source] }
               : {}), // 如果 source 存在，生成 sources 字段
             ...(this.imgs && this.imgs.length > 0
               ? {
@@ -1052,8 +1052,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                   return {
                     url: url,
                     thumbnail: i.thumbnail,
-                    label: i.label ?? this.form.formGroup.value.label, // 提供默认标签
-                    description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
+                    label: i.label ?? this.form.formGroup().value.label, // 提供默认标签
+                    description: i.description ?? this.form.formGroup().value.description, // 提供默认描述
                   };
                 }),
               }
@@ -1073,8 +1073,8 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                   return {
                     url: url,
                     thumbnail: i.thumbnail,
-                    label: i.label ?? this.form.formGroup.value.label, //供默认标签
-                    description: i.description ?? this.form.formGroup.value.description, // 提供默认描述
+                    label: i.label ?? this.form.formGroup().value.label, //供默认标签
+                    description: i.description ?? this.form.formGroup().value.description, // 提供默认描述
                   };
                 }),
               }

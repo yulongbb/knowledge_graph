@@ -22,3 +22,43 @@
     <!-- <div class="cytoscape-container" #cyContainer></div> -->
   </div>
 </x-inner>
+
+<div class="ontology-manager">
+  <!-- Ontology list -->
+  <div class="ontology-list">
+    <x-tree
+      #treeCom
+      [data]="data"
+      expandedLevel="0"
+      [nodeHeight]="1.875"
+      [actions]="treeActions"
+      (activatedChange)="handleOntologyAction('view', $event)"
+    ></x-tree>
+  </div>
+
+  <!-- Ontology form -->
+  <div class="ontology-form" *ngIf="ontologyFormMode">
+    <h3>{{ ontologyFormMode === 'add' ? '新增本体' : ontologyFormMode === 'edit' ? '编辑本体' : '查看本体' }}</h3>
+    <x-form
+      [formGroup]="ontologyFormData"
+      [controls]="[
+        { control: 'input', id: 'name', label: '名称', required: true },
+        { control: 'textarea', id: 'description', label: '描述' }
+      ]"
+      [disabled]="ontologyFormMode === 'view'"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="6rem"
+      width="30rem"
+      labelAlign="end"
+      span="20"
+      space="2"
+    ></x-form>
+    <div class="form-actions" *ngIf="ontologyFormMode !== 'view'">
+      <x-buttons space="0.5">
+        <x-button (click)="cancelOntologyForm()">取消</x-button>
+        <x-button type="primary" (click)="saveOntology()">保存</x-button>
+      </x-buttons>
+    </div>
+  </div>
+</div>

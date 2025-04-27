@@ -16,7 +16,7 @@ import { IndexService } from 'src/layout/index/index.service';
 })
 export class RolesComponent extends PageBase {
   index = 1;
-  query: XQuery = { filter: [] };
+  query: any
   data = (index: number, size: number, query: any) =>
     this.service.getList(index, size, query).pipe((x: any) => {
       return x;
@@ -83,7 +83,7 @@ export class RolesComponent extends PageBase {
         if (!this.query.filter || this.query.filter.length == 0) {
           this.query.filter = [filter];
         } else {
-          let flt = this.query.filter.find((x) => x.field === 'organizationId');
+          let flt = this.query.filter.find((x:any) => x.field === 'organizationId');
           if (flt) flt.value = filter.value;
           else this.query.filter = [...this.query.filter, filter];
         }

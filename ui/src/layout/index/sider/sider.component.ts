@@ -17,8 +17,32 @@ export class SiderComponent implements OnInit {
 
   // 层级
   level: number = 0;
+  
+  // 是否展开
+  isExpanded = true;
 
   constructor(private indexService: IndexService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.setupInitialState();
+  }
+  
+  /**
+   * 设置初始状态
+   */
+  setupInitialState() {
+    // 检查本地存储的状态
+    const savedState = localStorage.getItem('siderExpanded');
+    if (savedState !== null) {
+      this.isExpanded = savedState === 'true';
+    }
+  }
+  
+  /**
+   * 切换侧边栏状态
+   */
+  toggleSider() {
+    this.isExpanded = !this.isExpanded;
+    localStorage.setItem('siderExpanded', String(this.isExpanded));
+  }
 }

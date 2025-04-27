@@ -131,10 +131,10 @@ export class PropertyDetailComponent implements OnInit {
   ];
   title = '';
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
   disabled = false;
-  query: XQuery = { filter: [] };
+  query: any;
 
   constructor(
     private ontologyService: OntologyService,
@@ -205,7 +205,7 @@ export class PropertyDetailComponent implements OnInit {
                 .getList(1, 10, this.query)
                 .subscribe((t: any) => {
                   x['types'] = t.list;
-                  this.form.formGroup.patchValue(x);
+                  this.form.formGroup().patchValue(x);
                 });
             });
         });
@@ -215,18 +215,18 @@ export class PropertyDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log(this.form.formGroup.value);
+          console.log(this.form.formGroup().value);
           this.propertyService
-            .post(this.form.formGroup.value)
+            .post(this.form.formGroup().value)
             .subscribe((x) => {
               this.message.success('新增成功！');
               this.router.navigate(['/index/property']);
             });
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup.value);
+          this.form.formGroup().value['id'] = Number.parseInt(this.id);
+          console.log(this.form.formGroup().value);
 
-          this.propertyService.put(this.form.formGroup.value).subscribe((x) => {
+          this.propertyService.put(this.form.formGroup().value).subscribe((x) => {
             console.log(this.predicate);
             this.message.success('修改成功！');
             this.router.navigate(['/index/property']);

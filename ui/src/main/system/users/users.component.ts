@@ -19,7 +19,7 @@ import { PageBase } from 'src/share/base/base-page';
 })
 export class UsersComponent extends PageBase {
   index = 1;
-  query: XQuery = { filter: [] };
+  query: any
   data = (index: number, size: number, query: any) =>
     this.service.getList(index, size, query).pipe((x: any) => {
       return x;
@@ -106,7 +106,7 @@ export class UsersComponent extends PageBase {
           this.query.filter = [filter];
         } else {
           let flt = this.query.filter.find(
-            (x) => x.field === 'id' && x.relation === 'organizations'
+            (x:any) => x.field === 'id' && x.relation === 'organizations'
           );
           if (flt) flt.value = filter.value;
           else this.query.filter = [...this.query.filter, filter];

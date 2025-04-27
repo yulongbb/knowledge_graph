@@ -27,7 +27,7 @@ export class ActionDetailComponent implements OnInit {
   @ViewChild('form') form!: XFormComponent;
 
   get formInvalid() {
-    return this.form?.formGroup?.invalid;
+    return this.form?.formGroup()?.invalid;
   }
 
   get disabled() {
@@ -65,7 +65,7 @@ export class ActionDetailComponent implements OnInit {
     switch (type) {
       case 'info':
         this.service.get(this.id as string).subscribe((x) => {
-          this.form.formGroup.patchValue(x);
+          this.form.formGroup().patchValue(x);
         });
         break;
       case 'edit':
@@ -73,12 +73,12 @@ export class ActionDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          this.service.post(this.setForm(this.form.formGroup.value)).subscribe(() => {
+          this.service.post(this.setForm(this.form.formGroup().value)).subscribe(() => {
             this.message.success('新增成功！');
             this.nav.back(true);
           });
         } else if (this.type === 'edit') {
-          this.service.put(this.setForm(this.form.formGroup.value)).subscribe(() => {
+          this.service.put(this.setForm(this.form.formGroup().value)).subscribe(() => {
             this.message.success('修改成功！');
             this.nav.back(true);
           });
