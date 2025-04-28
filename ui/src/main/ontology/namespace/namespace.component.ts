@@ -90,30 +90,30 @@ export class NamespaceComponent extends PageBase implements OnInit {
   propertyDataLoaded = false;
   propertyData: any;
   propertyColumns: XTableColumn[] = [
-    { id: 'name', label: '名称', flex: 0.8, sort: true },
+    { id: 'name', label: '名称', sort: true },
     { id: 'actions', label: '操作', width: 150 },
   ];
-  propertyPageSize = 10;
+  propertyPageSize = 100;
   propertyPageIndex = 1;
 
   // Qualifier management
   qualifierDataLoaded = false;
   qualifierData: any;
   qualifierColumns: XTableColumn[] = [
-    { id: 'label', label: '名称', flex: 0.8, sort: true },
-    { id: 'actions', label: '操作', width: 150 },
+    { id: 'label', label: '名称', sort: true },
+    { id: 'actions', label: '操作', width: 100 },
   ];
-  qualifierPageSize = 10;
+  qualifierPageSize = 100;
   qualifierPageIndex = 1;
 
   // Tag dictionary management
   tagDataLoaded = false;
   tagData: any;
   tagColumns: XTableColumn[] = [
-    { id: 'name', label: '名称', flex: 0.8, sort: true },
-    { id: 'actions', label: '操作', width: 150 },
+    { id: 'name', label: '名称',  sort: true },
+    { id: 'actions', label: '操作', width: 100 },
   ];
-  tagPageSize = 10;
+  tagPageSize = 100;
   tagPageIndex = 1;
 
   // Added for namespace dropdown
@@ -154,7 +154,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   propertyFormMode: 'add' | 'edit' | 'view' | null = null;
   propertyForm = new UntypedFormGroup({});
   propertyControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID' , required: true },
+    { control: 'input', id: 'id', label: 'ID', required: true },
     { control: 'input', id: 'name', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     {
@@ -446,18 +446,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
     const filter =
       this.selectedNamespace.name === 'default'
         ? [
-            {
-              field: 'namespaceId',
-              value: '',
-              operation: 'isNull' as XOperation,
-            },
-          ]
+          {
+            field: 'namespaceId',
+            value: '',
+            operation: 'isNull' as XOperation,
+          },
+        ]
         : [
-            {
-              field: 'namespaceId',
-              value: this.selectedNamespace.id.toString(),
-            },
-          ];
+          {
+            field: 'namespaceId',
+            value: this.selectedNamespace.id.toString(),
+          },
+        ];
 
     this.ontologyService
       .getList(1, Number.MAX_SAFE_INTEGER, {
@@ -670,18 +670,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
+            {
+              field: 'namespaceId',
+              value: '',
+              operation: 'isNull' as XOperation,
+            },
+          ]
           : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
+            {
+              field: 'namespaceId',
+              value: this.selectedNamespace.id.toString(),
+            },
+          ];
 
       const finalQuery = {
         ...query,
@@ -699,18 +699,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
+            {
+              field: 'namespaceId',
+              value: '',
+              operation: 'isNull' as XOperation,
+            },
+          ]
           : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
+            {
+              field: 'namespaceId',
+              value: this.selectedNamespace.id.toString(),
+            },
+          ];
 
       const finalQuery = {
         ...query,
@@ -740,7 +740,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'edit':
         this.qualifierFormMode = 'edit';
         this.qualifierForm.reset();
-        
+
         this.qualifyService.get(item.id).subscribe((data: any) => {
           this.qualifierForm.patchValue({
             ...data,
@@ -752,7 +752,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'info':
         this.qualifierFormMode = 'view';
         this.qualifierForm.reset();
-        
+
         this.qualifyService.get(item.id).subscribe((data) => {
           this.qualifierForm.patchValue(data);
         });
@@ -1017,8 +1017,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           // If this was added as a child of a selected ontology
           if (ontologyData.pid && this.selectedOntology) {
             this.message.info(
-              `已创建为 "${
-                this.selectedOntology.name || this.selectedOntology.label
+              `已创建为 "${this.selectedOntology.name || this.selectedOntology.label
               }" 的子本体`
             );
           }
@@ -1206,18 +1205,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
+            {
+              field: 'namespaceId',
+              value: '',
+              operation: 'isNull' as XOperation,
+            },
+          ]
           : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
+            {
+              field: 'namespaceId',
+              value: this.selectedNamespace.id.toString(),
+            },
+          ];
 
       const finalQuery = {
         ...query,
@@ -1299,11 +1298,11 @@ export class NamespaceComponent extends PageBase implements OnInit {
     this.loadQualifiersForProperty(property);
     this.loadTagsForProperty(property);
     // if (this.isItemProperty) {
-      // this.loadQualifiersForProperty(property);
-      // this.clearTagData();
+    // this.loadQualifiersForProperty(property);
+    // this.clearTagData();
     // } else {
-      // this.loadTagsForProperty(property);
-      // this.clearQualifierData();
+    // this.loadTagsForProperty(property);
+    // this.clearQualifierData();
     // }
     // this.loadTagsForProperty(property);
   }
@@ -1327,7 +1326,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'edit':
         this.tagFormMode = 'edit';
         this.tagForm.reset();
-        
+
         this.tagService.get(item.id).subscribe((data: any) => {
           this.tagForm.patchValue({
             ...data,
@@ -1339,7 +1338,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'info':
         this.tagFormMode = 'view';
         this.tagForm.reset();
-        
+
         this.tagService.get(item.id).subscribe((data) => {
           this.tagForm.patchValue(data);
         });

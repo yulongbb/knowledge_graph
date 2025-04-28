@@ -5,20 +5,21 @@
   [controls]="controls"
   direction="row"
   labelSuffix=":"
-  labelWidth="6rem"
+  labelWidth="5rem"
   width="30rem"
   labelAlign="end"
   span="20"
-  space="2"
+  space="1"
 ></x-form>
 
 <div class="app-footer">
-  <x-buttons space="0.5">
-    <x-button (click)="action('cancel')">取消</x-button>
+  <x-buttons space="0.3">
+    <x-button (click)="action('cancel')" size="small">取消</x-button>
     <x-button
       type="primary"
       (click)="!formInvalid && action('save')"
       [disabled]="formInvalid || disabled"
+      size="small"
       >保存</x-button
     >
   </x-buttons>

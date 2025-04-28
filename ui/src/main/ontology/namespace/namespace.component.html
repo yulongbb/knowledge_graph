@@ -1,22 +1,15 @@
 <div class="namespace-manager">
   <!-- Namespace selection header -->
   <div class="namespace-header">
-    <h3>域管理</h3>
     <div class="namespace-selection-area">
       <x-select [(ngModel)]="selectedNamespaceId" placeholder="请选择域" [data]="namespaceOptions"
         (ngModelChange)="onNamespaceSelected($event)" [style.width.%]="60"></x-select>
-      <x-button type="primary" icon="fto-plus" (click)="action('add')" title="新增域">新增域</x-button>
-      <x-button *ngIf="selectedNamespace" icon="fto-edit" (click)="action('edit', selectedNamespace)"
-        title="编辑当前域">编辑</x-button>
+      <x-button type="primary" icon="fto-plus" (click)="action('add')" title="新增域" size="mini">新增</x-button>
+      <x-button *ngIf="selectedNamespace" icon="fto-edit" (click)="action('edit', selectedNamespace)" title="编辑当前域"
+        size="mini">编辑</x-button>
       <x-button *ngIf="selectedNamespace && selectedNamespace.name !== 'default'" icon="fto-trash-2"
-        (click)="action('delete', selectedNamespace)" title="删除当前域">删除</x-button>
+        (click)="action('delete', selectedNamespace)" title="删除当前域" size="mini">删除</x-button>
     </div>
-<!-- 
-    <div class="selected-namespace-info" *ngIf="selectedNamespace">
-      <div><strong>前缀:</strong> {{ selectedNamespace.prefix }}</div>
-      <div><strong>URI:</strong> {{ selectedNamespace.uri || '无' }}</div>
-      <div><strong>描述:</strong> {{ selectedNamespace.description || '无' }}</div>
-    </div> -->
   </div>
 
   <!-- Three-panel layout -->
@@ -27,13 +20,12 @@
       <div class="panel ontology-panel">
         <div class="panel-header">
           <h3>本体</h3>
-          <!-- Moved the add button to the right -->
           <div class="panel-actions">
-            <x-button type="primary" icon="fto-plus" (click)="handleOntologyAction('add')" size="small">新增</x-button>
+            <x-button type="primary" icon="fto-plus" (click)="handleOntologyAction('add')" size="mini">新增</x-button>
           </div>
         </div>
         <div class="panel-content" *ngIf="ontologyDataLoaded">
-          <x-tree [data]="ontologyData" expandedLevel="0" [nodeHeight]="2.25" [actions]="ontologyActions"
+          <x-tree [data]="ontologyData" expandedLevel="0" [nodeHeight]="2" [actions]="ontologyActions"
             (activatedChange)="selectOntology($event)" [nodeTpl]="ontologyNodeTpl"></x-tree>
         </div>
         <div class="loading-placeholder" *ngIf="!ontologyDataLoaded">
@@ -45,25 +37,24 @@
       <div class="panel property-panel" *ngIf="!ontologyFormMode && !propertyFormMode">
         <div class="panel-header">
           <h3>属性{{ selectedOntology ? ' - ' + (selectedOntology.label || selectedOntology.name) : '' }}</h3>
-          <!-- Moved the add button to the right -->
           <div class="panel-actions" *ngIf="selectedOntology">
-            <x-button type="primary" icon="fto-plus" (click)="handlePropertyAction('add')" size="small">新增</x-button>
+            <x-button type="primary" icon="fto-plus" (click)="handlePropertyAction('add')" size="mini">新增</x-button>
           </div>
         </div>
         <div class="panel-content" *ngIf="propertyDataLoaded && selectedOntology">
-          <!-- Replace x-list with x-table for properties -->
           <x-table
             [columns]="[
               { id: 'name', label: '名称', flex: 1 },
-              { id: 'actions', label: '操作', width: 120 }
+              { id: 'actions', label: '操作', width: 100 }
             ]"
-            [rowHeight]="40"
-            [allowSelectRow] = "true"
+            [rowHeight]="32"
+            [allowSelectRow]="true"
             [data]="propertyData"
-            [size]="propertyPageSize"
-            [index]="propertyPageIndex"
             [bodyColumnTpl]="{ actions: propertyActionsTplSimple }"
             (activatedRowChange)="selectProperty($event)"
+            [hiddenWrapBorder]="true"
+            [showHeader]="false"
+            [showPagination]="false"
             loading
           ></x-table>
         </div>
@@ -88,12 +79,12 @@
               { control: 'input', id: 'name', label: '名称', required: true },
               { control: 'textarea', id: 'description', label: '描述' },
               { control: 'input', id: 'label', label: '标签' },
-            ]" [disabled]="ontologyFormMode === 'view'" direction="row" labelSuffix=":" labelWidth="6rem" width="100%"
-            labelAlign="end" span="20" space="2"></x-form>
+            ]" [disabled]="ontologyFormMode === 'view'" direction="row" labelSuffix=":" labelWidth="5rem" width="100%"
+            labelAlign="end" span="20" space="1"></x-form>
           <div class="form-actions">
-            <x-buttons space="0.5">
-              <x-button (click)="cancelOntologyForm()">取消</x-button>
-              <x-button type="primary" (click)="saveOntology()">保存</x-button>
+            <x-buttons space="0.3">
+              <x-button (click)="cancelOntologyForm()" size="small">取消</x-button>
+              <x-button type="primary" (click)="saveOntology()" size="small">保存</x-button>
             </x-buttons>
           </div>
         </div>
@@ -111,19 +102,19 @@
             [disabled]="propertyFormMode === 'view'"
             direction="row"
             labelSuffix=":"
-            labelWidth="6rem"
-            width="100%"
+            labelWidth="5rem"
             labelAlign="end"
             span="20"
-            space="2"
+            space="1"
           ></x-form>
           <div class="form-actions">
-            <x-buttons space="0.5">
-              <x-button (click)="cancelPropertyForm()">取消</x-button>
+            <x-buttons space="0.3">
+              <x-button (click)="cancelPropertyForm()" size="small">取消</x-button>
               <x-button
                 type="primary"
                 (click)="saveProperty()"
                 [disabled]="propertyForm.invalid || propertyFormMode === 'view'"
+                size="small"
               >保存</x-button>
             </x-buttons>
           </div>
@@ -131,10 +122,8 @@
       </div>
 
       <!-- Right panel: Qualifiers and Tags -->
-      <div class="panel qualifier-tag-panel" [class.hidden]="ontologyFormMode ">
-        <div class="panel-header">
-          <h3>限定和标签</h3>
-        </div>
+      <div class="panel qualifier-tag-panel" [class.hidden]="ontologyFormMode">
+      
         <div class="panel-content">
           <!-- Upper section: Qualifiers -->
           <div class="qualifier-section">
@@ -145,29 +134,31 @@
                   type="primary"
                   icon="fto-plus"
                   (click)="handleQualifierAction('add', selectedProperty )"
-                  size="small"
+                  size="mini"
                 >
-                  新增限定
+                  新增
                 </x-button>
               </div>
             </div>
             
             <!-- Show qualifier table when no form is active -->
-            <div *ngIf="!qualifierFormMode">
+            <div *ngIf="!qualifierFormMode" class="section-content">
               <x-table
                 *ngIf="qualifierDataLoaded && selectedProperty"
                 [columns]="qualifierColumns"
-                [rowHeight]="35"
+                [rowHeight]="32"
                 [data]="qualifierData"
-                [size]="qualifierPageSize"
-                [index]="qualifierPageIndex"
                 [bodyColumnTpl]="{ actions: qualifierActionsTpl }"
+                [hiddenWrapBorder]="true"
+                [showHeader]="false"
+                [showPagination]="false"
                 loading
               ></x-table>
               <div class="empty-message" *ngIf="selectedProperty && !hasQualifiers">
                 <p>该属性没有关联的限定</p>
               </div>
-            </div>          
+            </div>
+            
             <!-- Show qualifier form when adding/editing -->
             <div *ngIf="qualifierFormMode">
               <div class="form-header">
@@ -179,19 +170,19 @@
                 [disabled]="qualifierFormMode === 'view'"
                 direction="row"
                 labelSuffix=":"
-                labelWidth="6rem"
-                width="100%"
+                labelWidth="5rem"
                 labelAlign="end"
                 span="20"
-                space="2"
+                space="1"
               ></x-form>
               <div class="form-actions">
-                <x-buttons space="0.5">
-                  <x-button (click)="cancelQualifierForm()">取消</x-button>
+                <x-buttons space="0.3">
+                  <x-button (click)="cancelQualifierForm()" size="small">取消</x-button>
                   <x-button
                     type="primary"
                     (click)="saveQualifier()"
                     [disabled]="qualifierForm.invalid || qualifierFormMode === 'view'"
+                    size="small"
                   >保存</x-button>
                 </x-buttons>
               </div>
@@ -207,23 +198,24 @@
                   type="primary"
                   icon="fto-plus"
                   (click)="handleTagAction('add', selectedProperty)"
-                  size="small"
+                  size="mini"
                 >
-                  新增标签
+                  新增
                 </x-button>
               </div>
             </div>
             
             <!-- Show tag table when no form is active -->
-            <div *ngIf="!tagFormMode">
+            <div *ngIf="!tagFormMode" class="section-content">
               <x-table
                 *ngIf="tagDataLoaded && selectedProperty"
                 [columns]="tagColumns"
-                [rowHeight]="35"
+                [rowHeight]="32"
                 [data]="tagData"
-                [size]="tagPageSize"
-                [index]="tagPageIndex"
                 [bodyColumnTpl]="{ actions: tagActionsTpl }"
+                [hiddenWrapBorder]="true"
+                [showHeader]="false"
+                [showPagination]="false"
                 loading
               ></x-table>
               <div class="empty-message" *ngIf="selectedProperty && !hasTags">
@@ -242,19 +234,20 @@
                 [disabled]="tagFormMode === 'view'"
                 direction="row"
                 labelSuffix=":"
-                labelWidth="6rem"
+                labelWidth="5rem"
                 width="100%"
                 labelAlign="end"
                 span="20"
-                space="2"
+                space="1"
               ></x-form>
               <div class="form-actions">
-                <x-buttons space="0.5">
-                  <x-button (click)="cancelTagForm()">取消</x-button>
+                <x-buttons space="0.3">
+                  <x-button (click)="cancelTagForm()" size="small">取消</x-button>
                   <x-button
                     type="primary"
                     (click)="saveTag()"
                     [disabled]="tagForm.invalid || tagFormMode === 'view'"
+                    size="small"
                   >保存</x-button>
                 </x-buttons>
               </div>
@@ -311,7 +304,7 @@
   <div class="ontology-node">
     <x-icon [type]="node.icon || 'fto-box'" class="node-icon"></x-icon>
     <span class="node-label">{{ node.label || node.name }}</span>
-    <x-tag *ngIf="node.tags && node.tags.length > 0" size="small" [style.margin-left.rem]="0.5">
+    <x-tag *ngIf="node.tags && node.tags.length > 0" size="mini" [style.margin-left.rem]="0.3">
       {{ node.tags[0] }}
     </x-tag>
   </div>
