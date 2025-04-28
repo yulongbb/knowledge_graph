@@ -70,19 +70,6 @@ export class Schema {
   })
   values: Property[];
 
-  @ManyToMany(() => Tag, (tag) => tag.schemas)
-  @JoinTable({
-    name: 'ontology_schema_tag',
-    joinColumn: { name: 'schemaId' },
-    inverseJoinColumn: { name: 'tagId' },
-  })
-  tags: Tag[];
 
-  @ManyToMany(() => Application, (application) => application.schemas)
-  @JoinTable({
-    name: 'ontology_schema_application',
-    joinColumn: { name: 'schemaId' },
-    inverseJoinColumn: { name: 'applicationId' },
-  })
-  applications: Application[];
+
 }

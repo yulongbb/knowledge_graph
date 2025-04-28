@@ -1297,7 +1297,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
     // this.isItemProperty = property.type === 'wikibase-item';
 
     this.loadQualifiersForProperty(property);
-
+    this.loadTagsForProperty(property);
     // if (this.isItemProperty) {
       // this.loadQualifiersForProperty(property);
       // this.clearTagData();

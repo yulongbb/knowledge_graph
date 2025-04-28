@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Schema } from './schema.entity';
 import { Property } from './property.entity';
 import { Qualify } from './qualify.entity';
 import { Tag } from './tag.entity';
-import { Dictionary } from './dictionary.entity';
+import { Application } from './application.entity';
 
 @Entity('ontology_namespace')
 export class Namespace {
@@ -38,6 +38,12 @@ export class Namespace {
   @OneToMany(() => Tag, (tag) => tag.namespace)
   tags: Tag[];
 
-  @OneToMany(() => Dictionary, (dictionary) => dictionary.namespace)
-  dictionaries: Dictionary[];
+
+  @ManyToMany(() => Application, (application) => application.namespaces)
+  @JoinTable({
+    name: 'ontology_namescape_application',
+    joinColumn: { name: 'namescapeId' },
+    inverseJoinColumn: { name: 'applicationId' },
+  })
+  applications: Application[];
 }

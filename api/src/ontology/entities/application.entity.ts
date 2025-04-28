@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
+import { Namespace } from './namespace.entity';
 
 @Entity('ontology_application')
 export class Application {
@@ -24,17 +25,17 @@ export class Application {
   @Column('simple-array', { nullable: true }) // 使用 simple-array 存储图片数组
   images: string[]; // 图片字段改为数组
 
-  @ManyToMany(() => Schema, (schema) => schema.applications)
+  @ManyToMany(() => Namespace, (namespace) => namespace.applications)
   @JoinTable({
-    name: 'application_schema',
+    name: 'ontology_application_namespace',
     joinColumn: {
       name: 'application_id',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'schema_id',
+      name: 'namespace_id',
       referencedColumnName: 'id',
     },
   })
-  schemas: Schema[];
+  namespaces: Namespace[];
 }

@@ -15,6 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map, tap } from 'rxjs';
 import { Application, ApplicationService } from './application.sevice';
 import { OntologyService } from '../ontology/ontology.service';
+import { NamespaceService } from '../namespace/namespace.service';
 
 @Component({
   selector: 'app-application',
@@ -41,7 +42,7 @@ export class ApplicationComponent extends PageBase {
       map((x:any) => {
         x.list.forEach((item: any) => {
 
-          this.ontologyService
+          this.namespaceService
           .getList(1, 50, {
             filter: [
               {
@@ -87,7 +88,7 @@ export class ApplicationComponent extends PageBase {
     private service: ApplicationService,
     public override indexService: IndexService,
     private message: XMessageService,
-    private ontologyService: OntologyService,
+    private namespaceService: NamespaceService,
 
     private router: Router,
     private activatedRoute: ActivatedRoute
