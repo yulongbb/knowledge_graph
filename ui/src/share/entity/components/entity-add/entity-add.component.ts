@@ -4,7 +4,9 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
+import { XOperation } from '@ng-nest/ui'; // Add this import
 
 interface TreeNode {
   id: string;
@@ -26,7 +28,8 @@ export class EntityAddComponent implements OnInit {
     label: '',
     aliases: '',
     tags: '',
-    description: ''
+    description: '',
+    namespace: 'default' // Default namespace
   };
 
   template: string = '';
@@ -47,6 +50,9 @@ export class EntityAddComponent implements OnInit {
     ]
   };
 
+  // New properties for namespaces
+  namespaceOptions: { label: string; value: string }[] = [];
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -58,9 +64,13 @@ export class EntityAddComponent implements OnInit {
   constructor(
     private entityService: EntityService,
     private ontologyService: OntologyService,
+    private namespaceService: NamespaceService, // Added namespace service
     private message: XMessageService,
     private location: Location
   ) {
+    // Load namespaces for dropdown
+    this.loadNamespaces();
+    
     this.types$ = this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
       sort: [
         { field: 'pid', value: 'asc' },
@@ -76,7 +86,15 @@ export class EntityAddComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Load initial data with default namespace
+    // Wait for namespaces to load before loading types
+    setTimeout(() => {
+      if (this.formData.namespace) {
+        this.loadTypesForNamespace(this.formData.namespace);
+      }
+    }, 500);
+  }
 
   isFormValid(): boolean {
     return !!this.formData.type && !!this.formData.label;
@@ -99,6 +117,7 @@ export class EntityAddComponent implements OnInit {
         zh: { language: 'zh', value: this.formData.description }
       },
       type: this.formData.type,
+      namespace: this.formData.namespace, // Include namespace in saved entity
       tags: this.formData.tags?.split('#').filter(x => x.trim() !== ''),
       template: this.template
     };
@@ -175,6 +194,127 @@ export class EntityAddComponent implements OnInit {
         return matches || node.children.length > 0;
       }
       return matches;
+    });
+  }
+
+  // Load namespaces for the dropdown
+  loadNamespaces() {
+    this.namespaceService.getList(1, 1000).subscribe({
+      next: (response: any) => {
+        const namespaces = response.list || [];
+        this.namespaceOptions = namespaces.map((ns: any) => ({
+          label: ns.name,
+          value: ns.name
+        }));
+
+        // Ensure default namespace is selected
+        if (!this.namespaceOptions.some(opt => opt.value === 'default')) {
+          this.namespaceOptions.unshift({ label: 'default', value: 'default' });
+        }
+
+        // Set default namespace
+        this.formData.namespace = 'default';
+      },
+      error: (error) => {
+        console.error('Failed to load namespaces:', error);
+        this.message.error('加载命名空间失败');
+        // Ensure at least default namespace is available
+        this.namespaceOptions = [{ label: 'default', value: 'default' }];
+      }
+    });
+  }
+
+  // When namespace changes, refresh the types tree
+  onNamespaceChange(namespace: string) {
+    console.log('Selected namespace:', namespace);
+    
+    // Clear selected type when namespace changes
+    this.formData.type = '';
+    this.selectedTypeName = '';
+    
+    // Reload types for the selected namespace
+    this.loadTypesForNamespace(namespace);
+  }
+
+  // Load types specific to the selected namespace
+  loadTypesForNamespace(namespace: string) {
+    // Find the namespace ID from the options
+    const namespaceObj = this.namespaceOptions.find(n => n.value === namespace);
+    if (!namespaceObj) return;
+
+    // Clear the search text when changing namespaces
+    this.typeSearchText = '';
+    
+    // Get the namespace ID for filtering ontologies
+    this.namespaceService.findByName(namespace).subscribe({
+      next: (namespaceData: any) => {
+        console.log('Found namespace:', namespaceData);
+        
+        let filter: any[];
+        
+        // Create filter based on whether we have an ID or not
+        if (namespaceData.id) {
+          filter = [{ 
+            field: 'namespaceId', 
+            value: namespaceData.id,
+            operation: '=' as XOperation 
+          }];
+        } else {
+          filter = [{ 
+            field: 'namespaceId', 
+            value: '',
+            operation: 'isNull' as XOperation 
+          }];
+        }
+        
+        // Load ontologies filtered by namespace
+        this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
+          filter: filter,
+          sort: [
+            { field: 'pid', value: 'asc' },
+            { field: 'sort', value: 'asc' }
+          ]
+        }).pipe(
+          map(x => {
+            console.log(`Loaded ${x.list?.length || 0} types for namespace ${namespace} with ID ${namespaceData.id}`);
+            return x.list || [];
+          }),
+          map(list => this.buildTree(list))
+        ).subscribe(tree => {
+          this.typeTree = tree;
+          
+          // Auto-open dropdown to show filtered types when namespace changes
+          if (tree && tree.length > 0) {
+            setTimeout(() => {
+              this.showTypeSelect = true;
+            }, 100);
+          } else {
+            this.message.info(`${namespace} 命名空间下没有可用的类型`);
+          }
+        });
+      },
+      error: (error) => {
+        console.error(`Failed to find namespace by name: ${namespace}`, error);
+        this.message.error('获取命名空间信息失败');
+        
+        // Fallback to loading all types
+        this.loadAllTypes();
+      }
+    });
+  }
+  
+  // Fallback method to load all types if namespace filtering fails
+  loadAllTypes() {
+    this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
+      sort: [
+        { field: 'pid', value: 'asc' },
+        { field: 'sort', value: 'asc' }
+      ]
+    }).pipe(
+      map(x => x.list || []),
+      map(list => this.buildTree(list))
+    ).subscribe(tree => {
+      this.typeTree = tree;
     });
   }
 }

@@ -42,21 +42,12 @@
           </div>
         </div>
         <div class="panel-content" *ngIf="propertyDataLoaded && selectedOntology">
-          <x-table
-            [columns]="[
+          <x-table [columns]="[
               { id: 'name', label: '名称', flex: 1 },
               { id: 'actions', label: '操作', width: 100 }
-            ]"
-            [rowHeight]="32"
-            [allowSelectRow]="true"
-            [data]="propertyData"
-            [bodyColumnTpl]="{ actions: propertyActionsTplSimple }"
-            (activatedRowChange)="selectProperty($event)"
-            [hiddenWrapBorder]="true"
-            [showHeader]="false"
-            [showPagination]="false"
-            loading
-          ></x-table>
+            ]" [rowHeight]="32" [allowSelectRow]="true" [data]="propertyData"
+            [bodyColumnTpl]="{ actions: propertyActionsTplSimple }" (activatedRowChange)="selectProperty($event)"
+            [hiddenWrapBorder]="true" [showHeader]="false" [showPagination]="false" loading></x-table>
         </div>
         <div class="empty-message" *ngIf="selectedOntology && propertyDataLoaded && !hasProperties">
           <p>该本体没有关联的属性</p>
@@ -96,26 +87,13 @@
           <h3>{{ propertyFormMode === 'add' ? '新增属性' : propertyFormMode === 'edit' ? '编辑属性' : '查看属性' }}</h3>
         </div>
         <div class="panel-content">
-          <x-form
-            [formGroup]="propertyForm"
-            [controls]="propertyControls"
-            [disabled]="propertyFormMode === 'view'"
-            direction="row"
-            labelSuffix=":"
-            labelWidth="5rem"
-            labelAlign="end"
-            span="20"
-            space="1"
-          ></x-form>
+          <x-form [formGroup]="propertyForm" [controls]="propertyControls" [disabled]="propertyFormMode === 'view'"
+            direction="row" labelSuffix=":" labelWidth="5rem" labelAlign="end" span="20" space="1"></x-form>
           <div class="form-actions">
             <x-buttons space="0.3">
               <x-button (click)="cancelPropertyForm()" size="small">取消</x-button>
-              <x-button
-                type="primary"
-                (click)="saveProperty()"
-                [disabled]="propertyForm.invalid || propertyFormMode === 'view'"
-                size="small"
-              >保存</x-button>
+              <x-button type="primary" (click)="saveProperty()"
+                [disabled]="propertyForm.invalid || propertyFormMode === 'view'" size="small">保存</x-button>
             </x-buttons>
           </div>
         </div>
@@ -123,67 +101,43 @@
 
       <!-- Right panel: Qualifiers and Tags -->
       <div class="panel qualifier-tag-panel" [class.hidden]="ontologyFormMode">
-      
+
         <div class="panel-content">
           <!-- Upper section: Qualifiers -->
           <div class="qualifier-section">
             <div class="section-header">
               <h4>限定</h4>
               <div class="section-actions" *ngIf="selectedProperty">
-                <x-button
-                  type="primary"
-                  icon="fto-plus"
-                  (click)="handleQualifierAction('add', selectedProperty )"
-                  size="mini"
-                >
+                <x-button type="primary" icon="fto-plus" (click)="handleQualifierAction('add', selectedProperty )"
+                  size="mini">
                   新增
                 </x-button>
               </div>
             </div>
-            
+
             <!-- Show qualifier table when no form is active -->
             <div *ngIf="!qualifierFormMode" class="section-content">
-              <x-table
-                *ngIf="qualifierDataLoaded && selectedProperty"
-                [columns]="qualifierColumns"
-                [rowHeight]="32"
-                [data]="qualifierData"
-                [bodyColumnTpl]="{ actions: qualifierActionsTpl }"
-                [hiddenWrapBorder]="true"
-                [showHeader]="false"
-                [showPagination]="false"
-                loading
-              ></x-table>
+              <x-table *ngIf="qualifierDataLoaded && selectedProperty" [columns]="qualifierColumns" [rowHeight]="32"
+                [data]="qualifierData" [bodyColumnTpl]="{ actions: qualifierActionsTpl }" [hiddenWrapBorder]="true"
+                [showHeader]="false" [showPagination]="false" loading></x-table>
               <div class="empty-message" *ngIf="selectedProperty && !hasQualifiers">
                 <p>该属性没有关联的限定</p>
               </div>
             </div>
-            
+
             <!-- Show qualifier form when adding/editing -->
             <div *ngIf="qualifierFormMode">
               <div class="form-header">
                 <h4>{{ qualifierFormMode === 'add' ? '新增限定' : qualifierFormMode === 'edit' ? '编辑限定' : '查看限定' }}</h4>
               </div>
-              <x-form
-                [formGroup]="qualifierForm"
-                [controls]="qualifierControls"
-                [disabled]="qualifierFormMode === 'view'"
-                direction="row"
-                labelSuffix=":"
-                labelWidth="5rem"
-                labelAlign="end"
-                span="20"
-                space="1"
-              ></x-form>
+              <x-form [formGroup]="qualifierForm" [controls]="qualifierControls"
+                [disabled]="qualifierFormMode === 'view'" direction="row" labelSuffix=":" labelWidth="5rem"
+                labelAlign="end" span="20" space="1"></x-form>
               <div class="form-actions">
                 <x-buttons space="0.3">
                   <x-button (click)="cancelQualifierForm()" size="small">取消</x-button>
-                  <x-button
-                    type="primary"
-                    (click)="saveQualifier()"
-                    [disabled]="qualifierForm.invalid || qualifierFormMode === 'view'"
-                    size="small"
-                  >保存</x-button>
+                  <x-button type="primary" (click)="saveQualifier()"
+                    [disabled]="qualifierForm.invalid || qualifierFormMode === 'view'" size="small">保存</x-button>
                 </x-buttons>
               </div>
             </div>
@@ -194,61 +148,34 @@
             <div class="section-header">
               <h4>标签</h4>
               <div class="section-actions" *ngIf="selectedProperty">
-                <x-button
-                  type="primary"
-                  icon="fto-plus"
-                  (click)="handleTagAction('add', selectedProperty)"
-                  size="mini"
-                >
+                <x-button type="primary" icon="fto-plus" (click)="handleTagAction('add', selectedProperty)" size="mini">
                   新增
                 </x-button>
               </div>
             </div>
-            
+
             <!-- Show tag table when no form is active -->
             <div *ngIf="!tagFormMode" class="section-content">
-              <x-table
-                *ngIf="tagDataLoaded && selectedProperty"
-                [columns]="tagColumns"
-                [rowHeight]="32"
-                [data]="tagData"
-                [bodyColumnTpl]="{ actions: tagActionsTpl }"
-                [hiddenWrapBorder]="true"
-                [showHeader]="false"
-                [showPagination]="false"
-                loading
-              ></x-table>
+              <x-table *ngIf="tagDataLoaded && selectedProperty" [columns]="tagColumns" [rowHeight]="32"
+                [data]="tagData" [bodyColumnTpl]="{ actions: tagActionsTpl }" [hiddenWrapBorder]="true"
+                [showHeader]="false" [showPagination]="false" loading></x-table>
               <div class="empty-message" *ngIf="selectedProperty && !hasTags">
                 <p>该属性没有关联的标签</p>
               </div>
             </div>
-            
+
             <!-- Show tag form when adding/editing -->
             <div *ngIf="tagFormMode">
               <div class="form-header">
                 <h4>{{ tagFormMode === 'add' ? '新增标签' : tagFormMode === 'edit' ? '编辑标签' : '查看标签' }}</h4>
               </div>
-              <x-form
-                [formGroup]="tagForm"
-                [controls]="tagControls"
-                [disabled]="tagFormMode === 'view'"
-                direction="row"
-                labelSuffix=":"
-                labelWidth="5rem"
-                width="100%"
-                labelAlign="end"
-                span="20"
-                space="1"
-              ></x-form>
+              <x-form [formGroup]="tagForm" [controls]="tagControls" [disabled]="tagFormMode === 'view'" direction="row"
+                labelSuffix=":" labelWidth="5rem" width="100%" labelAlign="end" span="20" space="1"></x-form>
               <div class="form-actions">
                 <x-buttons space="0.3">
                   <x-button (click)="cancelTagForm()" size="small">取消</x-button>
-                  <x-button
-                    type="primary"
-                    (click)="saveTag()"
-                    [disabled]="tagForm.invalid || tagFormMode === 'view'"
-                    size="small"
-                  >保存</x-button>
+                  <x-button type="primary" (click)="saveTag()" [disabled]="tagForm.invalid || tagFormMode === 'view'"
+                    size="small">保存</x-button>
                 </x-buttons>
               </div>
             </div>
@@ -277,7 +204,8 @@
   <div class="au-table-actions">
     <x-link icon="fto-eye" (click)="handlePropertyAction('info', row); $event.stopPropagation()" title="查看"></x-link>
     <x-link icon="fto-edit" (click)="handlePropertyAction('edit', row); $event.stopPropagation()" title="修改"></x-link>
-    <x-link icon="fto-trash-2" (click)="handlePropertyAction('delete', row); $event.stopPropagation()" title="删除"></x-link>
+    <x-link icon="fto-trash-2" (click)="handlePropertyAction('delete', row); $event.stopPropagation()"
+      title="删除"></x-link>
   </div>
 </ng-template>
 

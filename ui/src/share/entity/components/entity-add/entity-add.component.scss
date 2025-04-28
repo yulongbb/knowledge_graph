@@ -305,6 +305,38 @@
     position: relative;
     width: 100%;
 
+    // Add styling for the namespace selector
+    .namespace-selector {
+      margin-bottom: 0.5rem;
+      
+      ::ng-deep {
+        x-select {
+          width: 100%;
+          
+          .x-select-portal {
+            min-width: 240px;
+          }
+          
+          .x-select {
+            height: 36px;
+            
+            .x-select-input {
+              border: 1px solid #e2e8f0;
+              border-radius: 6px;
+              font-size: 0.875rem;
+              padding: 0.5rem 0.75rem;
+              
+              &:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+
     input {
       width: 100%;
       padding: 0.75rem 1rem;
@@ -409,7 +441,6 @@
           align-items: center;
           cursor: pointer;
           transition: all 0.15s ease;
-          user-select: none;
 
           &:hover {
             background: #f1f5f9;

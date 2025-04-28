@@ -2,12 +2,24 @@
   <div class="form-section">
     <div class="required-form-row">
       <div class="type-select">
-        <div class="custom-tree-select" (click)="toggleTypeSelect($event)">
-          <input type="text" [value]="selectedTypeName" readonly placeholder="请选择类型" required>
+        <div class="custom-tree-select">
+          <!-- Add namespace dropdown at the top of the tree select -->
+          <div class="namespace-selector">
+            <x-select 
+              [(ngModel)]="formData.namespace" 
+              [data]="namespaceOptions"
+              placeholder="请选择命名空间"
+              (ngModelChange)="onNamespaceChange($event)">
+            </x-select>
+          </div>
+          
+          <input type="text" [value]="selectedTypeName" readonly placeholder="请选择类型 (来自{{formData.namespace}})" 
+                 (click)="toggleTypeSelect($event)" required>
+          
           <div class="tree-dropdown" *ngIf="showTypeSelect">
             <div class="tree-container">
               <div class="tree-search">
-                <input type="text" [(ngModel)]="typeSearchText" placeholder="搜索类型...">
+                <input type="text" [(ngModel)]="typeSearchText" placeholder="搜索{{formData.namespace}}命名空间下的类型...">
               </div>
               <div class="tree-list">
                 <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: typeTree }">
