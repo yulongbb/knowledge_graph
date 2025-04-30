@@ -76,6 +76,9 @@ export class ExtractionComponent extends PageBase {
     entities: []
   };
 
+  private isCtrlPressed = false;
+  private lastMouseX: number | null = null;
+
   constructor(
     public override indexService: IndexService,
     private ontologyService: OntologyService,
@@ -106,11 +109,77 @@ export class ExtractionComponent extends PageBase {
     this.setupGrid();
     // 如果没有批处理任务，则使用默认空表格并加载批处理任务列表
     if (!this.batchTaskId) {
-      // 创建100行空白数据
       this.grid.data = this.generateDefaultData();
-      // 加载批处理任务列表
       this.loadBatchTasks();
     }
+
+    // Add event listeners for Ctrl + mouse drag
+    window.addEventListener('keydown', this.handleKeyDown.bind(this));
+    window.addEventListener('keyup', this.handleKeyUp.bind(this));
+    this.grid.addEventListener('mousedown', this.handleMouseDownForScroll.bind(this));
+    this.grid.addEventListener('mousemove', this.handleMouseMoveForScroll.bind(this));
+    this.grid.addEventListener('mouseup', this.handleMouseUpForScroll.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    // Remove event listeners
+    window.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    window.removeEventListener('keyup', this.handleKeyUp.bind(this));
+    this.grid.removeEventListener('mousedown', this.handleMouseDownForScroll.bind(this));
+    this.grid.removeEventListener('mousemove', this.handleMouseMoveForScroll.bind(this));
+    this.grid.removeEventListener('mouseup', this.handleMouseUpForScroll.bind(this));
+
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    this.stopPolling();
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Control') {
+      this.isCtrlPressed = true;
+    }
+    // Ctrl+C: Copy selection
+    if (event.ctrlKey && event.key === 'c') {
+      this.copySelection();
+      event.preventDefault();
+    }
+    // Ctrl+V: Paste content
+    else if (event.ctrlKey && event.key === 'v') {
+      this.pasteSelection();
+      event.preventDefault();
+    }
+    // Delete: Clear selected cells
+    else if (event.key === 'Delete' && this.selectedCells.length > 0) {
+      this.clearSelection();
+      event.preventDefault();
+    }
+  }
+
+  handleKeyUp(event: KeyboardEvent): void {
+    if (event.key === 'Control') {
+      this.isCtrlPressed = false;
+      this.lastMouseX = null;
+    }
+  }
+
+  handleMouseDownForScroll(event: MouseEvent): void {
+    if (this.isCtrlPressed) {
+      this.lastMouseX = event.clientX;
+      event.preventDefault(); // Prevent default behavior
+    }
+  }
+
+  handleMouseMoveForScroll(event: MouseEvent): void {
+    if (this.isCtrlPressed && this.lastMouseX !== null) {
+      const deltaX = event.clientX - this.lastMouseX;
+      this.grid.scrollLeft -= deltaX; // Adjust horizontal scroll
+      this.lastMouseX = event.clientX;
+    }
+  }
+
+  handleMouseUpForScroll(): void {
+    this.lastMouseX = null;
   }
 
   // 初始化网格组件
@@ -240,24 +309,6 @@ export class ExtractionComponent extends PageBase {
     this.isSelecting = false;
   }
 
-  // 处理键盘按键事件
-  handleKeyDown(e: any) {
-    // Ctrl+C: 复制选择内容
-    if (e.ctrlKey && e.key === 'c') {
-      this.copySelection();
-      e.preventDefault();
-    }
-    // Ctrl+V: 粘贴内容
-    else if (e.ctrlKey && e.key === 'v') {
-      this.pasteSelection();
-      e.preventDefault();
-    }
-    // Delete: 清除选中单元格
-    else if (e.key === 'Delete' && this.selectedCells.length > 0) {
-      this.clearSelection();
-      e.preventDefault();
-    }
-  }
 
   // 选择单元格范围
   selectCellRange(start: { rowIndex: number, columnIndex: number }, end: { rowIndex: number, columnIndex: number }) {
@@ -771,7 +822,7 @@ export class ExtractionComponent extends PageBase {
     this.nodeService.getBatchTask(this.batchTaskId).subscribe(
       (task) => {
         this.batchTask = task;
-        
+
         if (task.type === 'entity-new-batch') {
           // 处理新的批处理任务类型（批量创建）
           this.loadNewBatchTaskData(task);
@@ -833,21 +884,21 @@ export class ExtractionComponent extends PageBase {
       row['名称'] = source.labels?.zh?.value || '';
       row['描述'] = source.descriptions?.zh?.value || '';
       row['类型'] = source.type || '';
-      
+
       // 别名处理
       if (source.aliases?.zh?.length > 0) {
         row['别名'] = source.aliases.zh.map((alias: any) => alias.value).join(', ');
       } else {
         row['别名'] = '';
       }
-      
+
       // 标签处理
       if (source.tags?.length > 0) {
         row['标签'] = source.tags.join(', ');
       } else {
         row['标签'] = '';
       }
-      
+
       // 图片处理
       if (source.images?.length > 0) {
         row['图片'] = source.images.join(', ');
@@ -857,7 +908,7 @@ export class ExtractionComponent extends PageBase {
 
       // 保存原始实体ID以便后续更新
       row._entityId = entity._id;
-      
+
       return row;
     });
 
@@ -899,38 +950,38 @@ export class ExtractionComponent extends PageBase {
       if (!entityToUpdate) continue;
 
       // 创建简单的更新对象，只包含基础字段
-      const updateData:any = {
+      const updateData: any = {
         id: entityToUpdate._id,
-        labels: { 
-          zh: { 
-            language: "zh", 
-            value: row['名称'] || entityToUpdate._source.labels?.zh?.value 
+        labels: {
+          zh: {
+            language: "zh",
+            value: row['名称'] || entityToUpdate._source.labels?.zh?.value
           }
         },
-        descriptions: { 
-          zh: { 
-            language: "zh", 
-            value: row['描述'] || entityToUpdate._source.descriptions?.zh?.value 
+        descriptions: {
+          zh: {
+            language: "zh",
+            value: row['描述'] || entityToUpdate._source.descriptions?.zh?.value
           }
         },
         type: row['类型'] || entityToUpdate._source.type,
-        
+
         // 别名处理
-        aliases: { 
+        aliases: {
           zh: row['别名'] ? row['别名'].split(',').map((alias: string) => ({
             language: "zh",
             value: alias.trim()
           })) : entityToUpdate._source.aliases?.zh || []
         },
-        
+
         // 标签处理
-        tags: row['标签'] ? 
-          row['标签'].split(',').map((tag: string) => tag.trim()) : 
+        tags: row['标签'] ?
+          row['标签'].split(',').map((tag: string) => tag.trim()) :
           entityToUpdate._source.tags || [],
-        
+
         // 图片处理
-        images: row['图片'] ? 
-          row['图片'].split(',').map((image: string) => image.trim()) : 
+        images: row['图片'] ?
+          row['图片'].split(',').map((image: string) => image.trim()) :
           entityToUpdate._source.images || []
       };
 
@@ -975,7 +1026,7 @@ export class ExtractionComponent extends PageBase {
             const entitiesCount = task.entities?.length || 0;
             const dataCount = task.data?.length || 0;
             const count = isNewBatch ? dataCount : entitiesCount;
-            
+
             return {
               id: task.id,
               label: `${task.description || '批处理任务'} (${task.createdAt.substring(0, 10)}, ${count}${isNewBatch ? '条新数据' : '个实体'})`,
@@ -1027,7 +1078,7 @@ export class ExtractionComponent extends PageBase {
       this.message.warning('批处理任务没有包含数据');
       return;
     }
-    
+
     // 设置固定列
     this.grid.columns = [
       { label: '名称', property: '名称', width: 150 },
@@ -1037,11 +1088,11 @@ export class ExtractionComponent extends PageBase {
       { label: '标签', property: '标签', width: 150 },
       { label: '图片', property: '图片', width: 200 }
     ];
-    
+
     // 转换数据以适应固定列
     const adaptedData = task.data.map((item: any) => {
       const newItem: any = {};
-      
+
       // 适配属性名称
       newItem['名称'] = item['名称'] || '';
       newItem['描述'] = item['描述'] || '';
@@ -1049,10 +1100,10 @@ export class ExtractionComponent extends PageBase {
       newItem['类型'] = item['类型'] || '';
       newItem['标签'] = item['标签'] || '';
       newItem['图片'] = item['图片'] || item['文件'] || '';
-      
+
       return newItem;
     });
-    
+
     // 设置网格数据
     this.grid.data = adaptedData;
     this.grid.draw();
@@ -1110,7 +1161,7 @@ export class ExtractionComponent extends PageBase {
 
   // 获取批处理任务状态标签
   getBatchTaskStatusLabel(status: string): string {
-    switch(status) {
+    switch (status) {
       case 'pending': return '待处理';
       case 'processing': return '处理中';
       case 'completed': return '已完成';
@@ -1124,10 +1175,5 @@ export class ExtractionComponent extends PageBase {
     return `status-${status || 'pending'}`;
   }
 
-  ngOnDestroy() {
-    this.stopPolling();
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
+
 }
