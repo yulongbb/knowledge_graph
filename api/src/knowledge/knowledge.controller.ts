@@ -72,7 +72,7 @@ export class KnowledgeController {
   @Post('search/:size/:index')
   @ApiOperation({ 
     summary: '搜索知识实体', 
-    description: '根据条件搜索知识实体，支持分页和高级查询' 
+    description: '根据条件搜索知识实体，支持分页和高级查询，可按命名空间过滤' 
   })
   @ApiParam({ name: 'index', description: '页码，从1开始' })
   @ApiParam({ name: 'size', description: '每页数量' })
@@ -89,13 +89,6 @@ export class KnowledgeController {
       size: size,
       from: (index - 1) * size,
       query: bool,
-      // sort: [
-      //   {
-      //     modified: {
-      //       order: 'desc',
-      //     },
-      //   },
-      // ],
       aggs: {
         types: {
           terms: {
@@ -107,6 +100,12 @@ export class KnowledgeController {
           terms: {
             field: 'tags.keyword',
             size: 20000,
+          },
+        },
+        namespaces: {  // Add namespace aggregation
+          terms: {
+            field: 'namespace.keyword',
+            size: 100,
           },
         },
       },

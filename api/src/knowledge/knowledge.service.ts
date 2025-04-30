@@ -69,7 +69,7 @@ export class KnowledgeService {
 
     const result = await this.elasticsearchService.bulk(document);
     const myCollection = this.db.collection('entity');
-    
+
     for (const item of entity.items) {
       try {
         const existingDocument = await myCollection.document(item.split('/')[1]);
@@ -79,7 +79,7 @@ export class KnowledgeService {
         console.error('Failed to update document:', err);
       }
     }
-    
+
     return result['items'][0]['index'];
   }
 
@@ -100,10 +100,10 @@ export class KnowledgeService {
             modified: new Date().toISOString(),
             items: [item],
           };
-          
+
           // Fixed bulk call
           this.elasticsearchService.bulk(document);
-          
+
           existingDocument.id = existingDocument['_key'];
           return myCollection.update(existingDocument._key, existingDocument);
         })
@@ -241,6 +241,7 @@ export class KnowledgeService {
         // );
         const source = {
           type: entity.type.id,
+          namespace: entity.namespace,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
           aliases: entity?.aliases,
@@ -350,7 +351,7 @@ export class KnowledgeService {
 
         await this.db.query(removeEdgesQuery, { item });
       });
-      
+
       return this.elasticsearchService.delete(id);
     });
   }

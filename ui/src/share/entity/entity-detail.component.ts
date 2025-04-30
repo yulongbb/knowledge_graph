@@ -800,25 +800,25 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               .getAllParentIds(this.item.type)
               .subscribe((parents: any) => {
                 parents.push(this.item.type);
-                this.tagService
-                  .getList(1, 500, {
-                    filter: [
-                      {
-                        field: 'id',
-                        value: parents as string[],
-                        relation: 'schemas',
-                        operation: 'IN',
-                      },
-                    ],
-                  })
-                  .subscribe((data: any) => {
-                    let tags: any = {};
-                    data.list.forEach((tag: any) => {
-                      tags[tag.type] = tags[tag.type] ?? [];
-                      tags[tag.type].push(tag.name);
-                    });
-                    this.tags = tags;
-                  });
+                // this.tagService
+                //   .getList(1, 500, {
+                //     filter: [
+                //       {
+                //         field: 'id',
+                //         value: parents as string[],
+                //         relation: 'schemas',
+                //         operation: 'IN',
+                //       },
+                //     ],
+                //   })
+                //   .subscribe((data: any) => {
+                //     let tags: any = {};
+                //     data.list.forEach((tag: any) => {
+                //       tags[tag.type] = tags[tag.type] ?? [];
+                //       tags[tag.type].push(tag.name);
+                //     });
+                //     this.tags = tags;
+                //   });
                 this.propertyService
                   .getList(1, 50, {
                     filter: [

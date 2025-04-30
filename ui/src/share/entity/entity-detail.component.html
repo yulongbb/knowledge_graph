@@ -183,8 +183,6 @@
         </x-collapse-panel>
       </x-collapse>
 
-
-
       <x-collapse>
         <x-collapse-panel label="属性信息" active="true">
           <!-- Standard HTML Table with Optimized Styles -->
@@ -266,7 +264,7 @@
           </ng-template>
         </x-collapse-panel>
       </x-collapse>
-
+<!-- 
       <x-collapse>
         <x-collapse-panel label="标签标注" style="overflow: scroll">
           <div style="display: block; width: 100%; overflow: scroll">
@@ -284,7 +282,7 @@
             </ng-container>
           </div>
         </x-collapse-panel>
-      </x-collapse>
+      </x-collapse> -->
       <x-collapse>
         <x-collapse-panel label="地理位置">
           <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"

@@ -30,6 +30,7 @@ export class NodeService {
         labels: entity?.labels,
         descriptions: entity?.descriptions,
         aliases: entity?.aliases,
+        namespace: entity?.namespace || 'default', // Add namespace support
         modified: new Date().toISOString(),
       };
     } else {
@@ -38,6 +39,7 @@ export class NodeService {
         labels: entity?.labels,
         descriptions: entity?.descriptions,
         aliases: entity?.aliases,
+        namespace: entity?.namespace || 'default', // Add namespace support
         modified: new Date().toISOString(),
       };
     }

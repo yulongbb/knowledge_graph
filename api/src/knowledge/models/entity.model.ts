@@ -102,6 +102,9 @@ export class Entity {
   @ApiProperty({ description: '实体类型', type: EntityType })
   type: EntityType;
 
+  @ApiPropertyOptional({ description: '命名空间', example: 'science', default: 'default' })
+  namespace?: string;
+
   @ApiProperty({ description: '多语言标签', type: MultilingualLabels })
   labels: MultilingualLabels;
 

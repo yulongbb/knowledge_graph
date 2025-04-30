@@ -111,6 +111,9 @@ export class SearchResponse<T = ElasticsearchSource> {
 
   @ApiPropertyOptional({ description: '标签聚合', type: Aggregation })
   tags?: Aggregation;
+  
+  @ApiPropertyOptional({ description: '命名空间聚合', type: Aggregation })
+  namespaces?: Aggregation;
 }
 
 /**

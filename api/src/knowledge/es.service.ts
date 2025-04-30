@@ -147,15 +147,15 @@ export class EsService {
   async syncDataToTxt() {
     const body: any = await this.elasticsearchService.search({
       index: 'entity', // 索引名称
-      _source: ['id', 'labels'],
+      _source: ['id', 'labels', 'namespace'],
       size: 10000, // 数据量上限
     });
 
     console.log(body);
 
-    // 格式化数据：ID和中文标签
+    // 格式化数据：ID、中文标签和命名空间
     const data = body.hits.hits
-      .map((hit) => `${hit._id}, ${hit._source.labels.zh.value}`)
+      .map((hit) => `${hit._id}, ${hit._source.labels.zh.value}, ${hit._source.namespace || 'default'}`)
       .join('\n');
 
     // 将数据写入文件
