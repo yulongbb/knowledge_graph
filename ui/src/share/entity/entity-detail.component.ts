@@ -22,6 +22,7 @@ import {
   XTableColumn,
   XTableRow,
   XPlace,
+  XOperation,
 } from '@ng-nest/ui';
 import { forkJoin, map, Observable, tap } from 'rxjs';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
@@ -35,6 +36,7 @@ import * as L from 'leaflet';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import * as Plyr from 'plyr';
+import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -130,6 +132,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       treeData: () =>
         this.ontologyService
           .getList(1, Number.MAX_SAFE_INTEGER, {
+            filter: this.filter,
             sort: [
               { field: 'pid', value: 'asc' },
               { field: 'sort', value: 'asc' },
@@ -191,6 +194,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   private editor: any;
 
+  namespaceOptions: { label: string; value: string }[] = [];
+  filter: any[] = [];
+  namespace: any;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -202,6 +208,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     private ontologyService: OntologyService,
     public propertyService: PropertyService,
     private esService: EsService,
+    private namespaceService: NamespaceService, // Added namespace service
 
     public tagService: TagService,
     private nodeService: EntityService,
@@ -218,11 +225,70 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         if (this.id) {
           setTimeout(() => {
             this.loadData();
+            this.loadNamespaces();
           });
         }
       }
     });
   }
+
+  // Load namespaces for the dropdown
+  loadNamespaces() {
+    this.namespaceService.getList(1, 1000).subscribe({
+      next: (response: any) => {
+        const namespaces = response.list || [];
+        this.namespaceOptions = namespaces.map((ns: any) => ({
+          label: ns.name,
+          value: ns.name
+        }));
+
+        // Ensure default namespace is selected
+        if (!this.namespaceOptions.some(opt => opt.value === 'default')) {
+          this.namespaceOptions.unshift({ label: 'default', value: 'default' });
+        }
+
+        // Set default namespace
+        this.namespace = 'default';
+      },
+      error: (error) => {
+        console.error('Failed to load namespaces:', error);
+        this.message.error('加载命名空间失败');
+        // Ensure at least default namespace is available
+        this.namespaceOptions = [{ label: 'default', value: 'default' }];
+      }
+    });
+  }
+
+  // When namespace changes, refresh the types tree
+  onNamespaceChange(namespace: string) {
+    console.log('Selected namespace:', namespace);
+    this.namespaceService.findByName(namespace).subscribe({
+      next: (namespaceData: any) => {
+        console.log('Found namespace:', namespaceData);
+
+
+        // Create filter based on whether we have an ID or not
+        if (namespaceData.id) {
+          this.filter = [{
+            field: 'namespaceId',
+            value: namespaceData.id,
+            operation: '=' as XOperation
+          }];
+        } else {
+          this.filter = [{
+            field: 'namespaceId',
+            value: '',
+            operation: 'isNull' as XOperation
+          }];
+        }
+      },
+      error: (error: any) => {
+        console.error('Error finding namespace:', error);
+      }
+    });
+
+  }
+
 
   // 新增加载数据的方法
   loadData() {
@@ -275,7 +341,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnDestroy() {
-   
+
   }
 
   onEditorCreated(editor: any) {

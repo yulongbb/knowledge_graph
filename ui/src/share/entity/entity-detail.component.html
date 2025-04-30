@@ -3,7 +3,7 @@
     <app-entity-info [id]="id"></app-entity-info>
   </div>
   <div *ngSwitchCase="'add'">
-   <app-entity-add [id]="id"></app-entity-add>
+    <app-entity-add [id]="id"></app-entity-add>
   </div>
   <div *ngSwitchCase="'add_image'">
     <app-entity-add-image [id]="id" (saved)="onChildSaved()"></app-entity-add-image>
@@ -175,6 +175,10 @@
         [subTitle]="entity()?.value?._id" (backClick)="back()">
       </x-page-header>
 
+      <x-select style="float: right;" [(ngModel)]="namespace" [data]="namespaceOptions" placeholder="请选择命名空间"
+        (ngModelChange)="onNamespaceChange($event)">
+      </x-select>
+
       <x-collapse bordered>
         <x-collapse-panel label="基本信息" active="true">
           <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
@@ -264,7 +268,7 @@
           </ng-template>
         </x-collapse-panel>
       </x-collapse>
-<!-- 
+      <!-- 
       <x-collapse>
         <x-collapse-panel label="标签标注" style="overflow: scroll">
           <div style="display: block; width: 100%; overflow: scroll">
