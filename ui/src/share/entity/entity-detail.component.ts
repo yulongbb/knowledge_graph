@@ -265,22 +265,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     this.namespaceService.findByName(namespace).subscribe({
       next: (namespaceData: any) => {
         console.log('Found namespace:', namespaceData);
-
-
-        // Create filter based on whether we have an ID or not
-        if (namespaceData.id) {
-          this.filter = [{
-            field: 'namespaceId',
-            value: namespaceData.id,
-            operation: '=' as XOperation
-          }];
-        } else {
-          this.filter = [{
-            field: 'namespaceId',
-            value: '',
-            operation: 'isNull' as XOperation
-          }];
-        }
+        this.filter = [{
+          field: 'namespaceId',
+          value: namespaceData.id,
+          operation: '=' as XOperation
+        }];
       },
       error: (error: any) => {
         console.error('Error finding namespace:', error);
@@ -830,6 +819,14 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x: any) => {
           console.log(x);
+          this.namespaceService.get(x._source.namespace).subscribe((namespace: any) => {
+            this.namespace = namespace.name;
+            this.filter = [{
+              field: 'namespaceId',
+              value: namespace.id,
+              operation: '=' as XOperation
+            }];
+          });
           this.entity = signal({ value: x });
           this.item = x._source;
           this.imgs = [];

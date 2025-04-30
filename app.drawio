@@ -1,30 +1,9 @@
 <mxfile host="65bd71144e">
     <diagram id="dyDJvaHHn8QVIofBPpgf" name="Page-1">
-        <mxGraphModel dx="2264" dy="1036" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="505" dy="982" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="15" value="UI" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="330" y="320" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="16" value="API" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
-                    <mxGeometry x="330" y="490" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="17" value="MySQL" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="890" width="60" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="18" value="ArangoDB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-                    <mxGeometry x="210" y="890" width="60" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="19" value="Minio" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="890" width="60" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="21" value="ES" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
-                    <mxGeometry x="510" y="890" width="60" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="22" value="Redis" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
-                    <mxGeometry x="660" y="890" width="60" height="80" as="geometry"/>
-                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>

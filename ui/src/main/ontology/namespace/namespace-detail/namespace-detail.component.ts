@@ -96,19 +96,19 @@ export class NamespaceDetailComponent implements OnInit {
             .post(this.form.formGroup.value)
             .subscribe(() => {
               this.message.success('新增成功！');
-              this.router.navigate(['/index/namespaces']);
+              this.router.navigate(['/index/namespace']);
             });
         } else if (this.type === 'edit') {
           const formData = this.form.formGroup.value;
           formData.id = this.id;
           this.namespaceService.put(formData).subscribe(() => {
             this.message.success('修改成功！');
-            this.router.navigate(['/index/namespaces']);
+            this.router.navigate(['/index/namespace']);
           });
         }
         break;
       case 'cancel':
-        this.router.navigate(['/index/namespaces']);
+        this.router.navigate(['/index/namespace']);
         break;
     }
   }

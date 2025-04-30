@@ -110,7 +110,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   tagDataLoaded = false;
   tagData: any;
   tagColumns: XTableColumn[] = [
-    { id: 'name', label: '名称',  sort: true },
+    { id: 'name', label: '名称', sort: true },
     { id: 'actions', label: '操作', width: 100 },
   ];
   tagPageSize = 100;
@@ -443,21 +443,12 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadOntologyData() {
     this.ontologyDataLoaded = false;
 
-    const filter =
-      this.selectedNamespace.name === 'default'
-        ? [
-          {
-            field: 'namespaceId',
-            value: '',
-            operation: 'isNull' as XOperation,
-          },
-        ]
-        : [
-          {
-            field: 'namespaceId',
-            value: this.selectedNamespace.id.toString(),
-          },
-        ];
+    const filter = [
+      {
+        field: 'namespaceId',
+        value: this.selectedNamespace.id.toString(),
+      },
+    ]
 
     this.ontologyService
       .getList(1, Number.MAX_SAFE_INTEGER, {

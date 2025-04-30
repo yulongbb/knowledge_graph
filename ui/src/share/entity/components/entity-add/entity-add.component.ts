@@ -43,7 +43,7 @@ export class EntityAddComponent implements OnInit {
   editorModules = {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
       ['link', 'image'],
       ['clean']
@@ -70,7 +70,7 @@ export class EntityAddComponent implements OnInit {
   ) {
     // Load namespaces for dropdown
     this.loadNamespaces();
-    
+
     this.types$ = this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
       sort: [
         { field: 'pid', value: 'asc' },
@@ -80,7 +80,7 @@ export class EntityAddComponent implements OnInit {
       map(x => x.list || []),
       map(list => this.buildTree(list))
     );
-    
+
     this.types$.subscribe(tree => {
       this.typeTree = tree;
     });
@@ -102,35 +102,40 @@ export class EntityAddComponent implements OnInit {
 
   save() {
     if (!this.isFormValid()) return;
+    this.namespaceService.findByName(this.formData.namespace).subscribe({
+      next: (namespaceData: any) => {
+        console.log('Found namespace:', namespaceData);
+        const item: any = {
+          labels: {
+            zh: { language: 'zh', value: this.formData.label }
+          },
+          aliases: {
+            zh: this.formData.aliases?.split(',').map(alias => ({
+              language: 'zh',
+              value: alias.trim()
+            }))
+          },
+          descriptions: {
+            zh: { language: 'zh', value: this.formData.description }
+          },
+          type: this.formData.type,
+          namespace: namespaceData.id, // Include namespace in saved entity
+          tags: this.formData.tags?.split('#').filter(x => x.trim() !== ''),
+          template: this.template
+        };
 
-    const item:any = {
-      labels: {
-        zh: { language: 'zh', value: this.formData.label }
-      },
-      aliases: {
-        zh: this.formData.aliases?.split(',').map(alias => ({
-          language: 'zh',
-          value: alias.trim()
-        }))
-      },
-      descriptions: {
-        zh: { language: 'zh', value: this.formData.description }
-      },
-      type: this.formData.type,
-      namespace: this.formData.namespace, // Include namespace in saved entity
-      tags: this.formData.tags?.split('#').filter(x => x.trim() !== ''),
-      template: this.template
-    };
-
-    this.entityService.addItem(item).subscribe({
-      next: () => {
-        this.message.success('新增成功！');
-        this.back();
-      },
-      error: (error) => {
-        this.message.error('新增失败：' + error.message);
+        this.entityService.addItem(item).subscribe({
+          next: () => {
+            this.message.success('新增成功！');
+            this.back();
+          },
+          error: (error) => {
+            this.message.error('新增失败：' + error.message);
+          }
+        });
       }
     });
+
   }
 
   back() {
@@ -186,7 +191,7 @@ export class EntityAddComponent implements OnInit {
 
   filterNodes(nodes: TreeNode[]): TreeNode[] {
     if (!this.typeSearchText) return nodes;
-    
+
     return nodes.filter(node => {
       const matches = node.name.toLowerCase().includes(this.typeSearchText.toLowerCase());
       if (node.children?.length) {
@@ -227,11 +232,11 @@ export class EntityAddComponent implements OnInit {
   // When namespace changes, refresh the types tree
   onNamespaceChange(namespace: string) {
     console.log('Selected namespace:', namespace);
-    
+
     // Clear selected type when namespace changes
     this.formData.type = '';
     this.selectedTypeName = '';
-    
+
     // Reload types for the selected namespace
     this.loadTypesForNamespace(namespace);
   }
@@ -244,29 +249,29 @@ export class EntityAddComponent implements OnInit {
 
     // Clear the search text when changing namespaces
     this.typeSearchText = '';
-    
+
     // Get the namespace ID for filtering ontologies
     this.namespaceService.findByName(namespace).subscribe({
       next: (namespaceData: any) => {
         console.log('Found namespace:', namespaceData);
-        
+
         let filter: any[];
-        
+
         // Create filter based on whether we have an ID or not
         if (namespaceData.id) {
-          filter = [{ 
-            field: 'namespaceId', 
+          filter = [{
+            field: 'namespaceId',
             value: namespaceData.id,
-            operation: '=' as XOperation 
+            operation: '=' as XOperation
           }];
         } else {
-          filter = [{ 
-            field: 'namespaceId', 
+          filter = [{
+            field: 'namespaceId',
             value: '',
-            operation: 'isNull' as XOperation 
+            operation: 'isNull' as XOperation
           }];
         }
-        
+
         // Load ontologies filtered by namespace
         this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
           filter: filter,
@@ -282,7 +287,7 @@ export class EntityAddComponent implements OnInit {
           map(list => this.buildTree(list))
         ).subscribe(tree => {
           this.typeTree = tree;
-          
+
           // Auto-open dropdown to show filtered types when namespace changes
           if (tree && tree.length > 0) {
             setTimeout(() => {
@@ -296,13 +301,13 @@ export class EntityAddComponent implements OnInit {
       error: (error) => {
         console.error(`Failed to find namespace by name: ${namespace}`, error);
         this.message.error('获取命名空间信息失败');
-        
+
         // Fallback to loading all types
         this.loadAllTypes();
       }
     });
   }
-  
+
   // Fallback method to load all types if namespace filtering fails
   loadAllTypes() {
     this.ontologyService.getList(1, Number.MAX_SAFE_INTEGER, {
