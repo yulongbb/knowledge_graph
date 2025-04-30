@@ -1,7 +1,209 @@
 .canvas-datagrid-container {
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 100%;
+  margin: 1rem 0;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
   
+  // 增强滚动条样式
+  &::-webkit-scrollbar {
+    height: 10px;
+    background-color: #f1f1f1;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 5px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+  
+  // 添加滑动提示
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999"><path d="M9 5l7 7-7 7"></path></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    pointer-events: none;
+    animation: fadeInOut 2s infinite;
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+}
+
+// 添加触摸指导提示
+.table-scroll-hint {
+  display: none;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  padding: 5px;
+  margin-bottom: 10px;
+  
+  @media (max-width: 1024px) {
+    display: block;
+  }
+}
+
+x-tabs {
+  margin-top: 1rem;
+}
+
+x-progress {
+  margin: 1rem 0;
+}
+
+x-select {
+  min-width: 200px;
+}
+
+x-button {
+  margin-left: 0.5rem;
+}
+
+.edit-mode-indicator {
+  padding: 8px 12px;
+  margin: 8px 0;
+  background-color: #e8f4ff;
+  border-left: 4px solid #0069d9;
+  border-radius: 3px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  
+  span {
+    margin-right: 10px;
+    
+    &:first-child {
+      font-weight: bold;
+    }
+  }
+}
+
+au-tool {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  
+  x-input {
+    margin-left: 10px;
+    width: 150px;
+  }
+}
+
+.batch-task-label {
+  font-weight: bold;
+  color: #3f51b5;
+  padding: 0.25rem 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin-right: 1rem;
+}
+
+.batch-selection-area {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  x-select {
+    min-width: 300px; // 增加下拉框宽度
+  }
+  
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+  }
+}
+
+.empty-tasks-message {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 4px;
+  margin: 20px 0;
+  border: 1px dashed #ccc;
+  
+  .empty-icon {
+    font-size: 48px;
+    color: #aaa;
+    margin-bottom: 15px;
+  }
+  
+  p {
+    margin-bottom: 20px;
+  }
+  
+  .empty-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+}
+
+.task-status-label {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  margin-right: 10px;
+  
+  &.status-pending {
+    background-color: #e6f7ff;
+    border: 1px solid #91d5ff;
+    color: #1890ff;
+  }
+  
+  &.status-processing {
+    background-color: #fff7e6;
+    border: 1px solid #ffd591;
+    color: #fa8c16;
+  }
+  
+  &.status-completed {
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    color: #52c41a;
+  }
+  
+  &.status-failed {
+    background-color: #fff1f0;
+    border: 1px solid #ffa39e;
+    color: #f5222d;
+  }
+}
+
+.batch-task-form {
+  .form-group {
+    margin-bottom: 15px;
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    x-input, x-textarea, x-select {
+      width: 100%;
+    }
+  }
+}
+
+

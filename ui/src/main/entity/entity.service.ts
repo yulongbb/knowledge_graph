@@ -105,6 +105,32 @@ export class EntityService extends RepositoryService<Item> {
   render(id: string) {
     return this.http.get(`${this.option.controller?.name}/render/${id}`);
   }
+
+  createBatchTask(task: any): Observable<any> {
+    return this.http.post(
+      `${this.option.controller?.name}/batch-task`,
+      task
+    );
+  }
+  
+  getBatchTask(id: string): Observable<any> {
+    return this.http.get(
+      `${this.option.controller?.name}/batch-task/${id}`
+    );
+  }
+  
+  updateBatchTask(task: any): Observable<any> {
+    return this.http.put(
+      `${this.option.controller?.name}/batch-task`,
+      task
+    );
+  }
+  
+  getBatchTasks(): Observable<any> {
+    return this.http.get(
+      `${this.option.controller?.name}/batch-tasks`
+    );
+  }
 }
 
 export interface Item extends XId {

@@ -14,10 +14,13 @@ import {
   XPlace,
   XPosition,
   XRadioNode,
+  XGuid,
 } from '@ng-nest/ui';
 import { EntityService } from './entity.service';
 import { EsService } from '../start/search/es.service';
 import { OntologyService } from '../ontology/ontology/ontology.service';
+import { v4 as uuidv4 } from 'uuid';
+
 @Component({
   selector: 'app-entity',
 
@@ -179,9 +182,30 @@ export class EntityComponent extends PageBase {
         });
         break;
       case 'import':
-        this.router.navigate([`./grid`], {
-          relativeTo: this.activatedRoute,
-        });
+        if (this.checkedRows.length === 0) {
+          this.message.warning('请先选择需要批量处理的实体');
+          return;
+        }
+        
+        const batchTask = {
+          id: uuidv4(), // 生成唯一的任务ID
+          type: 'entity-batch',
+          entities: this.checkedRows.map(row => row['_id']),
+          createdBy: 'current-user', // 这里应该获取当前用户ID
+          description: '实体批量处理任务'
+        };
+        
+        // 将批处理任务保存到Redis或后端存储
+        this.service.createBatchTask(batchTask).subscribe(
+          (result) => {
+            this.message.success(`批处理任务已创建，任务ID: ${result.data.id}`);
+            // 不再自动跳转，而是显示任务ID供用户参考
+          },
+          (error) => {
+            this.message.error('创建批处理任务失败');
+            console.error('Error creating batch task:', error);
+          }
+        );
         break;
       case 'info':
         console.log(item);

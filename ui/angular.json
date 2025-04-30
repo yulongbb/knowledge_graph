@@ -40,8 +40,7 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "./node_modules/canvas-datagrid/dist/canvas-datagrid.js"
-              
+              "node_modules/canvas-datagrid/dist/canvas-datagrid.js"
             ]
           },
           "configurations": {

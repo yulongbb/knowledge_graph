@@ -9,6 +9,9 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  Query,
+  DefaultValuePipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { KnowledgeService } from './knowledge.service';
 import { XIdType } from 'src/core';
@@ -31,6 +34,13 @@ import {
   TemplateRenderResponse
 } from './models';
 import { ExtendedEdge } from './edge.service';
+import { 
+  BatchTask, 
+  BatchTaskResponse, 
+  CreateBatchTaskDto, 
+  UpdateBatchTaskDto 
+} from './models/batch-task.model';
+import { BatchTaskService } from './batch-task.service';
 
 @Controller('knowledge')
 @ApiTags('知识融合') // 分组
@@ -42,6 +52,7 @@ export class KnowledgeController {
     private readonly edgeService: EdgeService,
     private readonly dataImportService: DataImportService,
     @InjectQueue('data-import-queue') private queue: Queue,
+    private readonly batchTaskService: BatchTaskService,
   ) {}
 
   @Post('')
@@ -333,6 +344,123 @@ export class KnowledgeController {
       return result;
     } catch (error) {
       throw new Error(`Template rendering failed: ${error.message}`);
+    }
+  }
+
+  @Post('batch-task')
+  @ApiOperation({ 
+    summary: '创建批处理任务', 
+    description: '创建一个新的批处理任务，用于批量处理实体' 
+  })
+  @ApiBody({ description: '批处理任务数据，包含类型和实体ID列表', type: CreateBatchTaskDto })
+  @ApiResponse({ status: 201, description: '批处理任务创建成功', type: BatchTaskResponse })
+  async createBatchTask(@Body() createTaskDto: CreateBatchTaskDto): Promise<BatchTaskResponse> {
+    try {
+      const task = await this.batchTaskService.createTask(createTaskDto);
+      return { 
+        success: true, 
+        message: '批处理任务创建成功', 
+        data: task 
+      };
+    } catch (error) {
+      throw new HttpException(
+        { success: false, message: `创建批处理任务失败: ${error.message}` },
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  @Get('batch-task/:id')
+  @ApiOperation({ 
+    summary: '获取批处理任务', 
+    description: '通过ID获取批处理任务详情' 
+  })
+  @ApiParam({ name: 'id', description: '批处理任务ID' })
+  @ApiResponse({ status: 200, description: '批处理任务详情', type: BatchTask })
+  async getBatchTask(@Param('id') id: string): Promise<BatchTask> {
+    try {
+      return await this.batchTaskService.getTaskById(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(
+          { success: false, message: error.message },
+          HttpStatus.NOT_FOUND
+        );
+      }
+      throw new HttpException(
+        { success: false, message: `获取批处理任务失败: ${error.message}` },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Get('batch-tasks')
+  @ApiOperation({ 
+    summary: '获取批处理任务列表', 
+    description: '获取所有批处理任务的列表，支持分页' 
+  })
+  @ApiResponse({ status: 200, description: '批处理任务列表', type: [BatchTask] })
+  async getBatchTasks(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(20), ParseIntPipe) pageSize: number,
+  ): Promise<{ total: number, items: BatchTask[] }> {
+    return await this.batchTaskService.getAllTasks(page, pageSize);
+  }
+
+  @Put('batch-task')
+  @ApiOperation({ 
+    summary: '更新批处理任务', 
+    description: '更新批处理任务的状态、进度等信息' 
+  })
+  @ApiBody({ description: '批处理任务更新数据', type: UpdateBatchTaskDto })
+  @ApiResponse({ status: 200, description: '批处理任务更新成功', type: BatchTaskResponse })
+  async updateBatchTask(@Body() updateTaskDto: UpdateBatchTaskDto): Promise<BatchTaskResponse> {
+    try {
+      const task = await this.batchTaskService.updateTask(updateTaskDto);
+      return { 
+        success: true, 
+        message: '批处理任务更新成功', 
+        data: task 
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(
+          { success: false, message: error.message },
+          HttpStatus.NOT_FOUND
+        );
+      }
+      throw new HttpException(
+        { success: false, message: `更新批处理任务失败: ${error.message}` },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Delete('batch-task/:id')
+  @ApiOperation({ 
+    summary: '删除批处理任务', 
+    description: '删除指定ID的批处理任务' 
+  })
+  @ApiParam({ name: 'id', description: '批处理任务ID' })
+  @ApiResponse({ status: 200, description: '批处理任务删除成功', type: BatchTaskResponse })
+  async deleteBatchTask(@Param('id') id: string): Promise<BatchTaskResponse> {
+    try {
+      const result = await this.batchTaskService.deleteTask(id);
+      return { 
+        success: result.success, 
+        message: result.message 
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(
+          { success: false, message: error.message },
+          HttpStatus.NOT_FOUND
+        );
+      }
+      throw new HttpException(
+        { success: false, message: `删除批处理任务失败: ${error.message}` },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }

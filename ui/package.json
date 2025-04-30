@@ -33,7 +33,7 @@
     "@types/papaparse": "^5.3.15",
     "@types/three": "^0.139.0",
     "ag-grid-angular": "^33.2.1",
-    "canvas-datagrid": "^0.4.7",
+    "canvas-datagrid": "^0.4.14",
     "chart.js": "^4.4.8",
     "cytoscape": "^3.31.1",
     "cytoscape-cola": "^2.5.1",
@@ -64,6 +64,7 @@
     "swiper": "^11.2.6",
     "three": "^0.139.2",
     "tslib": "^2.3.0",
+    "uuid": "^11.1.0",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {

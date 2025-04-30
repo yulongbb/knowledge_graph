@@ -16,6 +16,8 @@ import { KnowledgeController } from './knowledge.controller';
 import { NLPService } from './nlp.service';
 import { BullModule } from '@nestjs/bullmq';
 import { DataImportService } from './data-import.queue';
+import Redis from 'ioredis';
+import { BatchTaskService } from './batch-task.service';
 
 /**
  * 知识图谱模块
@@ -87,6 +89,18 @@ import { DataImportService } from './data-import.queue';
     KnowledgeService,  // 知识管理服务
     PropertiesService, // 属性服务
     SchemasService,    // 模式服务
+    BatchTaskService,
+    {
+      provide: 'REDIS',
+      useFactory: (configService: ConfigService) => 
+        new Redis({
+          host: configService.get('REDIS_HOST'),
+          port: parseInt(configService.get('REDIS_PORT')),
+          password: configService.get('REDIS_PASSWORD'),
+          db: parseInt(configService.get('REDIS_DB')),
+        }),
+      inject: [ConfigService],
+    },
   ],
 })
 export class KnowledgeModule {}

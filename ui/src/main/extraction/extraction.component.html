@@ -1,30 +1,85 @@
 <au-tool>
-  <x-select [data]="datasets" [(ngModel)]="dataset" (ngModelChange)="selectDataset($event)"></x-select>
+  <div class="batch-selection-area">
+    <!-- 批处理任务选择器 - 始终显示 -->
+    <x-select [data]="batchTasks" [(ngModel)]="selectedBatchTaskId" (ngModelChange)="selectBatchTask($event)" 
+              placeholder="选择批处理任务" *ngIf="!batchTaskId">
+    </x-select>
 
-
-
-
-  <x-button type="success" icon="fto-upload" (click)="importData()">导入</x-button>
+    <div class="action-buttons">
+      <x-button *ngIf="!batchTaskId" type="primary" icon="fto-file-plus" (click)="createNewBatchTask()">新建批量任务</x-button>
+      <x-button *ngIf="!batchTaskId" type="success" icon="fto-upload" (click)="importData()">导入</x-button>
+      <x-button *ngIf="!batchTaskId" type="primary" icon="fto-eye" (click)="previewImport()">预览</x-button>
+      <x-button *ngIf="!batchTaskId" type="warning" icon="fto-refresh" (click)="refreshBatchTasks()">刷新任务</x-button>
+      
+      <ng-container *ngIf="batchTaskId">
+        <span class="batch-task-label">批处理任务: {{batchTaskId}}</span>
+        <span class="task-status-label" [ngClass]="getBatchTaskStatusClass(batchTask?.status)">
+          {{getBatchTaskStatusLabel(batchTask?.status)}}
+        </span>
+        <x-button type="success" icon="fto-save" (click)="saveBatchChanges()">保存更改</x-button>
+        <x-button icon="fto-arrow-left" [routerLink]="['/main/entity']">返回列表</x-button>
+      </ng-container>
+    </div>
+  </div>
 </au-tool>
-<au-tool>
-  <x-find label="名称" columnLabel="name" direction="row" [(ngModel)]="label" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema"></x-find>
-  <x-find label="描述" columnLabel="name" direction="row" [(ngModel)]="description" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema"></x-find>
-  <x-find label="类别" columnLabel="name" direction="row" [(ngModel)]="category" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema"></x-find>
-  <x-find label="url" columnLabel="name" direction="row" [(ngModel)]="url" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema"></x-find>
-  <x-find label="别名" columnLabel="name" direction="row" [(ngModel)]="aliases" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema" multiple></x-find>
-  <x-find label="标签" columnLabel="name" direction="row" [(ngModel)]="tags" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema" multiple></x-find>
-  <x-find label="文件" columnLabel="name" direction="row" [(ngModel)]="images" [tableColumns]="tableColumns()"
-    [tableData]="grid.schema" multiple></x-find>
+
+<au-tool *ngIf="activeTabIndex === 0">
+  <x-button icon="fto-plus" (click)="addCustomRows(1)">添加行</x-button>
+  <x-button [icon]="'fto-edit-3'" [type]="editMode ? 'primary' : undefined" (click)="toggleEditMode()">
+    {{editMode ? '退出批量编辑' : '批量编辑'}}
+  </x-button>
+  <ng-container *ngIf="editMode">
+    <x-button icon="fto-copy" (click)="copySelection()" [disabled]="!hasSelection">复制</x-button>
+    <x-button icon="fto-clipboard" (click)="pasteSelection()" [disabled]="!clipboardContent">粘贴</x-button>
+    <x-button icon="fto-trash-2" type="danger" (click)="clearSelection()" [disabled]="!hasSelection">清空选中</x-button>
+    <x-input placeholder="批量填充值" [(ngModel)]="batchFillValue"></x-input>
+    <x-button icon="fto-check-square" (click)="fillSelection()" [disabled]="!hasSelection">填充选中</x-button>
+  </ng-container>
 </au-tool>
-<x-progress *ngIf="showProgress" [percent]="latestJob?.progress"></x-progress>
-<p *ngIf="!showProgress && !isImporting">没有正在进行的导入任务。</p>
-<p *ngIf="isImporting">正在准备导入任务...</p>
-<x-row>
-  <div #datagridContainer class="canvas-datagrid-container"></div>
-</x-row>
+
+<div *ngIf="grid?.data.length === 0 && !isBatchProcessing" class="empty-tasks-message">
+  <div class="empty-icon">
+    <i class="fto-database"></i>
+  </div>
+  <p>正在准备空白表格，请稍候...</p>
+</div>
+
+<x-progress *ngIf="showProgress || isBatchProcessing" [percent]="latestJob?.progress || 50"></x-progress>
+<p *ngIf="isBatchProcessing">正在加载批处理任务数据...</p>
+<p *ngIf="!showProgress && !isImporting && !isBatchProcessing && grid?.data.length > 0">没有正在进行的任务。</p>
+<p *ngIf="isImporting">正在准备任务...</p>
+
+<div class="edit-mode-indicator" *ngIf="editMode">
+  <span>批量编辑模式：</span>
+  <span *ngIf="hasSelection">已选择 {{selectedCells.length}} 个单元格</span>
+  <span *ngIf="!hasSelection">请选择单元格</span>
+</div>
+
+<x-tabs [activatedIndex]="activeTabIndex" (activatedChange)="onTabChanged($event)">
+  <x-tab [label]="'数据表格'">
+    <div class="table-scroll-hint">
+      提示：可以左右滑动表格查看更多内容，按住Shift键+滚轮可水平滚动
+    </div>
+    <x-row>
+      <div #datagridContainer class="canvas-datagrid-container"></div>
+    </x-row>
+  </x-tab>
+  <x-tab [label]="'导入预览'" *ngIf="previewData.length > 0">
+    <x-table [columns]="previewColumns" [data]="previewData" [bodyHeight]="600"></x-table>
+  </x-tab>
+</x-tabs>
+
+<!-- 创建批处理任务对话框 -->
+<x-dialog title="创建新的批处理任务" [(visible)]="showNewBatchTaskDialog" width="500px" 
+          (cancel)="showNewBatchTaskDialog = false" (confirm)="confirmCreateBatchTask()">
+  <div class="batch-task-form">
+    <div class="form-group">
+      <label>任务名称：</label>
+      <x-input placeholder="请输入任务名称" [(ngModel)]="newBatchTask.name"></x-input>
+    </div>
+    <div class="form-group">
+      <label>任务描述：</label>
+      <x-textarea placeholder="请输入任务描述" [(ngModel)]="newBatchTask.description"></x-textarea>
+    </div>
+  </div>
+</x-dialog>
