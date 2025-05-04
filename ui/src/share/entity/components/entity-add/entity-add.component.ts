@@ -7,6 +7,7 @@ import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { map, switchMap } from 'rxjs/operators';
 import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
 import { XOperation } from '@ng-nest/ui'; // Add this import
+import { HttpClient } from '@angular/common/http'; // 添加 HttpClient 导入
 
 interface TreeNode {
   id: string;
@@ -66,7 +67,8 @@ export class EntityAddComponent implements OnInit {
     private ontologyService: OntologyService,
     private namespaceService: NamespaceService, // Added namespace service
     private message: XMessageService,
-    private location: Location
+    private location: Location,
+    private http: HttpClient // 添加 HttpClient
   ) {
     // Load namespaces for dropdown
     this.loadNamespaces();
@@ -102,6 +104,36 @@ export class EntityAddComponent implements OnInit {
 
   save() {
     if (!this.isFormValid()) return;
+    
+    // 首先将模版内容存储到文章表中获取返回的文章id
+    if (this.template) {
+      const article = {
+        title: this.formData.label,
+        content: this.template,
+        author: 'system' // 可以根据实际情况修改作者信息
+      };
+      
+      // 调用文章API保存模板内容
+      this.http.post('/api/article', article).subscribe({
+        next: (articleData: any) => {
+          console.log('Template saved as article:', articleData);
+          this.saveEntity(articleData.id);
+        },
+        error: (error) => {
+          console.error('Failed to save template as article:', error);
+          this.message.error('保存模板失败：' + error.message);
+          // 即使模板保存失败，仍然保存实体
+          this.saveEntity();
+        }
+      });
+    } else {
+      // 如果没有模板，直接保存实体
+      this.saveEntity();
+    }
+  }
+  
+  // 将保存实体的逻辑提取为单独的方法
+  private saveEntity(articleId?: string) {
     this.namespaceService.findByName(this.formData.namespace).subscribe({
       next: (namespaceData: any) => {
         console.log('Found namespace:', namespaceData);
@@ -119,9 +151,9 @@ export class EntityAddComponent implements OnInit {
             zh: { language: 'zh', value: this.formData.description }
           },
           type: this.formData.type,
-          namespace: namespaceData.id, // Include namespace in saved entity
+          namespace: namespaceData.id,
           tags: this.formData.tags?.split('#').filter(x => x.trim() !== ''),
-          template: this.template
+          template: articleId,
         };
 
         this.entityService.addItem(item).subscribe({
@@ -133,9 +165,11 @@ export class EntityAddComponent implements OnInit {
             this.message.error('新增失败：' + error.message);
           }
         });
+      },
+      error: (error) => {
+        this.message.error('获取命名空间失败：' + error.message);
       }
     });
-
   }
 
   back() {

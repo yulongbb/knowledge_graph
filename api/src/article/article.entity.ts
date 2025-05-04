@@ -13,13 +13,13 @@ export class Article {
 
   @Column('text', { nullable: true })
   author: string;
-  
-  @Column('simple-array', { nullable: true })
-  tags: string[];
 
   @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
   createTime: Date;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column('timestamp', {
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updateTime: Date;
 }

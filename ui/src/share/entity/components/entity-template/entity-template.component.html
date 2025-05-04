@@ -1,9 +1,12 @@
 <div class="template">
   <header class="template__header">
-    <x-page-header 
-      [title]="'编辑模板 - ' + (entity()?.value._source?.labels?.zh?.value || '')"
-      [subTitle]="entity()?.value._id" 
-      (backClick)="back()">
+    <x-page-header
+      [title]="
+        '编辑模板 - ' + (entity()?.value._source?.labels?.zh?.value || '')
+      "
+      [subTitle]="entity()?.value._id"
+      (backClick)="back()"
+    >
     </x-page-header>
   </header>
 
@@ -16,15 +19,23 @@
       <section class="sidebar__section">
         <h4 class="section__title">文本变量</h4>
         <div class="section__items">
-          <div class="text-item"
-               draggable="true"
-               (dragstart)="onDragStart($event, 'text', {content: 'labels.zh.value'})">
-            标题: {{entity()?.value._source?.labels?.zh?.value}}
+          <div
+            class="text-item"
+            draggable="true"
+            (dragstart)="
+              onDragStart($event, 'text', { content: 'labels.zh.value' })
+            "
+          >
+            标题: {{ entity()?.value._source?.labels?.zh?.value }}
           </div>
-          <div class="text-item"
-               draggable="true" 
-               (dragstart)="onDragStart($event, 'text', {content: 'descriptions.zh.value'})">
-            描述: {{entity()?.value._source?.descriptions?.zh?.value}}
+          <div
+            class="text-item"
+            draggable="true"
+            (dragstart)="
+              onDragStart($event, 'text', { content: 'descriptions.zh.value' })
+            "
+          >
+            描述: {{ entity()?.value._source?.descriptions?.zh?.value }}
           </div>
         </div>
       </section>
@@ -36,7 +47,8 @@
           [modules]="editorModules"
           (onEditorCreated)="onEditorCreated($event)"
           (dragover)="onEditorDragover($event)"
-          (drop)="onEditorDrop($event)">
+          (drop)="onEditorDrop($event)"
+        >
         </quill-editor>
       </section>
     </aside>

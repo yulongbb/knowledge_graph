@@ -934,18 +934,18 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                   });
               });
           });
-          this.nodeService.render(this.id).subscribe({
-            next: (response: any) => {
-              if (response.success) {
-                this.renderedContent = response.content;
-                // this.setupTocFromTemplate();
-                // this.cdr.detectChanges();
-              }
-            },
-            error: (error: Error) => {
-              console.error('Template rendering failed:', error);
-            }
-          });
+          // this.nodeService.render(this.id).subscribe({
+          //   next: (response: any) => {
+          //     if (response.success) {
+          //       this.renderedContent = response.content;
+          //       // this.setupTocFromTemplate();
+          //       // this.cdr.detectChanges();
+          //     }
+          //   },
+          //   error: (error: Error) => {
+          //     console.error('Template rendering failed:', error);
+          //   }
+          // });
           console.log({ knowledgeId: this.id });
           this.nodeService.view({ id: this.id }).subscribe();
         });

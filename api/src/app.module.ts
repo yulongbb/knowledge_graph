@@ -9,6 +9,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
 import { AddonModule } from './addons/addon.module';
 import { DatasetModule } from './dataset/dataset.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     RedisModule,
     AddonModule,
     DatasetModule,
+    ArticleModule,
   ],
   controllers: [],
   providers: [],
@@ -49,10 +51,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
+      // eslint-disable-next-line @typescript-eslint/ban-types
       .apply((req: Request, res: any, next: Function) => {
         res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
+        res.header(
+          'Access-Control-Allow-Methods',
+          'GET,PUT,POST,DELETE,OPTIONS',
+        );
+        res.header(
+          'Access-Control-Allow-Headers',
+          'Content-Type, Accept, Authorization',
+        );
         res.header('Access-Control-Allow-Credentials', 'true');
         if (req.method === 'OPTIONS') {
           res.sendStatus(200);
