@@ -81,7 +81,7 @@ export class ArticleService extends XRepositoryService<Article, XQuery> {
       const contentWithStyle = `
             <style>
               img {
-                max-width: 100%;
+                max-width: 50%;
                 height: auto;
                 margin: 1rem 0;
               }
