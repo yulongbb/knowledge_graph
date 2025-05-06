@@ -43,7 +43,6 @@ import { finalize, Subscription } from 'rxjs';
         </div>
       </div>
       
-      <x-button class="back-button" icon="fto-arrow-left" (click)="goBack()">返回主页</x-button>
     </div>
   `,
   styleUrls: ['./etl-graph.component.scss']

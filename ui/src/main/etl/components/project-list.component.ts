@@ -37,12 +37,12 @@ import { CreateProjectDialogComponent } from './create-project-dialog.component'
       </div>
     </div>
   `,
-  styleUrls: ['./project-list.component.scss'] 
+  styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit {
   projects$ = this.projectService.projects$;
   loading = false;
-  
+
   constructor(
     private projectService: ProjectService,
     private fb: FormBuilder,
@@ -50,7 +50,7 @@ export class ProjectListComponent implements OnInit {
     private dialogService: XDialogService,
     private messageBox: XMessageBoxService,
     private message: XMessageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loading = true;
@@ -61,7 +61,7 @@ export class ProjectListComponent implements OnInit {
     const dialogRef = this.dialogService.create(CreateProjectDialogComponent, {
       draggable: true,
       resizable: true,
-      data: { 
+      data: {
         title: '新建 ETL 项目'
       }
     });

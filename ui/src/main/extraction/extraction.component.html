@@ -1,85 +1,205 @@
-<au-tool>
-  <div class="batch-selection-area">
-    <!-- 批处理任务选择器 - 始终显示 -->
-    <x-select [data]="batchTasks" [(ngModel)]="selectedBatchTaskId" (ngModelChange)="selectBatchTask($event)" 
-              placeholder="选择批处理任务" *ngIf="!batchTaskId">
-    </x-select>
+<div class="extraction-container">
+  <div class="header">
+    <h2>数据处理脚本管理</h2>
+    <p>管理用于数据抽取、转换和清洗的脚本</p>
+  </div>
 
-    <div class="action-buttons">
-      <x-button *ngIf="!batchTaskId" type="primary" icon="fto-file-plus" (click)="createNewBatchTask()">新建批量任务</x-button>
-      <x-button *ngIf="!batchTaskId" type="success" icon="fto-upload" (click)="importData()">导入</x-button>
-      <x-button *ngIf="!batchTaskId" type="primary" icon="fto-eye" (click)="previewImport()">预览</x-button>
-      <x-button *ngIf="!batchTaskId" type="warning" icon="fto-refresh" (click)="refreshBatchTasks()">刷新任务</x-button>
-      
-      <ng-container *ngIf="batchTaskId">
-        <span class="batch-task-label">批处理任务: {{batchTaskId}}</span>
-        <span class="task-status-label" [ngClass]="getBatchTaskStatusClass(batchTask?.status)">
-          {{getBatchTaskStatusLabel(batchTask?.status)}}
-        </span>
-        <x-button type="success" icon="fto-save" (click)="saveBatchChanges()">保存更改</x-button>
-        <x-button icon="fto-arrow-left" [routerLink]="['/index/extraction']">返回列表</x-button>
+  <div class="content-container">
+    <!-- Left panel for script types and list -->
+    <div class="left-panel">
+      <!-- Script type selector - replaced tabs with buttons -->
+      <div class="type-selector">
+        <div class="section-title">脚本类型</div>
+        <div class="type-buttons">
+          <button 
+            *ngFor="let type of scriptTypes()" 
+            class="type-button" 
+            [class.active]="selectedType() === type.value"
+            (click)="onTypeChange(type.value)">
+            <i [class]="getTypeIcon(type.value)"></i>
+            <span>{{ type.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Script list -->
+      <div class="script-list">
+        <div class="list-header">
+          <h3>脚本列表</h3>
+          <x-button icon="fto-plus" type="primary" (click)="createScript()">新建脚本</x-button>
+        </div>
+
+        <div class="list-content" *ngIf="!loading()">
+          <x-list>
+            <x-list-item *ngFor="let script of scripts()" [activated]="selectedScript()?.id === script.id"
+              (click)="selectScript(script)">
+              <div class="script-item">
+                <div class="script-name">{{ script.name }}</div>
+                <div class="script-desc">{{ script.description }}</div>
+                <div class="script-meta">
+                  <span class="language-badge">{{ script.language }}</span>
+                  <span class="date">{{ script.updatedAt | date:'short' }}</span>
+                </div>
+              </div>
+            </x-list-item>
+          </x-list>
+
+          <div *ngIf="scripts().length === 0" class="empty-state">
+            暂无{{ getTypeLabel(selectedType()) }}脚本，请点击"新建脚本"按钮创建
+          </div>
+        </div>
+
+        <x-skeleton *ngIf="loading()" [rows]="5"></x-skeleton>
+      </div>
+    </div>
+
+    <!-- Right panel for script details and editor -->
+    <div class="right-panel">
+      <!-- Script editor when a script is selected or creating new script -->
+      <ng-container *ngIf="selectedScript() || isCreating()">
+        <div class="editor-header">
+          <h3>{{ isCreating() ? '创建新脚本' : isEditing() ? '编辑脚本' : '脚本详情' }}</h3>
+          <div class="action-buttons">
+            <ng-container *ngIf="!isEditing() && !isCreating()">
+              <x-button icon="fto-edit-2" type="primary" (click)="editScript()">编辑</x-button>
+              <x-button icon="fto-trash-2" type="danger" (click)="deleteScript()">删除</x-button>
+              <x-button icon="fto-play" (click)="isTesting.set(true)">测试</x-button>
+            </ng-container>
+            <ng-container *ngIf="isEditing() || isCreating()">
+              <x-button icon="fto-save" type="primary" (click)="saveScript()">保存</x-button>
+              <x-button icon="fto-x" (click)="cancelEdit()">取消</x-button>
+            </ng-container>
+          </div>
+        </div>
+
+        <form [formGroup]="scriptForm" class="script-form">
+          <div class="form-row">
+            <div class="form-group">
+              <x-form-item label="脚本名称" [required]="isEditing() || isCreating()">
+                <x-input formControlName="name" [disabled]="!isEditing() && !isCreating()" placeholder="输入脚本名称">
+                </x-input>
+                <div *ngIf="scriptForm.get('name')?.invalid && scriptForm.get('name')?.touched" class="form-error">
+                  请输入脚本名称
+                </div>
+              </x-form-item>
+            </div>
+            <div class="form-group">
+              <x-form-item label="语言" [required]="isEditing() || isCreating()">
+                <x-select formControlName="language" [data]="languageOptions" [disabled]="!isEditing() && !isCreating()"
+                  placeholder="选择脚本语言">
+                </x-select>
+              </x-form-item>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <x-form-item label="描述">
+              <x-input formControlName="description" [disabled]="!isEditing() && !isCreating()"
+                placeholder="简要描述脚本的功能和用途">
+              </x-input>
+            </x-form-item>
+          </div>
+
+          <div class="form-group">
+            <x-form-item label="类型" [required]="isEditing() || isCreating()">
+              <x-radio formControlName="type" [data]="scriptTypes()" [disabled]="!isEditing() && !isCreating()">
+              </x-radio>
+              <div class="type-description" *ngIf="scriptForm.get('type')?.value">
+                {{ getTypeDescription(scriptForm.get('type')?.value) }}
+              </div>
+            </x-form-item>
+          </div>
+
+          <div class="form-group">
+            <x-form-item label="脚本内容" [required]="isEditing() || isCreating()">
+              <div class="editor-container">
+                <!-- Replace CodeMirror with a simple textarea -->
+                <textarea 
+                  formControlName="content" 
+                  class="script-textarea"
+                  [readonly]="!isEditing() && !isCreating()"
+                  placeholder="输入脚本内容">
+                </textarea>
+                <div *ngIf="scriptForm.get('content')?.invalid && scriptForm.get('content')?.touched"
+                  class="form-error">
+                  请输入脚本内容
+                </div>
+              </div>
+              <div class="editor-tips" *ngIf="isEditing() || isCreating()">
+                <p><strong>提示:</strong> {{ getLanguageTips(scriptForm.get('language')?.value) }}</p>
+              </div>
+            </x-form-item>
+          </div>
+
+          <div class="form-group" *ngIf="isEditing() || isCreating()">
+            <x-form-item label="标签">
+              <!-- Replace x-tags component with regular text input -->
+              <x-input 
+                formControlName="tags" 
+                [disabled]="!isEditing() && !isCreating()" 
+                placeholder="使用#添加标签，例如: #抽取 #用户数据">
+              </x-input>
+              <div class="tag-tips">使用#号添加标签，多个标签用空格分隔，例如: #抽取 #用户数据 #清洗</div>
+            </x-form-item>
+          </div>
+
+          <div class="form-actions" *ngIf="isEditing() || isCreating()">
+            <x-button icon="fto-save" type="primary" (click)="saveScript()" [loading]="loading()">保存</x-button>
+            <x-button icon="fto-x" (click)="cancelEdit()">取消</x-button>
+          </div>
+        </form>
+
+        <!-- Test panel -->
+        <div class="test-panel" *ngIf="isTesting()">
+          <div class="test-header">
+            <h3>脚本测试</h3>
+            <x-button icon="fto-x" (click)="isTesting.set(false)">关闭</x-button>
+          </div>
+
+          <div class="test-content">
+            <div class="input-section">
+              <h4>输入样例数据 (JSON 格式)</h4>
+              <!-- Replace CodeMirror with textarea -->
+              <textarea 
+                [(ngModel)]="sampleData" 
+                class="sample-data-textarea"
+                placeholder='{
+  "example": "请在这里输入JSON格式的测试数据",
+  "data": [1, 2, 3]
+}'>
+              </textarea>
+              <x-button type="primary" (click)="testScript()" [loading]="loading()">执行测试</x-button>
+            </div>
+
+            <div class="output-section" *ngIf="testResult()">
+              <h4>测试结果</h4>
+              <div class="result" [class.success]="testResult()?.success" [class.error]="!testResult()?.success">
+                <div *ngIf="testResult()?.success">
+                  <div>执行成功 ({{ testResult()?.executionTime }}ms)</div>
+                  <ngx-codemirror [ngModel]="testResult()?.output | json" [options]="readOnlyJsonEditorOptions"
+                    class="result-editor">
+                  </ngx-codemirror>
+                </div>
+                <div *ngIf="!testResult()?.success" class="error-message">
+                  <pre>{{ testResult()?.error }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </ng-container>
+
+      <!-- Empty state when no script is selected -->
+      <div class="empty-state" *ngIf="!selectedScript() && !isCreating()">
+        <div class="empty-icon">
+          <i class="fto-file-text"></i>
+        </div>
+        <div class="empty-text">
+          <h3>请选择一个脚本或创建新脚本</h3>
+          <p>选择左侧列表中的脚本查看详情，或点击"新建脚本"按钮创建新的脚本</p>
+          <x-button type="primary" (click)="createScript()">新建脚本</x-button>
+        </div>
+      </div>
     </div>
   </div>
-</au-tool>
-
-<au-tool *ngIf="activeTabIndex === 0">
-  <x-button icon="fto-plus" (click)="addCustomRows(1)">添加行</x-button>
-  <x-button [icon]="'fto-edit-3'" [type]="editMode ? 'primary' : undefined" (click)="toggleEditMode()">
-    {{editMode ? '退出批量编辑' : '批量编辑'}}
-  </x-button>
-  <ng-container *ngIf="editMode">
-    <x-button icon="fto-copy" (click)="copySelection()" [disabled]="!hasSelection">复制</x-button>
-    <x-button icon="fto-clipboard" (click)="pasteSelection()" [disabled]="!clipboardContent">粘贴</x-button>
-    <x-button icon="fto-trash-2" type="danger" (click)="clearSelection()" [disabled]="!hasSelection">清空选中</x-button>
-    <x-input placeholder="批量填充值" [(ngModel)]="batchFillValue"></x-input>
-    <x-button icon="fto-check-square" (click)="fillSelection()" [disabled]="!hasSelection">填充选中</x-button>
-  </ng-container>
-</au-tool>
-
-<div *ngIf="grid?.data.length === 0 && !isBatchProcessing" class="empty-tasks-message">
-  <div class="empty-icon">
-    <i class="fto-database"></i>
-  </div>
-  <p>正在准备空白表格，请稍候...</p>
 </div>
-
-<x-progress *ngIf="showProgress || isBatchProcessing" [percent]="latestJob?.progress || 50"></x-progress>
-<p *ngIf="isBatchProcessing">正在加载批处理任务数据...</p>
-<p *ngIf="!showProgress && !isImporting && !isBatchProcessing && grid?.data.length > 0">没有正在进行的任务。</p>
-<p *ngIf="isImporting">正在准备任务...</p>
-
-<div class="edit-mode-indicator" *ngIf="editMode">
-  <span>批量编辑模式：</span>
-  <span *ngIf="hasSelection">已选择 {{selectedCells.length}} 个单元格</span>
-  <span *ngIf="!hasSelection">请选择单元格</span>
-</div>
-
-<x-tabs [activatedIndex]="activeTabIndex" (activatedChange)="onTabChanged($event)">
-  <x-tab [label]="'数据表格'">
-    <div class="table-scroll-hint">
-      提示：可以左右滑动表格查看更多内容，按住Shift键+滚轮可水平滚动
-    </div>
-    <x-row>
-      <div #datagridContainer class="canvas-datagrid-container"></div>
-    </x-row>
-  </x-tab>
-  <x-tab [label]="'导入预览'" *ngIf="previewData.length > 0">
-    <x-table [columns]="previewColumns" [data]="previewData" [bodyHeight]="600"></x-table>
-  </x-tab>
-</x-tabs>
-
-<!-- 创建批处理任务对话框 -->
-<x-dialog title="创建新的批处理任务" [(visible)]="showNewBatchTaskDialog" width="500px" 
-          (cancel)="showNewBatchTaskDialog = false" (confirm)="confirmCreateBatchTask()">
-  <div class="batch-task-form">
-    <div class="form-group">
-      <label>任务名称：</label>
-      <x-input placeholder="请输入任务名称" [(ngModel)]="newBatchTask.name"></x-input>
-    </div>
-    <div class="form-group">
-      <label>任务描述：</label>
-      <x-textarea placeholder="请输入任务描述" [(ngModel)]="newBatchTask.description"></x-textarea>
-    </div>
-  </div>
-</x-dialog>
