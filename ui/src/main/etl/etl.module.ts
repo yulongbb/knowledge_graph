@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -12,6 +12,7 @@ import { DataPreviewComponent } from './components/data-preview.component';
 import { EtlRoutingModule } from './etl-routing.module';
 import { ProjectListComponent } from './components/project-list.component';
 import { CreateProjectDialogComponent } from './components/create-project-dialog.component';
+import { NgNestModule } from 'src/share/ng-nest.module';
 
 @NgModule({
   declarations: [
@@ -26,21 +27,22 @@ import { CreateProjectDialogComponent } from './components/create-project-dialog
   imports: [
     CommonModule,
     ShareModule,
+    NgNestModule,
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forChild([
       {
         path: '',
-        component: EtlGraphComponent,
+        component: ProjectListComponent,
       }
     ]),
     EtlRoutingModule,
-
   ],
   exports: [
     EtlGraphComponent,
     EtlToolboxComponent,
     NodeConfigPanelComponent
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA] // Add schema to handle custom elements
 })
 export class EtlModule { }

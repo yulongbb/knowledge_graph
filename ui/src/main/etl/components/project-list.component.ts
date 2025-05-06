@@ -23,7 +23,7 @@ import { CreateProjectDialogComponent } from './create-project-dialog.component'
             <h3>{{project.name}}</h3>
           </div>
           <div class="card-body">
-            <p>{{project.description}}</p>
+            <p>{{project.description || '暂无描述'}}</p>
             <div class="meta">
               <span><i class="fto-calendar"></i>创建: {{project.createTime | date:'short'}}</span>
               <span><i class="fto-refresh-cw"></i>更新: {{project.updateTime | date:'short'}}</span>
@@ -34,6 +34,14 @@ import { CreateProjectDialogComponent } from './create-project-dialog.component'
             <x-button type="danger" icon="fto-trash-2" (click)="confirmDelete(project.id)">删除</x-button>
           </div>
         </x-card>
+        
+        <div class="empty-list" *ngIf="(projects$ | async)?.length === 0">
+          <div class="empty-content">
+            <i class="fto-inbox"></i>
+            <p>暂无项目，点击"新建项目"开始创建</p>
+            <x-button type="primary" icon="fto-plus" (click)="openCreateDialog()">新建项目</x-button>
+          </div>
+        </div>
       </div>
     </div>
   `,

@@ -15,12 +15,18 @@ import { DataService } from '../services/data.service';
             显示前10条数据，共 {{data.length}} 条
           </div>
         </div>
+        <div class="card-empty" *ngIf="!((dataService.previewData$ | async)?.data)">
+          <div class="empty-placeholder">
+            <i class="fto-database"></i>
+            <p>尚无数据预览，请选择一个节点并配置数据</p>
+          </div>
+        </div>
       </x-card>
     </div>
   `,
   styles: [`
     .data-preview {
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #f0f0f0;
       padding: 16px;
       height: 300px;
       overflow: hidden;
@@ -31,13 +37,41 @@ import { DataService } from '../services/data.service';
       padding: 16px;
       border-bottom: 1px solid #f0f0f0;
     }
+    .card-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
     .card-body {
       padding: 16px;
+      overflow: auto;
+    }
+    .card-empty {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+    }
+    .empty-placeholder {
+      text-align: center;
+      color: #bfbfbf;
+    }
+    .empty-placeholder i {
+      font-size: 32px;
+      margin-bottom: 8px;
     }
     .info {
       padding: 8px;
       color: #666;
       font-size: 12px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    
+    ::ng-deep .x-table {
+      width: 100%;
     }
   `]
 })

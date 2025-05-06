@@ -75,26 +75,18 @@ interface ConfigField {
           </form>
         </div>
       </x-card>
-
-      <div class="data-preview" *ngIf="previewData$ | async as preview">
-        <x-card>
-          <div class="card-header">
-            <h4>数据预览</h4>
-          </div>
-          <div class="card-body">
-            <pre>{{preview.data | json}}</pre>
-          </div>
-        </x-card>
-      </div>
     </div>
   `,
   styles: [`
     .config-panel {
       padding: 16px;
       margin: 8px;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
     }
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
     label {
       display: block;
@@ -102,36 +94,32 @@ interface ConfigField {
       font-weight: 500;
     }
     .form-actions {
-      margin-top: 16px;
+      margin-top: 24px;
       display: flex;
       justify-content: flex-end;
-    }
-    .data-preview {
-      margin-top: 16px;
-    }
-    pre {
-      max-height: 200px;
-      overflow: auto;
-      margin: 0;
     }
     .card-header {
       padding: 16px;
       border-bottom: 1px solid #f0f0f0;
     }
+    .card-header h3, .card-header h4 {
+      margin: 0;
+    }
     .card-body {
       padding: 16px;
     }
     .transform-help {
-      margin-top: 8px;
-      padding: 8px;
-      background: #f5f5f5;
+      margin-top: 16px;
+      padding: 16px;
+      background: #f9f9f9;
       border-radius: 4px;
+      border: 1px solid #f0f0f0;
     }
     .example-list {
-      margin: 8px 0;
+      margin: 12px 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
     .example-header {
       display: flex;
@@ -144,23 +132,33 @@ interface ConfigField {
     .example-desc {
       color: #666;
       font-size: 12px;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
     .example-code {
       display: block;
-      padding: 4px;
+      padding: 8px;
       background: #f8f9fa;
       font-size: 12px;
       white-space: pre-wrap;
+      border-radius: 4px;
+      border: 1px solid #eee;
     }
     .help-text {
-      font-size: 12px;
+      font-size: 13px;
       color: #666;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
     }
     code {
       background: #f8f9fa;
       padding: 2px 4px;
       border-radius: 2px;
+      font-family: monospace;
+    }
+    
+    ::ng-deep .x-input, ::ng-deep .x-textarea {
+      width: 100%;
     }
   `]
 })
@@ -190,19 +188,32 @@ export class NodeConfigPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // 获取项目ID
     this.route.paramMap.subscribe(params => {
       this.projectId = params.get('id')!;
     });
 
+    // 监听节点选择变化
     this.subscription = this.selectedNode$.subscribe(async (node: NodeConfig | null) => {
+      console.log("Node selected in panel:", node);
       this.currentNode = node;
+      
       if (node) {
         try {
+          console.log("Loading config for node:", node.id);
+          // 加载节点配置
           const config = await this.projectService.loadNodeConfig(this.projectId, node.id);
+          console.log("Loaded node config:", config);
           this.initForm(node, config || {});
         } catch (error: any) {
+          console.error("Failed to load node config:", error);
           this.message.error(`加载节点配置失败: ${error.message}`);
+          // 即使加载失败，也初始化一个空表单
+          this.initForm(node, {});
         }
+      } else {
+        // 创建一个空的表单，防止界面出错
+        this.configForm = this.fb.group({});
       }
     });
   }

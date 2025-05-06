@@ -1,7 +1,7 @@
 @import '../styles/shared.scss'; // Ensure the correct path to shared.scss
 
 .project-container {
-    padding: 24px;
+    padding: 32px;
     background: #f5f5f5;
     min-height: 100vh;
 }
@@ -10,12 +10,24 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 
     h2 {
         margin: 0;
-        font-size: 24px;
+        font-size: 28px;
         color: #262626;
+        font-weight: 500;
+        position: relative;
+        
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: #1890ff;
+        }
     }
 }
 
@@ -29,16 +41,22 @@
 }
 
 .project-card {
-    transition: transform 0.3s;
-
+    transition: all 0.3s;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    
     &:hover {
-        transform: translateY(-4px);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        border-color: #1890ff;
     }
 }
 
 .card-header {
-    padding: 16px;
+    padding: 20px;
     border-bottom: 1px solid #f0f0f0;
+    background-color: #fafafa;
     
     h3 {
         margin: 0;
@@ -48,28 +66,33 @@
 }
 
 .card-body {
-    padding: 16px;
+    padding: 20px;
     
     p {
         margin: 0 0 16px 0;
         color: #595959;
+        min-height: 40px;
     }
 }
 
 .card-actions {
-    padding: 12px 16px;
+    padding: 16px 20px;
     border-top: 1px solid #f0f0f0;
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 12px;
+    background-color: #fafafa;
 }
 
 .meta {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
     color: #8c8c8c;
     font-size: 13px;
-    margin-top: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed #f0f0f0;
 
     span {
         display: flex;
@@ -78,6 +101,7 @@
         
         i {
             font-size: 16px;
+            color: #1890ff;
         }
     }
 }
@@ -85,13 +109,101 @@
 .actions {
     margin-top: 16px;
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 :host ::ng-deep {
+    .x-card {
+        border-radius: 6px;
+    }
+    
     .x-card__actions {
         display: flex;
-        gap: 8px;
+        gap: 12px;
         justify-content: flex-end;
+    }
+}
+
+.empty-list {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.empty-content {
+    text-align: center;
+    color: #bfbfbf;
+    padding: 40px;
+    
+    i {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+    
+    p {
+        margin-bottom: 24px;
+        font-size: 16px;
+    }
+}
+
+// Add loading styles
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-content {
+    background-color: rgba(0, 0, 0, 0.65);
+    padding: 16px 24px;
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    
+    i {
+        font-size: 24px;
+        animation: spin 1.2s infinite linear;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+// Add responsive styles
+@media (max-width: 768px) {
+    .project-container {
+        padding: 20px;
+    }
+    
+    .header {
+        margin-bottom: 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .project-list {
+        grid-template-columns: 1fr;
     }
 }

@@ -31,12 +31,14 @@ import { XDialogRef, X_DIALOG_DATA } from '@ng-nest/ui/dialog';
   `,
   styles: [`
     .dialog-container {
-      min-width: 450px;
-      padding: 1rem;
+      width: 500px;
+      padding: 1.5rem;
     }
     .dialog-title {
       margin-top: 0;
       margin-bottom: 1.5rem;
+      font-size: 18px;
+      color: #262626;
     }
     .form-group {
       margin-bottom: 1.5rem;
@@ -60,6 +62,10 @@ import { XDialogRef, X_DIALOG_DATA } from '@ng-nest/ui/dialog';
       justify-content: flex-end;
       margin-top: 2rem;
       gap: 0.5rem;
+    }
+    
+    ::ng-deep .x-input, ::ng-deep .x-textarea {
+      width: 100%;
     }
   `]
 })

@@ -4,6 +4,10 @@ import { Component } from '@angular/core';
   selector: 'app-etl-toolbox',
   template: `
     <div class="etl-toolbox">
+      <div class="toolbox-header">
+        <h3>拖拽组件到画布</h3>
+      </div>
+      
       <x-card class="node-item source" draggable="true" (dragstart)="onDragStart($event, 'source')">
         <div class="card-body">
           <div class="node-content">
@@ -41,16 +45,35 @@ import { Component } from '@angular/core';
       display: flex;
       flex-direction: column;
       gap: 16px;
+      height: 100%;
+    }
+    
+    .toolbox-header {
+      margin-bottom: 8px;
+    }
+    
+    .toolbox-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #595959;
     }
     
     .node-item {
       cursor: move;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
+      border-radius: 6px;
+      overflow: hidden;
     }
     
     .node-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    
+    .node-item:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .card-body {
@@ -65,13 +88,14 @@ import { Component } from '@angular/core';
     }
     
     .node-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
+      font-size: 28px;
+      margin-bottom: 12px;
     }
     
     .node-label {
       font-weight: 500;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      font-size: 16px;
     }
     
     .node-desc {
