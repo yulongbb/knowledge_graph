@@ -191,8 +191,8 @@ export const layoutRoutes: Routes = [
   {
     path: "algorithm",
     loadChildren: () =>
-      import("../main/algorithm/algorithm.module").then(
-        x => x.AlgorithmModule
+      import("../main/etl/etl.module").then(
+        x => x.EtlModule
       ),
     canLoad: [AuthGuard],
     data: {

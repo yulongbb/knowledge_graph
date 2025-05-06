@@ -10,6 +10,7 @@ import { AddonModule } from './addons/addon.module';
 import { DatasetModule } from './dataset/dataset.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ArticleModule } from './article/article.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ArticleModule } from './article/article.module';
     AddonModule,
     DatasetModule,
     ArticleModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],
