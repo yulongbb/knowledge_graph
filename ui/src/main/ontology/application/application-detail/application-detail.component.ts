@@ -11,6 +11,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { forkJoin, map } from 'rxjs';
 import { OntologyService } from '../../ontology/ontology.service';
 import { ApplicationService } from '../application.sevice';
+import { NamespaceService } from '../../namespace/namespace.service'; // 修正路径
 
 @Component({
   selector: 'app-application-detail',
@@ -23,32 +24,47 @@ export class ApplicationDetailComponent implements OnInit {
   type: string = '';
   predicate: any;
   @ViewChild('form') form!: XFormComponent;
+  namespaces: any[] = []; // 存储命名空间列表
   controls: XControl[] = [
-
     {
       control: 'input',
       id: 'name',
       label: '名称',
       required: true,
-      maxlength: 16,
-      // pattern: /^[A-Za-z0-9]{4,16}$/,
-      // message: '只能包括数字、字母的组合，长度为4-16位'
+      maxlength: 50,
     },
     {
-      control: 'find',
-      id: 'schemas',
-      label: '本体',
+      control: 'textarea',
+      id: 'description',
+      label: '描述',
+      required: false,
+      rows: 4,
+    },
+    {
+      control: 'input',
+      id: 'category',
+      label: '分类',
       required: true,
+    },
+    {
+      control: 'input',
+      id: 'url',
+      label: '访问链接',
+      required: false,
+    },
+    {
+      control: 'switch',
+      id: 'isPinned',
+      label: '是否置顶',
+      required: false,
+    },
+    {
+      control: 'select',
+      id: 'namespaces',
+      label: '关联命名空间',
+      required: false,
       multiple: true,
-      treeData: () =>
-        this.ontologyService
-          .getList(1, Number.MAX_SAFE_INTEGER, {
-            sort: [
-              { field: 'pid', value: 'asc' },
-              { field: 'sort', value: 'asc' },
-            ],
-          })
-          .pipe(map((x) => x.list)),
+      data: () => this.namespaceService.getList(1, 50).pipe(map((x: any) => x.list)), // 显式声明x类型
     },
   ];
   title = '';
@@ -56,16 +72,15 @@ export class ApplicationDetailComponent implements OnInit {
     return this.form?.formGroup?.invalid;
   }
   disabled = false;
-  query: any;
 
   constructor(
     private ontologyService: OntologyService,
     private applicationService: ApplicationService,
+    private namespaceService: NamespaceService, // 注入命名空间服务
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private message: XMessageService
   ) {
-    // 获取路由参数
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
       this.id = x.get('id') as string;
       this.type = x.get('type') as string;
@@ -74,7 +89,7 @@ export class ApplicationDetailComponent implements OnInit {
         this.disabled = true;
       } else if (this.type === 'add') {
         this.title = '新增应用';
-      } else if (this.type === 'update') {
+      } else if (this.type === 'edit') {
         this.title = '修改应用';
       }
     });
@@ -87,24 +102,8 @@ export class ApplicationDetailComponent implements OnInit {
   action(type: string) {
     switch (type) {
       case 'info':
-        console.log(this.id);
-        this.applicationService.get(this.id as string).subscribe((x: any) => {
-          this.query.filter = [
-            {
-              field: 'id',
-              value: x.id as string,
-              relation: 'applications',
-              operation: '=',
-            },
-          ];
-          this.ontologyService
-            .getList(1, 10, this.query)
-            .subscribe((y: any) => {
-              console.log(x);
-              console.log(y.list);
-              x['schemas'] = y.list;
-              this.form.formGroup.patchValue(x);
-            });
+        this.applicationService.get(this.id).subscribe((app: any) => {
+          this.form.formGroup.patchValue(app);
         });
         break;
       case 'edit':
@@ -112,19 +111,12 @@ export class ApplicationDetailComponent implements OnInit {
         break;
       case 'save':
         if (this.type === 'add') {
-          console.log('新增单个');
-          this.applicationService
-            .post(this.form.formGroup.value)
-            .subscribe((x) => {
-              this.message.success('新增成功！');
-              this.router.navigate(['/index/applications']);
-            });
+          this.applicationService.post(this.form.formGroup.value).subscribe(() => {
+            this.message.success('新增成功！');
+            this.router.navigate(['/index/applications']);
+          });
         } else if (this.type === 'edit') {
-          this.form.formGroup.value['id'] = Number.parseInt(this.id);
-          console.log(this.form.formGroup.value);
-
-          this.applicationService.put(this.form.formGroup.value).subscribe((x) => {
-            console.log(this.predicate);
+          this.applicationService.put({ ...this.form.formGroup.value, id: this.id }).subscribe(() => {
             this.message.success('修改成功！');
             this.router.navigate(['/index/applications']);
           });

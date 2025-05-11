@@ -34,4 +34,8 @@ export class NamespaceService extends XRepositoryService<Namespace, XQuery> {
 
     return defaultNamespace;
   }
+
+  async findByIds(ids: string[]): Promise<Namespace[]> {
+    return this.namespaceRepository.findByIds(ids);
+  }
 }

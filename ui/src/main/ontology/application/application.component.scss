@@ -1,64 +1,178 @@
 :host {
-
-
-    > x-container:not(first-child) {
-      margin-top: 1rem;
-    }
-    x-container{
-      height: 100%;
-    }
-    x-header{
-      min-height: 400px;
-    }
-    // x-footer {
-    //   min-height: 50px;
-    //   line-height: 3rem;
-    //   text-align: center;
-    // }
-    x-header {
-      background-color: var(--x-info-200);
-    }
-    x-footer {
-      background-color: var(--x-info-300);
-    }
-    x-main {
-      height: 500px;
-      background-color: var(--x-info-400);
-    }
-    x-aside {
-      min-width: 400px;
-      height: 900px;
-      background-color: var(--x-info-500);
-    }
-
-
-    
-    // .design-td {
-    //   display: flex;
-    //   align-items: center;
-    // }
-    // .design-td x-icon {
-    //   font-size: 4rem;
-    //   padding: 1rem;
-    // }
-    // .design-td-inner {
-    //   margin-left: 0.875rem;
-    //   display: flex;
-    //   flex-direction: column;
-    // }
-    // .design-td-name {
-    //   font-weight: 600;
-    // }
-    // .echart {
-    //   width: 100%;
-    //   height: 500px;
-    // }
+  > x-container:not(first-child) {
+    margin-top: 1rem;
+  }
+  x-container{
+    height: 100%;
+  }
+  x-header{
+    min-height: 400px;
+  }
+  x-header {
+    background-color: var(--x-info-200);
+  }
+  x-footer {
+    background-color: var(--x-info-300);
+  }
+  x-main {
+    height: 500px;
+    background-color: var(--x-info-400);
+  }
+  x-aside {
+    min-width: 400px;
+    height: 900px;
+    background-color: var(--x-info-500);
+  }
   
-    x-input-group {
-      display: block;
-      width: 100%;
+  x-input-group {
+    display: block;
+    width: 100%;
+  }
+  
+  x-input-group:not(:first-child) {
+    margin-top: 1rem;
+  }
+  
+  .search-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .app-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    
+    .app-table-image {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
     }
-    x-input-group:not(:first-child) {
-      margin-top: 1rem;
+    
+    x-icon {
+      font-size: 2rem;
+      color: #ccc;
     }
   }
+  
+  .rating-display {
+    display: flex;
+    flex-direction: column;
+    
+    .rating-stars {
+      color: #f5a623;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    
+    .rating-value {
+      font-size: 0.875rem;
+      color: #666;
+      margin-top: 2px;
+    }
+  }
+  
+  .pinned-apps {
+    margin-bottom: 2rem;
+    
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .pinned-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .pinned-card {
+      display: flex;
+      flex-direction: column;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .app-icon {
+        height: 140px;
+        object-fit: cover;
+        width: 100%;
+      }
+      
+      .app-info {
+        padding: 1rem;
+        flex-grow: 1;
+        
+        h4 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+        }
+        
+        .app-rating {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.75rem;
+          
+          .stars {
+            color: #f5a623;
+            font-size: 1rem;
+          }
+          
+          .reviews {
+            margin-left: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+          }
+        }
+        
+        .app-description {
+          margin: 0;
+          color: #666;
+          font-size: 0.875rem;
+          line-height: 1.4;
+        }
+      }
+      
+      .app-actions {
+        display: flex;
+        padding: 0.75rem 1rem;
+        border-top: 1px solid #eee;
+        justify-content: space-between;
+        
+        x-button {
+          flex: 1;
+          margin: 0 0.25rem;
+          
+          &:first-child {
+            margin-left: 0;
+          }
+          
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+  
+  .au-table-actions {
+    display: flex;
+    x-link {
+      margin-right: 8px;
+      
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}

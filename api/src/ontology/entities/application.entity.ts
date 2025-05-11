@@ -13,8 +13,14 @@ export class Application {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('int', { nullable: true })
+  @Column('float', { nullable: true, default: 0 })
   rating: number;
+
+  @Column('int', { nullable: true, default: 0 })
+  reviews: number;
+
+  @Column('int', { nullable: true, default: 0 })
+  totalRatings: number;
 
   @Column('text', { nullable: true }) // 单值字段：分类
   category: string;
@@ -22,8 +28,20 @@ export class Application {
   @Column('simple-array', { nullable: true }) // 多值字段：标签
   tags: string[];
 
-  @Column('simple-array', { nullable: true }) // 使用 simple-array 存储图片数组
-  images: string[]; // 图片字段改为数组
+  @Column('text', { nullable: true })
+  image: string; // 主图片
+
+  @Column('simple-array', { nullable: true }) // 使用 simple-array 存储截图数组
+  screenshots: string[]; // 截图数组
+
+  @Column('text', { nullable: true })
+  url: string; // 应用访问链接
+
+  @Column('boolean', { nullable: true, default: false })
+  isPinned: boolean; // 是否置顶
+
+  @Column('simple-array', { nullable: true }) // 存储用户评分数组
+  userRatings: number[];
 
   @ManyToMany(() => Namespace, (namespace) => namespace.applications)
   @JoinTable({
