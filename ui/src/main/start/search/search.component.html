@@ -78,7 +78,7 @@
     </div>
 
     <!-- 图片预览 -->
-    <div class="result-item image-preview" *ngIf="images.length > 0">
+    <div class="result-item image-preview" *ngIf="images?.length > 0">
       <div class="image-grid">
         <img *ngFor="let image of images?.slice(0, 4)" [src]="getFullImageUrl(image.image)" [alt]="image" />
       </div>
@@ -86,7 +86,7 @@
     </div>
 
     <!-- 视频预览 -->
-    <div *ngIf="videos.length > 0">
+    <div *ngIf="videos?.length > 0">
       <div class="result-item video-preview" *ngFor="let video of videos?.slice(0, 4)">
         <div class="video-thumbnail">
           <img [src]="
