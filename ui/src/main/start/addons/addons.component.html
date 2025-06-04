@@ -22,6 +22,7 @@
 
   <!-- 右侧内容区域 -->
   <div class="content">
+    <button class="visualize-button" (click)="visualize()">可视化</button>
     <!-- Carousel for pinned applications -->
     <div class="carousel"
       *ngIf="pinnedExtensions.length > 0 && (!selectedCategory || selectedCategory === '全部') && !isCreating && !isEditing && !selectedExtension">
@@ -217,6 +218,7 @@
                   extension.description.length > 150 ? '...' : '' }}</p>
               </div>
             </a>
+            <button class="visualize-button" (click)="visualizeExtension(extension)">可视化</button>
             <a [href]="extension.url" target="_blank" class="visit-button">访问应用</a>
           </div>
         </div>
@@ -286,6 +288,7 @@
 
             </div>
           </a>
+          <button class="visualize-button" (click)="visualizeExtension(extension)">可视化</button>
           <a [href]="extension.url" target="_blank" class="visit-button">访问应用</a>
         </div>
       </div>

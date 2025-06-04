@@ -209,19 +209,21 @@ export class AddonsComponent implements OnInit {
 
       this.http.post<{urls: string[]}>('/api/addons/upload-screenshots', formData).subscribe(
         response => {
-          if (this.selectedExtension) {
-            // Initialize screenshots array if undefined
+          if (this.isEditing && this.selectedExtension) {
             if (!this.selectedExtension.screenshots) {
               this.selectedExtension.screenshots = [];
             }
-            // Add new screenshots to existing ones
             this.selectedExtension.screenshots = [
               ...this.selectedExtension.screenshots,
               ...response.urls
             ];
             console.log('Updated screenshots:', this.selectedExtension.screenshots);
-            // Trigger change detection
             this.selectedExtension = {...this.selectedExtension};
+          } else if (this.isCreating) {
+            this.newExtension.screenshots = [
+              ...this.newExtension.screenshots,
+              ...response.urls
+            ];
           }
         },
         error => {
@@ -309,4 +311,13 @@ export class AddonsComponent implements OnInit {
       });
   }
 
+  visualize() {
+    console.log('Visualize button clicked');
+    // 在这里实现可视化逻辑
+  }
+
+  visualizeExtension(extension: Extension) {
+    console.log('Visualizing extension:', extension.name);
+    // 在这里实现具体的可视化逻辑
+  }
 }
