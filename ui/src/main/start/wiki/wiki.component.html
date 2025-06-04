@@ -1,0 +1,206 @@
+<div class="wiki-container">
+  <!-- 顶部导航 -->
+  <header class="wiki-header">
+    <div class="logo-container">
+      <img src="assets/images/wiki/logo.png" class="wiki-logo" alt="知识百科">
+    </div>
+    <div class="header-tools">
+      <div class="search-box">
+        <input type="text" placeholder="搜索词条" class="search-input">
+        <button class="search-button"><i class="fa fa-search"></i></button>
+      </div>
+      <div class="user-tools">
+        <a href="#" class="tool-link"><i class="fa fa-bell"></i></a>
+        <a href="#" class="tool-link"><i class="fa fa-user"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <div class="wiki-content">
+    <!-- 百科标题 -->
+    <div class="wiki-title-container">
+      <h1 class="wiki-title">{{wikiTitle}}</h1>
+      <div class="wiki-nav">
+        <a href="#" class="active">阅读</a>
+        <a href="#">讨论</a>
+      </div>
+    </div>
+
+    <!-- 主要内容区分为两列 -->
+    <div class="wiki-main-content">
+      <!-- 左侧列 -->
+      <div class="wiki-left-column">
+        <!-- 优秀条目 -->
+        <div class="wiki-section equal-height-card">
+          <div class="wiki-section-header">
+            <h3>【 优秀条目 】</h3>
+          </div>
+          <div class="wiki-section-content">
+            <div class="featured-entry">
+              <h4>{{featuredEntry.title}}</h4>
+              <p>{{featuredEntry.content}}</p>
+              <div class="entry-footer">
+                <a href="#" class="more-link">阅读全文</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 特色图片 -->
+        <div class="wiki-section equal-height-card">
+          <div class="wiki-section-header">
+            <h3>【 特色图片 】</h3>
+          </div>
+          <div class="wiki-section-content">
+            <div class="featured-image">
+              <blockquote class="quote">
+                各山各水各不同，无限风光无限中。古树吐翠色纷然，苍烟醉岭流云从。乱石铺溪水潺潺，绿树低垂柳赏风。看山不厌沙滩头，村舍酒垄名声隆。为我淘尽几多蓝，行人流连不愿归。小桥流水处处有，白鹭鸥鹭纷来去。
+              </blockquote>
+              <div class="quote-attribution">—— 《思乡》 (列宁·麦，国家，民族，去哪儿)</div>
+            </div>
+          </div>
+          <div class="section-footer">
+            <a href="#" class="more-link">更多</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧列 -->
+      <div class="wiki-right-column">
+        <!-- 热门条目 -->
+        <div class="wiki-section equal-height-card">
+          <div class="wiki-section-header">
+            <h3>【 热门条目 】</h3>
+          </div>
+          <div class="wiki-section-content">
+            <div class="hot-entries">
+              <ul class="entry-list">
+                <li *ngFor="let entry of hotEntries" class="entry-item">
+                  <div class="entry-content">
+                    <div class="entry-bullet">•</div>
+                    <div>
+                      <h4 class="entry-title">{{entry.title}}</h4>
+                      <p class="entry-description">{{entry.description}}</p>
+                      <a href="{{entry.linkUrl}}" *ngIf="entry.linkText" class="entry-link">{{entry.linkText}}</a>
+                    </div>
+                  </div>
+                  <img *ngIf="entry.imageUrl" [src]="entry.imageUrl" class="entry-image" [alt]="entry.title">
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="section-footer">
+            <a href="#" class="more-link">更多</a>
+          </div>
+        </div>
+
+        <!-- 每日图片 -->
+        <div class="wiki-section equal-height-card">
+          <div class="wiki-section-header">
+            <h3>【 每日图片 】</h3>
+          </div>
+          <div class="wiki-section-content">
+            <div class="daily-image">
+              <img [src]="featuredImage.imageUrl" [alt]="featuredImage.title">
+              <p class="image-description">{{featuredImage.description}}</p>
+            </div>
+          </div>
+          <div class="section-footer">
+            <a href="#" class="more-link">更多</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导航链接区 -->
+    <div class="wiki-section wiki-navigation">
+      <div class="wiki-section-header">
+        <h3>【 分类浏览 】</h3>
+      </div>
+      <div class="wiki-section-content">
+        <div class="navigation-links">
+          <div class="nav-row">
+            <a href="#" class="nav-link">关于知识</a>
+            <a href="#" class="nav-link">帮助指南</a>
+            <a href="#" class="nav-link">社区活动</a>
+            <a href="#" class="nav-link">站长须知</a>
+          </div>
+          <div class="nav-row">
+            <a href="#" class="nav-link">常见问答</a>
+            <a href="#" class="nav-link">热点推荐</a>
+            <a href="#" class="nav-link">精彩内容</a>
+            <a href="#" class="nav-link">编辑指引</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 参与编辑区 -->
+    <div class="wiki-section wiki-contribute">
+      <div class="wiki-section-header">
+        <h3>【 参与百科共创 】</h3>
+      </div>
+      <div class="wiki-section-content">
+        <div class="contribute-content">
+          <div class="contribute-item">
+            <img src="assets/images/wiki/contribute-icon.png" alt="参与百科">
+            <span>加入百科</span>
+          </div>
+          <div class="contribute-item">
+            <img src="assets/images/wiki/support-icon.png" alt="支持中心">
+            <span>支持中心</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 关于百科区 -->
+    <div class="wiki-section wiki-about">
+      <div class="wiki-section-header">
+        <h3>【 关于知识百科 】</h3>
+      </div>
+      <div class="wiki-section-content">
+        <div class="qr-codes">
+          <div class="qr-code-item">
+            <img src="assets/images/wiki/qr-1.png" alt="微信公众号">
+            <span>微信公众号</span>
+          </div>
+          <div class="qr-code-item">
+            <img src="assets/images/wiki/qr-2.png" alt="QQ群">
+            <span>QQ群(点击加入)</span>
+          </div>
+          <div class="qr-code-item">
+            <img src="assets/images/wiki/qr-3.png" alt="微信交流群">
+            <span>微信交流群</span>
+          </div>
+          <div class="qr-code-item">
+            <img src="assets/images/wiki/qr-4.png" alt="B站账号">
+            <span>B站账号(知识说)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="wiki-footer">
+    <div class="footer-links">
+      <a href="#" class="footer-link">个人信息保护声明</a>
+      <a href="#" class="footer-link">关于我们</a>
+      <a href="#" class="footer-link">企业声明</a>
+      <a href="#" class="footer-link">权责声明</a>
+      <a href="#" class="footer-link">用户协议</a>
+    </div>
+    <div class="footer-links">
+      <a href="#" class="footer-link">法律声明</a>
+      <a href="#" class="footer-link">隐私政策</a>
+      <a href="#" class="footer-link">平台审核</a>
+      <a href="#" class="footer-link">京ICP备20230316号</a>
+      <a href="#" class="footer-link">京公网安备20211202000090号</a>
+    </div>
+    <div class="copyright">
+      <span>© 中国互联网举报中心 举报电话:12377 京ICP备20230316号</span>
+    </div>
+  </footer>
+</div>

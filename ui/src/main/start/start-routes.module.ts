@@ -19,6 +19,11 @@ const routes: Routes = [
         loadChildren: () =>
           import("./knowledge/knowledge.module").then(x => x.KnowledgeModule)
       },
+       {
+        path: "wiki",
+        loadChildren: () =>
+          import("./wiki/wiki.module").then(x => x.WikiModule)
+      },
       {
         path: "image",
         loadChildren: () =>
