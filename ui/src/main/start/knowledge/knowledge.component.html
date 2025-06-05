@@ -12,159 +12,145 @@
   <app-knowledge-nav [categories]="categories" (categorySelected)="onCategorySelected($event)">
   </app-knowledge-nav>
 
-  <!-- 资讯类型及其子类型使用三栏布局 -->
-  <ng-container *ngIf="isNewsCategory(); else defaultLayout">
-    <div class="news-three-column-layout">
-      <!-- 左侧：类型卡片和标签筛选 -->
-      <aside class="news-sidebar-left">
-        <!-- 类型/来源卡片 -->
-        <div class="news-source-card">
-          <img [src]="selectedCategory || 'assets/news-avatar.png'" alt="资讯" class="news-source-logo">
-          <h3 class="news-source-title">{{ selectedCategory?.name || '资讯' }}</h3>
-          <p class="news-source-desc">{{ selectedCategory?.description || '最新资讯动态' }}</p>
-          <div class="news-source-follow">
-            <button class="follow-btn">
-              <i class="fas fa-plus"></i> 关注
-            </button>
-            <span>{{ selectedCategory || '1,006,445' }} 粉丝</span>
-          </div>
-        </div>
-
-        <!-- 标签筛选 -->
-        <div class="news-tags-filter">
-          <h4>热门标签</h4>
-          <div class="news-tags-list">
-            <span class="news-tag">热点</span>
-            <span class="news-tag">科技</span>
-            <span class="news-tag">财经</span>
-            <span class="news-tag">体育</span>
-            <span class="news-tag">娱乐</span>
-            <span class="news-tag">教育</span>
-          </div>
-        </div>
-      </aside>
-
-      <!-- 中间：资讯列表（可滚动） -->
-      <div class="news-content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
-        (scrolled)="onScrollEntity()">
-        <!-- 资讯列表 -->
-        <div class="news-feed">
-          <div *ngFor="let entity of entities" class="news-item">
-            <div class="news-item-header">
-              <img class="news-publisher-avatar" [src]="entity['_source']?.avatar || 'assets/default-avatar.png'"
-                alt="发布者">
-              <span class="news-publisher-name">{{ entity['_source']?.source || '新华社' }}</span>
-              <span class="news-publish-time">{{ entity['_source']?.publishTime || '2小时' }}</span>
-            </div>
-
-            <div class="news-item-content" [routerLink]="'/start/search/info/' + entity._id">
-              <h3 class="news-item-title">{{ entity["_source"]?.labels?.zh?.value }}</h3>
-              <div class="news-item-layout">
-                <p class="news-item-desc">{{ entity["_source"]?.descriptions?.zh?.value || "" }}</p>
-                <img *ngIf="entity['_source']?.screenshot || entity['_source']?.images?.length"
-                  [src]="entity['_source']?.screenshot || entity['_source']?.images?.[0] || 'assets/default-news.png'"
-                  alt="资讯图片" class="news-item-img">
-              </div>
-            </div>
-
-            <div class="news-item-actions">
-              <span class="news-action"><i class="far fa-thumbs-up"></i> {{ entity['_source']?.likeCount || '0' }}</span>
-              <span class="news-action"><i class="far fa-comment"></i> {{ entity['_source']?.commentCount || '0' }}</span>
-              <span class="news-action"><i class="far fa-share-square"></i> 分享</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右侧：推荐内容 -->
-      <aside class="news-sidebar-right">
-        <div class="news-hot-recommend">
-          <h4>热门推荐</h4>
-          <ul class="news-recommend-list">
-            <li class="news-recommend-item">
-              <div class="news-recommend-title">
-                <span class="news-recommend-num">1</span>
-                <span>成语起源地，故事有新篇——循迹文脉走读"万年仙居"</span>
-              </div>
-              <img src="assets/news1.jpg" alt="推荐新闻" class="news-recommend-img">
-            </li>
-            <li class="news-recommend-item">
-              <div class="news-recommend-title">
-                <span class="news-recommend-num">2</span>
-                <span>2025全国高考天气地图:江南北部雨强且持续</span>
-              </div>
-              <img src="assets/news2.jpg" alt="推荐新闻" class="news-recommend-img">
-            </li>
-            <li class="news-recommend-item">
-              <div class="news-recommend-title">
-                <span class="news-recommend-num">3</span>
-                <span>为什么全网都爱看江苏"内斗"?</span>
-              </div>
-              <img src="assets/news3.jpg" alt="推荐新闻" class="news-recommend-img">
-            </li>
-          </ul>
-        </div>
-      </aside>
+  <!-- 游戏类型布局 -->
+  <ng-container *ngIf="isGamesCategory(); else sportsLayout">
+    <div class="games-layout">
+      <app-knowledge-games></app-knowledge-games>
     </div>
   </ng-container>
 
-  <!-- 默认布局 -->
-  <ng-template #defaultLayout>
-    <div class="content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
-      (scrolled)="onScrollEntity()">
-      <div class="news-grid">
-        <!-- 其它类型整体渲染 -->
-        <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
-          <!-- 视频内容 -->
-          <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
-            <a [routerLink]="'/start/search/info/' + entity._id">
-              <img [src]="'data:image/jpeg;base64,' + entity['_source']?.videos[0].thumbnail" class="thumbnail"
-                loading="lazy" style="width: 100%; border-radius: 4px" />
-              <div class="play-icon">
-                <i class="fas fa-play"></i>
-              </div>
-              <div class="video-duration">
-                {{ entity["_source"]?.videos[0].duration || "00:00" }}
-              </div>
-            </a>
-            <div class="overlay-text">
-              <h3 [routerLink]="'/start/search/info/' + entity._id">
-                {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
-                {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
-              </h3>
-              <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
-            </div>
-          </div>
-
-          <!-- 文档内容 -->
-          <div *ngIf="entity['_source']?.documents?.length > 0" class="thumbnail-container">
-            <a [routerLink]="'/start/search/info/' + entity._id">
-              <img [src]="entity['_source']?.documents[0].thumbnail" class="thumbnail" loading="lazy"
-                style="width: 100%; border-radius: 4px" />
-            </a>
-            <div class="overlay-text">
-              <h3 [routerLink]="'/start/search/info/' + entity._id">
-                {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
-                {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
-              </h3>
-              <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
-            </div>
-          </div>
-
-          <!-- 图片内容 -->
-          <div *ngIf="!entity['_source']?.documents && !entity['_source']?.videos">
-            <img [routerLink]="'/start/search/info/' + entity._id" class="image"
-              *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
-              [src]="image.startsWith('http') ? image : 'http://'+ip+':9000/kgms/' + image" loading="lazy"
-              style="width: 100%; border-radius: 4px; margin-bottom: 12px" />
-            <h3 [routerLink]="'/start/search/info/' + entity._id">
-              {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
-              {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
-            </h3>
-            <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
-          </div>
-        </div>
+  <!-- 体育或其他布局 -->
+  <ng-template #sportsLayout>
+    <!-- 体育类型布局 -->
+    <ng-container *ngIf="isSportsCategory(); else aiToolsLayout">
+      <div class="sports-layout">
+        <app-knowledge-sports></app-knowledge-sports>
       </div>
-    </div>
+    </ng-container>
+
+    <!-- AI工具或其他布局 -->
+    <ng-template #aiToolsLayout>
+      <!-- AI工具类型布局 -->
+      <ng-container *ngIf="isAiToolsCategory(); else navigationLayout">
+        <div class="ai-tools-layout">
+          <app-knowledge-ai-tools></app-knowledge-ai-tools>
+        </div>
+      </ng-container>
+
+      <!-- 导航或其他布局 -->
+      <ng-template #navigationLayout>
+        <!-- 导航类型布局 -->
+        <ng-container *ngIf="isNavigationCategory(); else financeOrWeatherLayout">
+          <div class="navigation-layout">
+            <app-knowledge-navigation></app-knowledge-navigation>
+          </div>
+        </ng-container>
+        
+        <!-- 财经或天气或日历或新闻或默认布局 -->
+        <ng-template #financeOrWeatherLayout>
+          <!-- 财经类型布局 -->
+          <ng-container *ngIf="isFinanceCategory(); else weatherOrCalendarLayout">
+            <div class="finance-layout">
+              <app-knowledge-finance></app-knowledge-finance>
+            </div>
+          </ng-container>
+          
+          <!-- 天气或日历或新闻或默认布局 -->
+          <ng-template #weatherOrCalendarLayout>
+            <!-- 天气类型布局 -->
+            <ng-container *ngIf="isWeatherCategory(); else calendarOrNewsLayout">
+              <div class="weather-layout">
+                <app-knowledge-weather></app-knowledge-weather>
+              </div>
+            </ng-container>
+            
+            <!-- 日历或新闻或默认布局 -->
+            <ng-template #calendarOrNewsLayout>
+              <!-- 日历类型布局 -->
+              <ng-container *ngIf="isCalendarCategory(); else newsOrDefaultLayout">
+                <div class="calendar-layout">
+                  <app-knowledge-calendar 
+                    [events]="calendarEvents"
+                    (dateSelected)="onDateSelected($event)">
+                  </app-knowledge-calendar>
+                </div>
+              </ng-container>
+
+              <!-- 新闻或默认布局 -->
+              <ng-template #newsOrDefaultLayout>
+                <!-- 资讯类型及其子类型使用三栏布局 -->
+                <ng-container *ngIf="isNewsCategory(); else defaultLayout">
+                  <app-knowledge-news 
+                    [entities]="entities" 
+                    [selectedCategory]="selectedCategory"
+                    [onScrollEntity]="onScrollEntity.bind(this)">
+                  </app-knowledge-news>
+                </ng-container>
+
+                <!-- 默认布局 -->
+                <ng-template #defaultLayout>
+                  <div class="content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+                    (scrolled)="onScrollEntity()">
+                    <div class="news-grid">
+                      <!-- 其它类型整体渲染 -->
+                      <div *ngFor="let entity of entities" class="news-card" [style.grid-column]="getCardWidth(entity)">
+                        <!-- 视频内容 -->
+                        <div *ngIf="entity['_source']?.videos?.length > 0" class="thumbnail-container">
+                          <a [routerLink]="'/start/search/info/' + entity._id">
+                            <img [src]="'data:image/jpeg;base64,' + entity['_source']?.videos[0].thumbnail" class="thumbnail"
+                              loading="lazy" style="width: 100%; border-radius: 4px" />
+                            <div class="play-icon">
+                              <i class="fas fa-play"></i>
+                            </div>
+                            <div class="video-duration">
+                              {{ entity["_source"]?.videos[0].duration || "00:00" }}
+                            </div>
+                          </a>
+                          <div class="overlay-text">
+                            <h3 [routerLink]="'/start/search/info/' + entity._id">
+                              {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+                              {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+                            </h3>
+                            <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+                          </div>
+                        </div>
+
+                        <!-- 文档内容 -->
+                        <div *ngIf="entity['_source']?.documents?.length > 0" class="thumbnail-container">
+                          <a [routerLink]="'/start/search/info/' + entity._id">
+                            <img [src]="entity['_source']?.documents[0].thumbnail" class="thumbnail" loading="lazy"
+                              style="width: 100%; border-radius: 4px" />
+                          </a>
+                          <div class="overlay-text">
+                            <h3 [routerLink]="'/start/search/info/' + entity._id">
+                              {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+                              {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+                            </h3>
+                            <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+                          </div>
+                        </div>
+
+                        <!-- 图片内容 -->
+                        <div *ngIf="!entity['_source']?.documents && !entity['_source']?.videos">
+                          <img [routerLink]="'/start/search/info/' + entity._id" class="image"
+                            *ngFor="let image of entity['_source']?.images?.slice(0, 1)"
+                            [src]="image.startsWith('http') ? image : 'http://'+ip+':9000/kgms/' + image" loading="lazy"
+                            style="width: 100%; border-radius: 4px; margin-bottom: 12px" />
+                          <h3 [routerLink]="'/start/search/info/' + entity._id">
+                            {{ entity["_source"]?.labels?.zh?.value | slice:0:25 }}
+                            {{ entity["_source"]?.labels?.zh?.value.length > 25 ? "..." : "" }}
+                          </h3>
+                          <p>{{ entity["_source"]?.descriptions?.zh?.value || "No description available." }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-template>
+            </ng-template>
+          </ng-template>
+        </ng-template>
+      </ng-template>
+    </ng-template>
   </ng-template>
 </div>

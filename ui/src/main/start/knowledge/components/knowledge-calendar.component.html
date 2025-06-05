@@ -1,0 +1,48 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <div class="header-top">
+      <div class="month-navigation">
+        <button class="nav-btn" (click)="prevMonth()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="current-month">{{ monthNames[currentMonth] }} {{ currentYear }}</span>
+        <button class="nav-btn" (click)="nextMonth()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <button class="today-btn" (click)="goToToday()">今天</button>
+    </div>
+
+    <div class="weekdays">
+      <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+    </div>
+  </div>
+
+  <div class="calendar-body">
+    <div class="calendar-day" 
+      *ngFor="let day of calendarDays" 
+      [ngClass]="{
+        'other-month': !day.currentMonth,
+        'today': day.today,
+        'selected': day.selected,
+        'has-event': day.hasEvent
+      }"
+      (click)="selectDate(day)">
+      <span class="day-number">{{ day.date }}</span>
+      <div class="event-indicator" *ngIf="day.hasEvent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="events-container" *ngIf="events && events.length">
+  <h3>{{ selectedDate | date: 'yyyy年MM月dd日' }}的事件</h3>
+  <div class="event-list">
+    <div class="event-item" *ngFor="let event of events">
+      <div class="event-time">{{ event.time }}</div>
+      <div class="event-details">
+        <div class="event-title">{{ event.title }}</div>
+        <div class="event-description">{{ event.description }}</div>
+      </div>
+    </div>
+  </div>
+</div>

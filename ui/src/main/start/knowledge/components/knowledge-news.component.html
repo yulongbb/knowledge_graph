@@ -1,0 +1,78 @@
+<div class="news-three-column-layout">
+  <!-- 左侧：类型卡片和标签筛选 -->
+  <aside class="news-sidebar-left">
+    <!-- 类型/来源卡片 -->
+    <div class="news-source-card">
+      <img [src]="selectedCategory || 'assets/news-avatar.png'" alt="资讯" class="news-source-logo">
+      <h3 class="news-source-title">{{ selectedCategory?.name || '资讯' }}</h3>
+      <p class="news-source-desc">{{ selectedCategory?.description || '最新资讯动态' }}</p>
+      <div class="news-source-follow">
+        <button class="follow-btn">
+          <i class="fas fa-plus"></i> 关注
+        </button>
+        <span>{{ selectedCategory || '1,006,445' }} 粉丝</span>
+      </div>
+    </div>
+
+    <!-- 标签筛选 -->
+    <div class="news-tags-filter">
+      <h4>热门标签</h4>
+      <div class="news-tags-list">
+        <span class="news-tag">热点</span>
+        <span class="news-tag">科技</span>
+        <span class="news-tag">财经</span>
+        <span class="news-tag">体育</span>
+        <span class="news-tag">娱乐</span>
+        <span class="news-tag">教育</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 中间：资讯列表（可滚动） -->
+  <div class="news-content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+    (scrolled)="onScroll()">
+    <!-- 资讯列表 -->
+    <div class="news-feed">
+      <div *ngFor="let entity of entities" class="news-item">
+        <div class="news-item-header">
+          <img class="news-publisher-avatar" [src]="entity['_source']?.avatar || 'assets/default-avatar.png'"
+            alt="发布者">
+          <span class="news-publisher-name">{{ entity['_source']?.source || '新华社' }}</span>
+          <span class="news-publish-time">{{ entity['_source']?.publishTime || '2小时' }}</span>
+        </div>
+
+        <div class="news-item-content" [routerLink]="'/start/search/info/' + entity._id">
+          <h3 class="news-item-title">{{ entity["_source"]?.labels?.zh?.value }}</h3>
+          <div class="news-item-layout">
+            <p class="news-item-desc">{{ entity["_source"]?.descriptions?.zh?.value || "" }}</p>
+            <img *ngIf="entity['_source']?.screenshot || (entity['_source']?.images?.length)"
+              [src]="entity['_source']?.screenshot || entity['_source']?.images?.[0] || 'assets/default-news.png'"
+              alt="资讯图片" class="news-item-img">
+          </div>
+        </div>
+
+        <div class="news-item-actions">
+          <span class="news-action"><i class="far fa-thumbs-up"></i> {{ entity['_source']?.likeCount || '0' }}</span>
+          <span class="news-action"><i class="far fa-comment"></i> {{ entity['_source']?.commentCount || '0' }}</span>
+          <span class="news-action"><i class="far fa-share-square"></i> 分享</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧：推荐内容 -->
+  <aside class="news-sidebar-right">
+    <div class="news-hot-recommend">
+      <h4>热门推荐</h4>
+      <ul class="news-recommend-list">
+        <li *ngFor="let item of recommendList" class="news-recommend-item">
+          <div class="news-recommend-title">
+            <span class="news-recommend-num">{{ item.id }}</span>
+            <span>{{ item.title }}</span>
+          </div>
+          <img [src]="item.image" alt="推荐新闻" class="news-recommend-img">
+        </li>
+      </ul>
+    </div>
+  </aside>
+</div>

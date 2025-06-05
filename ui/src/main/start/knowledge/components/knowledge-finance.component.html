@@ -1,0 +1,117 @@
+<div class="finance-container">
+  <div class="finance-header">
+    <div class="header-title">
+      <h2>伦敦金 (XAUUSD)</h2>
+      <div class="refresh-btn-container">
+        <button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading">
+          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+        </button>
+      </div>
+    </div>
+    <div class="gold-price-overview">
+      <div class="current-price-container">
+        <div class="current-price">
+          {{ goldPrice.current.toFixed(2) }}
+          <span class="currency">USD</span>
+        </div>
+        <div class="price-change" [ngClass]="{'price-up': goldPrice.change > 0, 'price-down': goldPrice.change < 0}">
+          <span>
+            <i class="fas" [ngClass]="goldPrice.change >= 0 ? 'fa-caret-up' : 'fa-caret-down'"></i>
+            {{ Math.abs(goldPrice.change).toFixed(2) }} ({{ Math.abs(goldPrice.changePercent).toFixed(2) }}%)
+          </span>
+        </div>
+        <div class="update-time">
+          更新时间: {{ goldPrice.timestamp | date:'HH:mm:ss' }}
+        </div>
+      </div>
+      <div class="price-details">
+        <div class="detail-item">
+          <span class="label">开盘价</span>
+          <span class="value">{{ goldPrice.open.toFixed(2) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">前收盘</span>
+          <span class="value">{{ goldPrice.previousClose.toFixed(2) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">日高</span>
+          <span class="value">{{ goldPrice.high.toFixed(2) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">日低</span>
+          <span class="value">{{ goldPrice.low.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-header">
+      <h3>伦敦金价格走势</h3>
+      <div class="time-range-selector">
+        <button *ngFor="let range of timeRangeOptions" 
+          class="time-range-btn" 
+          [class.active]="selectedTimeRange === range"
+          (click)="changeTimeRange(range)">
+          {{ range }}
+        </button>
+      </div>
+    </div>
+    <div class="chart">
+      <div *ngIf="isLoading" class="chart-loading">
+        <i class="fas fa-spinner fa-spin"></i> 加载中...
+      </div>
+      <!-- 图表组件，假设使用 ng2-charts -->
+      <!-- 需要在项目中安装 chart.js 和 ng2-charts -->
+      <!-- <canvas baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'line'">
+      </canvas> -->
+      
+      <!-- 模拟图表效果 -->
+      <div class="mock-chart" *ngIf="!isLoading">
+        <div class="chart-trend" [ngClass]="{'trend-up': isPriceUp(), 'trend-down': !isPriceUp()}">
+          <div class="trend-line"></div>
+          <div class="trend-area"></div>
+        </div>
+        <div class="chart-labels">
+          <span *ngFor="let label of chartData.labels" class="chart-label">{{ label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="finance-content">
+    <div class="market-overview">
+      <h3>市场概况</h3>
+      <div class="market-grid">
+        <div *ngFor="let market of marketOverview" class="market-item">
+          <div class="market-name">{{ market.name }}</div>
+          <div class="market-value">{{ market.value }}</div>
+          <div class="market-change" [ngClass]="{'price-up': market.trend === 'up', 'price-down': market.trend === 'down'}">
+            <i class="fas" [ngClass]="market.trend === 'up' ? 'fa-caret-up' : 'fa-caret-down'"></i>
+            {{ market.change }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="financial-news">
+      <h3>财经新闻</h3>
+      <ul class="news-list">
+        <li *ngFor="let news of financialNews" class="news-item">
+          <a [href]="news.url" class="news-link">
+            <div class="news-content">
+              <h4 class="news-title">{{ news.title }}</h4>
+              <div class="news-meta">
+                <span class="news-source">{{ news.source }}</span>
+                <span class="news-time">{{ news.time }}</span>
+              </div>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

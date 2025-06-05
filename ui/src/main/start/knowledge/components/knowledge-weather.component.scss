@@ -1,0 +1,341 @@
+.weather-container {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.weather-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 15px;
+  
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .city-selector {
+    display: flex;
+    align-items: center;
+    
+    select {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      margin-right: 8px;
+      cursor: pointer;
+      
+      &:focus {
+        outline: none;
+        border-color: #1677ff;
+      }
+    }
+    
+    .refresh-btn {
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 4px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        background-color: #e0e0e0;
+      }
+      
+      i {
+        color: #666;
+      }
+    }
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 30px 0;
+  color: #999;
+  
+  i {
+    margin-right: 8px;
+    color: #1677ff;
+  }
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: #ff4d4f;
+  background-color: #fff2f0;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+.current-weather {
+  background-color: #f4f9ff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  
+  .weather-main {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    .weather-icon {
+      font-size: 72px;
+      color: #1677ff;
+      margin-right: 30px;
+      
+      i.fa-sun {
+        color: #ffb400;
+      }
+      
+      i.fa-cloud {
+        color: #8590a6;
+      }
+      
+      i.fa-cloud-rain {
+        color: #1677ff;
+      }
+      
+      i.fa-snowflake {
+        color: #91caff;
+      }
+      
+      i.fa-bolt {
+        color: #722ed1;
+      }
+      
+      i.fa-cloud-sun {
+        color: #ffa940;
+      }
+    }
+    
+    .weather-info {
+      h1 {
+        font-size: 48px;
+        margin: 0 0 5px 0;
+        font-weight: 500;
+      }
+      
+      .condition {
+        font-size: 20px;
+        margin: 0 0 5px 0;
+        color: #333;
+      }
+      
+      .location {
+        font-size: 16px;
+        margin: 0 0 5px 0;
+        color: #666;
+      }
+      
+      .updated {
+        font-size: 12px;
+        color: #999;
+        margin: 0;
+      }
+    }
+  }
+  
+  .weather-details {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 15px;
+    
+    .detail-item {
+      text-align: center;
+      
+      .detail-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      
+      .detail-value {
+        font-size: 16px;
+        font-weight: 500;
+        
+        &.good {
+          color: #52c41a;
+        }
+        
+        &.moderate {
+          color: #faad14;
+        }
+        
+        &.unhealthy {
+          color: #ff4d4f;
+        }
+      }
+    }
+  }
+}
+
+.weather-forecast {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .forecast-list {
+    display: flex;
+    justify-content: space-between;
+    
+    .forecast-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
+      
+      .forecast-day {
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      
+      .forecast-date {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+      }
+      
+      .forecast-icon {
+        font-size: 24px;
+        color: #1677ff;
+        margin-bottom: 10px;
+        
+        i.fa-sun {
+          color: #ffb400;
+        }
+        
+        i.fa-cloud {
+          color: #8590a6;
+        }
+        
+        i.fa-cloud-rain {
+          color: #1677ff;
+        }
+      }
+      
+      .forecast-temp {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .day-temp {
+          font-weight: 500;
+          color: #ff4d4f;
+          margin-bottom: 2px;
+        }
+        
+        .night-temp {
+          color: #1677ff;
+        }
+      }
+    }
+  }
+}
+
+.life-index {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    
+    .index-item {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      
+      i {
+        font-size: 24px;
+        color: #1677ff;
+        margin-bottom: 10px;
+      }
+      
+      .index-name {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+      
+      .index-value {
+        font-weight: 500;
+        color: #333;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .weather-main {
+    flex-direction: column;
+    text-align: center;
+    
+    .weather-icon {
+      margin-right: 0;
+      margin-bottom: 15px;
+    }
+  }
+  
+  .forecast-list {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    
+    .forecast-item {
+      min-width: 80px;
+    }
+  }
+  
+  .weather-details {
+    flex-wrap: wrap;
+    
+    .detail-item {
+      flex: 0 0 50%;
+      margin-bottom: 15px;
+    }
+  }
+  
+  .index-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}

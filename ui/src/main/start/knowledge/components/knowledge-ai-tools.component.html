@@ -1,0 +1,24 @@
+<div class="ai-tools-container">
+  <div class="ai-tools-content">
+    <!-- 工具榜单 -->
+    <div class="tools-categories">
+      <div *ngFor="let category of toolsCategories" class="tools-category">
+        <div class="category-header">
+          <span class="category-title">{{ category.name }}</span>
+        </div>
+        <div class="tools-list">
+          <div *ngFor="let tool of category.list" class="tool-item" (click)="openToolLink(tool.url)">
+            <div class="tool-rank">{{ tool.id }}</div>
+            <div class="tool-info">
+              <div class="tool-details">
+                <div class="tool-name">{{ tool.name }}</div>
+                <div class="tool-description">{{ tool.description }}</div>
+              </div>
+            </div>
+            <button class="start-button">开始用</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="games-container">
+
+  <!-- 主内容区域 -->
+  <div class="games-content">
+    <!-- 左侧游戏列表 -->
+    <div class="games-main">
+      <!-- 标签页切换 -->
+      <div class="games-tabs">
+        <div class="tab-item" [class.active]="activeTab === 'popular'" (click)="setActiveTab('popular')">
+          <i class="fas fa-fire"></i> 热门游戏
+        </div>
+        <div class="tab-item" [class.active]="activeTab === 'new'" (click)="setActiveTab('new')">
+          <i class="fas fa-star"></i> 新品推荐
+        </div>
+        <div class="tab-item" [class.active]="activeTab === 'categories'" (click)="setActiveTab('categories')">
+          <i class="fas fa-th-large"></i> 游戏分类
+        </div>
+      </div>
+      
+      <!-- 分类标签 - 仅在分类标签页显示 -->
+      <div class="category-tags" *ngIf="activeTab === 'categories'">
+        <div 
+          *ngFor="let category of gameCategories" 
+          class="category-tag" 
+          [class.active]="selectedCategory === category.id"
+          (click)="selectCategory(category.id)"
+        >
+          {{ category.name }}
+        </div>
+      </div>
+      
+      <!-- 游戏列表 -->
+      <div class="games-grid">
+        <div *ngFor="let game of getFilteredGames()" class="game-card">
+          <div class="game-thumbnail-container">
+            <div class="game-thumbnail" [style.background-image]="'url(' + game.thumbnail + ')'"></div>
+            <div class="game-badges">
+              <span *ngIf="game.trending" class="badge trending">热门</span>
+              <span *ngIf="game.isNew" class="badge new">新品</span>
+            </div>
+          </div>
+          <div class="game-info">
+            <h3 class="game-title">{{ game.name }}</h3>
+            <div class="game-meta">
+              <span class="game-type">{{ game.type }}</span>
+              <span class="game-rating">
+                <i class="fas fa-star"></i> {{ game.rating }}
+              </span>
+            </div>
+            <p class="game-description">{{ game.description }}</p>
+            <div class="game-footer">
+              <span class="game-players">
+                <i class="fas fa-users"></i> {{ formatPlayerCount(game.players) }} 玩家
+              </span>
+              <button class="play-button">开始游戏</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 没有找到游戏时的提示 -->
+      <div *ngIf="getFilteredGames().length === 0" class="no-games-found">
+        <i class="fas fa-search"></i>
+        <p>没有找到符合条件的游戏</p>
+        <button (click)="searchQuery = ''; selectedCategory = 'all'">清除筛选条件</button>
+      </div>
+    </div>
+    
+    <!-- 右侧侧边栏 -->
+    <div class="games-sidebar">
+      <!-- 游戏排行榜 -->
+      <div class="games-ranking">
+        <h3 class="sidebar-title">热门游戏榜</h3>
+        <div class="ranking-list">
+          <div *ngFor="let game of topGames" class="ranking-item">
+            <div class="rank-number" [ngClass]="{'rank-1': game.rank === 1, 'rank-2': game.rank === 2, 'rank-3': game.rank === 3}">
+              {{ game.rank }}
+            </div>
+            <div class="rank-info">
+              <div class="rank-name">{{ game.name }}</div>
+              <div class="rank-genre">{{ game.genre }}</div>
+            </div>
+            <div class="rank-trend">
+              <i class="fas" [ngClass]="[getTrendIcon(game.change), getTrendClass(game.change)]"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 热门推荐 -->
+      <div class="games-recommendations">
+        <h3 class="sidebar-title">游戏资讯</h3>
+        <div class="recommendation-list">
+          <div class="news-item">
+            <h4>原神新版本3.0即将上线，全新区域须弥将开放</h4>
+            <div class="news-meta">2023-07-15</div>
+          </div>
+          <div class="news-item">
+            <h4>英雄联盟S12全球总决赛：DRX夺冠</h4>
+            <div class="news-meta">2023-07-10</div>
+          </div>
+          <div class="news-item">
+            <h4>《崩坏：星穹铁道》首月流水突破10亿美元</h4>
+            <div class="news-meta">2023-07-05</div>
+          </div>
+          <div class="news-item">
+            <h4>《塞尔达传说：王国之泪》全球销量突破1000万</h4>
+            <div class="news-meta">2023-07-02</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

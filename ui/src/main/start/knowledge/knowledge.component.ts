@@ -33,6 +33,14 @@ export class KnowledgeComponent implements OnInit {
         { id: 3, title: '为什么全网都爱看江苏"内斗"?', image: 'assets/news3.jpg' }
     ];
 
+    // 添加日历事件数据
+    calendarEvents = [
+        { date: new Date(2023, 4, 15), time: '09:00', title: '产品发布会', description: '新产品发布会，介绍最新技术和功能' },
+        { date: new Date(2023, 4, 18), time: '14:30', title: '团队会议', description: '讨论项目进度和未来规划' },
+        { date: new Date(2023, 4, 20), time: '10:00', title: '客户沟通', description: '与重要客户讨论合作事宜' },
+        { date: new Date(2023, 4, 25), time: '16:00', title: '技术研讨', description: '跨部门技术问题讨论' }
+    ];
+
     constructor(
         private categoryService: CategoryService,
         private route: ActivatedRoute,
@@ -326,5 +334,74 @@ export class KnowledgeComponent implements OnInit {
         };
         
         return searchInCategories(this.categories);
+    }
+
+    // 检查是否为日历类型
+    isCalendarCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '日历';
+    }
+
+    // 检查是否为天气类型
+    isWeatherCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '天气';
+    }
+
+    // 检查是否为财经类型
+    isFinanceCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '财经';
+    }
+
+    // 检查是否为导航类型
+    isNavigationCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '导航';
+    }
+
+    // 检查是否为AI类型
+    isAiToolsCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === 'AI大全' || this.selectedCategory.name === '人工智能';
+    }
+
+    // 检查是否为体育类型
+    isSportsCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '体育';
+    }
+
+    // 检查是否为游戏类型
+    isGamesCategory(): boolean {
+        if (!this.selectedCategory) {
+            return false;
+        }
+        
+        return this.selectedCategory.name === '游戏';
+    }
+
+    // 日历日期选择事件处理
+    onDateSelected(date: Date): void {
+        console.log('Selected date:', date);
+        // 这里可以根据选定的日期过滤或获取事件数据
     }
 }

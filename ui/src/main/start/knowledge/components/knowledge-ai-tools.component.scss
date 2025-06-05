@@ -1,0 +1,153 @@
+.ai-tools-container {
+  padding: 20px 0;
+  background-color: #f0f2f5;
+}
+
+.ai-tools-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tools-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tools-category {
+  flex: 1 0 calc(33.333% - 20px);
+  min-width: 300px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  
+  .category-header {
+    margin-bottom: 16px;
+    
+    .category-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      position: relative;
+      padding-left: 12px;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 18px;
+        width: 4px;
+        background-color: #1677ff;
+        border-radius: 2px;
+      }
+    }
+  }
+  
+  .tools-list {
+    .tool-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: #f9f9f9;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      
+      .tool-rank {
+        width: 24px;
+        height: 24px;
+        background: #f1f1f1;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #666;
+        margin-right: 12px;
+      }
+      
+      .tool-info {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        
+        .tool-details {
+          flex: 1;
+          min-width: 0;
+          
+          .tool-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .tool-description {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+      
+      .start-button {
+        background-color: #1677ff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background-color: #1668dc;
+        }
+      }
+    }
+  }
+}
+
+// Special styling for ranks 1-3
+.tool-item:nth-child(1) .tool-rank {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.tool-item:nth-child(2) .tool-rank {
+  background-color: #ff7a45;
+  color: white;
+}
+
+.tool-item:nth-child(3) .tool-rank {
+  background-color: #ffa940;
+  color: white;
+}
+
+@media (max-width: 992px) {
+  .tools-categories {
+    flex-direction: column;
+  }
+  
+  .tools-category {
+    width: 100%;
+  }
+}

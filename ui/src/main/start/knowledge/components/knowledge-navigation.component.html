@@ -1,0 +1,16 @@
+<div class="navigation-container">
+
+  
+  <div class="categories-container">
+    <div class="category-section" *ngFor="let category of categories">
+      <div class="category-header">
+        <h3>{{ category.name }}</h3>
+      </div>
+      <div class="links-grid">
+        <div class="link-item" *ngFor="let link of category.links" (click)="openLink(link.url)">
+          <div class="link-name">{{ link.name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

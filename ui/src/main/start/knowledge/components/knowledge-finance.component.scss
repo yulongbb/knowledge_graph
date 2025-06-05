@@ -1,0 +1,454 @@
+.finance-container {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.finance-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  
+  .header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .refresh-btn-container {
+      .refresh-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background-color: #f5f5f5;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover {
+          background-color: #e0e0e0;
+        }
+        
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+  
+  .gold-price-overview {
+    display: flex;
+    align-items: flex-start;
+    
+    .current-price-container {
+      flex: 1;
+      
+      .current-price {
+        font-size: 36px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 4px;
+        
+        .currency {
+          font-size: 16px;
+          font-weight: normal;
+          color: #666;
+          margin-left: 4px;
+        }
+      }
+      
+      .price-change {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        
+        &.price-up {
+          color: #52c41a;
+        }
+        
+        &.price-down {
+          color: #f5222d;
+        }
+        
+        i {
+          margin-right: 4px;
+        }
+      }
+      
+      .update-time {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+    
+    .price-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      
+      .detail-item {
+        display: flex;
+        flex-direction: column;
+        
+        .label {
+          font-size: 12px;
+          color: #999;
+          margin-bottom: 2px;
+        }
+        
+        .value {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+.chart-container {
+  margin-bottom: 24px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+  
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .time-range-selector {
+      display: flex;
+      
+      .time-range-btn {
+        font-size: 12px;
+        padding: 4px 12px;
+        border: 1px solid #d9d9d9;
+        background: #fff;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s;
+        
+        &:first-child {
+          border-top-left-radius: 4px;
+          border-bottom-left-radius: 4px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+        }
+        
+        &:not(:first-child) {
+          margin-left: -1px;
+        }
+        
+        &:hover {
+          color: #1677ff;
+          z-index: 1;
+        }
+        
+        &.active {
+          color: #1677ff;
+          border-color: #1677ff;
+          background-color: #e6f7ff;
+          z-index: 2;
+        }
+      }
+    }
+  }
+  
+  .chart {
+    position: relative;
+    height: 300px;
+    
+    .chart-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.6);
+      color: #666;
+      
+      i {
+        margin-right: 8px;
+      }
+    }
+    
+    // 模拟图表
+    .mock-chart {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      
+      .chart-trend {
+        position: absolute;
+        top: 10%;
+        left: 0;
+        width: 100%;
+        height: 70%;
+        
+        .trend-line {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, 
+            rgba(255,215,0,0.8) 0%, 
+            rgba(255,215,0,0.6) 30%,
+            rgba(255,215,0,0.5) 70%, 
+            rgba(255,215,0,0.7) 100%);
+          clip-path: polygon(
+            0% 80%, 10% 70%, 20% 50%, 30% 60%, 
+            40% 30%, 50% 40%, 60% 35%, 70% 20%, 
+            80% 30%, 90% 10%, 100% 20%, 
+            100% 100%, 0% 100%
+          );
+          
+          &.trend-up {
+            clip-path: polygon(
+              0% 70%, 10% 65%, 20% 55%, 30% 60%, 
+              40% 40%, 50% 35%, 60% 25%, 70% 15%, 
+              80% 10%, 90% 5%, 100% 10%, 
+              100% 100%, 0% 100%
+            );
+          }
+          
+          &.trend-down {
+            clip-path: polygon(
+              0% 20%, 10% 30%, 20% 25%, 30% 45%, 
+              40% 40%, 50% 60%, 60% 55%, 70% 70%, 
+              80% 65%, 90% 80%, 100% 70%, 
+              100% 100%, 0% 100%
+            );
+          }
+        }
+        
+        .trend-area {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(to bottom, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 100%);
+          clip-path: polygon(
+            0% 80%, 10% 70%, 20% 50%, 30% 60%, 
+            40% 30%, 50% 40%, 60% 35%, 70% 20%, 
+            80% 30%, 90% 10%, 100% 20%, 
+            100% 100%, 0% 100%
+          );
+          
+          &.trend-up {
+            clip-path: polygon(
+              0% 70%, 10% 65%, 20% 55%, 30% 60%, 
+              40% 40%, 50% 35%, 60% 25%, 70% 15%, 
+              80% 10%, 90% 5%, 100% 10%, 
+              100% 100%, 0% 100%
+            );
+          }
+          
+          &.trend-down {
+            clip-path: polygon(
+              0% 20%, 10% 30%, 20% 25%, 30% 45%, 
+              40% 40%, 50% 60%, 60% 55%, 70% 70%, 
+              80% 65%, 90% 80%, 100% 70%, 
+              100% 100%, 0% 100%
+            );
+          }
+        }
+      }
+      
+      .chart-labels {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .chart-label {
+          font-size: 11px;
+          color: #999;
+        }
+      }
+    }
+  }
+}
+
+.finance-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+  
+  .market-overview {
+    h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0 0 16px 0;
+    }
+    
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      
+      .market-item {
+        padding: 12px;
+        border: 1px solid #f0f0f0;
+        border-radius: 6px;
+        
+        .market-name {
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 4px;
+        }
+        
+        .market-value {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .market-change {
+          font-size: 14px;
+          
+          &.price-up {
+            color: #52c41a;
+          }
+          
+          &.price-down {
+            color: #f5222d;
+          }
+          
+          i {
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+  }
+  
+  .financial-news {
+    h3 {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0 0 16px 0;
+    }
+    
+    .news-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      .news-item {
+        margin-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 16px;
+        
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+        
+        .news-link {
+          text-decoration: none;
+          color: inherit;
+          
+          &:hover .news-title {
+            color: #1677ff;
+          }
+        }
+        
+        .news-content {
+          .news-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+            transition: color 0.2s;
+          }
+          
+          .news-meta {
+            display: flex;
+            font-size: 12px;
+            color: #999;
+            
+            .news-source {
+              margin-right: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .gold-price-overview {
+    flex-direction: column;
+    
+    .price-details {
+      margin-top: 16px;
+      width: 100%;
+    }
+  }
+  
+  .chart-container {
+    .chart-header {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      h3 {
+        margin-bottom: 12px;
+      }
+    }
+  }
+  
+  .finance-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .market-overview .market-grid {
+    grid-template-columns: 1fr;
+  }
+}

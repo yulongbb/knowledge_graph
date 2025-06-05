@@ -694,6 +694,54 @@
     }
   }
 
+  // 日历布局
+  .calendar-layout {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  // 天气布局
+  .weather-layout {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  // 财经布局
+  .finance-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  // 导航布局
+  .navigation-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  // AI工具布局
+  .ai-tools-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  // 体育布局
+  .sports-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  // 游戏布局
+  .games-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
   // 响应式调整
   @media (max-width: 1200px) {
     .news-three-column-layout {

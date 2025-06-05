@@ -1,0 +1,127 @@
+<div class="sports-container">
+  <!-- 顶部标签页导航 -->
+  <div class="sports-tabs">
+    <div class="tab-item" [ngClass]="{'active': activeTab === 'football'}" (click)="changeTab('football')">
+      <i class="fas fa-futbol"></i>
+      <span>足球</span>
+    </div>
+    <div class="tab-item" [ngClass]="{'active': activeTab === 'basketball'}" (click)="changeTab('basketball')">
+      <i class="fas fa-basketball-ball"></i>
+      <span>篮球</span>
+    </div>
+    <div class="tab-item" [ngClass]="{'active': activeTab === 'esports'}" (click)="changeTab('esports')">
+      <i class="fas fa-gamepad"></i>
+      <span>电竞</span>
+    </div>
+  </div>
+
+  <!-- 主体内容区 -->
+  <div class="sports-content">
+    <!-- 左侧赛事列表 -->
+    <div class="sports-matches">
+      <div class="section-title">
+        <h3>赛事直播</h3>
+      </div>
+      
+      <div class="matches-list">
+        <div *ngFor="let match of getCurrentMatches()" class="match-card" [ngClass]="{'highlight': match.highlight}">
+          <div class="match-header">
+            <span class="league-name">{{ match.league }}</span>
+            <span class="match-time" [ngClass]="getStatusClass(match.status)">
+              {{ getStatusText(match.status, match.matchTime) }}
+            </span>
+          </div>
+          
+          <div class="match-teams">
+            <div class="team team-1">
+              <span class="team-name">{{ match.team1 }}</span>
+            </div>
+            
+            <div class="match-score">
+              <span class="score-display">{{ match.team1Score }}</span>
+              <span class="score-separator">:</span>
+              <span class="score-display">{{ match.team2Score }}</span>
+            </div>
+            
+            <div class="team team-2">
+              <span class="team-name">{{ match.team2 }}</span>
+            </div>
+          </div>
+          
+          <div class="match-footer">
+            <button class="watch-btn" *ngIf="match.status === 'live'">
+              <i class="fas fa-play-circle"></i> 观看直播
+            </button>
+            <span class="match-info" *ngIf="match.status !== 'live'">
+              {{ match.status === 'upcoming' ? '未开始' : '已结束' }}
+            </span>
+          </div>
+        </div>
+        
+        <div *ngIf="getCurrentMatches().length === 0" class="no-data">
+          暂无比赛数据
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右侧新闻和排名 -->
+    <div class="sports-sidebar">
+      <!-- 热门新闻 -->
+      <div class="sports-news">
+        <div class="section-title">
+          <h3>热门新闻</h3>
+        </div>
+        
+        <div class="news-list">
+          <div *ngFor="let item of news" class="news-item">
+            <div class="news-content">
+              <h4 class="news-title">{{ item.title }}</h4>
+              <div class="news-info">
+                <span class="news-source">{{ item.source }}</span>
+                <span class="news-time">{{ item.time }}</span>
+                <span class="news-views"><i class="fas fa-eye"></i> {{ item.views }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 排行榜 -->
+      <div class="sports-rankings">
+        <div class="section-title">
+          <h3>排行榜</h3>
+        </div>
+        
+        <div class="rankings-table">
+          <table>
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>球队</th>
+                <th>{{ isFootballTab() ? '积分' : '胜/负' }}</th>
+                <th>走势</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let team of getCurrentRankings()">
+                <td class="rank-cell">{{ team.rank }}</td>
+                <td class="team-cell">{{ team.team }}</td>
+                <td class="stats-cell">
+                  <ng-container *ngIf="isFootballTab()">
+                    {{ getPoints(team) }}
+                  </ng-container>
+                  <ng-container *ngIf="!isFootballTab()">
+                    {{ getWinLoss(team) }}
+                  </ng-container>
+                </td>
+                <td class="trend-cell">
+                  <i class="fas" [ngClass]="[getChangeIcon(team.change), getChangeClass(team.change)]"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
