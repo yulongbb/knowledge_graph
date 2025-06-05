@@ -26,8 +26,6 @@ export class CategoryService {
     });
 
     return [
-      { id: 'discover', name: '发现', label: '发现', value: 0, children: [] } as unknown as Category,
-      { id: 'following', name: '关注', label: '关注', value: 0, children: [] } as unknown as Category,
       ...rootCategories
     ];
   }

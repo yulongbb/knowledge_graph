@@ -88,7 +88,31 @@ export class KnowledgeComponent implements OnInit {
                     level: 1
                 } as unknown as Category;
 
-                this.categories = [allCategory, ...namespaceCategories];
+                // Add "发现" and "关注" categories at the top
+                const discoverCategory = {
+                    id: 'discover',
+                    name: '发现',
+                    displayName: '发现',
+                    description: '发现新知识',
+                    isNamespace: false,
+                    children: [],
+                    path: 'discover',
+                    level: 1
+                } as unknown as Category;
+
+                const followCategory = {
+                    id: 'follow',
+                    name: '关注',
+                    displayName: '关注',
+                    description: '我关注的内容',
+                    isNamespace: false,
+                    children: [],
+                    path: 'follow',
+                    level: 1
+                } as unknown as Category;
+
+                // Set categories with discover and follow at the beginning
+                this.categories = [discoverCategory, followCategory, allCategory, ...namespaceCategories];
                 this.isLoading = false;
             },
             error => {
@@ -251,6 +275,22 @@ export class KnowledgeComponent implements OnInit {
         if (category.name === '') {
             // 清空过滤条件
             this.query = { must: [] };
+        } else if (category.name === 'discover') {
+            // 发现分类逻辑 - 显示最新添加的实体
+            this.query = {
+                must: [],
+                sort: [{ "created_at": "desc" }]
+            };
+        } else if (category.name === 'follow') {
+            // 关注分类逻辑 - 可以从用户关注数据中获取
+            // 这里暂时展示一个示例过滤条件，实际实现需要根据用户关注数据
+            this.query = {
+                must: [{
+                    match: {
+                        "followed": true
+                    }
+                }]
+            };
         } else {
             // 使用分类过滤
             this.query = {
