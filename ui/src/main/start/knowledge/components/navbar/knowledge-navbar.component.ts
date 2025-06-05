@@ -3,11 +3,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Category } from '../../models/category.model';
 
 @Component({
-  selector: 'app-knowledge-nav',
-  templateUrl: './knowledge-nav.component.html',
-  styleUrls: ['./knowledge-nav.component.scss']
+  selector: 'app-knowledge-navbar',
+  templateUrl: './knowledge-navbar.component.html',
+  styleUrls: ['./knowledge-navbar.component.scss']
 })
-export class KnowledgeNavComponent implements OnInit {
+export class KnowledgeNavbarComponent implements OnInit {
   @Input() categories: Category[] = [];
   @Output() categorySelected = new EventEmitter<Category>();
   selectedPath: string[] = [];

@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { KnowledgeNavComponent } from './components/nav/knowledge-nav.component';
+import { KnowledgeNavbarComponent } from './components/navbar/knowledge-navbar.component';
 import { KnowledgeComponent } from './knowledge.component';
 import { KnowledgeCalendarComponent } from './components/calendar/knowledge-calendar.component';
 import { KnowledgeWeatherComponent } from './components/weather/knowledge-weather.component';
@@ -28,7 +28,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     KnowledgeComponent,
-    KnowledgeNavComponent,
+    KnowledgeNavbarComponent,
     KnowledgeCalendarComponent,
     KnowledgeWeatherComponent,
     KnowledgeNewsComponent,

@@ -9,8 +9,8 @@
     </div>
   </div>
 
-  <app-knowledge-nav [categories]="categories" (categorySelected)="onCategorySelected($event)">
-  </app-knowledge-nav>
+  <app-knowledge-navbar [categories]="categories" (categorySelected)="onCategorySelected($event)">
+  </app-knowledge-navbar>
 
   <!-- 游戏类型布局 -->
   <ng-container *ngIf="isGamesCategory(); else sportsLayout">
