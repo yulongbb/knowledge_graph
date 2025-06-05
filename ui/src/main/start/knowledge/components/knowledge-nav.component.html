@@ -1,11 +1,19 @@
 <nav class="knowledge-nav">
   <ul class="nav-list" *ngIf="categories?.length; else empty">
-    <!-- Fixed categories -->
-    <li *ngFor="let category of getFixedCategories()" 
-        [class.selected]="isSelected(category)"
-        (click)="selectCategory(category, 0)">
-      {{ category.name }}
+    <!-- Navigation button when not on first level -->
+    <li *ngIf="showNavButton" class="nav-button" (click)="toggleSideNav()">
+      <i class="fas fa-bars"></i>
     </li>
+
+    <!-- Fixed categories in a unified container -->
+    <div class="fixed-categories-container">
+      <li *ngFor="let category of getFixedCategories()" 
+          [class.selected]="isSelected(category)"
+          class="fixed-category"
+          (click)="selectCategory(category, 0)">
+        {{ category.name }}
+      </li>
+    </div>
 
     <!-- Categories with levels -->
     <li *ngFor="let category of getCurrentLevelCategories(); let i = index"
@@ -20,3 +28,36 @@
     <div class="empty-state">暂无分类数据</div>
   </ng-template>
 </nav>
+
+<!-- Side Navigation Panel -->
+<div class="side-nav-panel" [class.active]="sideNavOpen">
+  <div class="side-nav-header">
+    <h3>全部分类</h3>
+    <button class="close-btn" (click)="closeSideNav()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <div class="side-nav-content">
+    <ul class="side-nav-list">
+      <!-- Fixed categories -->
+      <li *ngFor="let category of getFixedCategories()" 
+          [class.selected]="isSelected(category)"
+          (click)="selectCategoryAndCloseSideNav(category, 0)">
+        {{ category.name }}
+      </li>
+      
+      <!-- All categories grouped by namespace -->
+      <ng-container *ngFor="let namespace of getAllNamespaces()">
+        <li class="namespace-header">{{ namespace.name }}</li>
+        <li *ngFor="let category of getOntologiesForNamespace(namespace)"
+            [class.selected]="isSelected(category)"
+            (click)="selectCategoryAndCloseSideNav(category, 0)">
+          <span class="indent"></span>{{ category.name }}
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+</div>
+
+<!-- Backdrop for side navigation -->
+<div class="side-nav-backdrop" *ngIf="sideNavOpen" (click)="closeSideNav()"></div>

@@ -12,6 +12,7 @@ export class KnowledgeNavComponent implements OnInit {
   @Output() categorySelected = new EventEmitter<Category>();
   selectedPath: string[] = [];
   currentSelectedId: string | null = null;
+  sideNavOpen: boolean = false;
 
   constructor(
     private router: Router,
@@ -159,5 +160,43 @@ export class KnowledgeNavComponent implements OnInit {
 
   isSelected(category: Category): boolean {
     return category.id === this.currentSelectedId;
+  }
+
+  // Check if the navigation button should be shown
+  get showNavButton(): boolean {
+    // Show button when not on the first level or when a category is selected
+    return this.selectedPath.length > 0 || 
+           (this.currentSelectedId !== null && 
+            this.currentSelectedId !== 'discover' && 
+            this.currentSelectedId !== 'following');
+  }
+
+  // Toggle side navigation panel
+  toggleSideNav(): void {
+    this.sideNavOpen = !this.sideNavOpen;
+    // Prevent body scrolling when side nav is open
+    document.body.style.overflow = this.sideNavOpen ? 'hidden' : '';
+  }
+
+  // Close side navigation panel
+  closeSideNav(): void {
+    this.sideNavOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  // Select category and close side nav
+  selectCategoryAndCloseSideNav(category: Category, level: number): void {
+    this.selectCategory(category, level);
+    this.closeSideNav();
+  }
+
+  // Get all namespaces for the side panel
+  getAllNamespaces(): Category[] {
+    return this.categories.filter(c => c.isNamespace);
+  }
+
+  // Get ontologies for a specific namespace
+  getOntologiesForNamespace(namespace: Category): Category[] {
+    return namespace.children || [];
   }
 }

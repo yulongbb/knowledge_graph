@@ -30,7 +30,7 @@ export class EntityAddComponent implements OnInit {
     aliases: '',
     tags: '',
     description: '',
-    namespace: 'default' // Default namespace
+    namespace: '' // Changed from 'default' to empty string initially
   };
 
   template: string = '';
@@ -89,13 +89,8 @@ export class EntityAddComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load initial data with default namespace
     // Wait for namespaces to load before loading types
-    setTimeout(() => {
-      if (this.formData.namespace) {
-        this.loadTypesForNamespace(this.formData.namespace);
-      }
-    }, 500);
+    // The first namespace will be automatically selected in loadNamespaces()
   }
 
   isFormValid(): boolean {
@@ -246,19 +241,25 @@ export class EntityAddComponent implements OnInit {
           value: ns.name
         }));
 
-        // Ensure default namespace is selected
-        if (!this.namespaceOptions.some(opt => opt.value === 'default')) {
-          this.namespaceOptions.unshift({ label: 'default', value: 'default' });
+        // Set the first namespace as default if available
+        if (this.namespaceOptions.length > 0) {
+          this.formData.namespace = this.namespaceOptions[0].value;
+          // Load types for the default namespace
+          this.loadTypesForNamespace(this.formData.namespace);
+        } else {
+          // Fallback to 'default' if no namespaces are available
+          this.namespaceOptions.push({ label: 'default', value: 'default' });
+          this.formData.namespace = 'default';
+          this.loadTypesForNamespace('default');
         }
-
-        // Set default namespace
-        this.formData.namespace = 'default';
       },
       error: (error) => {
         console.error('Failed to load namespaces:', error);
         this.message.error('加载命名空间失败');
         // Ensure at least default namespace is available
         this.namespaceOptions = [{ label: 'default', value: 'default' }];
+        this.formData.namespace = 'default';
+        this.loadTypesForNamespace('default');
       }
     });
   }
@@ -277,6 +278,12 @@ export class EntityAddComponent implements OnInit {
 
   // Load types specific to the selected namespace
   loadTypesForNamespace(namespace: string) {
+    // Check if namespace is empty or undefined
+    if (!namespace) {
+      console.warn('No namespace selected, cannot load types');
+      return;
+    }
+    
     // Find the namespace ID from the options
     const namespaceObj = this.namespaceOptions.find(n => n.value === namespace);
     if (!namespaceObj) return;

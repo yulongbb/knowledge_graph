@@ -1,164 +1,250 @@
 .knowledge-nav {
-  position: fixed;
-  top: 60px; // 紧贴顶部导航
-  left: 0;
-  right: 0;
   z-index: 100;
   background-color: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-
+  border-bottom: 1px solid #f0f0f0;
+  
   .nav-list {
     display: flex;
     align-items: center;
-    padding: 12px 0;
-    margin: 0;
+    padding: 0 16px;
+    margin: 0 auto;
     list-style: none;
-    border-bottom: 1px solid #eee;
     overflow-x: auto;
     background-color: white;
-    
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 16px;
-      cursor: pointer;
-      color: #666;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      margin-right: 16px;
-      
-      &:hover {
-        color: #1890ff;
-        border-color: #1890ff;
-      }
-      
-      &::before {
-        content: '←';
-        margin-right: 4px;
-      }
-    }
+    max-width: 1200px;
+    height: 48px; // Increased height to accommodate larger text
     
     &::-webkit-scrollbar {
-      height: 6px;
+      display: none;
     }
     
-    &::-webkit-scrollbar-thumb {
-      background: #e8e8e8;
-      border-radius: 3px;
+    // Container for fixed categories (发现 and 关注)
+    .fixed-categories-container {
+      display: flex;
+      align-items: center;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      height: 40px; // Increased height for fixed categories
+      padding: 0;
+      margin-right: 24px;
+      overflow: hidden;
+      
+      .fixed-category {
+        margin: 0;
+        padding: 0 16px;
+        border: none;
+        border-radius: 0;
+        position: relative;
+        font-size: 15px; // Larger font size for fixed categories
+        
+        &.selected {
+          color: #1677ff;
+          
+          // Remove the underline indicator
+          &:after {
+            display: none;
+          }
+        }
+      }
     }
 
     li {
       display: inline-flex;
       align-items: center;
-      margin: 0 8px;
-      padding: 6px 16px;
+      padding: 0 12px;
       cursor: pointer;
       position: relative;
       white-space: nowrap;
-      border-radius: 4px;
-      transition: all 0.3s;
+      transition: all 0.2s;
+      font-size: 15px; // Increased font size from 14px to 15px
+      height: 100%;
+      color: #333;
       
-      // Special style for discover and following
-      &:nth-child(1), &:nth-child(2) {
-        color: #666;
-        margin-right: 16px;
-        
-        &:hover {
-          color: #1890ff;
-        }
-        
-        &.selected {
-          color: #1890ff;
-          font-weight: 500;
-          background-color: #e6f7ff;
-        }
-
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        background-color: white;
+      &:hover {
+        color: #1677ff;
       }
       
-      // Remove the separator
-      &:nth-child(2)::before {
-        display: none;
-      }
-      
-      // Regular categories
-      &:not(:nth-child(1)):not(:nth-child(2)) {
-        color: #666;
+      &.selected {
+        color: #1677ff;
+        font-weight: 600; // Slightly bolder when selected for better visibility
+        position: relative;
         
-        &:hover {
-          color: #1890ff;
-        }
-        
-        &.selected {
-          color: #1890ff;
-          font-weight: 500;
-          background-color: #e6f7ff;
-          
-          & + li {
-            margin-left: 16px; // Add spacing after selected category
-          }
-        }
-      }
-
-      &.path-item {
-        color: #1890ff;
-        font-weight: 500;
-        margin-right: 16px;
-        
-        // Remove the separator
         &:after {
-          display: none;
-        }
-
-        &.selected {
-          color: #1890ff;
-          font-weight: 500;
-          background-color: #e6f7ff;
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: #1677ff;
         }
       }
       
-      // Add level indicators
+      // Adjust spacing for regular items
+      &:not(:last-child):not(.fixed-category) {
+        margin-right: 16px;
+      }
+      
+      // Level indicators with indentation
       &[data-level="1"] {
-        margin-left: 16px;
+        margin-left: 12px;
       }
       
       &[data-level="2"] {
-        margin-left: 32px;
+        margin-left: 24px;
       }
       
       &[data-level="3"] {
-        margin-left: 48px;
+        margin-left: 36px;
       }
     }
     
-    &.sub-list {
-      background-color: transparent;
+    // Navigation button
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #333;
+      padding: 0 8px;
       
-      li {
-        &:hover {
-          color: #1890ff;
-        }
-        
-        &.selected {
-          color: #1890ff;
-          font-weight: 500;
-        }
+      &:hover {
+        color: #1677ff;
+      }
+      
+      i {
+        display: flex;
       }
     }
   }
 
-  // Remove unused styles
-  .sub-nav, .sub-sub-nav {
-    display: none;
-  }
-
   .empty-state {
-    padding: 24px;
+    padding: 16px;
     text-align: center;
     color: #999;
     background-color: #fafafa;
   }
+}
+
+@media (max-width: 768px) {
+  .knowledge-nav .nav-list {
+    padding: 0 8px;
+    
+    li:not(.fixed-category) {
+      padding: 0 8px;
+      margin-right: 8px;
+    }
+    
+    .fixed-categories-container {
+      margin-right: 12px;
+    }
+  }
+}
+
+// Side Navigation Panel
+.side-nav-panel {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background-color: white;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  
+  &.active {
+    left: 0;
+  }
+  
+  .side-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #999;
+      
+      &:hover {
+        color: #333;
+      }
+    }
+  }
+  
+  .side-nav-content {
+    padding: 8px 0;
+  }
+  
+  .side-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      padding: 12px 16px;
+      cursor: pointer;
+      position: relative;
+      color: #333;
+      
+      &:hover {
+        background-color: #f5f5f5;
+        color: #1677ff;
+      }
+      
+      &.selected {
+        color: #1677ff;
+        font-weight: 500;
+        background-color: #e6f7ff;
+      }
+      
+      &.namespace-header {
+        font-weight: 500;
+        color: #333;
+        padding-top: 16px;
+        padding-bottom: 8px;
+        cursor: default;
+        
+        &:first-child {
+          padding-top: 8px;
+        }
+        
+        &:hover {
+          background-color: transparent;
+          color: #333;
+        }
+      }
+      
+      .indent {
+        display: inline-block;
+        width: 16px;
+      }
+    }
+  }
+}
+
+// Backdrop for side navigation
+.side-nav-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  transition: opacity 0.3s ease;
 }
