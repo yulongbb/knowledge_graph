@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Category } from '../models/category.model';
+import { Category } from '../../models/category.model';
 
 @Component({
   selector: 'app-knowledge-nav',
