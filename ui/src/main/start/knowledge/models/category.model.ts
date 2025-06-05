@@ -13,6 +13,9 @@ export interface Category {
   color: string | null;
   parent: any | null;
   children?: Category[];
+  displayName?: string;
+  level?: number;
+  isNamespace?: boolean;  // Added to identify namespace-level categories
 }
 
 export interface CategoryResponse {

@@ -18,23 +18,6 @@ export class NamespaceService extends XRepositoryService<Namespace, XQuery> {
     return this.namespaceRepository.findOne({ where: { name } });
   }
 
-  async getDefault(): Promise<Namespace> {
-    const defaultNamespace = await this.namespaceRepository.findOne({
-      where: { name: 'default' }
-    });
-
-    if (!defaultNamespace) {
-      // Create default namespace if it doesn't exist
-      const namespace = new Namespace();
-      namespace.name = 'default';
-      namespace.description = 'Default namespace for ontology entities';
-      namespace.prefix = 'def';
-      return this.namespaceRepository.save(namespace);
-    }
-
-    return defaultNamespace;
-  }
-
   async findByIds(ids: string[]): Promise<Namespace[]> {
     return this.namespaceRepository.findByIds(ids);
   }

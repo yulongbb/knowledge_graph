@@ -15,9 +15,4 @@ export class NamespaceController extends XControllerService<Namespace, XQuery> {
   findByName(@Param('name') name: string): Promise<Namespace> {
     return this.namespaceService.findByName(name);
   }
-
-  @Get('default')
-  getDefault(): Promise<Namespace> {
-    return this.namespaceService.getDefault();
-  }
 }

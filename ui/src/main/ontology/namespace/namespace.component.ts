@@ -266,41 +266,16 @@ export class NamespaceComponent extends PageBase implements OnInit {
     });
 
     // First ensure the default namespace exists, then load all namespaces
-    this.namespaceService
-      .ensureDefaultNamespace()
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to ensure default namespace:', error);
-          return of(null);
-        })
-      )
-      .subscribe(() => {
-        this.loadNamespaces();
-      });
+    this.loadNamespaces();
+
   }
 
   // Load namespaces for the dropdown
   loadNamespaces() {
     this.namespaceService
-      .getDefault()
-      .pipe(
-        catchError((error) => {
-          console.warn(
-            'Could not fetch default namespace directly, falling back to list:',
-            error
-          );
-          return of(null);
-        }),
-        switchMap((defaultNamespace) => {
-          return this.namespaceService.getList(1, 1000).pipe(
-            map((response: any) => {
-              return { defaultNamespace, response };
-            })
-          );
-        })
-      )
+      .getList(1, 1000)
       .subscribe({
-        next: ({ defaultNamespace, response }) => {
+        next: (response: any) => {
           this.namespaces = response.list || [];
           this.namespaceOptions = this.namespaces.map((ns) => ({
             label: ns.name as string,
@@ -309,26 +284,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
           console.log('Namespace options:', this.namespaceOptions);
 
-          if (defaultNamespace) {
-            console.log('Using default namespace from API:', defaultNamespace);
-            this.selectNamespace(defaultNamespace);
-          } else {
-            const defaultNs = this.namespaces.find(
-              (ns) => ns.name === 'default'
-            );
-            if (defaultNs) {
-              console.log('Found default namespace in list:', defaultNs);
-              this.selectNamespace(defaultNs);
-            } else if (this.namespaces.length > 0) {
-              console.log(
-                'No default namespace found, using first one:',
-                this.namespaces[0]
-              );
-              this.selectNamespace(this.namespaces[0]);
-            } else {
-              console.warn('No namespaces available');
-            }
-          }
+          // Remove automatic selection of default namespace
+          // Let user explicitly choose which namespace to work with
         },
         error: (error) => {
           console.error('Failed to load namespaces:', error);

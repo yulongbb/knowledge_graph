@@ -5,6 +5,7 @@ import { CategoryService } from './services/category.service';
 import { OntologyService } from './services/ontology.service';
 import { environment } from 'src/environments/environment';
 import { EsService } from '../home/es.service';
+import { NamespaceService } from '../../ontology/namespace/namespace.service';
 
 @Component({
     selector: 'app-knowledge',
@@ -16,6 +17,8 @@ export class KnowledgeComponent implements OnInit {
     searchText: string = '';
     categories: Category[] = [];
     isLoading: boolean = false;
+    loadingOntologies: boolean = false;
+    selectedNamespace: any = null;
 
     // 添加实体相关属性
     entities: any[] = [];
@@ -26,16 +29,14 @@ export class KnowledgeComponent implements OnInit {
     constructor(
         private categoryService: CategoryService,
         private ontologyService: OntologyService,
+        private namespaceService: NamespaceService,
         private route: ActivatedRoute,
         private esService: EsService
     ) { }
 
     ngOnInit(): void {
-        this.ontologyService
-            .getList(1, Number.MAX_SAFE_INTEGER).subscribe((res: any) => {
-                console.log('Fetched schema list:', res);
-                this.categories = this.categoryService.buildCategoryTree(res.list);
-            });
+        // First load namespaces as top-level categories instead of all ontologies
+        this.loadNamespacesAsCategories();
 
         // 加载实体列表
         this.esService
@@ -52,6 +53,84 @@ export class KnowledgeComponent implements OnInit {
                 console.log('Current category path:', category);
             }
         });
+    }
+
+    // Load namespaces as top-level categories
+    loadNamespacesAsCategories() {
+        this.isLoading = true;
+        this.namespaceService.getList(1, 1000).subscribe(
+            (response: any) => {
+                console.log('Fetched namespaces:', response);
+                
+                // Create categories from namespaces
+                const namespaceCategories:any = response.list.map((namespace: any) => {
+                    return {
+                        id: namespace.id,
+                        name: namespace.name,
+                        displayName: namespace.name,
+                        description: namespace.description,
+                        isNamespace: true, // Mark as namespace for identification
+                        children: [], // Will be loaded when namespace is selected
+                        path: namespace.name,
+                        level: 1
+                    } as unknown as Category;
+                });
+
+                // Add "All" category at the top
+                const allCategory = {
+                    id: 'all',
+                    name: '',
+                    displayName: '全部',
+                    description: '显示所有实体',
+                    isNamespace: false,
+                    children: [],
+                    path: 'all',
+                    level: 1
+                } as unknown as Category;
+
+                this.categories = [allCategory, ...namespaceCategories];
+                this.isLoading = false;
+            },
+            error => {
+                console.error('Error loading namespaces:', error);
+                this.isLoading = false;
+            }
+        );
+    }
+
+    // Load ontologies for a specific namespace
+    loadOntologiesForNamespace(namespace: Category) {
+        this.loadingOntologies = true;
+        this.selectedNamespace = namespace;
+        
+        // Clear existing children
+        namespace.children = [];
+        
+        const filter = [
+            {
+                field: 'namespaceId',
+                value: namespace.id.toString()
+            }
+        ];
+
+        this.ontologyService
+            .getList(1, Number.MAX_SAFE_INTEGER, { filter: filter })
+            .subscribe({
+                next: (res: any) => {
+                    console.log('Fetched ontologies for namespace:', res);
+                    
+                    // Build ontology tree structure as children
+                    namespace.children = this.categoryService.buildCategoryTree(res.list);
+                    
+                    // Force update of categories array
+                    this.categories = [...this.categories];
+                    this.loadingOntologies = false;
+                },
+                error: (error) => {
+                    console.error('Error loading ontologies:', error);
+                    this.loadingOntologies = false;
+                }
+            });
     }
 
     onSearch(): void {
@@ -136,7 +215,35 @@ export class KnowledgeComponent implements OnInit {
         return 'span 1';
     }
 
-    onCategorySelected(category: Category) {
+    onCategorySelected(category: any) {
+        // Check if this is a namespace level category and needs to load child ontologies
+        if (category.isNamespace && category.children.length === 0) {
+            // Load ontologies for this namespace
+            this.loadOntologiesForNamespace(category);
+            
+            // Also filter entities by namespace if needed
+            this.index = 1;
+            this.entities = [];
+            
+            // Use namespace-specific filter
+            this.query = {
+                must: [{
+                    match: {
+                        "namespace.keyword": category.name
+                    }
+                }]
+            };
+            
+            // Load entities for the namespace
+            this.esService
+                .searchEntity(this.index, this.size, { bool: this.query })
+                .subscribe((data: any) => {
+                    this.entities = data.list;
+                });
+                
+            return;
+        }
+        
         // Reset pagination
         this.index = 1;
         this.entities = [];
