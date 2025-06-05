@@ -99,7 +99,7 @@ export class EntityAddComponent implements OnInit {
 
   save() {
     if (!this.isFormValid()) return;
-    
+
     // 首先将模版内容存储到文章表中获取返回的文章id
     if (this.template) {
       const article = {
@@ -107,7 +107,7 @@ export class EntityAddComponent implements OnInit {
         content: this.template,
         author: 'system' // 可以根据实际情况修改作者信息
       };
-      
+
       // 调用文章API保存模板内容
       this.http.post('/api/article', article).subscribe({
         next: (articleData: any) => {
@@ -126,7 +126,7 @@ export class EntityAddComponent implements OnInit {
       this.saveEntity();
     }
   }
-  
+
   // 将保存实体的逻辑提取为单独的方法
   private saveEntity(articleId?: string) {
     this.namespaceService.findByName(this.formData.namespace).subscribe({
@@ -145,11 +145,12 @@ export class EntityAddComponent implements OnInit {
           descriptions: {
             zh: { language: 'zh', value: this.formData.description }
           },
-          type: this.formData.type,
+          type: { id: this.formData.type },
           namespace: namespaceData.id,
           tags: this.formData.tags?.split('#').filter(x => x.trim() !== ''),
           template: articleId,
         };
+        console.log('Saving entity with data:', item);
 
         this.entityService.addItem(item).subscribe({
           next: () => {
@@ -283,7 +284,7 @@ export class EntityAddComponent implements OnInit {
       console.warn('No namespace selected, cannot load types');
       return;
     }
-    
+
     // Find the namespace ID from the options
     const namespaceObj = this.namespaceOptions.find(n => n.value === namespace);
     if (!namespaceObj) return;
