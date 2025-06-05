@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 21/03/2025 18:05:38
+ Date: 05/06/2025 17:20:34
 */
 
 SET NAMES utf8mb4;
@@ -25,39 +25,86 @@ CREATE TABLE `addon`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `rating` int(0) NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `reviews` int(0) NOT NULL,
   `category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `isPinned` tinyint(0) NOT NULL DEFAULT 0,
+  `screenshots` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `userRatings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `totalRatings` int(0) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of addon
 -- ----------------------------
-INSERT INTO `addon` VALUES (1, '人物资料', 0, '123', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.56263.d49a3368-918f-446f-8d8b-4dadb0f08e8e.cdbc41ed-1d7d-4505-afe8-a6a5e9625173.cee8f208-68bb-4658-8c00-42a1875c9156?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/person');
-INSERT INTO `addon` VALUES (2, '组织架构', 0, '456', 0, '数据', 'https://store-images.s-microsoft.com/image/apps.51432.28814507-f5dd-460b-920a-434482a8221e.56cb44bd-7868-4d0c-9b18-f9f5203c0d0c.4e33ecf0-2cec-4a03-ac14-7cdbe119310f?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/organization');
-INSERT INTO `addon` VALUES (3, '课程', 0, '课程', 0, '教育', 'https://store-images.s-microsoft.com/image/apps.42712.ccd6f4ab-51e2-43c6-9b9c-b0e30988e026.45d062f5-f818-49e0-8264-8bb9df6f7645.ad7feeb0-87fa-423e-82d1-1313d64123da?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/course');
-INSERT INTO `addon` VALUES (4, '智能问答', 0, '智能问答', 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.39736.b96d3c39-5351-4a27-b7ae-c67500e04730.d6393bea-a187-4c24-aadf-134ec37d86d0.abedc914-0114-4c06-9c08-4e184dba9a54?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/ai');
-INSERT INTO `addon` VALUES (5, '武器装备', 0, '武器库', 0, '军事', 'https://store-images.s-microsoft.com/image/apps.38216.446a094c-6e55-486d-aca9-a51c2a588f65.f8b3b475-7a54-4af0-bec1-4dc68197e1cf.6394a570-d197-4e6e-9cca-e666f83abeef?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/weapon');
-INSERT INTO `addon` VALUES (6, '软件超市', 0, '软件超市', 0, '开发', 'https://store-images.s-microsoft.com/image/apps.6547.3483184d-76e1-45f0-97e6-9335bd119d82.1deee2c7-9c9e-4eb5-a047-3022d434540c.2ce8ada5-c845-44e9-9cf8-04a3c206381e?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/software');
-INSERT INTO `addon` VALUES (7, '数据同步工具', 0, '数据同步工具', 0, '工具', 'https://store-images.s-microsoft.com/image/apps.21870.124b152a-5cef-4fed-8770-5e39d1e08fcb.68b45caa-7b20-4a43-b68f-242b1366e441.3d01b570-572f-45ed-b506-8fa694f69290?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/etl');
-INSERT INTO `addon` VALUES (8, '领域数字人', 0, '领域数字人', 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.31985.19b15086-d2ea-4e74-849a-e5b5e3ca40cd.20c40a3f-0b2e-468c-a47e-66ea022be55e.2875cb69-3f22-4e59-ab13-04aad36bf3f5?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/digital-person');
+INSERT INTO `addon` VALUES (2, '组织架构', 860, 0, '数据', 'https://store-images.s-microsoft.com/image/apps.51432.28814507-f5dd-460b-920a-434482a8221e.56cb44bd-7868-4d0c-9b18-f9f5203c0d0c.4e33ecf0-2cec-4a03-ac14-7cdbe119310f?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/organization', 1, '', '<p>篡改猴&nbsp;(Tampermonkey)&nbsp;是拥&nbsp;有&nbsp;超过&nbsp;1000&nbsp;万用户&nbsp;的最流行的浏览器扩展之一。它允许用户自定义并增强您最喜爱的网页的功能。用户脚本是小型&nbsp;JavaScript&nbsp;程序，可用于向网页添加新功能或修改现有功能。使用&nbsp;篡改猴，您可以轻松在任何网站上创建、管理和运行这些用户脚本。&nbsp;</p>', '3,4,4,3', 4);
+INSERT INTO `addon` VALUES (3, '课程', 0, 0, '教育', 'https://store-images.s-microsoft.com/image/apps.42712.ccd6f4ab-51e2-43c6-9b9c-b0e30988e026.45d062f5-f818-49e0-8264-8bb9df6f7645.ad7feeb0-87fa-423e-82d1-1313d64123da?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/course', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (4, '智能问答', 0, 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.39736.b96d3c39-5351-4a27-b7ae-c67500e04730.d6393bea-a187-4c24-aadf-134ec37d86d0.abedc914-0114-4c06-9c08-4e184dba9a54?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/ai', 1, '', '', NULL, 0);
+INSERT INTO `addon` VALUES (5, '武器装备', 0, 0, '军事', 'https://store-images.s-microsoft.com/image/apps.38216.446a094c-6e55-486d-aca9-a51c2a588f65.f8b3b475-7a54-4af0-bec1-4dc68197e1cf.6394a570-d197-4e6e-9cca-e666f83abeef?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/weapon', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (6, '软件超市', 0, 0, '开发', 'https://store-images.s-microsoft.com/image/apps.6547.3483184d-76e1-45f0-97e6-9335bd119d82.1deee2c7-9c9e-4eb5-a047-3022d434540c.2ce8ada5-c845-44e9-9cf8-04a3c206381e?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/software', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (7, '数据同步工具', 0, 0, '工具', 'https://store-images.s-microsoft.com/image/apps.21870.124b152a-5cef-4fed-8770-5e39d1e08fcb.68b45caa-7b20-4a43-b68f-242b1366e441.3d01b570-572f-45ed-b506-8fa694f69290?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/etl', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (8, '领域数字人', 0, 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.31985.19b15086-d2ea-4e74-849a-e5b5e3ca40cd.20c40a3f-0b2e-468c-a47e-66ea022be55e.2875cb69-3f22-4e59-ab13-04aad36bf3f5?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/digital-person', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (9, 'Bing积分', 0, 0, '工具', 'https://rewards.bing.com/rewardscdn/images/rewards.png', 'http://localhost:4200/bing-redeem', 0, NULL, '', NULL, 0);
+INSERT INTO `addon` VALUES (10, '标注数字人', 0, 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.59683.5751c008-39d3-42d9-acb8-752c27727f7e.359567f0-ee88-4614-b7b9-e3c040955ba0.a854801b-c7d5-46f2-8390-e37ec02253d9?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/gym-person', 0, '', '', '', 0);
+INSERT INTO `addon` VALUES (12, '3D模型', 0, 0, 'AI', 'https://store-images.s-microsoft.com/image/apps.47791.6642a11a-c740-4522-b359-b9f4ca184278.1206caf3-27ff-4ecd-83e4-547291cee70f.6db4f203-b6c3-4f14-8f20-da8b4f9cce84?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/3d-model', 0, '', '', '', 0);
+INSERT INTO `addon` VALUES (13, '数据字典', 0, 0, '数据', 'https://store-images.s-microsoft.com/image/apps.57207.cd6f34e2-4493-4b3c-b1c9-f63bfc132b9a.b63a4a6f-9504-4e71-81ab-11a67dbfd749.18178811-c832-4f54-9d91-bd82bab27d9b?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/dictionary', 0, '', '', '', 0);
+INSERT INTO `addon` VALUES (14, '网络监控', 0, 0, '工具', 'https://store-images.s-microsoft.com/image/apps.38007.11ce51e3-a1dd-4d31-abd3-7bdd8092723e.5aeaf666-fcee-473a-9c5c-7003ed8a544e.b73cfd6b-540f-4b9b-9bd4-58c05663f4cc?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/network', 0, '', '', '', 0);
+INSERT INTO `addon` VALUES (15, 'nebular', 0, 0, 'UI', 'https://ts2.tc.mm.bing.net/th/id/ODLS.d0a741ef-6fe9-4ad6-9e7f-1db96845f0a3?w=32&h=32&qlt=90&pcl=fffffa&o=6&pid=1.2', 'http://localhost:4200/nebular', 0, '', '', '', 0);
+INSERT INTO `addon` VALUES (16, '考试', 0, 0, '', 'https://store-images.s-microsoft.com/image/apps.20957.73233ea9-0266-4c24-af63-30bbeb006e21.ebac3fff-4d9f-4567-906e-7813ef81e972.e37e3731-84e2-4393-bb7d-9562ac3ff497?mode=scale&h=100&q=90&w=100', 'http://localhost:4200/exam', 0, '', '', '', 0);
 
 -- ----------------------------
--- Table structure for application_schema
+-- Table structure for article
 -- ----------------------------
-DROP TABLE IF EXISTS `application_schema`;
-CREATE TABLE `application_schema`  (
-  `application_id` int(0) NOT NULL,
-  `schema_id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  PRIMARY KEY (`application_id`, `schema_id`) USING BTREE,
-  INDEX `IDX_15335b03bc903d19cfcb077ff2`(`application_id`) USING BTREE,
-  INDEX `IDX_c224eef6c63bc030c3dbb143cc`(`schema_id`) USING BTREE,
-  CONSTRAINT `FK_15335b03bc903d19cfcb077ff2d` FOREIGN KEY (`application_id`) REFERENCES `ontology_application` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_c224eef6c63bc030c3dbb143cc5` FOREIGN KEY (`schema_id`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+DROP TABLE IF EXISTS `article`;
+CREATE TABLE `article`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `title` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `author` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `createTime` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `updateTime` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for category
+-- ----------------------------
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE `category`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `label` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `parentId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `icon` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `color` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `sort` int(0) NULL DEFAULT 0,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_d5456fd7e4c4866fec8ada1fa10`(`parentId`) USING BTREE,
+  CONSTRAINT `FK_d5456fd7e4c4866fec8ada1fa10` FOREIGN KEY (`parentId`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of category
+-- ----------------------------
+INSERT INTO `category` VALUES ('04261c2f-12ba-91b2-4733-f7d3871f11aa', '日历', '日历', NULL, NULL, '04261c2f-12ba-91b2-4733-f7d3871f11aa', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('1e0e31e4-7de6-d4b0-f064-cafa2994f237', '娱乐', '娱乐', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.1e0e31e4-7de6-d4b0-f064-cafa2994f237', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('2ed0b72a-4adf-00e5-2dec-834f56f64f62', '汽车', '汽车', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.2ed0b72a-4adf-00e5-2dec-834f56f64f62', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('31004c74-a52c-e956-9ddb-60fe6604ad60', 'AI大全', 'AI大全', NULL, NULL, '31004c74-a52c-e956-9ddb-60fe6604ad60', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', '财经', '财经', NULL, NULL, '32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('4fea1c9d-2fc4-57ad-8561-9067d4dc977c', '体育', '体育', NULL, NULL, '4fea1c9d-2fc4-57ad-8561-9067d4dc977c', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', '导航', '导航', NULL, NULL, '76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('771c8f21-afdd-d082-7d2a-ee5502a0fcb6', '萌宠', '萌宠', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.771c8f21-afdd-d082-7d2a-ee5502a0fcb6', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '资讯', '资讯', NULL, NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', '科技', '科技', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('95023e34-d4f2-a5cb-05d1-abed36b4b5ab', '教育', '教育', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.95023e34-d4f2-a5cb-05d1-abed36b4b5ab', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('a7c9eca0-451d-2e4f-c6b6-590b6fb95785', '天气', '天气', NULL, NULL, 'a7c9eca0-451d-2e4f-c6b6-590b6fb95785', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('c73269fe-ae8a-7396-58a6-8981c761c2d6', '时尚', '时尚', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.c73269fe-ae8a-7396-58a6-8981c761c2d6', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', '游戏', '游戏', NULL, NULL, 'e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', NULL, NULL, 0);
 
 -- ----------------------------
 -- Table structure for dataset
@@ -71,13 +118,7 @@ CREATE TABLE `dataset`  (
   `label` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of dataset
--- ----------------------------
-INSERT INTO `dataset` VALUES (13, '文件', NULL, 'fcc8e4a8379aa7ff1b0f8eb73e18d0fd.jsonl', '飞行器', '飞行器');
-INSERT INTO `dataset` VALUES (14, 'api', 'title,abstract,url,type,category', NULL, 'bing资讯', 'https://api.msn.com/news/feed/pages/channelfeed?timeOut=10000&apikey=0QfOX3Vn51YCzitbLaRkTTBadtWpgTN8NZLW0C1SEM&cm=zh-cn&User=a-EDD29C0861EECFA2A1521A4DFFFFFFFF&newsSkip=24&$skip=1');
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_col
@@ -185,6 +226,66 @@ CREATE TABLE `design_table`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for extraction_script
+-- ----------------------------
+DROP TABLE IF EXISTS `extraction_script`;
+CREATE TABLE `extraction_script`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `type` enum('extraction','transformation','cleaning') CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT 'extraction',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `language` enum('javascript','python','sql') CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT 'javascript',
+  `createdBy` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  `tags` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of extraction_script
+-- ----------------------------
+INSERT INTO `extraction_script` VALUES ('e9a80626-6ebf-44b6-9e5f-c8aec3055c2e', '123', '123', 'extraction', '// Please 1enter your code here123', 'javascript', NULL, '2025-05-06 08:26:40.603225', '2025-05-06 08:26:40.603225', '[\"123\"]');
+
+-- ----------------------------
+-- Table structure for gpt_models
+-- ----------------------------
+DROP TABLE IF EXISTS `gpt_models`;
+CREATE TABLE `gpt_models`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `logo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `apiEndpoint` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `api_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `createdAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `updatedAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for marker
+-- ----------------------------
+DROP TABLE IF EXISTS `marker`;
+CREATE TABLE `marker`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `positionX` float NOT NULL,
+  `positionY` float NOT NULL,
+  `positionZ` float NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `createdAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of marker
+-- ----------------------------
+INSERT INTO `marker` VALUES (66, '头', -2.63375, 199.019, 25.5947, '', '2025-03-27 02:27:16');
+INSERT INTO `marker` VALUES (67, '背', 0.0496074, 142.896, -25.6037, '', '2025-03-27 02:27:28');
+
+-- ----------------------------
 -- Table structure for message
 -- ----------------------------
 DROP TABLE IF EXISTS `message`;
@@ -196,7 +297,7 @@ CREATE TABLE `message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_58be890b9a1199e6da5037a994f`(`sessionId`) USING BTREE,
   CONSTRAINT `FK_58be890b9a1199e6da5037a994f` FOREIGN KEY (`sessionId`) REFERENCES `session` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 714 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 717 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -278,6 +379,8 @@ INSERT INTO `message` VALUES (711, 'user', 250, '你是谁');
 INSERT INTO `message` VALUES (712, 'ai', 250, '<think>\n\n</think>\n\n您好！我是由中国的深度求索（DeepSeek）公司开发的智能助手DeepSeek-R1。如您有任何任何问题，我会尽我所能为您提供帮助。');
 INSERT INTO `message` VALUES (713, 'user', 251, '你是谁');
 INSERT INTO `message` VALUES (714, 'ai', 251, '<think>\n嗯，用户问“你是谁”，我需要先确定他们的意图。可能他们刚接触这个平台，或者想确认我的身份以便更好地使用我的功能。\n\n首先，我要简明扼要地介绍自己，说明我是通义千问，阿里巴巴集团旗下的超大规模语言模型。这样用户能快速了解我的背景和能力范围。\n\n接下来，应该列举一些我能够帮助的方面，比如回答问题、创作文字、编程等，这样用户知道我能提供哪些具体的服务。同时，保持口语化，避免使用过于技术性的术语，让解释更易懂。\n\n还要注意用户的潜在需求，可能他们需要进一步的帮助或有特定的问题要解决。所以最后可以邀请他们提出具体的问题，这样能促进互动，并展示我的实用性。\n\n另外，检查是否有遗漏的重要信息，比如多语言支持或者应用场景的例子，确保回答全面但不过于冗长。保持自然流畅，避免生硬的结构，让用户感觉亲切和可靠。\n</think>\n\n你好！我是通义千问，阿里巴巴集团旗下的超大规模语言模型。我能够帮助你：\n\n- **回答问题**：无论是常识、专业知识还是复杂的问题，我都可以尽力为你解答。\n- **创作文字**：写故事、写公文、写邮件、写剧本等，只要你给出主题或要求，我可以帮你生成内容。\n- **逻辑推理与编程**：我可以处理逻辑推理任务，并协助编写代码（支持多种编程语言）。\n- **表达观点**：如果你需要对某个话题发表意见或撰写评论，我也可以提供帮助。\n- **玩游戏**：我们可以一起玩文字游戏，比如猜谜语、成语接龙等。\n\n无论你需要什么类型的帮助，只要告诉我具体需求，我会尽最大努力为你服务！有什么我可以帮到你的吗？');
+INSERT INTO `message` VALUES (715, 'user', 252, '唐纳德·特朗普:\n> \n> `总统`\n> \n> <img src=\"http://127.0.0.1:9000/kgms/487d870f7af9aacd6df642590247a9c7.png\" alt=\"描述\" height=\"120\">\n> \n> 第45任、第47任美国总统\n\n> ');
+INSERT INTO `message` VALUES (716, 'ai', 252, '<think>\n嗯，唐纳德·特朗普，这位美国的前总统，我好像听说过他不少次了。他是谁来着？好像是个挺有名的人物。让我仔细想一想。\n\n首先，他是美国的第45任总统，对吗？然后好像又当选了第47任？这有点奇怪，通常应该是一任接一任的啊。那我可能记错了。嗯，是不是因为他中间有一次选举失利，所以后来又重新当选了？\n\n对了，我记得美国的总统是每四年选一次，他从2016年开始担任，然后到2020年结束，对吗？然后好像有个乔·拜登接替了他的位置。所以特朗普应该只当了一届，也就是第45任，而不是47任。那可能是我记错了，或者信息来源有问题。\n\n再想想，他有什么特别的事情吗？哦，对了，他是个生意人，本来是做地产的，有个大公司叫特朗普集团。他还主持过《学徒》这个节目，这很出名。所以他转行进入政坛，可能是个备受瞩目的变化。\n\n然后，他在任期间有什么重要的事情吗？我记得他推动了一些减税政策，还有移民政策，比如建边墙什么的。这部分好像引起了很多争议，有支持者也有反对者。\n\n还有，他喜欢用Twitter，经常发推特表达自己的观点，甚至用这个平台来宣布政策或者回应事件。后来好像被封了账号，这可能是因为他的一些言论引起了问题。\n\n哦，对了，他的任期内发生了一些大事件，比如新冠疫情开始的时候，美国的应对措施，他处理得怎么样呢？这部分外界评价似乎褒贬不一，有人说他反应太慢，也有人觉得他采取了一些有效措施。\n\n还有，美国和朝鲜的关系，在他的任期内好像有过直接会谈，这是历史上的第一次，对吗？特朗普和金正恩见面，这可能是个重大事件，但具体效果如何，我不太确定。\n\n另外，他被弹劾过两次，第一次是2019年，第二次是在2021年他离任后不久。这说明他的总统任期内发生了很多争议的事情，但每次弹劾都没有成功免职，所以他还是完成了任期。\n\n还有一个事情，就是关于选举舞弊的指控，他在2020年大选之后一直声称有舞弊行为，这导致了一些诉讼和调查。不过，没有确凿的证据证明大规模舞弊，所以最终结果是乔·拜登胜出。\n\n哦，对了，特朗普的政治风格很独特，他喜欢直言不讳，用很直接的语言表达观点，这可能让一部分人非常支持他，同时也让另一部分人强烈反对。这种两极分化的情况在他的任期内特别明显。\n\n我还记得他退出了巴黎气候协定，理由是认为这对美国经济不利，但后来拜登又重新加入了。这显示出他在环境政策上的立场与前任和继任者有很大不同。\n\n还有，他推动了一些“美国优先”的政策，比如关税、贸易保护措施，这可能影响了全球贸易格局，特别是对中国的关税加征引发了一系列贸易战。\n\n此外，他任内进行了几次重要的人事变动，比如更换司法部长、国务卿等关键职位，这些人事安排通常都会引起媒体和公众的广泛关注。\n\n还有一件事情是关于他与媒体的关系，他经常批评主流媒体是“假新闻”，这在一定程度上影响了公众对媒体信任度，同时也增加了社会的分裂感。\n\n哦，对了，特朗普的头发好像很有特色，总是看起来那么金黄色的，风格也挺独特，这可能也是他个人标志的一部分。\n\n另外，他的家族成员，比如女儿伊万卡·特朗普和小儿子巴伦·特朗普，在他的任期内担任了重要职务，或者至少是在白宫有很大的影响力。这种家族成员参与政府的事实，也引起了一些人的关注和讨论。\n\n他还推动了一些基础设施的建设，比如修建边境墙，这个项目在选举时期是一个重点承诺，但实际完成情况如何，我不太清楚，可能存在资金和执行上的问题。\n\n还有，他任内的经济表现如何呢？我记得在特朗普上任前，美国经济已经处于复苏状态，他任期内可能延续了这一趋势，但也有批评声音认为他的政策加剧了贫富差距或增加了国家债务。\n\n此外，他对待盟友的方式也很特别，比如经常在公开场合表达不满，或者突然做出影响盟国决策的举动，这可能让国际关系变得更加复杂和不可预测。\n\n哦，对了，他在任期内还处理了一些重大事件，比如中东的和平协议，帮助以色列与一些阿拉伯国家建立正式关系，这被视为外交上的成就之一。\n\n还有，他对中国采取了强硬政策，不仅是贸易战，还包括对中国科技公司的限制，比如华为、中芯等，这些措施影响了全球科技产业链，尤其是在半导体领域。\n\n哦，对了，他还在任期内经历了许多丑闻和争议，比如与乌克兰的事件，这导致他第一次被弹劾，虽然最后被宣判无罪，但这一事件占据了很多媒体空间，并对他的形象产生了一定影响。\n\n还有，他的支持者群体主要是什么样的人呢？我记得他们大多是保守派、右翼选民，可能集中在农村地区和中西部，这些地方在经济上可能面临更多挑战，而特朗普的政策或许更能引起这些人的共鸣。\n\n此外，他在任期内还推动了最高法院法官的提名，比如艾米·康尼·巴雷特，她是在特朗普政府晚期提名并确认的，这可能对美国司法体系产生长期影响。\n\n还有，关于医疗政策，他想要废除奥巴马时代的《平价医疗法案》（ACA），但在国会遇到了阻力，没有成功完全废除。不过，他可能做了一些修改或削弱这一法案的措施。\n\n哦，对了，他的移民政策非常严格，不仅是边境墙，还包括限制合法移民和难民的数量，这引发了很多人权组织的批评，同时也受到了部分支持者的欢迎。\n\n还有，他在任期内对伊朗采取了强硬立场，包括退出伊核协议和加征制裁，这导致了地区紧张局势的加剧，但可能也带来了某些外交上的变化。\n\n哦，对了，他处理朝鲜问题时采取的“最大压力”政策，包括制裁和对话并行，这在一定程度上保持了朝鲜半岛的局势稳定，但最终是否达到了完全无核化的目标，还值得怀疑。\n\n还有，在他的领导下，美国从叙利亚撤军，这可能导致了地区力量平衡的变化，并引发了一些关于美国全球领导力的讨论。\n\n哦，对了，他还推动了一系列减少监管的措施，特别是在能源和环境领域，这有助于短期内促进经济增长，但长期来看可能对环境保护不利。\n\n还有，他在任期间股市表现如何？我记得特朗普经常引用股市上涨作为经济成功的标志，而在他的任期内，确实有一段时间股市表现非常强劲，但后来疫情影响导致市场波动加剧。\n\n哦，对了，新冠疫情对他的任期评价影响');
 
 -- ----------------------------
 -- Table structure for ontology_application
@@ -287,12 +390,71 @@ CREATE TABLE `ontology_application`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
-  `rating` int(0) NULL DEFAULT NULL,
-  `images` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `category` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `tags` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `reviews` int(0) NULL DEFAULT 0,
+  `totalRatings` int(0) NULL DEFAULT 0,
+  `image` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `screenshots` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `isPinned` tinyint(0) NULL DEFAULT 0,
+  `userRatings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `rating` float NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ontology_application
+-- ----------------------------
+INSERT INTO `ontology_application` VALUES (9, '测试', '<p><strong>测试</strong></p>', '测试', NULL, 0, 0, NULL, NULL, NULL, 0, NULL, 0);
+
+-- ----------------------------
+-- Table structure for ontology_application_namespace
+-- ----------------------------
+DROP TABLE IF EXISTS `ontology_application_namespace`;
+CREATE TABLE `ontology_application_namespace`  (
+  `application_id` int(0) NOT NULL,
+  `namespace_id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`application_id`, `namespace_id`) USING BTREE,
+  INDEX `IDX_c74913edd362ff55226457349f`(`application_id`) USING BTREE,
+  INDEX `IDX_42fdb5235db26c292b92429c89`(`namespace_id`) USING BTREE,
+  CONSTRAINT `FK_42fdb5235db26c292b92429c89b` FOREIGN KEY (`namespace_id`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_c74913edd362ff55226457349f8` FOREIGN KEY (`application_id`) REFERENCES `ontology_application` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for ontology_namescape_application
+-- ----------------------------
+DROP TABLE IF EXISTS `ontology_namescape_application`;
+CREATE TABLE `ontology_namescape_application`  (
+  `namescapeId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `applicationId` int(0) NOT NULL,
+  PRIMARY KEY (`namescapeId`, `applicationId`) USING BTREE,
+  INDEX `IDX_7bb68feb40f02c8b85e1f0643c`(`namescapeId`) USING BTREE,
+  INDEX `IDX_167221a193edbf8301eb4aabd0`(`applicationId`) USING BTREE,
+  CONSTRAINT `FK_167221a193edbf8301eb4aabd04` FOREIGN KEY (`applicationId`) REFERENCES `ontology_application` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_7bb68feb40f02c8b85e1f0643c6` FOREIGN KEY (`namescapeId`) REFERENCES `ontology_namespace` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for ontology_namespace
+-- ----------------------------
+DROP TABLE IF EXISTS `ontology_namespace`;
+CREATE TABLE `ontology_namespace`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `prefix` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `uri` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `createdAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `IDX_94803f4747a30651280d5c592c`(`name`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ontology_namespace
+-- ----------------------------
+INSERT INTO `ontology_namespace` VALUES ('9f232845-395f-49a7-b051-bd46e0f42e27', 'bing', '', 'bing', '', '2025-06-05 07:17:50');
 
 -- ----------------------------
 -- Table structure for ontology_property
@@ -307,39 +469,39 @@ CREATE TABLE `ontology_property`  (
   `enName` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `type` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `group` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9519 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+  `namespaceId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_505114461d0def37f2c6f6e8691`(`namespaceId`) USING BTREE,
+  CONSTRAINT `FK_505114461d0def37f2c6f6e8691` FOREIGN KEY (`namespaceId`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 9527 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of ontology_property
+-- Table structure for ontology_property_qualify
 -- ----------------------------
-INSERT INTO `ontology_property` VALUES (9492, NULL, NULL, '研发单位', 1, NULL, 'string', '7.其他');
-INSERT INTO `ontology_property` VALUES (9493, NULL, NULL, '气动布局', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9494, NULL, NULL, '武器装备', NULL, NULL, 'string', '5.装备使用');
-INSERT INTO `ontology_property` VALUES (9495, '使用情况', NULL, '使用情况', 0, NULL, 'monolingualtext', '5.装备使用');
-INSERT INTO `ontology_property` VALUES (9496, NULL, NULL, '发动机数量', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9497, NULL, NULL, '发动机', 1, NULL, 'wikibase-item', '4.发动机动力系统');
-INSERT INTO `ontology_property` VALUES (9498, NULL, NULL, '空重', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9499, NULL, NULL, '最大飞行速度', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9500, NULL, NULL, '最大起飞重量', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9501, NULL, NULL, '飞行速度', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9502, NULL, NULL, '最大航程', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9503, NULL, NULL, '乘员', 1, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9504, NULL, NULL, '研发单位', NULL, NULL, 'string', '7.其他');
-INSERT INTO `ontology_property` VALUES (9505, NULL, NULL, '发动机数量', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9506, NULL, NULL, '飞行速度', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9507, NULL, NULL, '空重', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9508, NULL, NULL, '发动机', NULL, NULL, 'wikibase-item', '4.发动机动力系统');
-INSERT INTO `ontology_property` VALUES (9509, NULL, NULL, '最大起飞重量', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9510, NULL, NULL, '最大飞行速度', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9511, NULL, NULL, '最大航程', NULL, NULL, 'string', '2.性能参数');
-INSERT INTO `ontology_property` VALUES (9512, '三视图', NULL, '三视图', 0, NULL, 'commonsMedia', '3.三视图');
-INSERT INTO `ontology_property` VALUES (9513, '基本信息', NULL, '基本信息', 0, NULL, 'monolingualtext', '1.基本信息');
-INSERT INTO `ontology_property` VALUES (9514, '立体剖视图', NULL, '立体剖视图', 0, NULL, 'commonsMedia', '6.立体剖视图');
-INSERT INTO `ontology_property` VALUES (9515, '视频', NULL, '视频', 0, NULL, 'commonsMedia', '视频');
-INSERT INTO `ontology_property` VALUES (9516, NULL, NULL, 'url', NULL, NULL, 'string', NULL);
-INSERT INTO `ontology_property` VALUES (9517, '', NULL, '章节', 1, NULL, 'wikibase-item', '');
-INSERT INTO `ontology_property` VALUES (9518, '', NULL, '知识点', 1, NULL, 'wikibase-item', '');
+DROP TABLE IF EXISTS `ontology_property_qualify`;
+CREATE TABLE `ontology_property_qualify`  (
+  `propertyId` int(0) NOT NULL,
+  `qualifyId` int(0) NOT NULL,
+  PRIMARY KEY (`propertyId`, `qualifyId`) USING BTREE,
+  INDEX `IDX_e3338dfa9b151820a5bc01c7dc`(`propertyId`) USING BTREE,
+  INDEX `IDX_85a2ee0abf8aa15d9fcef916d2`(`qualifyId`) USING BTREE,
+  CONSTRAINT `FK_85a2ee0abf8aa15d9fcef916d22` FOREIGN KEY (`qualifyId`) REFERENCES `ontology_qualify` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_e3338dfa9b151820a5bc01c7dc3` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for ontology_property_tag
+-- ----------------------------
+DROP TABLE IF EXISTS `ontology_property_tag`;
+CREATE TABLE `ontology_property_tag`  (
+  `propertyId` int(0) NOT NULL,
+  `tagId` int(0) NOT NULL,
+  PRIMARY KEY (`propertyId`, `tagId`) USING BTREE,
+  INDEX `IDX_c58711e66bd5dcedb500cf92e1`(`propertyId`) USING BTREE,
+  INDEX `IDX_10fea09f9e69d3997856f1ecfd`(`tagId`) USING BTREE,
+  CONSTRAINT `FK_10fea09f9e69d3997856f1ecfd6` FOREIGN KEY (`tagId`) REFERENCES `ontology_tag` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_c58711e66bd5dcedb500cf92e18` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ontology_qualify
@@ -352,22 +514,11 @@ CREATE TABLE `ontology_qualify`  (
   `enName` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `enDescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `type` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for ontology_qualify_property
--- ----------------------------
-DROP TABLE IF EXISTS `ontology_qualify_property`;
-CREATE TABLE `ontology_qualify_property`  (
-  `propertyId` int(0) NOT NULL,
-  `qualifyId` int(0) NOT NULL,
-  PRIMARY KEY (`propertyId`, `qualifyId`) USING BTREE,
-  INDEX `IDX_2f9d494bd1f157d7a4b18b2535`(`propertyId`) USING BTREE,
-  INDEX `IDX_b4dba9576718ec687e4bbdb9fc`(`qualifyId`) USING BTREE,
-  CONSTRAINT `FK_2f9d494bd1f157d7a4b18b25352` FOREIGN KEY (`propertyId`) REFERENCES `ontology_property` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_b4dba9576718ec687e4bbdb9fc7` FOREIGN KEY (`qualifyId`) REFERENCES `ontology_qualify` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+  `namespaceId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_8dbd9407df5697a1a52bdcab34c`(`namespaceId`) USING BTREE,
+  CONSTRAINT `FK_8dbd9407df5697a1a52bdcab34c` FOREIGN KEY (`namespaceId`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 124 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ontology_schema
@@ -387,37 +538,19 @@ CREATE TABLE `ontology_schema`  (
   `label` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `collection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `namespaceId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_16cf37d5711e15bdc49419b6227`(`parentId`) USING BTREE,
-  CONSTRAINT `FK_16cf37d5711e15bdc49419b6227` FOREIGN KEY (`parentId`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  INDEX `FK_6bd16d585af8317a5079733477b`(`namespaceId`) USING BTREE,
+  CONSTRAINT `FK_16cf37d5711e15bdc49419b6227` FOREIGN KEY (`parentId`) REFERENCES `ontology_schema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_6bd16d585af8317a5079733477b` FOREIGN KEY (`namespaceId`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_schema
 -- ----------------------------
-INSERT INTO `ontology_schema` VALUES ('3111da94-2aa2-e38f-31a6-12d57b2f8614', NULL, NULL, NULL, 'dcddad89-a727-a28b-1ac8-baa1aec5e9cc', '3111da94-2aa2-e38f-31a6-12d57b2f8614', 1, '章节', NULL, NULL, '章节', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('327991d8-5d75-46b9-909f-65daa8bf5eb2', NULL, NULL, NULL, NULL, 'E4.327991d8-5d75-46b9-909f-65daa8bf5eb2', 1, '新闻', NULL, NULL, '新闻', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('54a90bf4-6921-cb57-a2e2-b3234ae18520', NULL, NULL, NULL, NULL, '54a90bf4-6921-cb57-a2e2-b3234ae18520', 1, '教材', NULL, NULL, '教材', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('7eed2cf0-d708-6f48-4aeb-386dcb1165f0', NULL, NULL, NULL, NULL, '7eed2cf0-d708-6f48-4aeb-386dcb1165f0', 1, '人物', NULL, NULL, '人物', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('803003cf-2cb3-2ef3-1cee-97e5bedfb50c', NULL, NULL, NULL, '3111da94-2aa2-e38f-31a6-12d57b2f8614', '803003cf-2cb3-2ef3-1cee-97e5bedfb50c', 1, '知识点', NULL, NULL, '知识点', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('E4', NULL, NULL, NULL, NULL, 'E4', 1, '其他', NULL, NULL, '其他', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('dcddad89-a727-a28b-1ac8-baa1aec5e9cc', NULL, NULL, NULL, NULL, 'dcddad89-a727-a28b-1ac8-baa1aec5e9cc', 1, '课程', NULL, NULL, '课程', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', NULL, NULL, NULL, NULL, 'dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 1, '飞行器', NULL, NULL, '飞行器', NULL, NULL);
-INSERT INTO `ontology_schema` VALUES ('faf96bec-f50e-d45d-4e1c-9efb9e7f9c11', NULL, NULL, NULL, NULL, 'faf96bec-f50e-d45d-4e1c-9efb9e7f9c11', 1, '机构', NULL, NULL, '机构', NULL, NULL);
-
--- ----------------------------
--- Table structure for ontology_schema_application
--- ----------------------------
-DROP TABLE IF EXISTS `ontology_schema_application`;
-CREATE TABLE `ontology_schema_application`  (
-  `schemaId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `applicationId` int(0) NOT NULL,
-  PRIMARY KEY (`schemaId`, `applicationId`) USING BTREE,
-  INDEX `IDX_bc8828cc7da567fb99c52926a8`(`schemaId`) USING BTREE,
-  INDEX `IDX_a9db72b6b1ab3c06b807b1b66e`(`applicationId`) USING BTREE,
-  CONSTRAINT `FK_a9db72b6b1ab3c06b807b1b66e1` FOREIGN KEY (`applicationId`) REFERENCES `ontology_application` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `FK_bc8828cc7da567fb99c52926a86` FOREIGN KEY (`schemaId`) REFERENCES `ontology_schema` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+INSERT INTO `ontology_schema` VALUES ('image', NULL, NULL, NULL, NULL, 'image', 1, '新闻', NULL, NULL, '新闻', '', NULL, '9f232845-395f-49a7-b051-bd46e0f42e27');
+INSERT INTO `ontology_schema` VALUES ('ont-1749107883318-5840', NULL, NULL, NULL, NULL, 'ont-1749107883318-5840', 1, '新闻', NULL, NULL, '', '', NULL, '9f232845-395f-49a7-b051-bd46e0f42e27');
 
 -- ----------------------------
 -- Table structure for ontology_schema_property
@@ -434,51 +567,6 @@ CREATE TABLE `ontology_schema_property`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of ontology_schema_property
--- ----------------------------
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9492);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9493);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9494);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9495);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9496);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9497);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9498);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9499);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9500);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9501);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9502);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9503);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9504);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9505);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9506);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9507);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9508);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9509);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9510);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9511);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9512);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9513);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9514);
-INSERT INTO `ontology_schema_property` VALUES ('dd2a65f6-5aa4-44db-b9e6-41c65bc75c82', 9515);
-INSERT INTO `ontology_schema_property` VALUES ('327991d8-5d75-46b9-909f-65daa8bf5eb2', 9516);
-INSERT INTO `ontology_schema_property` VALUES ('dcddad89-a727-a28b-1ac8-baa1aec5e9cc', 9517);
-INSERT INTO `ontology_schema_property` VALUES ('3111da94-2aa2-e38f-31a6-12d57b2f8614', 9518);
-
--- ----------------------------
--- Table structure for ontology_schema_tag
--- ----------------------------
-DROP TABLE IF EXISTS `ontology_schema_tag`;
-CREATE TABLE `ontology_schema_tag`  (
-  `schemaId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `tagId` int(0) NOT NULL,
-  PRIMARY KEY (`schemaId`, `tagId`) USING BTREE,
-  INDEX `IDX_3bfd95cc06afd1ebae902243a3`(`schemaId`) USING BTREE,
-  INDEX `IDX_44865993a3286ad3a3f55809d9`(`tagId`) USING BTREE,
-  CONSTRAINT `FK_3bfd95cc06afd1ebae902243a3e` FOREIGN KEY (`schemaId`) REFERENCES `ontology_schema` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_44865993a3286ad3a3f55809d99` FOREIGN KEY (`tagId`) REFERENCES `ontology_tag` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
-
--- ----------------------------
 -- Table structure for ontology_tag
 -- ----------------------------
 DROP TABLE IF EXISTS `ontology_tag`;
@@ -486,8 +574,11 @@ CREATE TABLE `ontology_tag`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `type` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+  `namespaceId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_76808bdbc91fa5d647e467e7e0c`(`namespaceId`) USING BTREE,
+  CONSTRAINT `FK_76808bdbc91fa5d647e467e7e0c` FOREIGN KEY (`namespaceId`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 842 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ontology_type_value
@@ -504,12 +595,6 @@ CREATE TABLE `ontology_type_value`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of ontology_type_value
--- ----------------------------
-INSERT INTO `ontology_type_value` VALUES ('3111da94-2aa2-e38f-31a6-12d57b2f8614', 9517);
-INSERT INTO `ontology_type_value` VALUES ('803003cf-2cb3-2ef3-1cee-97e5bedfb50c', 9518);
-
--- ----------------------------
 -- Table structure for plugin
 -- ----------------------------
 DROP TABLE IF EXISTS `plugin`;
@@ -523,7 +608,7 @@ CREATE TABLE `plugin`  (
   `outputFormat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of plugin
@@ -543,7 +628,7 @@ CREATE TABLE `plugin_message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_7620f035eb6c49cf037df83dc32`(`pluginId`) USING BTREE,
   CONSTRAINT `FK_7620f035eb6c49cf037df83dc32` FOREIGN KEY (`pluginId`) REFERENCES `plugin` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of plugin_message
@@ -570,7 +655,7 @@ CREATE TABLE `project`  (
 -- ----------------------------
 -- Records of project
 -- ----------------------------
-INSERT INTO `project` VALUES ('0df3bd69-917c-4218-b00f-4fa4a7df1914', '123', '123', '2025-03-17 09:32:25.452025', '2025-03-18 00:13:14.000000', '{\"edges\": [{\"source\": \"e1c4467f-e595-4e58-b58f-980ecbd069a5\", \"target\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\"}, {\"source\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\", \"target\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\"}, {\"source\": \"c01b549b-a076-4cdc-ba3d-dc92a5694ac4\", \"target\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\"}, {\"source\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\", \"target\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\"}, {\"source\": \"f70ea853-8403-4693-9534-6b6d0dc720c5\", \"target\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\"}], \"nodes\": [{\"id\": \"e1c4467f-e595-4e58-b58f-980ecbd069a5\", \"type\": \"source\", \"position\": {\"x\": 190, \"y\": 130}, \"properties\": {}}, {\"id\": \"d5127a47-6f1c-4a15-b3d0-7b8a81c2c5f0\", \"type\": \"transform\", \"position\": {\"x\": 353.99998474121094, \"y\": 414.711799621582}, \"properties\": {}}, {\"id\": \"d4bee3dc-9779-4283-a64e-cb0b12983787\", \"type\": \"target\", \"position\": {\"x\": 280.99998474121094, \"y\": 760.711799621582}, \"properties\": {}}, {\"id\": \"c01b549b-a076-4cdc-ba3d-dc92a5694ac4\", \"type\": \"source\", \"position\": {\"x\": 774.9999847412109, \"y\": 200.71179962158203}, \"properties\": {}}, {\"id\": \"7ffa50c4-dee4-4911-a280-7c16a7067b21\", \"type\": \"transform\", \"position\": {\"x\": 740, \"y\": 460}, \"properties\": {}}, {\"id\": \"f70ea853-8403-4693-9534-6b6d0dc720c5\", \"type\": \"source\", \"position\": {\"x\": 79.99998474121094, \"y\": 370.711799621582}, \"properties\": {}}]}');
+INSERT INTO `project` VALUES ('74338496-0046-4e89-bab2-c284c0b1b92f', '123', '123', '2025-05-06 08:54:33.889136', '2025-05-06 08:54:33.889136', '{\"edges\": [], \"nodes\": []}');
 INSERT INTO `project` VALUES ('7592b67e-9c22-4df7-a480-826f07408dc3', '数据同步', '数据同步', '2025-03-17 08:56:52.358077', '2025-03-17 09:36:53.000000', '{\"edges\": [{\"source\": \"03f2711b-bee2-4ed9-b0d7-2ef0c519672c\", \"target\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\"}, {\"source\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\", \"target\": \"c4918ac7-58f4-4a74-8aff-751a7b141abe\"}], \"nodes\": [{\"id\": \"03f2711b-bee2-4ed9-b0d7-2ef0c519672c\", \"type\": \"source\", \"position\": {\"x\": 372.99998474121094, \"y\": 173.71179962158203}, \"properties\": {}}, {\"id\": \"061710c9-2c19-4106-9ae4-4cced4a1c09c\", \"type\": \"transform\", \"position\": {\"x\": 940, \"y\": 470}, \"properties\": {}}, {\"id\": \"c4918ac7-58f4-4a74-8aff-751a7b141abe\", \"type\": \"target\", \"position\": {\"x\": 370, \"y\": 720}, \"properties\": {}}]}');
 
 -- ----------------------------
@@ -582,7 +667,7 @@ CREATE TABLE `session`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 252 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 253 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of session
@@ -626,6 +711,7 @@ INSERT INTO `session` VALUES (248, '你是谁', '2025-03-17 07:35:43.358643');
 INSERT INTO `session` VALUES (249, '你是谁', '2025-03-17 07:38:02.285062');
 INSERT INTO `session` VALUES (250, '你是谁', '2025-03-17 07:38:47.246300');
 INSERT INTO `session` VALUES (251, '你是谁', '2025-03-17 07:38:55.535158');
+INSERT INTO `session` VALUES (252, '唐纳德·特朗普...', '2025-03-25 08:15:21.574368');
 
 -- ----------------------------
 -- Table structure for system_action
@@ -673,6 +759,7 @@ INSERT INTO `system_action` VALUES ('cac38734-fa4c-0775-96f2-c4146a4dcbe0', '新
 INSERT INTO `system_action` VALUES ('e1497f04-16fa-9bee-c77e-fd4afab4ef86', '删除', 'delete', 'fto-trash-2', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 4);
 INSERT INTO `system_action` VALUES ('f50bd17d-2436-47f3-2f9a-d914ff2ad834', '查看', 'info', 'fto-eye', 'f97d223d-b777-3dfa-c76a-d24244eba25e', 1);
 INSERT INTO `system_action` VALUES ('fb5680c4-47cb-78f9-c107-656f42886e3c', '新增', 'add', 'fto-plus', '4a305e03-c1b9-1ab7-b9ac-3408dced0194', 2);
+INSERT INTO `system_action` VALUES ('fcf6de3b-2457-2d8f-0d7b-81989dbe2249', '查看', 'info', 'fto-inbox', '01840711-0e26-078b-9019-3442e47f88ef', 1);
 
 -- ----------------------------
 -- Table structure for system_menu
@@ -695,14 +782,15 @@ CREATE TABLE `system_menu`  (
 -- Records of system_menu
 -- ----------------------------
 INSERT INTO `system_menu` VALUES ('0009d7da-3efc-2ea1-3be1-2542c7b6c070', '系统管理', '', 'ado-setting', NULL, '0009d7da-3efc-2ea1-3be1-2542c7b6c070', 11);
+INSERT INTO `system_menu` VALUES ('01840711-0e26-078b-9019-3442e47f88ef', '领域', 'category', 'fto-inbox', NULL, '01840711-0e26-078b-9019-3442e47f88ef', 9);
 INSERT INTO `system_menu` VALUES ('06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', '知识库', 'entity', 'fto-inbox', NULL, '06e43b64-1fa6-64b1-8eae-4e33f2ec3b41', 5);
 INSERT INTO `system_menu` VALUES ('10f15681-0d11-78db-bc92-76d43298a5f8', '菜单管理', 'menus', 'fto-menu', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.10f15681-0d11-78db-bc92-76d43298a5f8', 4);
-INSERT INTO `system_menu` VALUES ('29db4c9b-7e43-fe4e-e249-9a10c4a853e6', '应用', 'applications', 'fto-inbox', NULL, '29db4c9b-7e43-fe4e-e249-9a10c4a853e6', 9);
-INSERT INTO `system_menu` VALUES ('29ecd267-2707-8c74-d508-730526ddd7ee', '抽取', 'extraction', 'fto-filter', NULL, '29ecd267-2707-8c74-d508-730526ddd7ee', 4);
+INSERT INTO `system_menu` VALUES ('29db4c9b-7e43-fe4e-e249-9a10c4a853e6', '应用', 'applications', 'fto-inbox', NULL, '29db4c9b-7e43-fe4e-e249-9a10c4a853e6', 8);
+INSERT INTO `system_menu` VALUES ('29ecd267-2707-8c74-d508-730526ddd7ee', '批处理', 'extraction', 'fto-filter', NULL, '29ecd267-2707-8c74-d508-730526ddd7ee', 7);
 INSERT INTO `system_menu` VALUES ('32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', '用户管理', 'users', 'ado-team', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.32cbc14a-632e-24d0-8d8f-2032c2c7a5e0', 1);
-INSERT INTO `system_menu` VALUES ('47c99575-24ac-d6d5-5353-f000e29e3115', '本体建模', 'ontology', 'fto-triangle', NULL, '47c99575-24ac-d6d5-5353-f000e29e3115', 2);
+INSERT INTO `system_menu` VALUES ('47c99575-24ac-d6d5-5353-f000e29e3115', '本体建模', 'namespace', 'fto-triangle', NULL, '47c99575-24ac-d6d5-5353-f000e29e3115', 2);
 INSERT INTO `system_menu` VALUES ('4a305e03-c1b9-1ab7-b9ac-3408dced0194', '组织管理', 'organization', 'ado-apartment', '0009d7da-3efc-2ea1-3be1-2542c7b6c070', '0009d7da-3efc-2ea1-3be1-2542c7b6c070.4a305e03-c1b9-1ab7-b9ac-3408dced0194', 3);
-INSERT INTO `system_menu` VALUES ('595449e7-a0f5-0ed4-c67b-98cf0a6f9d1a', '构建', 'algorithm', 'fto-inbox', NULL, '595449e7-a0f5-0ed4-c67b-98cf0a6f9d1a', 10);
+INSERT INTO `system_menu` VALUES ('595449e7-a0f5-0ed4-c67b-98cf0a6f9d1a', '构建', 'algorithm', 'fto-inbox', NULL, '595449e7-a0f5-0ed4-c67b-98cf0a6f9d1a', 4);
 INSERT INTO `system_menu` VALUES ('90d5153c-3241-0ef6-27a8-6d00012d1838', '首页', 'dashboard', 'ado-home', NULL, '90d5153c-3241-0ef6-27a8-6d00012d1838', 1);
 INSERT INTO `system_menu` VALUES ('e2203f49-23da-5372-a260-ba8f71dc9e08', '图编辑', 'graph', 'fto-compass', NULL, 'e2203f49-23da-5372-a260-ba8f71dc9e08', 6);
 INSERT INTO `system_menu` VALUES ('ecb74912-91e9-5fb0-c737-de74aa65d454', '数据集', 'dataset', 'fto-compass', NULL, 'ecb74912-91e9-5fb0-c737-de74aa65d454', 3);
@@ -806,6 +894,7 @@ INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01',
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', 'f50bd17d-2436-47f3-2f9a-d914ff2ad834');
 INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'fb5680c4-47cb-78f9-c107-656f42886e3c');
 INSERT INTO `system_role_action` VALUES ('e88d7417-2981-c495-2d40-65a57b03748c', 'fb5680c4-47cb-78f9-c107-656f42886e3c');
+INSERT INTO `system_role_action` VALUES ('365612aa-3646-c1ab-f026-07e25a874c01', 'fcf6de3b-2457-2d8f-0d7b-81989dbe2249');
 
 -- ----------------------------
 -- Table structure for system_user
@@ -865,5 +954,33 @@ CREATE TABLE `system_user_role`  (
 -- Records of system_user_role
 -- ----------------------------
 INSERT INTO `system_user_role` VALUES ('48c55613-5042-0fe9-9c9a-1743822125ee', '365612aa-3646-c1ab-f026-07e25a874c01');
+
+-- ----------------------------
+-- Table structure for three_d_models
+-- ----------------------------
+DROP TABLE IF EXISTS `three_d_models`;
+CREATE TABLE `three_d_models`  (
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `filePath` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `tags` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `format` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `fileSize` int(0) NOT NULL,
+  `thumbnailUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `previewUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `searchableText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
+  `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of three_d_models
+-- ----------------------------
+INSERT INTO `three_d_models` VALUES ('30f20e71-70a0-45c0-9338-bf41b50fd7f2', 'men', '', 'cf8be5f52bde893aa62d92d818772dc8.fbx', '', 'Other', 'fbx', 52567744, NULL, 'cf8be5f52bde893aa62d92d818772dc8.fbx', 'men  ', '2025-04-01 06:57:48.026263', '2025-04-01 06:57:48.026263');
+INSERT INTO `three_d_models` VALUES ('677275d8-3175-450a-90d2-4150cd12c7e3', 'talking', '', '2e7c4dee45b924dcd9bef17944c1e941.fbx', '', 'Other', 'fbx', 2138512, NULL, '2e7c4dee45b924dcd9bef17944c1e941.fbx', 'talking  ', '2025-04-01 06:52:02.191657', '2025-04-01 06:52:02.191657');
+INSERT INTO `three_d_models` VALUES ('ade7f10c-c11d-49d4-9f79-09f205b2724d', 'greeting', '', 'd7d59a06f986f638a8853e1a02d9cc35.fbx', '', 'Other', 'fbx', 35103648, NULL, 'd7d59a06f986f638a8853e1a02d9cc35.fbx', 'greeting  ', '2025-04-01 07:12:13.646868', '2025-04-01 07:12:13.646868');
 
 SET FOREIGN_KEY_CHECKS = 1;
