@@ -1,0 +1,24 @@
+:host {
+  .au-inner {
+    display: flex;
+    flex: 1;
+    height: 100%;
+  }
+
+  .au-tree-left {
+    margin-right: 1rem;
+    h4 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 0.5rem 0;
+    }
+  }
+
+  .au-form-right {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+}

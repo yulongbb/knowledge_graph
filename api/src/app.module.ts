@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ArticleModule } from './article/article.module';
 import { ProjectModule } from './project/project.module';
 import { ExtractionModule } from './extraction/extraction.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ExtractionModule } from './extraction/extraction.module';
     ArticleModule,
     ProjectModule,
     ExtractionModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],

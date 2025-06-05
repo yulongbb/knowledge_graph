@@ -103,7 +103,7 @@ export class EntityAddImageComponent {
   uploadFile(file: File) {
     this.isUploading = true;
     const formData = new FormData();
-    
+
     formData.append('file', file, this.generateUniqueFileName(file.name));
 
     fetch('http://localhost:3000/api/minio-client/uploadFile', {
@@ -126,13 +126,13 @@ export class EntityAddImageComponent {
   async uploadImageFromUrl(url: string) {
     try {
       this.isUploading = true;
-      
+
       // 直接使用后端代理接口获取图片
       const proxyResponse = await fetch(`http://localhost:3000/api/minio-client/proxy-image?url=${encodeURIComponent(url)}`);
       if (!proxyResponse.ok) {
         throw new Error('无法获取图片');
       }
-      
+
       const blob = await proxyResponse.blob();
       const fileName = this.generateUniqueFileNameFromUrl(url);
       const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
@@ -149,17 +149,17 @@ export class EntityAddImageComponent {
     // 从URL中提取原始文件名
     const urlParts = url.split('/');
     let originalName = urlParts[urlParts.length - 1].split('?')[0];
-    
+
     // 如果URL中没有有效的文件名，使用默认名称
     if (!originalName || originalName.length < 4) {
       originalName = 'image.jpg';
     }
-    
+
     // 生成带时间戳的唯一文件名
     const timestamp = new Date().getTime();
     const randomStr = Math.random().toString(36).substring(2, 8);
     const extension = this.getExtensionFromUrl(url);
-    
+
     return `web-${timestamp}-${randomStr}.${extension}`;
   }
 
@@ -169,7 +169,7 @@ export class EntityAddImageComponent {
     if (pathMatch && /^(jpg|jpeg|png|gif|webp|avif)$/i.test(pathMatch[1])) {
       return pathMatch[1].toLowerCase();
     }
-    
+
     // 如果URL中没有有效的图片扩展名，返回默认扩展名
     return 'jpg';
   }
@@ -189,10 +189,10 @@ export class EntityAddImageComponent {
   }
 
   uploadImage($event: any) {
-    $event.url =`http://localhost:9000/kgms/${$event.body.name}`;
-    $event.label =$event.body.name;
-    $event.description ='';
-    $event.tags ='';
+    $event.url = `http://localhost:9000/kgms/${$event.body.name}`;
+    $event.label = $event.body.name;
+    $event.description = '';
+    $event.tags = '';
     this.selectImage($event);
     console.log($event);
     this.uploadedFiles.push($event);
@@ -211,7 +211,7 @@ export class EntityAddImageComponent {
 
     // 构建保存数据
     const item: any = {
-      type: 'E4',
+      type: { id: 'image' },
       labels: {
         zh: {
           language: 'zh',
@@ -224,7 +224,7 @@ export class EntityAddImageComponent {
           value: this.selectedImage.description || ''
         }
       },
-      tags: this.selectedImage.tags?.split('#').filter((x:any) => x.trim() !== ''),
+      tags: this.selectedImage.tags?.split('#').filter((x: any) => x.trim() !== ''),
       images: this.uploadedFiles.map(img => {
         const url = img.url.replace('http://localhost:9000/kgms/', '');
         return url;
@@ -242,7 +242,7 @@ export class EntityAddImageComponent {
         this.saved.emit();
         // 使用 router 导航到指定路径，带上空的 keyword 参数
         setTimeout(() => {
-          this.router.navigate(['/start/image'], { 
+          this.router.navigate(['/start/image'], {
             queryParams: { keyword: '' }
           });
         }, 300);

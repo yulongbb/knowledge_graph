@@ -230,7 +230,18 @@ export const layoutRoutes: Routes = [
       shouldReuse: true
     }
   },
-
+  // 抽取
+  {
+    path: "category",
+    loadChildren: () =>
+      import("../main/category/category.module").then(
+        x => x.CategoryModule
+      ),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true
+    }
+  },
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页

@@ -2,61 +2,11 @@
   font-family: 'Microsoft YaHei', Arial, sans-serif;
   background-color: #f0f2f5;
   min-height: 100vh;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
 }
 
-/* 头部导航样式 */
-.wiki-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
-  .logo-container {
-    .wiki-logo {
-      height: 30px;
-    }
-  }
-  
-  .header-tools {
-    display: flex;
-    align-items: center;
-    
-    .search-box {
-      display: flex;
-      margin-right: 20px;
-      
-      .search-input {
-        border: 1px solid #ddd;
-        border-radius: 4px 0 0 4px;
-        padding: 5px 10px;
-        outline: none;
-      }
-      
-      .search-button {
-        background-color: #4285f4;
-        color: white;
-        border: none;
-        border-radius: 0 4px 4px 0;
-        padding: 5px 10px;
-        cursor: pointer;
-      }
-    }
-    
-    .user-tools {
-      display: flex;
-      
-      .tool-link {
-        margin-left: 15px;
-        color: #555;
-        font-size: 18px;
-      }
-    }
-  }
-}
 
 /* 主内容区样式 */
 .wiki-content {

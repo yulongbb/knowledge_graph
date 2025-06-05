@@ -46,15 +46,13 @@
         {{ category.name }}
       </li>
       
-      <!-- All categories grouped by namespace -->
-      <ng-container *ngFor="let namespace of getAllNamespaces()">
-        <li class="namespace-header">{{ namespace.name }}</li>
-        <li *ngFor="let category of getOntologiesForNamespace(namespace)"
-            [class.selected]="isSelected(category)"
-            (click)="selectCategoryAndCloseSideNav(category, 0)">
-          <span class="indent"></span>{{ category.name }}
-        </li>
-      </ng-container>
+      <!-- All categories in a flattened tree structure -->
+      <li *ngFor="let category of getFlattenedCategories()"
+          [class.selected]="isSelected(category)"
+          (click)="selectCategoryAndCloseSideNav(category, 0)"
+          [style.padding-left]="(16 + (category.level || 0) * 16) + 'px'">
+        {{ category.name }}
+      </li>
     </ul>
   </div>
 </div>

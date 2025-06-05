@@ -46,8 +46,8 @@ export class KnowledgeNavComponent implements OnInit {
     return this.categories.slice(0, 2); // 发现和关注
   }
 
-  getRegularCategories(): Category[] {
-    return this.categories.slice(2);
+  getCategoryTrees(): Category[] {
+    return this.categories.slice(2); // All category trees
   }
 
   selectCategory(category: Category, level: number): void {
@@ -75,12 +75,6 @@ export class KnowledgeNavComponent implements OnInit {
       return;
     }
 
-    // 如果当前分类没有子分类，只更新选中状态，不改变路径
-    if (!category.children || category.children.length === 0) {
-      this.categorySelected.emit(category);
-      return;
-    }
-
     // 如果是新的子分类，添加到路径中
     this.selectedPath.push(category.id);
 
@@ -101,7 +95,7 @@ export class KnowledgeNavComponent implements OnInit {
     if (this.selectedPath.length === 0 || 
         this.currentSelectedId === 'discover' || 
         this.currentSelectedId === 'following') {
-      return this.getRegularCategories();
+      return this.getCategoryTrees();
     }
 
     let result: Category[] = [];
@@ -109,7 +103,7 @@ export class KnowledgeNavComponent implements OnInit {
     
     // 找到第一个选中的分类
     const firstSelectedCategory = currentLevel.find(c => c.id === this.selectedPath[0]);
-    if (!firstSelectedCategory) return this.getRegularCategories();
+    if (!firstSelectedCategory) return this.getCategoryTrees();
 
     // 返回第一个选中的分类及其子分类
     result = [firstSelectedCategory];
@@ -126,22 +120,6 @@ export class KnowledgeNavComponent implements OnInit {
     }
 
     return result;
-  }
-
-  private findParentCategory(categoryId: string): Category | undefined {
-    for (const category of this.categories) {
-      if (category.children?.some(child => child.id === categoryId)) {
-        return category;
-      }
-      if (category.children) {
-        for (const child of category.children) {
-          if (child.children?.some(grandChild => grandChild.id === categoryId)) {
-            return child;
-          }
-        }
-      }
-    }
-    return undefined;
   }
 
   getSelectedCategoryPath(): Category[] {
@@ -164,7 +142,6 @@ export class KnowledgeNavComponent implements OnInit {
 
   // Check if the navigation button should be shown
   get showNavButton(): boolean {
-    // Show button when not on the first level or when a category is selected
     return this.selectedPath.length > 0 || 
            (this.currentSelectedId !== null && 
             this.currentSelectedId !== 'discover' && 
@@ -174,7 +151,6 @@ export class KnowledgeNavComponent implements OnInit {
   // Toggle side navigation panel
   toggleSideNav(): void {
     this.sideNavOpen = !this.sideNavOpen;
-    // Prevent body scrolling when side nav is open
     document.body.style.overflow = this.sideNavOpen ? 'hidden' : '';
   }
 
@@ -189,14 +165,39 @@ export class KnowledgeNavComponent implements OnInit {
     this.selectCategory(category, level);
     this.closeSideNav();
   }
-
-  // Get all namespaces for the side panel
-  getAllNamespaces(): Category[] {
-    return this.categories.filter(c => c.isNamespace);
+  
+  // Get all top level categories for the side panel
+  getTopLevelCategories(): Category[] {
+    return this.categories.slice(2); // Skip fixed categories
   }
 
-  // Get ontologies for a specific namespace
-  getOntologiesForNamespace(namespace: Category): Category[] {
-    return namespace.children || [];
+  // Get subcategories for a category
+  getSubcategories(category: Category): Category[] {
+    return category.children || [];
+  }
+  
+  // Flatten the category tree for the side panel
+  getFlattenedCategories(): Category[] {
+    const flattenedCategories: Category[] = [];
+    
+    const processCategory = (category: Category, level: number = 0) => {
+      // Add the category with its level
+      const processedCategory = { ...category, level: level };
+      flattenedCategories.push(processedCategory);
+      
+      // Process children if they exist
+      if (category.children && category.children.length > 0) {
+        category.children.forEach(child => {
+          processCategory(child, level + 1);
+        });
+      }
+    };
+    
+    // Start with top-level categories (skip fixed ones)
+    this.getCategoryTrees().forEach(category => {
+      processCategory(category);
+    });
+    
+    return flattenedCategories;
   }
 }
