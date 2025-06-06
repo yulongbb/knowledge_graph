@@ -1,33 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 
-type MatchData = {
+interface MatchData {
   league: string;
   leagueLogo: string;
   matchTime: string;
-  status: string;
+  status: 'upcoming' | 'live' | 'finished';
   team1: string;
   team1Logo: string;
   team1Score: string;
   team2: string;
   team2Logo: string;
   team2Score: string;
-  highlight: boolean;
+  highlight?: boolean;
 }
 
-// Common interface for all ranking types
-interface RankingData {
+interface TeamRanking {
   rank: number;
   team: string;
-  change: string;
-}
-
-interface FootballRanking extends RankingData {
-  points: number;
-}
-
-interface BasketballRanking extends RankingData {
-  wins: number;
-  losses: number;
+  points?: number;
+  wins?: number;
+  losses?: number;
+  change: 'up' | 'down' | 'same';
 }
 
 @Component({
@@ -36,11 +29,8 @@ interface BasketballRanking extends RankingData {
   styleUrls: ['./knowledge-sports.component.scss']
 })
 export class KnowledgeSportsComponent implements OnInit {
-  
-  // 当前激活的标签页
-  activeTab: 'football' | 'basketball' | 'esports' = 'football';
-  
-  // 比赛数据
+  activeTab: string = 'football';
+
   matches: {
     football: MatchData[];
     basketball: MatchData[];
@@ -51,7 +41,7 @@ export class KnowledgeSportsComponent implements OnInit {
         league: '英超',
         leagueLogo: 'assets/icons/sports/premier-league.png',
         matchTime: '今天 19:30',
-        status: 'upcoming', // upcoming, live, finished
+        status: 'upcoming',
         team1: '曼联',
         team1Logo: 'assets/icons/sports/man-utd.png',
         team1Score: '-',
@@ -144,6 +134,34 @@ export class KnowledgeSportsComponent implements OnInit {
       }
     ]
   };
+
+  rankings: {
+    football: TeamRanking[];
+    basketball: TeamRanking[];
+    esports: TeamRanking[];
+  } = {
+    football: [
+      { rank: 1, team: '曼城', points: 82, change: 'same' },
+      { rank: 2, team: '阿森纳', points: 78, change: 'up' },
+      { rank: 3, team: '曼联', points: 75, change: 'down' },
+      { rank: 4, team: '纽卡斯尔', points: 71, change: 'up' },
+      { rank: 5, team: '利物浦', points: 67, change: 'down' }
+    ],
+    basketball: [
+      { rank: 1, team: '凯尔特人', wins: 62, losses: 20, change: 'same' },
+      { rank: 2, team: '掘金', wins: 58, losses: 24, change: 'up' },
+      { rank: 3, team: '76人', wins: 54, losses: 28, change: 'down' },
+      { rank: 4, team: '雄鹿', wins: 52, losses: 30, change: 'up' },
+      { rank: 5, team: '骑士', wins: 51, losses: 31, change: 'down' }
+    ],
+    esports: [
+      { rank: 1, team: 'JDG', wins: 14, losses: 2, change: 'same' },
+      { rank: 2, team: 'BLG', wins: 13, losses: 3, change: 'up' },
+      { rank: 3, team: 'EDG', wins: 12, losses: 4, change: 'down' },
+      { rank: 4, team: 'WBG', wins: 11, losses: 5, change: 'up' },
+      { rank: 5, team: 'TES', wins: 10, losses: 6, change: 'down' }
+    ]
+  };
   
   // 新闻数据
   news = [
@@ -180,121 +198,82 @@ export class KnowledgeSportsComponent implements OnInit {
       views: '33.5万'
     }
   ];
-  
-  // 热门榜单
-  rankings: {
-    football: FootballRanking[];
-    basketball: BasketballRanking[];
-    esports: BasketballRanking[];
-  } = {
-    football: [
-      { rank: 1, team: '曼城', points: 86, change: 'up' },
-      { rank: 2, team: '阿森纳', points: 84, change: 'down' },
-      { rank: 3, team: '利物浦', points: 78, change: 'up' },
-      { rank: 4, team: '曼联', points: 72, change: 'same' },
-      { rank: 5, team: '切尔西', points: 70, change: 'up' }
-    ],
-    basketball: [
-      { rank: 1, team: '凯尔特人', wins: 58, losses: 24, change: 'up' },
-      { rank: 2, team: '掘金', wins: 56, losses: 26, change: 'down' },
-      { rank: 3, team: '雄鹿', wins: 55, losses: 27, change: 'same' },
-      { rank: 4, team: '76人', wins: 54, losses: 28, change: 'up' },
-      { rank: 5, team: '湖人', wins: 52, losses: 30, change: 'up' }
-    ],
-    esports: [
-      { rank: 1, team: 'JDG', wins: 14, losses: 2, change: 'same' },
-      { rank: 2, team: 'BLG', wins: 13, losses: 3, change: 'up' },
-      { rank: 3, team: 'LNG', wins: 12, losses: 4, change: 'up' },
-      { rank: 4, team: 'TES', wins: 11, losses: 5, change: 'down' },
-      { rank: 5, team: 'EDG', wins: 10, losses: 6, change: 'same' }
-    ]
-  };
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
-  
-  // 切换标签页
-  changeTab(tab: 'football' | 'basketball' | 'esports'): void {
+  ngOnInit(): void { }
+
+  changeTab(tab: string): void {
     this.activeTab = tab;
   }
-  
-  // Get current matches based on active tab
+
   getCurrentMatches(): MatchData[] {
-    return this.matches[this.activeTab];
+    return this.matches[this.activeTab as keyof typeof this.matches] || [];
   }
-  
-  // Get current rankings based on active tab
-  getCurrentRankings(): RankingData[] {
-    return this.rankings[this.activeTab];
+
+  getCurrentRankings(): TeamRanking[] {
+    return this.rankings[this.activeTab as keyof typeof this.rankings] || [];
   }
-  
-  // Check if current tab is football
-  isFootballTab(): boolean {
-    return this.activeTab === 'football';
-  }
-  
-  // Get points for a football ranking
-  getPoints(team: RankingData): number {
-    if (this.isFootballTab()) {
-      return (team as FootballRanking).points;
-    }
-    return 0;
-  }
-  
-  // Get win-loss record for basketball/esports ranking
-  getWinLoss(team: RankingData): string {
-    if (!this.isFootballTab()) {
-      const basketballTeam = team as BasketballRanking;
-      return `${basketballTeam.wins}-${basketballTeam.losses}`;
-    }
-    return '';
-  }
-  
-  // 获取样式类
+
   getStatusClass(status: string): string {
     switch (status) {
       case 'live':
-        return 'match-live';
+        return 'status-live';
+      case 'upcoming':
+        return 'status-upcoming';
       case 'finished':
-        return 'match-finished';
+        return 'status-finished';
       default:
         return '';
     }
   }
-  
-  // 获取状态文本
-  getStatusText(status: string, time: string): string {
+
+  getStatusText(status: string, matchTime: string): string {
     switch (status) {
       case 'live':
-        return '进行中';
+        return '直播中';
+      case 'upcoming':
+        return matchTime;
       case 'finished':
         return '已结束';
       default:
-        return time;
+        return matchTime;
     }
   }
-  
-  // 获取变化图标
+
+  isFootballTab(): boolean {
+    return this.activeTab === 'football';
+  }
+
+  getPoints(team: TeamRanking): string {
+    return team.points?.toString() || '0';
+  }
+
+  getWinLoss(team: TeamRanking): string {
+    return `${team.wins || 0}/${team.losses || 0}`;
+  }
+
   getChangeIcon(change: string): string {
     switch (change) {
       case 'up':
         return 'fa-caret-up';
       case 'down':
         return 'fa-caret-down';
+      case 'same':
+        return 'fa-minus';
       default:
         return 'fa-minus';
     }
   }
-  
-  // 获取变化颜色
+
   getChangeClass(change: string): string {
     switch (change) {
       case 'up':
         return 'trend-up';
       case 'down':
         return 'trend-down';
+      case 'same':
+        return 'trend-same';
       default:
         return 'trend-same';
     }

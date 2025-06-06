@@ -1,104 +1,52 @@
 <div class="weather-container">
-  <div class="weather-header">
-    <h2>天气预报</h2>
-    <div class="city-selector">
-      <select [(ngModel)]="selectedCity" (change)="loadWeather()">
-        <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
-      </select>
-      <button class="refresh-btn" (click)="loadWeather()">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+  <!-- 当前天气 -->
+  <div class="current-weather">
+    <div class="weather-header">
+      <h2>{{ currentWeather.city }}天气</h2>
+      <div class="search-box">
+        <input type="text" placeholder="搜索城市..." #cityInput>
+        <button (click)="searchCity(cityInput.value)">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
     </div>
-  </div>
-
-  <div *ngIf="isLoading" class="loading">
-    <i class="fas fa-spinner fa-spin"></i> 正在加载天气数据...
-  </div>
-
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
-
-  <div *ngIf="!isLoading && !errorMessage" class="weather-content">
-    <!-- 当前天气 -->
-    <div class="current-weather">
-      <div class="weather-main">
-        <div class="weather-icon">
-          <i [class]="getWeatherIcon(weather.condition)"></i>
-        </div>
-        <div class="weather-info">
-          <h1>{{ weather.temperature }}°C</h1>
-          <p class="condition">
-            {{ getWeatherConditionText(weather.condition) }}
-          </p>
-          <p class="location">{{ weather.city }}</p>
-          <p class="updated">更新时间: {{ weather.updated }}</p>
-        </div>
+    
+    <div class="weather-main">
+      <div class="temperature-section">
+        <i [class]="currentWeather.icon" class="weather-icon"></i>
+        <div class="temperature">{{ currentWeather.temperature }}°</div>
+        <div class="weather-desc">{{ currentWeather.weather }}</div>
       </div>
       
       <div class="weather-details">
         <div class="detail-item">
-          <div class="detail-label">湿度</div>
-          <div class="detail-value">{{ weather.humidity }}%</div>
+          <i class="fas fa-tint"></i>
+          <span>湿度</span>
+          <span>{{ currentWeather.humidity }}%</span>
         </div>
         <div class="detail-item">
-          <div class="detail-label">风力</div>
-          <div class="detail-value">{{ weather.wind?.direction }} {{ weather.wind?.speed }} km/h</div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">空气质量</div>
-          <div class="detail-value" [ngClass]="{
-            'good': weather.aqi <= 50,
-            'moderate': weather.aqi > 50 && weather.aqi <= 100,
-            'unhealthy': weather.aqi > 100
-          }">
-            {{ weather.aqi <= 50 ? '优' : (weather.aqi <= 100 ? '良' : '差') }}
-          </div>
+          <i class="fas fa-wind"></i>
+          <span>风力</span>
+          <span>{{ currentWeather.windSpeed }}</span>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 天气预报 -->
-    <div class="weather-forecast">
-      <h3>未来5天预报</h3>
-      <div class="forecast-list">
-        <div *ngFor="let day of forecast" class="forecast-item">
-          <div class="forecast-day">{{ day.dayOfWeek }}</div>
-          <div class="forecast-date">{{ day.date | date: 'M/d' }}</div>
-          <div class="forecast-icon">
-            <i [class]="getWeatherIcon(day.condition)"></i>
-          </div>
-          <div class="forecast-temp">
-            <span class="day-temp">{{ day.temperature.day }}°</span>
-            <span class="night-temp">{{ day.temperature.night }}°</span>
-          </div>
+  <!-- 天气预报 -->
+  <div class="weather-forecast">
+    <h3>未来几天</h3>
+    <div class="forecast-list">
+      <div *ngFor="let day of forecast" class="forecast-item">
+        <div class="forecast-date">
+          <span class="date">{{ day.date }}</span>
+          <span class="dayOfWeek">{{ day.dayOfWeek }}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- 生活指数 -->
-    <div class="life-index">
-      <h3>生活指数</h3>
-      <div class="index-grid">
-        <div class="index-item">
-          <i class="fas fa-umbrella"></i>
-          <div class="index-name">雨伞指数</div>
-          <div class="index-value">{{ weather.condition === 'rainy' || weather.condition === 'stormy' ? '需要' : '不需要' }}</div>
-        </div>
-        <div class="index-item">
-          <i class="fas fa-tshirt"></i>
-          <div class="index-name">穿衣指数</div>
-          <div class="index-value">{{ weather.temperature > 25 ? '夏装' : (weather.temperature > 15 ? '春秋装' : '冬装') }}</div>
-        </div>
-        <div class="index-item">
-          <i class="fas fa-running"></i>
-          <div class="index-name">运动指数</div>
-          <div class="index-value">{{ ['sunny', 'partly-cloudy'].includes(weather.condition) ? '适宜' : '不宜' }}</div>
-        </div>
-        <div class="index-item">
-          <i class="fas fa-car-side"></i>
-          <div class="index-name">洗车指数</div>
-          <div class="index-value">{{ ['sunny', 'partly-cloudy'].includes(weather.condition) ? '适宜' : '不宜' }}</div>
+        <i [class]="day.icon" class="forecast-icon"></i>
+        <div class="forecast-weather">{{ day.weather }}</div>
+        <div class="forecast-temp">
+          <span class="high">{{ day.high }}°</span>
+          <span class="low">{{ day.low }}°</span>
         </div>
       </div>
     </div>

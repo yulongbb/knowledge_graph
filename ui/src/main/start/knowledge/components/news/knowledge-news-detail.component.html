@@ -1,0 +1,87 @@
+<div class="news-detail-container">
+    <!-- 返回按钮 -->
+    <div class="back-button" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> 返回资讯列表
+    </div>
+
+    <div class="loading-container" *ngIf="loading">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+    </div>
+
+    <div class="news-content-container" *ngIf="!loading">
+        <!-- 头部信息 -->
+        <header class="news-header">
+            <h1 class="news-title">{{ item?.labels?.zh?.value }}</h1>
+            <div class="news-meta">
+                <div class="news-source">
+                    <img [src]="item?.avatar || 'assets/default-avatar.png'" alt="来源" class="news-source-avatar">
+                    <span class="news-source-name">{{ item?.source || '未知来源' }}</span>
+                </div>
+                <div class="news-info">
+                    <span class="news-publish-time">{{ item?.publishTime || '未知时间' }}</span>
+                </div>
+            </div>
+            <div class="news-tags" *ngIf="tag()?.length">
+                <span class="news-tag" *ngFor="let t of tag()">{{ t }}</span>
+            </div>
+        </header>
+
+        <!-- 封面图片 -->
+        <div class="news-cover" *ngIf="item?.screenshot || (item?.images?.length > 0)">
+            <img [src]="item?.screenshot || item?.images?.[0]" alt="封面图片" class="cover-image">
+        </div>
+
+        <!-- 多媒体内容区域 -->
+        <div class="media-content" *ngIf="hasMediaContent()">
+            <!-- 图片展示 -->
+            <div class="image-gallery" *ngIf="imgs?.length">
+                <div class="image-item" *ngFor="let img of imgs">
+                    <img [src]="img.url" (click)="openImage(img.url)" alt="图片">
+                </div>
+            </div>
+
+            <!-- 视频展示 -->
+            <div class="video-gallery" *ngIf="videos?.length">
+                <div class="video-item" *ngFor="let video of videos">
+                    <video controls>
+                        <source [src]="video.url" [type]="video.type">
+                        你的浏览器不支持视频播放
+                    </video>
+                </div>
+            </div>
+
+            <!-- PDF展示 -->
+            <div class="pdf-gallery" *ngIf="pdfs?.length">
+                <div class="pdf-item" *ngFor="let pdf of pdfs">
+                    <div class="pdf-preview" (click)="openPdf(pdf.url)">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>{{ pdf.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资讯正文内容 -->
+        <div class="news-body">
+            <div *ngIf="content" [innerHTML]="content | safeHtml"></div>
+            <div *ngIf="!content" class="news-description">
+                {{ item?.descriptions?.zh?.value || '暂无详细内容' }}
+            </div>
+        </div>
+
+        <!-- 相关推荐 -->
+        <div class="related-news" *ngIf="relatedNews?.length">
+            <h3 class="related-title">相关资讯</h3>
+            <div class="related-list">
+                <div class="related-item" *ngFor="let news of relatedNews">
+                    <h4 class="related-item-title">{{ news.title }}</h4>
+                    <div class="related-item-meta">
+                        <span class="related-item-source">{{ news.source }}</span>
+                        <span class="related-item-time">{{ news.time }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

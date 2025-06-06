@@ -37,6 +37,7 @@ import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import * as Plyr from 'plyr';
 import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-entity-detail',
@@ -209,7 +210,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     public propertyService: PropertyService,
     private esService: EsService,
     private namespaceService: NamespaceService, // Added namespace service
-
+    private http: HttpClient,
     public tagService: TagService,
     private nodeService: EntityService,
     private location: Location,
@@ -959,14 +960,32 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
       case 'save':
         if (this.type === 'template') {
-          const updateData = {
-            id: this.id,
-            template: this.entity().value._source.template
+          const article = {
+            title: this.entity().value._source.labels.zh.value + ' 模板',
+            content: this.entity().value._source.template,
+            author: 'system' // 可以根据实际情况修改作者信息
           };
-          this.nodeService.put(updateData).subscribe(() => {
-            this.message.success('模板更新成功！');
-            this.back();
+
+          // 调用文章API保存模板内容
+          this.http.post('/api/article', article).subscribe({
+            next: (articleData: any) => {
+              const updateData = {
+                id: this.id,
+                template: articleData.id
+              };
+              this.nodeService.put(updateData).subscribe(() => {
+                this.message.success('模板更新成功！');
+                this.back();
+              });
+              console.log('Template saved as article:', articleData);
+            },
+            error: (error: any) => {
+              console.error('Failed to save template as article:', error);
+              this.message.error('保存模板失败：' + error.message);
+
+            }
           });
+
           return;
         } else if (this.type === 'edit') {
           // 构建更新数据对象

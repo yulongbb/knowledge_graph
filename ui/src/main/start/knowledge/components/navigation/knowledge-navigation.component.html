@@ -1,14 +1,24 @@
 <div class="navigation-container">
-
-  
-  <div class="categories-container">
-    <div class="category-section" *ngFor="let category of categories">
-      <div class="category-header">
-        <h3>{{ category.name }}</h3>
-      </div>
-      <div class="links-grid">
-        <div class="link-item" *ngFor="let link of category.links" (click)="openLink(link.url)">
-          <div class="link-name">{{ link.name }}</div>
+  <div class="navigation-content">
+    <h2 class="navigation-title">网站导航</h2>
+    <p class="navigation-subtitle">精选优质网站，助您高效工作学习</p>
+    
+    <div class="navigation-categories">
+      <div *ngFor="let category of navigationCategories" class="nav-category">
+        <h3 class="category-title">
+          <i [class]="category.icon"></i>
+          {{ category.name }}
+        </h3>
+        <div class="sites-grid">
+          <div *ngFor="let site of category.sites" class="site-card" (click)="openSite(site.url)">
+            <div class="site-icon">
+              <img [src]="site.icon" [alt]="site.name" />
+            </div>
+            <div class="site-info">
+              <h4 class="site-name">{{ site.name }}</h4>
+              <p class="site-description">{{ site.description }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

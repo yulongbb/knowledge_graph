@@ -16,12 +16,72 @@ import { KnowledgeSportsComponent } from './components/sports/knowledge-sports.c
 import { KnowledgeGamesComponent } from './components/games/knowledge-games.component';
 import { CategoryService } from './services/category.service';
 import { EsService } from '../home/es.service';
+import { ShareModule } from 'src/share/share.module';
+import { KnowledgeDefaultComponent } from './components/default/knowledge-default.component';
 
 const routes: Routes = [
   {
     path: '',
     component: KnowledgeComponent,
-    runGuardsAndResolvers: 'paramsOrQueryParamsChange'
+    children: [
+      {
+        path: '',
+        redirectTo: 'discover',
+        pathMatch: 'full'
+      },
+      {
+        path: 'discover',
+        component: KnowledgeDefaultComponent
+      },
+      {
+        path: 'following',
+        component: KnowledgeDefaultComponent
+      },
+      {
+        path: 'news',
+        component: KnowledgeNewsComponent
+      },
+      {
+        path: 'sports',
+        component: KnowledgeSportsComponent
+      },
+      {
+        path: 'games',
+        component: KnowledgeGamesComponent
+      },
+      {
+        path: 'ai-tools',
+        component: KnowledgeAiToolsComponent
+      },
+      {
+        path: 'navigation',
+        component: KnowledgeNavigationComponent
+      },
+      {
+        path: 'finance',
+        component: KnowledgeFinanceComponent
+      },
+      {
+        path: 'weather',
+        component: KnowledgeWeatherComponent
+      },
+      {
+        path: 'calendar',
+        component: KnowledgeCalendarComponent
+      },
+      {
+        path: ':category',
+        component: KnowledgeDefaultComponent
+      },
+      {
+        path: ':category/:subcategory',
+        component: KnowledgeDefaultComponent
+      },
+      {
+        path: ':category/:subcategory/:subsubcategory',
+        component: KnowledgeDefaultComponent
+      }
+    ]
   }
 ];
 
@@ -36,14 +96,16 @@ const routes: Routes = [
     KnowledgeNavigationComponent,
     KnowledgeAiToolsComponent,
     KnowledgeSportsComponent,
-    KnowledgeGamesComponent
+    KnowledgeGamesComponent,
+    KnowledgeDefaultComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
     InfiniteScrollModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ShareModule
   ],
   providers: [CategoryService, EsService]
 })

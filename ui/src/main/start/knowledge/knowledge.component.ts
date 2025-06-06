@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from './models/category.model';
 import { CategoryService } from './services/category.service';
 import { environment } from 'src/environments/environment';
 import { EsService } from '../home/es.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-knowledge',
@@ -41,9 +40,13 @@ export class KnowledgeComponent implements OnInit {
         { date: new Date(2023, 4, 25), time: '16:00', title: '技术研讨', description: '跨部门技术问题讨论' }
     ];
 
+    // 添加当前路由类型
+    currentRouteType: string = 'discover';
+
     constructor(
         private categoryService: CategoryService,
         private route: ActivatedRoute,
+        private router: Router,
         private esService: EsService
     ) { }
 
@@ -51,21 +54,184 @@ export class KnowledgeComponent implements OnInit {
         // Load category tree and add fixed categories
         this.loadCategoryTree();
 
-        // 加载实体列表
-        this.esService
-            .searchEntity(1, this.size, { bool: this.query })
-            .subscribe((data: any) => {
-                console.log(data);
-                this.entities = data.list;
-            });
+        // 监听路由变化
+        this.route.url.subscribe(urlSegments => {
+            const path = urlSegments.map(segment => segment.path).join('/');
+            this.handleRouteChange(path);
+        });
 
-        // Handle route params
-        this.route.queryParams.subscribe(params => {
-            const category = params['category'];
-            if (category) {
-                console.log('Current category path:', category);
+        // 监听子路由参数变化
+        this.route.params.subscribe(params => {
+            if (params['category'] || params['subcategory'] || params['subsubcategory']) {
+                this.handleCategoryRoute(params);
             }
         });
+    }
+
+    handleRouteChange(path: string) {
+        console.log('Route changed to:', path);
+        this.currentRouteType = path || 'discover';
+        
+        // 根据路由类型加载对应数据
+        switch (this.currentRouteType) {
+            case 'discover':
+                this.loadDiscoverData();
+                break;
+            case 'following':
+                this.loadFollowingData();
+                break;
+            case 'news':
+                this.loadNewsData();
+                break;
+            case 'sports':
+                this.loadSportsData();
+                break;
+            case 'games':
+                this.loadGamesData();
+                break;
+            case 'ai-tools':
+                this.loadAiToolsData();
+                break;
+            case 'navigation':
+                this.loadNavigationData();
+                break;
+            case 'finance':
+                this.loadFinanceData();
+                break;
+            case 'weather':
+                this.loadWeatherData();
+                break;
+            case 'calendar':
+                this.loadCalendarData();
+                break;
+            default:
+                // 处理分类路由
+                this.loadCategoryData(this.currentRouteType);
+                break;
+        }
+    }
+
+    handleCategoryRoute(params: any) {
+        // 处理分类参数路由，使用label字段
+        let targetCategory: Category | null = null;
+        
+        if (params['subsubcategory']) {
+            targetCategory = this.findCategoryByLabel(params['subsubcategory']);
+        } else if (params['subcategory']) {
+            targetCategory = this.findCategoryByLabel(params['subcategory']);
+        } else if (params['category']) {
+            targetCategory = this.findCategoryByLabel(params['category']);
+        }
+        
+        if (targetCategory) {
+            this.onCategorySelected(targetCategory);
+        }
+    }
+
+    // 数据加载方法
+    loadDiscoverData() {
+        this.selectedCategory = {
+            id: 'discover',
+            name: '发现',
+            displayName: '发现',
+            description: '发现新知识'
+        } as Category;
+        this.loadEntitiesForCategory(this.selectedCategory);
+    }
+
+    loadFollowingData() {
+        this.selectedCategory = {
+            id: 'following',
+            name: '关注',
+            displayName: '关注',
+            description: '我关注的内容'
+        } as Category;
+        this.loadEntitiesForCategory(this.selectedCategory);
+    }
+
+    loadNewsData() {
+        // 使用label字段查找资讯分类
+        const newsCategory = this.findCategoryByLabel('news');
+        if (newsCategory) {
+            this.selectedCategory = newsCategory;
+            this.loadEntitiesForCategory(newsCategory);
+        }
+    }
+
+    loadSportsData() {
+        // 使用label字段查找体育分类
+        const sportsCategory = this.findCategoryByLabel('sports');
+        if (sportsCategory) {
+            this.selectedCategory = sportsCategory;
+            this.loadEntitiesForCategory(sportsCategory);
+        }
+    }
+
+    loadGamesData() {
+        // 使用label字段查找游戏分类
+        const gamesCategory = this.findCategoryByLabel('games');
+        if (gamesCategory) {
+            this.selectedCategory = gamesCategory;
+            this.loadEntitiesForCategory(gamesCategory);
+        }
+    }
+
+    loadAiToolsData() {
+        // 使用label字段查找AI工具分类
+        const aiCategory = this.findCategoryByLabel('ai-tools');
+        if (aiCategory) {
+            this.selectedCategory = aiCategory;
+            this.loadEntitiesForCategory(aiCategory);
+        }
+    }
+
+    loadNavigationData() {
+        // 使用label字段查找导航分类
+        const navCategory = this.findCategoryByLabel('navigation');
+        if (navCategory) {
+            this.selectedCategory = navCategory;
+            this.loadEntitiesForCategory(navCategory);
+        }
+    }
+
+    loadFinanceData() {
+        // 使用label字段查找财经分类
+        const financeCategory = this.findCategoryByLabel('finance');
+        if (financeCategory) {
+            this.selectedCategory = financeCategory;
+            this.loadEntitiesForCategory(financeCategory);
+        }
+    }
+
+    loadWeatherData() {
+        // 使用label字段查找天气分类
+        const weatherCategory = this.findCategoryByLabel('weather');
+        if (weatherCategory) {
+            this.selectedCategory = weatherCategory;
+            this.loadEntitiesForCategory(weatherCategory);
+        }
+    }
+
+    loadCalendarData() {
+        // 使用label字段查找日历分类
+        const calendarCategory = this.findCategoryByLabel('calendar');
+        if (calendarCategory) {
+            this.selectedCategory = calendarCategory;
+            this.loadEntitiesForCategory(calendarCategory);
+        }
+    }
+
+    loadCategoryData(categoryLabel: string) {
+        // 使用label字段查找分类
+        const category = this.findCategoryByLabel(categoryLabel);
+        if (category) {
+            this.selectedCategory = category;
+            this.loadEntitiesForCategory(category);
+        }
+    }
+
+    loadEntitiesForCategory(category: Category) {
+        this.onCategorySelected(category);
     }
 
     // Load the category tree from API
@@ -103,6 +269,11 @@ export class KnowledgeComponent implements OnInit {
                 // Add API categories to the fixed categories
                 this.categories = [...this.categories, ...categoryTree];
                 this.isLoading = false;
+                
+                // 分类加载完成后，处理当前路由
+                this.route.params.subscribe(params => {
+                    this.handleCategoryRoute(params);
+                });
             },
             error: (error) => {
                 console.error('Error loading categories:', error);
@@ -220,7 +391,6 @@ export class KnowledgeComponent implements OnInit {
             // 发现分类逻辑 - 显示最新添加的实体
             this.query = {
                 must: [],
-                sort: [{ "created_at": "desc" }]
             };
         } else if (category.id === 'following') {
             // 关注分类逻辑 - 可以从用户关注数据中获取
@@ -258,33 +428,11 @@ export class KnowledgeComponent implements OnInit {
             });
     }
 
-    // 检查是否为资讯类型或其子类型
-    isNewsCategory(): boolean {
-        // 如果没有选中分类，返回false
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        // 如果选中的是资讯分类，直接返回true
-        if (this.selectedCategory.name === '资讯') {
-            return true;
-        }
-        
-        // 查找资讯分类
-        const newsCategory = this.findCategoryByName('资讯');
-        if (!newsCategory) {
-            return false;
-        }
-        
-        // 检查选中的分类是否是资讯的子分类
-        return this.isSubcategoryOf(this.selectedCategory, newsCategory);
-    }
-
-    // 通过名称查找分类
-    findCategoryByName(name: string): Category | null {
+    // 通过label字段查找分类
+    findCategoryByLabel(label: string): Category | null {
         const searchInCategories = (categories: Category[]): Category | null => {
             for (const category of categories) {
-                if (category.name === name) {
+                if (category.label === label) {
                     return category;
                 }
                 
@@ -297,111 +445,5 @@ export class KnowledgeComponent implements OnInit {
         };
         
         return searchInCategories(this.categories);
-    }
-
-    // 检查一个分类是否是另一个分类的子分类
-    isSubcategoryOf(child: Category, possibleParent: Category): boolean {
-        // 如果直接是子分类
-        if (child.pid === possibleParent.id) {
-            return true;
-        }
-        
-        // 递归检查父类链
-        if (child.pid) {
-            const parentCategory = this.findCategoryById(child.pid);
-            if (parentCategory) {
-                return this.isSubcategoryOf(parentCategory, possibleParent);
-            }
-        }
-        
-        return false;
-    }
-
-    // 通过ID查找分类
-    findCategoryById(id: string): Category | null {
-        const searchInCategories = (categories: Category[]): Category | null => {
-            for (const category of categories) {
-                if (category.id === id) {
-                    return category;
-                }
-                
-                if (category.children && category.children.length > 0) {
-                    const found = searchInCategories(category.children as Category[]);
-                    if (found) return found;
-                }
-            }
-            return null;
-        };
-        
-        return searchInCategories(this.categories);
-    }
-
-    // 检查是否为日历类型
-    isCalendarCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '日历';
-    }
-
-    // 检查是否为天气类型
-    isWeatherCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '天气';
-    }
-
-    // 检查是否为财经类型
-    isFinanceCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '财经';
-    }
-
-    // 检查是否为导航类型
-    isNavigationCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '导航';
-    }
-
-    // 检查是否为AI类型
-    isAiToolsCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === 'AI大全' || this.selectedCategory.name === '人工智能';
-    }
-
-    // 检查是否为体育类型
-    isSportsCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '体育';
-    }
-
-    // 检查是否为游戏类型
-    isGamesCategory(): boolean {
-        if (!this.selectedCategory) {
-            return false;
-        }
-        
-        return this.selectedCategory.name === '游戏';
-    }
-
-    // 日历日期选择事件处理
-    onDateSelected(date: Date): void {
-        console.log('Selected date:', date);
-        // 这里可以根据选定的日期过滤或获取事件数据
     }
 }

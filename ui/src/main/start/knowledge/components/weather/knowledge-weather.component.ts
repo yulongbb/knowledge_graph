@@ -1,5 +1,22 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+
+interface WeatherData {
+  city: string;
+  temperature: number;
+  weather: string;
+  humidity: number;
+  windSpeed: string;
+  icon: string;
+}
+
+interface ForecastData {
+  date: string;
+  dayOfWeek: string;
+  high: number;
+  low: number;
+  weather: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-knowledge-weather',
@@ -7,134 +24,71 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./knowledge-weather.component.scss']
 })
 export class KnowledgeWeatherComponent implements OnInit {
-  @Input() city: string = '北京';
-  
-  weather: any = {};
-  forecast: any[] = [];
-  isLoading: boolean = true;
-  errorMessage: string = '';
-  cities: string[] = ['北京', '上海', '广州', '深圳', '杭州', '南京', '成都', '重庆', '武汉', '西安'];
-  selectedCity: string = '北京';
-  
-  weatherIcons: {[key: string]: string} = {
-    'sunny': 'fas fa-sun',
-    'cloudy': 'fas fa-cloud',
-    'rainy': 'fas fa-cloud-rain',
-    'snowy': 'fas fa-snowflake',
-    'stormy': 'fas fa-bolt',
-    'foggy': 'fas fa-smog',
-    'windy': 'fas fa-wind',
-    'partly-cloudy': 'fas fa-cloud-sun',
+  currentWeather: WeatherData = {
+    city: '北京',
+    temperature: 25,
+    weather: '晴',
+    humidity: 45,
+    windSpeed: '3-4级',
+    icon: 'fas fa-sun'
   };
 
-  // 天气状态文本映射
-  weatherConditionTexts: {[key: string]: string} = {
-    'sunny': '晴天',
-    'cloudy': '多云',
-    'rainy': '雨',
-    'snowy': '雪',
-    'stormy': '雷雨',
-    'foggy': '雾',
-    'windy': '大风',
-    'partly-cloudy': '局部多云'
-  };
+  forecast: ForecastData[] = [
+    {
+      date: '今天',
+      dayOfWeek: '周一',
+      high: 28,
+      low: 15,
+      weather: '晴',
+      icon: 'fas fa-sun'
+    },
+    {
+      date: '明天',
+      dayOfWeek: '周二',
+      high: 26,
+      low: 17,
+      weather: '多云',
+      icon: 'fas fa-cloud-sun'
+    },
+    {
+      date: '后天',
+      dayOfWeek: '周三',
+      high: 22,
+      low: 14,
+      weather: '小雨',
+      icon: 'fas fa-cloud-rain'
+    },
+    {
+      date: '周四',
+      dayOfWeek: '周四',
+      high: 24,
+      low: 16,
+      weather: '阴',
+      icon: 'fas fa-cloud'
+    },
+    {
+      date: '周五',
+      dayOfWeek: '周五',
+      high: 27,
+      low: 18,
+      weather: '晴',
+      icon: 'fas fa-sun'
+    }
+  ];
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.loadWeather();
+    this.loadWeatherData();
   }
 
-  ngOnChanges(): void {
-    if (this.city) {
-      this.selectedCity = this.city;
-      this.loadWeather();
-    }
+  loadWeatherData(): void {
+    // 这里可以调用天气API获取实际数据
+    console.log('Loading weather data...');
   }
 
-  loadWeather(): void {
-    this.isLoading = true;
-    
-    // 模拟API调用，实际项目中应替换为真实的天气API
-    setTimeout(() => {
-      this.weather = this.getMockWeatherData(this.selectedCity);
-      this.forecast = this.getMockForecastData(this.selectedCity);
-      this.isLoading = false;
-    }, 800);
-    
-    // 实际API调用示例:
-    // this.http.get(`https://weather-api.example.com/current?city=${this.selectedCity}`)
-    //   .subscribe(
-    //     (data: any) => {
-    //       this.weather = data;
-    //       this.isLoading = false;
-    //     },
-    //     (error) => {
-    //       this.errorMessage = '无法加载天气数据，请稍后再试';
-    //       this.isLoading = false;
-    //     }
-    //   );
-  }
-
-  // 获取天气条件对应的文本
-  getWeatherConditionText(condition: string): string {
-    return this.weatherConditionTexts[condition as keyof typeof this.weatherConditionTexts] || condition;
-  }
-
-  changeCity(city: string): void {
-    this.selectedCity = city;
-    this.loadWeather();
-  }
-
-  getWeatherIcon(condition: string): string {
-    return this.weatherIcons[condition as keyof typeof this.weatherIcons] || 'fas fa-question';
-  }
-
-  private getMockWeatherData(city: string): any {
-    const conditions = ['sunny', 'cloudy', 'rainy', 'partly-cloudy', 'windy'];
-    const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
-    const randomTemp = Math.floor(Math.random() * 15) + 15; // 15-30度之间
-    const randomHumidity = Math.floor(Math.random() * 30) + 40; // 40-70%之间
-    
-    return {
-      city: city,
-      temperature: randomTemp,
-      condition: randomCondition,
-      humidity: randomHumidity,
-      wind: {
-        speed: Math.floor(Math.random() * 20) + 5,
-        direction: ['东', '南', '西', '北', '东南', '西南', '东北', '西北'][Math.floor(Math.random() * 8)]
-      },
-      aqi: Math.floor(Math.random() * 100) + 20,
-      updated: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})
-    };
-  }
-
-  private getMockForecastData(city: string): any[] {
-    const forecast = [];
-    const conditions = ['sunny', 'cloudy', 'rainy', 'partly-cloudy', 'windy'];
-    
-    // 生成未来5天的预报
-    const today = new Date();
-    
-    for (let i = 0; i < 5; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      
-      const dayTemp = Math.floor(Math.random() * 10) + 20; // 20-30度
-      const nightTemp = dayTemp - (Math.floor(Math.random() * 5) + 5); // 比白天低5-10度
-      
-      forecast.push({
-        date: date,
-        dayOfWeek: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()],
-        condition: conditions[Math.floor(Math.random() * conditions.length)],
-        temperature: {
-          day: dayTemp,
-          night: nightTemp
-        }
-      });
-    }
-    
-    return forecast;
+  searchCity(city: string): void {
+    // 搜索其他城市天气
+    console.log('Searching weather for:', city);
   }
 }

@@ -1,21 +1,15 @@
 export interface Category {
   id: string;
   name: string;
-  label: string;
-  value: number;
-  description: string | null;
-  collection: string | null;
-  router: string | null;
-  icon: string | null;
-  sort: number | null;
-  pid: string | null;
-  path: string;
-  color: string | null;
-  parent: any | null;
-  children?: Category[];
+  label: string;  // 添加label字段用于路由
   displayName?: string;
+  description?: string;
+  avatar?: string; // Add avatar property
+  children?: Category[];
+  pid?: string;
+  parentId?: string;
+  path?: string;
   level?: number;
-  isNamespace?: boolean;  // Added to identify namespace-level categories
 }
 
 export interface CategoryResponse {
