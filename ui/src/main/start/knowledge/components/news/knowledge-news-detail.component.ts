@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EsService } from 'src/main/start/search/es.service';
 import { HttpClient } from '@angular/common/http';
-import { Signal, signal } from '@angular/core';
+import { EsService } from 'src/main/start/home/es.service';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-knowledge-news-detail',
@@ -92,6 +92,8 @@ export class KnowledgeNewsDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading news:', error);
         this.loading = false;
+        // 如果加载失败，返回列表页
+        this.router.navigate(['/start/knowledge/news']);
       }
     });
   }
@@ -108,6 +110,11 @@ export class KnowledgeNewsDetailComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/start/knowledge/news']);
+  }
+
+  // 导航到相关新闻详情
+  viewRelatedNews(newsId: string) {
+    this.router.navigate(['/start/knowledge/news', newsId]);
   }
 
   hasMediaContent(): boolean {

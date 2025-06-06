@@ -18,6 +18,7 @@ import { CategoryService } from './services/category.service';
 import { EsService } from '../home/es.service';
 import { ShareModule } from 'src/share/share.module';
 import { KnowledgeDefaultComponent } from './components/default/knowledge-default.component';
+import { KnowledgeNewsDetailComponent } from './components/news/knowledge-news-detail.component';
 
 const routes: Routes = [
   {
@@ -40,6 +41,10 @@ const routes: Routes = [
       {
         path: 'news',
         component: KnowledgeNewsComponent
+      },
+      {
+        path: 'news/:id',
+        component: KnowledgeNewsDetailComponent
       },
       {
         path: 'sports',
@@ -92,6 +97,7 @@ const routes: Routes = [
     KnowledgeCalendarComponent,
     KnowledgeWeatherComponent,
     KnowledgeNewsComponent,
+    KnowledgeNewsDetailComponent,
     KnowledgeFinanceComponent,
     KnowledgeNavigationComponent,
     KnowledgeAiToolsComponent,

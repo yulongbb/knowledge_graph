@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Category } from '../../models/category.model';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
 import { EsService } from 'src/main/start/home/es.service';
 
 @Component({
@@ -18,22 +17,6 @@ export class KnowledgeNewsComponent implements OnInit {
   size: number = 20;
   index: number = 1;
   
-  // 新闻详情状态管理
-  showDetail = false;
-  currentNewsId = '';
-  currentNewsDetails: any = null;
-  
-  // 详情页相关数据
-  imgs: any = [];
-  videos: any[] = [];
-  pdfs: any[] = [];
-  content: string = '';
-  tags: string[] = [];
-  loading = false;
-  
-  // 相关推荐
-  relatedNews: any[] = [];
-  
   // 推荐内容数据
   recommendList = [
     { id: 1, title: '成语起源地，故事有新篇——循迹文脉走读"万年仙居"', image: 'assets/news1.jpg' },
@@ -42,7 +25,7 @@ export class KnowledgeNewsComponent implements OnInit {
   ];
   
   constructor(
-    private http: HttpClient,
+    private router: Router,
     private esService: EsService,
     private route: ActivatedRoute
   ) { }
@@ -232,106 +215,8 @@ export class KnowledgeNewsComponent implements OnInit {
     });
   }
   
-  // 查看新闻详情
+  // 查看新闻详情 - 使用路由导航
   viewNewsDetail(newsId: string): void {
-    this.loading = true;
-    this.currentNewsId = newsId;
-    this.showDetail = true;
-    
-    // 获取详情数据
-    this.esService.getEntity(newsId).subscribe({
-      next: (data: any) => {
-        this.currentNewsDetails = data;
-        const item = data._source;
-        this.tags = item?.tags || [];
-        
-        // 处理图片
-        this.imgs = item?.images?.map((image: any) => ({
-          url: `http://localhost:9000/kgms/${image}`,
-        })) || [];
-
-        // 处理视频
-        this.videos = item?.videos?.map((video: any) => ({
-          url: `http://localhost:9000/kgms/${video.url}`,
-          type: this.getVideoType(video.url),
-        })) || [];
-
-        // 处理 PDF
-        this.pdfs = item?.pdfs?.map((pdf: any) => ({
-          url: `http://localhost:9000/kgms/${pdf}`,
-          name: pdf.split('/').pop(),
-        })) || [];
-
-        // 获取内容模板
-        if (item.template) {
-          this.http.get(`/api/article/render/${item.template}`).subscribe({
-            next: (response: any) => {
-              if (response.success) {
-                this.content = response.content;
-              }
-              this.loading = false;
-            },
-            error: () => {
-              this.content = item?.descriptions?.zh?.value || '';
-              this.loading = false;
-            }
-          });
-        } else {
-          this.content = item?.descriptions?.zh?.value || '';
-          this.loading = false;
-        }
-
-        // 获取相关新闻（这里使用模拟数据）
-        this.loadRelatedNews();
-      },
-      error: (error) => {
-        console.error('加载新闻详情失败:', error);
-        this.loading = false;
-      }
-    });
-  }
-  
-  // 返回新闻列表
-  closeNewsDetail(): void {
-    this.showDetail = false;
-    this.currentNewsId = '';
-    this.currentNewsDetails = null;
-  }
-  
-  // 加载相关新闻
-  private loadRelatedNews() {
-    // 实际应用中应基于标签/分类获取相关新闻
-    // 这里使用模拟数据
-    this.relatedNews = [
-      { id: 'mock1', title: '相关资讯：人工智能在医疗领域的新应用', source: '科技日报', time: '3小时前' },
-      { id: 'mock2', title: '相关资讯：大数据分析助力精准医疗', source: '人民日报', time: '5小时前' },
-      { id: 'mock3', title: '相关资讯：未来医疗的发展趋势', source: '健康时报', time: '昨天' }
-    ];
-  }
-  
-  hasMediaContent(): boolean {
-    return !!(this.imgs?.length || this.videos?.length || this.pdfs?.length);
-  }
-
-  openImage(url: string): void {
-    window.open(url, '_blank');
-  }
-
-  openPdf(url: string): void {
-    window.open(url, '_blank');
-  }
-
-  private getVideoType(filename: string): string {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    switch (ext) {
-      case 'mp4':
-        return 'video/mp4';
-      case 'webm':
-        return 'video/webm';
-      case 'ogg':
-        return 'video/ogg';
-      default:
-        return 'video/mp4';
-    }
+    this.router.navigate(['news', newsId], { relativeTo: this.route.parent });
   }
 }

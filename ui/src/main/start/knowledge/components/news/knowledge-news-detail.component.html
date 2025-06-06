@@ -9,7 +9,7 @@
         <p>加载中...</p>
     </div>
 
-    <div class="news-content-container" *ngIf="!loading">
+    <div class="news-content-container" *ngIf="!loading && item">
         <!-- 头部信息 -->
         <header class="news-header">
             <h1 class="news-title">{{ item?.labels?.zh?.value }}</h1>
@@ -74,7 +74,7 @@
         <div class="related-news" *ngIf="relatedNews?.length">
             <h3 class="related-title">相关资讯</h3>
             <div class="related-list">
-                <div class="related-item" *ngFor="let news of relatedNews">
+                <div class="related-item" *ngFor="let news of relatedNews" (click)="viewRelatedNews(news.id)">
                     <h4 class="related-item-title">{{ news.title }}</h4>
                     <div class="related-item-meta">
                         <span class="related-item-source">{{ news.source }}</span>
