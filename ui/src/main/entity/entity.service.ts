@@ -77,6 +77,10 @@ export class EntityService extends RepositoryService<Item> {
     );
   }
 
+  getAllGraph(index: number, size: number, query: any): Observable<any> {
+    return this.http.post(`${this.option.controller?.name}/graphAll/${size}/${index}`, query);
+  }
+
 
   import(
     data: any

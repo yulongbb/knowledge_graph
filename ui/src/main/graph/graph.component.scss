@@ -1,64 +1,368 @@
 :host {
-
-
-    > x-container:not(first-child) {
-      margin-top: 1rem;
-    }
-    x-container{
-      height: 100%;
-    }
-    x-header{
-      min-height: 400px;
-    }
-    // x-footer {
-    //   min-height: 50px;
-    //   line-height: 3rem;
-    //   text-align: center;
-    // }
-    x-header {
-      background-color: var(--x-info-200);
-    }
-    x-footer {
-      background-color: var(--x-info-300);
-    }
-    x-main {
-      height: 500px;
-      background-color: var(--x-info-400);
-    }
-    x-aside {
-      min-width: 400px;
-      height: 900px;
-      background-color: var(--x-info-500);
-    }
-
-
-    
-    // .design-td {
-    //   display: flex;
-    //   align-items: center;
-    // }
-    // .design-td x-icon {
-    //   font-size: 4rem;
-    //   padding: 1rem;
-    // }
-    // .design-td-inner {
-    //   margin-left: 0.875rem;
-    //   display: flex;
-    //   flex-direction: column;
-    // }
-    // .design-td-name {
-    //   font-weight: 600;
-    // }
-    // .echart {
-    //   width: 100%;
-    //   height: 500px;
-    // }
+  display: block;
+  height: 100vh;
   
-    x-input-group {
-      display: block;
-      width: 100%;
+  .graph-container {
+    display: flex;
+    height: 100%;
+    
+    .sidebar {
+      width: 250px;
+      background: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      
+      .sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        
+        h3 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.2rem;
+          font-weight: 600;
+        }
+        
+        .filter-toggle {
+          margin-top: 0.5rem;
+        }
+      }
+      
+      .search-section {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+      }
+      
+      .network-controls, .quick-actions {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        
+        h4 {
+          margin: 0 0 0.75rem 0;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #6c757d;
+          text-transform: uppercase;
+        }
+        
+        x-button {
+          display: block;
+          width: 100%;
+          margin-bottom: 0.5rem;
+          text-align: left;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
     }
-    x-input-group:not(:first-child) {
-      margin-top: 1rem;
+    
+    .graph-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      
+      .graph-header {
+        padding: 1rem 1.5rem;
+        background: white;
+        border-bottom: 1px solid #e9ecef;
+        
+        h2 {
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #495057;
+        }
+      }
+      
+      .cytoscape-container {
+        flex: 1;
+        background: white;
+        
+        // Add styles for cytoscape node labels
+        :global(.cy-node-label) {
+          max-width: 80px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 12px;
+          text-align: center;
+        }
+      }
+    }
+
+    .right-sidebar {
+      width: 300px;
+      background: #f8f9fa;
+      border-left: 1px solid #e9ecef;
+      overflow-y: auto;
+      
+      x-tabs {
+        height: 100%;
+        
+        .network-overview {
+          margin-bottom: 1.5rem;
+          padding: 1rem;
+          
+          h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+          }
+          
+          .stats-grid {
+            display: grid;
+            gap: 0.75rem;
+            
+            .stat-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem;
+              background: white;
+              border-radius: 4px;
+              border: 1px solid #e9ecef;
+              
+              .stat-label {
+                font-size: 0.875rem;
+                color: #6c757d;
+              }
+              
+              .stat-value {
+                font-weight: 600;
+                font-size: 1.1rem;
+                color: #495057;
+              }
+            }
+          }
+        }
+        
+        .communities-section {
+          padding: 0 1rem 1rem;
+          
+          h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+          }
+          
+          .community-list {
+            .community-item {
+              padding: 0.75rem;
+              margin-bottom: 0.5rem;
+              background: white;
+              border-radius: 6px;
+              border: 1px solid #e9ecef;
+              border-left: 4px solid;
+              cursor: pointer;
+              transition: all 0.2s;
+              
+              &:hover {
+                background: #f8f9fa;
+                transform: translateY(-1px);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }
+              
+              .community-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.5rem;
+                
+                .community-dot {
+                  width: 12px;
+                  height: 12px;
+                  border-radius: 50%;
+                  margin-right: 0.5rem;
+                }
+                
+                .community-name {
+                  font-weight: 600;
+                  font-size: 0.9rem;
+                }
+              }
+              
+              .community-stats {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.8rem;
+                color: #6c757d;
+                margin-bottom: 0.25rem;
+              }
+              
+              .community-central {
+                font-size: 0.8rem;
+                color: #6c757d;
+              }
+            }
+          }
+        }
+        
+        .tools-section {
+          padding: 1rem;
+          
+          h4 {
+            margin: 1.5rem 0 0.5rem 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            
+            &:first-child {
+              margin-top: 0;
+            }
+          }
+
+          h5 {
+            margin: 0.5rem 0 0.25rem 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6c757d;
+          }
+
+          .layout-controls {
+            margin-bottom: 1rem;
+            
+            label {
+              display: block;
+              font-size: 0.8rem;
+              color: #6c757d;
+              margin-bottom: 0.25rem;
+            }
+          }
+
+          .node-spacing {
+            margin-bottom: 1rem;
+            
+            label {
+              display: block;
+              font-size: 0.8rem;
+              color: #6c757d;
+              margin-bottom: 0.25rem;
+            }
+
+            .spacing-slider {
+              width: 100%;
+              height: 5px;
+              border-radius: 5px;
+              background: #e9ecef;
+              outline: none;
+              opacity: 0.7;
+              transition: opacity 0.2s;
+
+              &:hover {
+                opacity: 1;
+              }
+
+              &::-webkit-slider-thumb {
+                appearance: none;
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: #007bff;
+                cursor: pointer;
+              }
+
+              &::-moz-range-thumb {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: #007bff;
+                cursor: pointer;
+                border: none;
+              }
+            }
+          }
+
+          .apply-layout-btn {
+            width: 100%;
+            margin-bottom: 1rem;
+          }
+
+          .persistence-section, .export-section {
+            margin-bottom: 1rem;
+            
+            .storage-buttons, .export-buttons {
+              display: flex;
+              gap: 0.5rem;
+              
+              x-button {
+                flex: 1;
+              }
+            }
+          }
+          
+          x-select, x-checkbox, x-button {
+            margin-bottom: 0.75rem;
+            display: block;
+            width: 100%;
+          }
+        }
+      }
     }
   }
+  
+  > x-container:not(first-child) {
+    margin-top: 1rem;
+  }
+  x-container{
+    height: 100%;
+  }
+  x-header{
+    min-height: 400px;
+  }
+  // x-footer {
+  //   min-height: 50px;
+  //   line-height: 3rem;
+  //   text-align: center;
+  // }
+  x-header {
+    background-color: var(--x-info-200);
+  }
+  x-footer {
+    background-color: var(--x-info-300);
+  }
+  x-main {
+    height: 500px;
+    background-color: var(--x-info-400);
+  }
+  x-aside {
+    min-width: 400px;
+    height: 900px;
+    background-color: var(--x-info-500);
+  }
+
+  // .design-td {
+  //   display: flex;
+  //   align-items: center;
+  // }
+  // .design-td x-icon {
+  //   font-size: 4rem;
+  //   padding: 1rem;
+  // }
+  // .design-td-inner {
+  //   margin-left: 0.875rem;
+  //   display: flex;
+  //   flex-direction: column;
+  // }
+  // .design-td-name {
+  //   font-weight: 600;
+  // }
+  // .echart {
+  //   width: 100%;
+  //   height: 500px;
+  // }
+  
+  x-input-group {
+    display: block;
+    width: 100%;
+  }
+}
+
+// Global styles for cytoscape labels
+:global {
+  // Target cytoscape canvas text rendering
+  .cytoscape-container canvas {
+    // This will be handled by cytoscape style configuration
+  }
+}

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>知识图谱助手</title>
+  <style>
+    body {
+      width: 400px;  /* 增加宽度 */
+      padding: 25px;  /* 增加内边距 */
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .button-grid {
+      display: none; /* 隐藏按钮网格 */
+    }
+    .nav-button {
+      padding: 15px 0;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .nav-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .nav-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: linear-gradient(135deg, #cccccc, #999999);
+    }
+    .edit-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .edit-form {
+      display: none;
+      margin-top: 15px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    .save-button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 15px 0;
+      font-size: 18px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .button-container .nav-button {
+      flex: 1;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .tag-item {
+      background: #1e88e5;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tag-item .remove {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #tags {
+      border: 2px solid #1e88e5;
+      padding: 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      width: calc(100% - 24px);
+    }
+    #tags:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30,136,229,0.2);
+    }
+    .tags-label {
+      color: #2c3e50;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .properties-list {
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .property-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .property-label {
+      font-weight: bold;
+      min-width: 100px;
+    }
+    .property-value {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .add-property {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f0f8ff;
+      border-radius: 8px;
+    }
+    .property-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .property-select-group {
+      display: grid;
+      grid-template-columns: 2fr 2fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .property-select, .property-value-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .property-value-input:focus, .property-select:focus {
+      border-color: #1e88e5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(30,136,229,0.1);
+    }
+    .add-property-btn {
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .property-actions {
+      display: flex;
+      gap: 5px;
+    }
+    .property-action-btn {
+      cursor: pointer;
+      padding: 4px;
+      color: #666;
+    }
+    .property-action-btn:hover {
+      color: #1e88e5;
+    }
+    .file-upload-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .file-upload-section h3 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 18px;
+    }
+    .file-upload-section input[type="file"] {
+      margin-bottom: 10px;
+    }
+    .paste-area {
+      margin: 15px 0;
+      padding: 20px;
+      border: 2px dashed #1e88e5;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .paste-area:hover, .paste-area:focus {
+      background: #f0f7ff;
+    }
+    .paste-area p {
+      color: #666;
+      margin: 0;
+    }
+    .image-preview {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow: hidden;
+    }
+    .image-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 4px;
+      display: none;
+    }
+    /* Custom file input styling */
+    .file-input-container {
+      position: relative;
+      display: block;
+      margin-bottom: 15px;
+    }
+    .file-input-container input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .file-input-button {
+      display: block;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    .file-input-button:hover {
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+    .file-name {
+      margin-top: 8px;
+      padding: 8px;
+      background: #f0f7ff;
+      border-radius: 4px;
+      color: #1565c0;
+      font-size: 14px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: none;
+    }
+    #uploadFileButton {
+      margin-top: 15px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      width: 100%;
+      font-size: 16px;
+    }
+    #uploadFileButton:hover {
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+    }
+  </style>
+</head>
+<body>
+  <h2>知识图谱助手</h2>
+  
+  <!-- Knowledge Edit Section -->
+  <div class="edit-section">
+    <div class="button-container">
+      <button class="nav-button" id="btn-upload-file">文件上传</button>
+      <button class="nav-button" id="btn-edit">知识编辑</button>
+      <button class="nav-button" id="btn-tag">知识标注</button>
+      <button class="nav-button" id="btn-prop">属性编辑</button>
+    </div>
+    <div class="edit-form" id="editForm"> <!-- 改为div，移除form标签 -->
+      <!-- 编辑表单 -->
+      <div id="editFormContent">
+        <div class="form-group">
+          <label>标签 (中文)</label>
+          <input type="text" id="labelZh">
+        </div>
+        <div class="form-group">
+          <label>描述 (中文)</label>
+          <textarea id="descriptionZh"></textarea>
+        </div>
+        <div class="form-group">
+          <label>别名 (中文)</label>
+          <input type="text" id="aliasZh">
+        </div>
+      </div>
+      <!-- 标注表单 -->
+      <div id="tagFormContent" style="display: none;">
+        <div class="form-group" id="tagsGroup">
+          <label class="tags-label">标注</label>
+          <div class="tags-container" id="tagsContainer"></div>
+          <input type="text" id="tags" placeholder="输入标签后按回车添加">
+        </div>
+      </div>
+      <!-- 属性编辑表单 -->
+      <div id="propFormContent" style="display: none;">
+        <div class="form-group">
+          <div class="add-property">
+            <div class="property-form">
+              <div class="property-select-group">
+                <select id="propertySelect" class="property-select">
+                  <option value="">选择属性...</option>
+                </select>
+                <input type="text" id="propertyValue" class="property-value-input" placeholder="输入属性值">
+              </div>
+              <button id="addPropertyBtn" class="add-property-btn nav-button">添加属性</button>
+            </div>
+          </div>
+          <div class="properties-list" id="propertiesList"></div>
+        </div>
+      </div>
+      <button class="nav-button save-button" id="saveButton">保存</button>
+    </div>
+  </div>
+
+  <!-- File Upload Section (Hidden by default) -->
+  <div class="file-upload-section" id="fileUploadSection" style="display: none;">
+    <h3>文件上传</h3>
+    <div class="file-input-container">
+      <input type="file" id="fileInput">
+      <div class="file-input-button">选择文件</div>
+      <div class="file-name" id="fileName">未选择文件</div>
+    </div>
+    <div class="form-group">
+      <label>文件标签</label>
+      <div class="tags-container" id="fileTagsContainer"></div>
+      <input type="text" id="fileTags" placeholder="输入标签后按回车添加">
+    </div>
+    <!-- Add paste area for images -->
+    <div class="paste-area" id="pasteArea">
+      <p>点击此处粘贴图片或截图 (Ctrl+V)</p>
+      <div class="image-preview" id="imagePreview"></div>
+    </div>
+    <button class="nav-button" id="uploadFileButton">上传文件</button>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

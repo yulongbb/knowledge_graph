@@ -306,6 +306,29 @@ export class KnowledgeController {
     return this.knowledgeService.graph(id, index, size, query);
   }
 
+  @Post('graphAll/:size/:index')
+  @ApiOperation({
+    summary: '获取完整知识图谱',
+    description: '获取所有实体和关系构成的完整知识图谱，支持分页，返回适合可视化的数据结构',
+  })
+  @ApiParam({ name: 'index', description: '页码，从1开始' })
+  @ApiParam({ name: 'size', description: '每页实体数量' })
+  @ApiBody({ description: '图谱查询条件，可选', type: SearchQuery })
+  @ApiResponse({
+    status: 200,
+    description: '完整知识图谱数据，包含所有节点和边信息',
+    type: KnowledgeGraph,
+  })
+  async getAllGraph(
+    @Param('index', new ParseIntPipe())
+    index: number = 1,
+    @Param('size', new ParseIntPipe())
+    size: number = 100,
+    @Body() query: SearchQuery,
+  ): Promise<KnowledgeGraph> {
+    return this.knowledgeService.getAllGraph(index, size, query);
+  }
+
   @Get('jobs')
   @ApiOperation({
     summary: '获取队列任务状态',

@@ -428,6 +428,167 @@ export class KnowledgeService {
     }
   }
 
+  async getAllGraph(
+    index: number,
+    size: number,
+    query: any,
+  ): Promise<KnowledgeGraph> {
+    try {
+      const start = size * (index - 1);
+
+      // First, get all entities from Elasticsearch
+      const searchResult = await this.elasticsearchService.search({
+        size: size,
+        from: start,
+        query: query?.bool || { match_all: {} },
+      });
+
+      const entities = searchResult.list;
+      console.log(`Found ${entities.length} entities`);
+
+      if (entities.length === 0) {
+        return { elements: { nodes: [], edges: [] } };
+      }
+
+      // Extract all entity items for relationship queries
+      const allItems: string[] = [];
+      entities.forEach((entity: any) => {
+        if (entity._source.items) {
+          allItems.push(...entity._source.items);
+        }
+      });
+
+      console.log(`Total items for relationship query: ${allItems.length}`);
+
+      const cytoscapeData = { elements: { nodes: [], edges: [] } };
+      const addedNodes = new Set();
+
+      // Add all entities as nodes first
+      for (const entity of entities) {
+        const entityId = entity._id;
+        if (!addedNodes.has(entityId)) {
+          cytoscapeData.elements.nodes.push({
+            data: {
+              _id: entity._source.items?.[0] || entityId,
+              images: entity._source.images?.map(
+                (image: string) => 'http://localhost:9000/kgms/' + image,
+              ),
+              type: entity._source.type,
+              id: entityId,
+              base: [],
+              label: entity._source.labels?.zh?.value || 'Unknown',
+              description: entity._source.descriptions?.zh?.value || '',
+            },
+          });
+          addedNodes.add(entityId);
+        }
+      }
+
+      // Only query relationships if we have items
+      if (allItems.length > 0) {
+        // Query relationships for all entities
+        const cursor = await this.db.query(aql`
+          FOR item IN ${allItems}
+            LET startNode = DOCUMENT(item)
+            FOR v, e, p IN 0..1 ANY DOCUMENT(item)['_id'] GRAPH "graph"
+            FILTER e != null AND e.mainsnak.property !='P31'
+            RETURN {vertex: v, edge: e, start: startNode, from: DOCUMENT(e._from), to: DOCUMENT(e._to)}
+        `);
+
+        const relationshipResults = await cursor.all();
+        console.log(`Found ${relationshipResults.length} relationships`);
+
+        // Process relationships and add connected nodes
+        await Promise.all(
+          relationshipResults.map(async ({ vertex, edge, from, to }) => {
+            // Add vertex node if not already added and if vertex has valid id
+            if (vertex && vertex.id && !addedNodes.has(vertex.id)) {
+              try {
+                const data = await this.elasticsearchService.get(vertex.id);
+                if (data && data._source) {
+                  cytoscapeData.elements.nodes.push({
+                    data: {
+                      _id: vertex['_id'],
+                      images: data['_source']['images']?.map(
+                        (image: string) => 'http://localhost:9000/kgms/' + image,
+                      ),
+                      type: data['_source']['type'],
+                      id: vertex.id,
+                      base: [],
+                      label: vertex.labels?.zh?.value || data['_source']?.labels?.zh?.value || '',
+                      description: vertex.descriptions?.zh?.value || data['_source']?.descriptions?.zh?.value || '',
+                    },
+                  });
+                  addedNodes.add(vertex.id);
+                }
+              } catch (error) {
+                console.error(`Error fetching vertex data for ${vertex.id}:`, error);
+                // Skip this vertex if we can't fetch its data
+              }
+            }
+
+            // Add edges only if both source and target exist and are valid
+            if (edge && edge._from !== edge._to && from?.id && to?.id) {
+              try {
+                const property = await this.propertiesService.get(
+                  edge.mainsnak.property.replace('P', ''),
+                );
+                if (property?.name) {
+                  // Check if both source and target nodes exist in our graph
+                  const sourceExists = addedNodes.has(from.id);
+                  const targetExists = addedNodes.has(to.id);
+                  
+                  if (sourceExists && targetExists) {
+                    cytoscapeData.elements.edges.push({
+                      data: {
+                        _id: edge['_key'],
+                        source: from.id,
+                        target: to.id,
+                        label: property.name || '',
+                      },
+                    });
+                  }
+                }
+              } catch (error) {
+                console.error(`Error processing edge ${edge._key}:`, error);
+              }
+            }
+
+            // Handle self-referencing edges (base properties)
+            if (edge && edge._from === edge._to && from?.id) {
+              try {
+                const property = await this.propertiesService.get(
+                  edge.mainsnak.property.replace('P', ''),
+                );
+                if (property?.name) {
+                  cytoscapeData.elements.nodes.forEach((node: any) => {
+                    if (node.data._id === edge._from) {
+                      if (!node.data.base.some((b: any) => b._id === edge._id)) {
+                        node.data.base.push({
+                          _id: edge._id,
+                          value: edge.mainsnak.datavalue?.value,
+                          label: property.name || '',
+                        });
+                      }
+                    }
+                  });
+                }
+              } catch (error) {
+                console.error(`Error processing self-edge ${edge._key}:`, error);
+              }
+            }
+          }),
+        );
+      }
+
+      console.log(`Generated graph with ${cytoscapeData.elements.nodes.length} nodes and ${cytoscapeData.elements.edges.length} edges`);
+      return cytoscapeData;
+    } catch (error) {
+      console.error('Error in getAllGraph:', error);
+      return { elements: { nodes: [], edges: [] } };
+    }
+  }
+
   // 更新 Redis 中的热度数据
   async recordView(knowledge: any): Promise<void> {
     // 增加浏览次数

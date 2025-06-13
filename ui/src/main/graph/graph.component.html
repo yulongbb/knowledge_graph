@@ -1,5 +1,4 @@
-<!-- 搜索栏 -->
-<div style="width: 100%; display: flex; align-items: center; justify-content: center">
+<!-- <div style="width: 100%; display: flex; align-items: center; justify-content: center">
     <x-input-group compact size="big">
         <x-select [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="20"></x-select>
 
@@ -7,18 +6,146 @@
             [(ngModel)]="modelAsync" placeholder="检索知识" [nodeTpl]="nodeTpl"></x-auto-complete>
         <x-button size="big" icon="fto-search" (click)="search(keyword)"></x-button>
     </x-input-group>
-</div>
-
+</div> -->
 
 <ng-template #nodeTpl let-node="$node">
     <span class="select-item">{{ node?._source?.labels.zh.value }} </span>
 </ng-template>
 
-<div #cy style="width: 100%; height: 100%;"></div>
-
-
 <ng-template #contentTpl>
     <x-select [data]="properties()" [(ngModel)]="model1"></x-select>
 </ng-template>
+
+<div class="graph-container">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>知识图谱</h3>
+      <div class="filter-toggle">
+        <x-button type="text" icon="fto-filter">筛选视图</x-button>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <x-input-group compact size="big">
+        <x-select [(ngModel)]="way" [data]="['默认检索', '精确检索', '模糊检索']" [style.width.%]="30"></x-select>
+        <x-auto-complete [style.width.%]="70" (nodeEmit)="selectNode($event)" [data]="dataAsync()"
+            [(ngModel)]="modelAsync" placeholder="搜索节点..." [nodeTpl]="nodeTpl"></x-auto-complete>
+      </x-input-group>
+    </div>
+
+    <!-- Network Controls -->
+    <div class="network-controls">
+      <h4>网络控制</h4>
+      <x-button type="primary" icon="fto-plus" (click)="addNode()">添加节点</x-button>
+      <x-button type="text" icon="fto-link" (click)="createLink()">创建连接</x-button>
+      <x-button type="text" icon="fto-edit" (click)="editNode()">编辑节点</x-button>
+      <x-button type="danger" icon="fto-trash" (click)="deleteSelection()">删除选中</x-button>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h4>快捷操作</h4>
+      <x-button type="text" icon="fto-users" (click)="showAllStakeholders()">所有相关者</x-button>
+      <x-button type="text" icon="fto-clock" (click)="showRecentActivity()">最近活动</x-button>
+      <x-button type="text" icon="fto-activity" (click)="showEngagements()">参与度分析</x-button>
+    </div>
+  </div>
+
+  <!-- Main Graph Area -->
+  <div class="graph-main">
+    <div class="graph-header">
+      <h2>网络可视化</h2>
+    </div>
+    <div #cy class="cytoscape-container"></div>
+  </div>
+
+  <!-- Right Sidebar with Tabs -->
+  <div class="right-sidebar">
+    <x-tabs [activatedIndex]="activeTab" (activatedIndexChange)="onTabChange($event)">
+      <x-tab label="概览">
+        <!-- Network Overview -->
+        <div class="network-overview">
+          <h4>网络概览</h4>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">总节点数</span>
+              <span class="stat-value">{{networkStats.totalNodes}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">总边数</span>
+              <span class="stat-value">{{networkStats.totalEdges}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">社区数</span>
+              <span class="stat-value">{{networkStats.communities}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communities -->
+        <div class="communities-section">
+          <h4>社区</h4>
+          <div class="community-list">
+            <div *ngFor="let community of communities" class="community-item" 
+                 [style.border-left-color]="community.color" (click)="selectCommunity(community)">
+              <div class="community-header">
+                <span class="community-dot" [style.background-color]="community.color"></span>
+                <span class="community-name">{{community.name}}</span>
+              </div>
+              <div class="community-stats">
+                <span>节点: {{community.nodeCount}}</span>
+                <span>边: {{community.edgeCount}}</span>
+              </div>
+              <div class="community-central">中心: {{community.central}}</div>
+            </div>
+          </div>
+        </div>
+      </x-tab>
+      
+      <x-tab label="工具">
+        <div class="tools-section">
+          <h4>布局控制</h4>
+          <div class="layout-controls">
+            <label>布局类型</label>
+            <x-select [(ngModel)]="selectedLayout" [data]="layoutOptions"></x-select>
+          </div>
+
+          <div class="node-spacing">
+            <label>节点间距: {{nodeSpacing}}</label>
+            <input type="range" [(ngModel)]="nodeSpacing" min="10" max="100" class="spacing-slider">
+          </div>
+
+          <x-button type="primary" class="apply-layout-btn" (click)="applyLayout()">应用布局</x-button>
+
+          <h4>网络持久化</h4>
+          <div class="persistence-section">
+            <h5>浏览器存储</h5>
+            <div class="storage-buttons">
+              <x-button type="text" icon="fto-save" (click)="saveToStorage()">保存</x-button>
+              <x-button type="text" icon="fto-upload" (click)="loadFromStorage()">加载</x-button>
+            </div>
+          </div>
+
+          <div class="export-section">
+            <h5>文件导入导出</h5>
+            <div class="export-buttons">
+              <x-button type="text" icon="fto-download" (click)="exportNetwork()">导出</x-button>
+              <x-button type="text" icon="fto-upload" (click)="importNetwork()">导入</x-button>
+            </div>
+          </div>
+
+          <h4>筛选选项</h4>
+          <x-checkbox [(ngModel)]="showLabels" (ngModelChange)="toggleLabels()">显示标签</x-checkbox>
+          <x-checkbox [(ngModel)]="showEdgeLabels" (ngModelChange)="toggleEdgeLabels()">显示边标签</x-checkbox>
+          
+          <h4>社区检测</h4>
+          <x-button type="primary" (click)="detectCommunities()">检测社区</x-button>
+        </div>
+      </x-tab>
+    </x-tabs>
+  </div>
+</div>
 
 
