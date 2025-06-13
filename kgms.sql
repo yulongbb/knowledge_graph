@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 06/06/2025 17:15:32
+ Date: 13/06/2025 16:05:32
 */
 
 SET NAMES utf8mb4;
@@ -35,7 +35,7 @@ CREATE TABLE `addon`  (
   `userRatings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `totalRatings` int(0) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of addon
@@ -67,7 +67,7 @@ CREATE TABLE `article`  (
   `createTime` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
   `updateTime` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of article
@@ -97,20 +97,20 @@ CREATE TABLE `category`  (
 -- ----------------------------
 -- Records of category
 -- ----------------------------
-INSERT INTO `category` VALUES ('04261c2f-12ba-91b2-4733-f7d3871f11aa', '日历', 'calendar', NULL, NULL, '04261c2f-12ba-91b2-4733-f7d3871f11aa', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('1e0e31e4-7de6-d4b0-f064-cafa2994f237', '娱乐', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.1e0e31e4-7de6-d4b0-f064-cafa2994f237', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('2ed0b72a-4adf-00e5-2dec-834f56f64f62', '汽车', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.2ed0b72a-4adf-00e5-2dec-834f56f64f62', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('31004c74-a52c-e956-9ddb-60fe6604ad60', 'AI大全', 'ai-tools', NULL, NULL, '31004c74-a52c-e956-9ddb-60fe6604ad60', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', '财经', 'finance', NULL, NULL, '32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('4fea1c9d-2fc4-57ad-8561-9067d4dc977c', '体育', 'sports', NULL, NULL, '4fea1c9d-2fc4-57ad-8561-9067d4dc977c', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', '导航', 'navigation', NULL, NULL, '76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('771c8f21-afdd-d082-7d2a-ee5502a0fcb6', '萌宠', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.771c8f21-afdd-d082-7d2a-ee5502a0fcb6', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '资讯', 'news', NULL, NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', '科技', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('95023e34-d4f2-a5cb-05d1-abed36b4b5ab', '教育', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.95023e34-d4f2-a5cb-05d1-abed36b4b5ab', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('a7c9eca0-451d-2e4f-c6b6-590b6fb95785', '天气', 'weather', NULL, NULL, 'a7c9eca0-451d-2e4f-c6b6-590b6fb95785', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('c73269fe-ae8a-7396-58a6-8981c761c2d6', '时尚', 'news', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.c73269fe-ae8a-7396-58a6-8981c761c2d6', NULL, NULL, 0);
-INSERT INTO `category` VALUES ('e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', '游戏', 'games', NULL, NULL, 'e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', NULL, NULL, 0);
+INSERT INTO `category` VALUES ('04261c2f-12ba-91b2-4733-f7d3871f11aa', 'calendar', '日历', NULL, NULL, '04261c2f-12ba-91b2-4733-f7d3871f11aa', NULL, 'calendar', 0);
+INSERT INTO `category` VALUES ('1e0e31e4-7de6-d4b0-f064-cafa2994f237', 'news', '娱乐', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.1e0e31e4-7de6-d4b0-f064-cafa2994f237', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('2ed0b72a-4adf-00e5-2dec-834f56f64f62', 'news', '汽车', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.2ed0b72a-4adf-00e5-2dec-834f56f64f62', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('31004c74-a52c-e956-9ddb-60fe6604ad60', 'ai-tools', 'AI大全', NULL, NULL, '31004c74-a52c-e956-9ddb-60fe6604ad60', NULL, 'ai-tools', 0);
+INSERT INTO `category` VALUES ('32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', 'finance', '财经', NULL, NULL, '32ea1099-15ff-efc0-0c9f-cae6c6d45f6a', NULL, 'finance', 0);
+INSERT INTO `category` VALUES ('4fea1c9d-2fc4-57ad-8561-9067d4dc977c', 'sports', '体育', NULL, NULL, '4fea1c9d-2fc4-57ad-8561-9067d4dc977c', NULL, 'sports', 0);
+INSERT INTO `category` VALUES ('76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', 'navigation', '导航', NULL, NULL, '76b4a660-2c20-7ace-fd1e-9833c1e5b1c2', NULL, 'navigation', 0);
+INSERT INTO `category` VALUES ('771c8f21-afdd-d082-7d2a-ee5502a0fcb6', 'news', '萌宠', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.771c8f21-afdd-d082-7d2a-ee5502a0fcb6', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', 'news', '资讯', NULL, NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', 'news', '科技', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.7c3dadb3-9f5c-b02b-8a9d-690c3e3509c8', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('95023e34-d4f2-a5cb-05d1-abed36b4b5ab', 'news', '教育', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.95023e34-d4f2-a5cb-05d1-abed36b4b5ab', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('a7c9eca0-451d-2e4f-c6b6-590b6fb95785', 'weather', '天气', NULL, NULL, 'a7c9eca0-451d-2e4f-c6b6-590b6fb95785', NULL, 'weather', 0);
+INSERT INTO `category` VALUES ('c73269fe-ae8a-7396-58a6-8981c761c2d6', 'news', '时尚', NULL, '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3', '778c4eb3-3764-a1d9-4bfc-c7de62a3f6f3.c73269fe-ae8a-7396-58a6-8981c761c2d6', NULL, 'news', 0);
+INSERT INTO `category` VALUES ('e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', 'games', '游戏', NULL, NULL, 'e76f6dca-b6d8-1d2e-a7ee-30ef74c7e7a2', NULL, 'games', 0);
 
 -- ----------------------------
 -- Table structure for dataset
@@ -124,7 +124,7 @@ CREATE TABLE `dataset`  (
   `label` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for design_col
@@ -268,7 +268,7 @@ CREATE TABLE `gpt_models`  (
   `createdAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
   `updatedAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for marker
@@ -283,7 +283,7 @@ CREATE TABLE `marker`  (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `createdAt` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 67 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of marker
@@ -303,7 +303,7 @@ CREATE TABLE `message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_58be890b9a1199e6da5037a994f`(`sessionId`) USING BTREE,
   CONSTRAINT `FK_58be890b9a1199e6da5037a994f` FOREIGN KEY (`sessionId`) REFERENCES `session` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 717 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 716 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of message
@@ -407,7 +407,7 @@ CREATE TABLE `ontology_application`  (
   `userRatings` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `rating` float NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ontology_application
@@ -524,7 +524,7 @@ CREATE TABLE `ontology_qualify`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_8dbd9407df5697a1a52bdcab34c`(`namespaceId`) USING BTREE,
   CONSTRAINT `FK_8dbd9407df5697a1a52bdcab34c` FOREIGN KEY (`namespaceId`) REFERENCES `ontology_namespace` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 124 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 123 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for ontology_schema
@@ -614,7 +614,7 @@ CREATE TABLE `plugin`  (
   `outputFormat` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of plugin
@@ -634,7 +634,7 @@ CREATE TABLE `plugin_message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_7620f035eb6c49cf037df83dc32`(`pluginId`) USING BTREE,
   CONSTRAINT `FK_7620f035eb6c49cf037df83dc32` FOREIGN KEY (`pluginId`) REFERENCES `plugin` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of plugin_message
@@ -673,7 +673,7 @@ CREATE TABLE `session`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `createdAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 253 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 252 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of session
