@@ -71,7 +71,7 @@ export class KnowledgeComponent implements OnInit {
     handleRouteChange(path: string) {
         console.log('Route changed to:', path);
         this.currentRouteType = path || 'discover';
-        
+
         // 根据路由类型加载对应数据
         switch (this.currentRouteType) {
             case 'discover':
@@ -114,7 +114,7 @@ export class KnowledgeComponent implements OnInit {
     handleCategoryRoute(params: any) {
         // 处理分类参数路由，使用label字段
         let targetCategory: Category | null = null;
-        
+
         if (params['subsubcategory']) {
             targetCategory = this.findCategoryByLabel(params['subsubcategory']);
         } else if (params['subcategory']) {
@@ -122,7 +122,7 @@ export class KnowledgeComponent implements OnInit {
         } else if (params['category']) {
             targetCategory = this.findCategoryByLabel(params['category']);
         }
-        
+
         if (targetCategory) {
             this.onCategorySelected(targetCategory);
         }
@@ -237,12 +237,12 @@ export class KnowledgeComponent implements OnInit {
     // Load the category tree from API
     loadCategoryTree() {
         this.isLoading = true;
-        
+
         // Create the fixed categories
         const discoverCategory = {
             id: 'discover',
             name: '发现',
-            displayName: '发现',
+            label: '发现',
             description: '发现新知识',
             children: [],
             path: 'discover',
@@ -252,16 +252,16 @@ export class KnowledgeComponent implements OnInit {
         const followCategory = {
             id: 'following',
             name: '关注',
-            displayName: '关注',
+            label: '关注',
             description: '我关注的内容',
             children: [],
             path: 'following',
             level: 1
         } as unknown as Category;
-        
+
         // Set initial categories with discover and follow
         this.categories = [discoverCategory, followCategory];
-        
+
         // Load categories from API
         this.categoryService.getFormattedCategoryTree().subscribe({
             next: (categoryTree) => {
@@ -269,7 +269,7 @@ export class KnowledgeComponent implements OnInit {
                 // Add API categories to the fixed categories
                 this.categories = [...this.categories, ...categoryTree];
                 this.isLoading = false;
-                
+
                 // 分类加载完成后，处理当前路由
                 this.route.params.subscribe(params => {
                     this.handleCategoryRoute(params);
@@ -435,7 +435,7 @@ export class KnowledgeComponent implements OnInit {
                 if (category.label === label) {
                     return category;
                 }
-                
+
                 if (category.children && category.children.length > 0) {
                     const found = searchInCategories(category.children as Category[]);
                     if (found) return found;
@@ -443,7 +443,7 @@ export class KnowledgeComponent implements OnInit {
             }
             return null;
         };
-        
+
         return searchInCategories(this.categories);
     }
 }

@@ -159,8 +159,8 @@ export class KnowledgeNavbarComponent implements OnInit {
       'calendar': 'calendar'
     };
 
-    if (specialRoutes[category.label]) {
-      this.router.navigate(['/start/knowledge', specialRoutes[category.label]]);
+    if (specialRoutes[category.name]) {
+      this.router.navigate(['/start/knowledge', specialRoutes[category.name]]);
       this.categorySelected.emit(category);
       return;
     }

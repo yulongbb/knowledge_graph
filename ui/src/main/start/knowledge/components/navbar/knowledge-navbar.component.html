@@ -11,7 +11,7 @@
           [class.selected]="isSelected(category)"
           class="fixed-category"
           (click)="selectCategory(category, 0)">
-        {{ category.name }}
+        {{ category.label }}
       </li>
     </div>
 
@@ -20,7 +20,7 @@
         [class.selected]="isSelected(category)"
         [attr.data-level]="getSelectedCategoryPath().indexOf(category)"
         (click)="selectCategory(category, getSelectedCategoryPath().indexOf(category) + 1)">
-      {{ category.name }}
+      {{ category.label }}
     </li>
   </ul>
 
@@ -43,7 +43,7 @@
       <li *ngFor="let category of getFixedCategories()" 
           [class.selected]="isSelected(category)"
           (click)="selectCategoryAndCloseSideNav(category, 0)">
-        {{ category.name }}
+        {{ category.label }}
       </li>
       
       <!-- All categories in a flattened tree structure -->
@@ -51,7 +51,7 @@
           [class.selected]="isSelected(category)"
           (click)="selectCategoryAndCloseSideNav(category, 0)"
           [style.padding-left]="(16 + (category.level || 0) * 16) + 'px'">
-        {{ category.name }}
+        {{ category.label }}
       </li>
     </ul>
   </div>

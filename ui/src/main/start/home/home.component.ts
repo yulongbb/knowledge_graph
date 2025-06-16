@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('searchContainer') searchContainer!: ElementRef;
 
   keyword: string = ''; // 搜索关键字
+  isAiMode: boolean = false; // AI模式状态
   discoverItems = Array.from({ length: 10 }, (_, i) => i + 1); // 初始内容
   searchContainerStyle: any = {}; // 动态样式
   isLoading = false; // 是否正在加载
@@ -176,7 +177,17 @@ export class HomeComponent implements OnInit {
   }
 
   queryKeyword(keyword: any) {
-    this.router.navigate(['/start/search'], { queryParams: { keyword } });
+    if (this.isAiMode) {
+      this.router.navigate(['/start/ai-search'], { queryParams: { keyword } });
+    } else {
+      this.router.navigate(['/start/search'], { queryParams: { keyword } });
+    }
+  }
+
+  onAiSearch() {
+    this.isAiMode = !this.isAiMode; // Toggle AI mode
+    // 只切换模式，不跳转
+    console.log('AI mode toggled:', this.isAiMode ? 'ON' : 'OFF');
   }
 
   // 判断新闻是否为新

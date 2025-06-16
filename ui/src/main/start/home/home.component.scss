@@ -35,16 +35,146 @@
     transition: all 0.3s ease; // 平滑过渡
     background-color: white;
 
-    .search-box {
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
       margin: 20px auto;
-      display: block;
-      width: 100%;
-      padding: 10px 20px;
+    }
+
+    .search-box {
+      flex: 1;
+      padding: 10px 60px 10px 20px; // Add right padding for AI button
       font-size: 18px;
       border: 1px solid #ddd;
       border-radius: 25px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease; // 平滑过渡
+    }
+
+    .search-box.ai-active {
+      border: 3px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+        linear-gradient(0deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #6c5ce7, #a29bfe) border-box;
+      animation: rainbow-border 4s ease-in-out infinite,
+                 rainbow-glow 3s ease-in-out infinite alternate;
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.18); // 发光减弱
+      transform: scale(1.01);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes rainbow-border {
+      0% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(0deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #6c5ce7, #a29bfe) border-box;
+      }
+      16.666% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(60deg, #4ecdc4, #45b7d1, #f7d794, #6c5ce7, #a29bfe, #ff6b6b) border-box;
+      }
+      33.333% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(120deg, #45b7d1, #f7d794, #6c5ce7, #a29bfe, #ff6b6b, #4ecdc4) border-box;
+      }
+      50% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(180deg, #f7d794, #6c5ce7, #a29bfe, #ff6b6b, #4ecdc4, #45b7d1) border-box;
+      }
+      66.666% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(240deg, #6c5ce7, #a29bfe, #ff6b6b, #4ecdc4, #45b7d1, #f7d794) border-box;
+      }
+      83.333% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(300deg, #a29bfe, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #6c5ce7) border-box;
+      }
+      100% {
+        background: linear-gradient(white, white) padding-box,
+          linear-gradient(360deg, #ff6b6b, #4ecdc4, #45b7d1, #f7d794, #6c5ce7, #a29bfe) border-box;
+      }
+    }
+
+    @keyframes rainbow-glow {
+      0% {
+        box-shadow: 0 0 8px rgba(255, 107, 107, 0.12),
+                    0 0 16px rgba(78, 205, 196, 0.08),
+                    0 0 24px rgba(69, 183, 209, 0.05);
+        filter: brightness(1) saturate(1);
+      }
+      25% {
+        box-shadow: 0 0 10px rgba(78, 205, 196, 0.15),
+                    0 0 20px rgba(69, 183, 209, 0.10),
+                    0 0 30px rgba(247, 215, 148, 0.06);
+        filter: brightness(1.03) saturate(1.05);
+      }
+      50% {
+        box-shadow: 0 0 12px rgba(69, 183, 209, 0.18),
+                    0 0 24px rgba(247, 215, 148, 0.12),
+                    0 0 36px rgba(108, 92, 231, 0.08);
+        filter: brightness(1.06) saturate(1.08);
+      }
+      75% {
+        box-shadow: 0 0 10px rgba(247, 215, 148, 0.13),
+                    0 0 20px rgba(108, 92, 231, 0.09),
+                    0 0 30px rgba(162, 155, 254, 0.06);
+        filter: brightness(1.03) saturate(1.05);
+      }
+      100% {
+        box-shadow: 0 0 14px rgba(108, 92, 231, 0.20),
+                    0 0 28px rgba(162, 155, 254, 0.13),
+                    0 0 42px rgba(255, 107, 107, 0.08);
+        filter: brightness(1.08) saturate(1.1);
+      }
+    }
+
+    .ai-button {
+      position: absolute;
+      right: 5px;
+      height: calc(100% - 10px);
+      padding: 0 15px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .ai-button:hover {
+      background: linear-gradient(135deg, #3730a3 0%, #6b21a8 50%, #be185d 100%);
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .ai-button.active {
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 25%, #8b5cf6 50%, #ef4444 75%, #f59e0b 100%);
+      animation: ai-button-glow 2s ease-in-out infinite alternate;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25); // 发光减弱
+    }
+
+    @keyframes ai-button-glow {
+      from {
+        box-shadow: 0 0 5px rgba(6, 182, 212, 0.25),
+                    0 0 10px rgba(59, 130, 246, 0.12),
+                    0 0 15px rgba(139, 92, 246, 0.10);
+        filter: saturate(1.1);
+      }
+      to {
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.30),
+                    0 0 20px rgba(59, 130, 246, 0.15),
+                    0 0 30px rgba(139, 92, 246, 0.12);
+        filter: saturate(1.15);
+      }
+    }
+
+    .ai-button i {
+      font-size: 12px;
     }
 
     /* 容器样式 */
@@ -204,7 +334,8 @@
       position: absolute;
       bottom: 10px;
       right: 10px;
-      background: rgba(0, 0, 0, 0.7); /* 半透明黑色背景 */
+      background: rgba(0, 0, 0, 0.7);
+      /* 半透明黑色背景 */
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
@@ -219,22 +350,25 @@
       font-size: 40px;
       color: rgba(255, 255, 255, 0.8);
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease; /* 添加过渡效果 */
+      transition: all 0.3s ease;
+      /* 添加过渡效果 */
     }
-    
+
     .play-icon .play-text {
       display: none;
       font-size: 16px;
       margin-top: 8px;
     }
-    
+
     .thumbnail-container:hover .play-icon {
-      font-size: 50px; /* 放大图标 */
+      font-size: 50px;
+      /* 放大图标 */
       color: rgba(255, 255, 255, 1);
     }
-    
+
     .thumbnail-container:hover .play-icon .play-text {
-      display: block; /* 显示文字 */
+      display: block;
+      /* 显示文字 */
     }
   }
 

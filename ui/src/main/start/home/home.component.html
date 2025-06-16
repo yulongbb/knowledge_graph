@@ -27,8 +27,18 @@
 
   <!-- 搜索框 -->
   <div class="search-container" #searchContainer [ngStyle]="searchContainerStyle">
-    <input type="text" placeholder="搜索知识" class="search-box" [(ngModel)]="keyword"
-      (keyup.enter)="queryKeyword(keyword)" />
+    <div class="search-input-wrapper">
+      <input type="text" placeholder="搜索知识" class="search-box" 
+        [class.ai-active]="isAiMode"
+        [(ngModel)]="keyword"
+        (keyup.enter)="queryKeyword(keyword)" />
+      <button class="ai-button" 
+        [class.active]="isAiMode"
+        (click)="onAiSearch()" 
+        title="AI搜索">
+        <span>AI 模式</span>
+      </button>
+    </div>
     <div class="hot-news-container" *ngIf="!isFixed" @fadeInOut>
       <div class="hot-news-title">热点</div>
       <div class="hot-news-grid">
