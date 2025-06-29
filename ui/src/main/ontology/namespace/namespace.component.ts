@@ -234,7 +234,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       if (namespaceControl) {
         namespaceControl['data'] = (response.list || []).map((ns) => ({
           label: ns.name,
-          value: ns.id,
+          value: String(ns.id), // 保证为字符串
         }));
       }
     });
@@ -250,15 +250,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       .subscribe({
         next: (response: any) => {
           this.namespaces = response.list || [];
+          // 下拉选项的 value 改为 name
           this.namespaceOptions = this.namespaces.map((ns) => ({
             label: ns.name as string,
-            value: String(ns.id),
+            value: String(ns.name),
           }));
 
           console.log('Namespace options:', this.namespaceOptions);
 
-          // Remove automatic selection of default namespace
-          // Let user explicitly choose which namespace to work with
+          if (this.namespaces.length > 0) {
+            this.selectedNamespaceId = String(this.namespaces[0].name);
+            this.onNamespaceSelected(this.selectedNamespaceId);
+          }
         },
         error: (error) => {
           console.error('Failed to load namespaces:', error);
@@ -270,12 +273,13 @@ export class NamespaceComponent extends PageBase implements OnInit {
   // Select a namespace and update the dropdown
   private selectNamespace(namespace: Namespace) {
     this.selectedNamespace = namespace;
-    this.selectedNamespaceId = String(namespace.name);
+    this.selectedNamespaceId = String(namespace.id); // 修改为id
     console.log('Selected namespace:', namespace);
   }
 
   // Handle namespace selection from dropdown
   onNamespaceSelected(namespaceId: string) {
+    console.log('Namespace selected:', namespaceId);
     console.log('Namespace selected from dropdown:', namespaceId);
 
     if (!namespaceId) {
@@ -284,15 +288,16 @@ export class NamespaceComponent extends PageBase implements OnInit {
       return;
     }
 
+    // 用 name 字段筛选
     const selectedNs = this.namespaces.find(
-      (ns) => String(ns.name) === namespaceId
+      (ns) => String(ns.name) === String(namespaceId)
     );
     if (selectedNs) {
       this.selectedNamespace = selectedNs;
       console.log('Found and set selected namespace:', selectedNs);
       this.message.success(`已选择命名空间: ${selectedNs.name}`);
     } else {
-      console.error('Namespace not found with ID:', namespaceId);
+      console.error('Namespace not found with name:', namespaceId);
       this.message.error('未找到对应的命名空间');
     }
   }
@@ -1089,3 +1094,4 @@ export class NamespaceComponent extends PageBase implements OnInit {
     return `prop-${timestamp}-${randomPart}`;
   }
 }
+
