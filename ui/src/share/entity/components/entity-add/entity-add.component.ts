@@ -44,11 +44,19 @@ export class EntityAddComponent implements OnInit {
   editorModules = {
     toolbar: [
       ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
       ['link', 'image'],
       ['clean']
-    ]
+    ],
+    imageResize: {
+      displaySize: true
+    }
   };
 
   // New properties for namespaces
@@ -65,7 +73,7 @@ export class EntityAddComponent implements OnInit {
   constructor(
     private entityService: EntityService,
     private ontologyService: OntologyService,
-    private namespaceService: NamespaceService, // Added namespace service
+    private namespaceService: NamespaceService,
     private message: XMessageService,
     private location: Location,
     private http: HttpClient // 添加 HttpClient

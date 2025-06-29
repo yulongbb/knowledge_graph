@@ -17,6 +17,11 @@ import { XContainerModule } from '@ng-nest/ui/container';
 import { XAvatarModule } from '@ng-nest/ui/avatar';
 import { XTabsModule } from '@ng-nest/ui/tabs';
 import { XSelectModule } from '@ng-nest/ui/select';
+import { XInputModule } from '@ng-nest/ui/input';
+import { XTextareaModule } from '@ng-nest/ui/textarea';
+import { XPageHeaderModule } from '@ng-nest/ui/page-header';
+import { XUploadModule } from '@ng-nest/ui/upload';
+import { XCollapseModule } from '@ng-nest/ui/collapse';
 
 // 模块
 const modules = [
@@ -37,7 +42,12 @@ const modules = [
   XMessageBoxModule,
   XLoadingModule,
   XTabsModule,
-  XSelectModule
+  XSelectModule,
+  XInputModule,
+  XTextareaModule,
+  XPageHeaderModule,
+  XUploadModule,
+  XCollapseModule
 ];
 
 /**
