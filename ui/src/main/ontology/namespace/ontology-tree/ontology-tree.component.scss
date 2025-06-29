@@ -1,0 +1,169 @@
+.ontology-tree-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.7rem;
+      background-color: var(--x-background);
+      border-bottom: 1px solid var(--x-border);
+      
+      h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70%;
+      }
+      
+      .panel-actions {
+        display: flex;
+        gap: 0.3rem;
+      }
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow: auto;
+      padding: 0.3rem;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .loading-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 150px;
+      color: var(--x-text-300);
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    &.ontology-form-panel {
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        border-top: 1px solid var(--x-border);
+      }
+    }
+  }
+
+  // Enhanced styles for the ontology tree
+  ::ng-deep {
+    .x-tree {
+      height: 100%;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .x-tree-node {
+        transition: all 0.2s ease;
+        border-radius: 3px;
+        margin: 1px 0;
+        
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.03);
+        }
+        
+        &.x-activated {
+          background-color: var(--x-primary-a100);
+          
+          > .x-tree-node-content {
+            color: var(--x-primary);
+            font-weight: 500;
+          }
+        }
+        
+        .x-tree-node-content {
+          padding: 0.25rem 0.4rem;
+          display: flex;
+          align-items: center;
+          
+          .x-tree-node-label {
+            margin-left: 0.4rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          
+          .x-tree-node-toggle {
+            transition: transform 0.2s ease;
+            
+            &.x-tree-node-open {
+              transform: rotate(90deg);
+            }
+          }
+        }
+        
+        .x-tree-node-actions {
+          .x-link {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+      }
+      
+      .x-tree-node-children {
+        position: relative;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        
+        &::-webkit-scrollbar {
+          display: none;
+        }
+        
+        &:before {
+          content: '';
+          position: absolute;
+          left: 10px;
+          top: 0;
+          height: 100%;
+          width: 1px;
+          background-color: rgba(0, 0, 0, 0.1);
+          z-index: 0;
+        }
+      }
+    }
+  }
+}
+
+.ontology-node {
+  display: flex;
+  align-items: center;
+  
+  .node-icon {
+    margin-right: 0.3rem;
+  }
+  
+  .node-label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

@@ -16,25 +16,18 @@
   <div class="entity-manager" *ngIf="selectedNamespace">
     <!-- Three-panel container -->
     <div class="three-panel-container">
-      <!-- Left panel: Ontology tree -->
+      <!-- Left panel: Ontology tree component -->
       <div class="panel ontology-panel">
-        <div class="panel-header">
-          <h3>本体</h3>
-          <div class="panel-actions">
-            <x-button type="primary" icon="fto-plus" (click)="handleOntologyAction('add')" size="mini">新增</x-button>
-          </div>
-        </div>
-        <div class="panel-content" *ngIf="ontologyDataLoaded">
-          <x-tree [data]="ontologyData" expandedLevel="0" [nodeHeight]="2" [actions]="ontologyActions"
-            (activatedChange)="selectOntology($event)" [nodeTpl]="ontologyNodeTpl"></x-tree>
-        </div>
-        <div class="loading-placeholder" *ngIf="!ontologyDataLoaded">
-          <p><x-icon type="fto-loader" spin></x-icon> 加载中...</p>
-        </div>
+        <app-ontology-tree 
+          [selectedNamespace]="selectedNamespace"
+          [namespaceOptions]="namespaceOptions"
+          (ontologySelected)="onOntologySelected($event)"
+          (ontologyDataLoaded)="onOntologyDataLoaded($event)">
+        </app-ontology-tree>
       </div>
 
       <!-- Middle panel: Properties or Form -->
-      <div class="panel property-panel" *ngIf="!ontologyFormMode && !propertyFormMode">
+      <div class="panel property-panel" *ngIf="!propertyFormMode">
         <div class="panel-header">
           <h3>属性{{ selectedOntology ? ' - ' + (selectedOntology.label || selectedOntology.name) : '' }}</h3>
           <div class="panel-actions" *ngIf="selectedOntology">
@@ -60,27 +53,6 @@
         </div>
       </div>
 
-      <!-- Middle panel: Ontology Form when adding/editing -->
-      <div class="panel ontology-form-panel" *ngIf="ontologyFormMode">
-        <div class="panel-header">
-          <h3>{{ ontologyFormMode === 'add' ? '新增本体' : ontologyFormMode === 'edit' ? '编辑本体' : '查看本体' }}</h3>
-        </div>
-        <div class="panel-content">
-          <x-form [formGroup]="ontologyForm" [controls]="[
-              { control: 'input', id: 'name', label: '名称', required: true },
-              { control: 'textarea', id: 'description', label: '描述' },
-              { control: 'input', id: 'label', label: '标签' },
-            ]" [disabled]="ontologyFormMode === 'view'" direction="row" labelSuffix=":" labelWidth="5rem" width="100%"
-            labelAlign="end" span="20" space="1"></x-form>
-          <div class="form-actions">
-            <x-buttons space="0.3">
-              <x-button (click)="cancelOntologyForm()" size="small">取消</x-button>
-              <x-button type="primary" (click)="saveOntology()" size="small">保存</x-button>
-            </x-buttons>
-          </div>
-        </div>
-      </div>
-
       <!-- Middle panel: Property Form when adding/editing -->
       <div class="panel property-form-panel" *ngIf="propertyFormMode">
         <div class="panel-header">
@@ -100,8 +72,7 @@
       </div>
 
       <!-- Right panel: Qualifiers and Tags -->
-      <div class="panel qualifier-tag-panel" [class.hidden]="ontologyFormMode">
-
+      <div class="panel qualifier-tag-panel">
         <div class="panel-content">
           <!-- Upper section: Qualifiers -->
           <div class="qualifier-section">
@@ -224,16 +195,5 @@
     <x-link icon="fto-eye" (click)="handleTagAction('info', row)" title="查看"></x-link>
     <x-link icon="fto-edit" (click)="handleTagAction('edit', row)" title="修改"></x-link>
     <x-link icon="fto-trash-2" (click)="handleTagAction('delete', row)" title="删除"></x-link>
-  </div>
-</ng-template>
-
-<!-- Add a custom template for ontology tree nodes -->
-<ng-template #ontologyNodeTpl let-node="$node" let-level="$level">
-  <div class="ontology-node">
-    <x-icon [type]="node.icon || 'fto-box'" class="node-icon"></x-icon>
-    <span class="node-label">{{ node.label || node.name }}</span>
-    <x-tag *ngIf="node.tags && node.tags.length > 0" size="mini" [style.margin-left.rem]="0.3">
-      {{ node.tags[0] }}
-    </x-tag>
   </div>
 </ng-template>

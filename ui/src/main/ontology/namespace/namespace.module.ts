@@ -13,13 +13,18 @@ import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { NamespaceDetailComponent } from './namespace-detail/namespace-detail.component';
 import { NamespaceRoutesModule } from './namespace-routes.module';
 import { NamespaceComponent } from './namespace.component';
+import { OntologyTreeComponent } from './ontology-tree/ontology-tree.component';
 import { OntologyModule } from '../ontology/ontology.module';
 import { PropertyModule } from '../property/property.module';
 import { QualifyModule } from '../qualify/qualify.module';
 import { TagModule } from '../tag/tag.module';
 
 @NgModule({
-  declarations: [NamespaceComponent, NamespaceDetailComponent],
+  declarations: [
+    NamespaceComponent, 
+    NamespaceDetailComponent,
+    OntologyTreeComponent
+  ],
   imports: [
     CommonModule,
     ShareModule,
@@ -44,6 +49,6 @@ import { TagModule } from '../tag/tag.module';
   ],
   exports: [RouterModule],
   providers: [],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA] // Add this to suppress schema errors
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class NamespaceModule {}

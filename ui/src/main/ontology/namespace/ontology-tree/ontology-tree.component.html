@@ -1,0 +1,51 @@
+<div class="ontology-tree-container">
+  <!-- Ontology tree panel -->
+  <div class="panel ontology-panel" *ngIf="!ontologyFormMode">
+    <div class="panel-header">
+      <h3>本体</h3>
+      <div class="panel-actions">
+        <x-button type="primary" icon="fto-plus" (click)="action('add-root')" size="mini">新增</x-button>
+      </div>
+    </div>
+    <div class="panel-content" *ngIf="isOntologyDataLoaded">
+      <x-tree [data]="ontologyData" expandedLevel="0" [nodeHeight]="2" [actions]="treeActions"
+        (activatedChange)="selectOntology($event)" [nodeTpl]="ontologyNodeTpl"></x-tree>
+    </div>
+    <div class="loading-placeholder" *ngIf="!isOntologyDataLoaded">
+      <p><x-icon type="fto-loader" spin></x-icon> 加载中...</p>
+    </div>
+  </div>
+
+  <!-- Ontology form panel -->
+  <div class="panel ontology-form-panel" *ngIf="ontologyFormMode">
+    <div class="panel-header">
+      <h3>{{ ontologyFormMode === 'add' ? '新增本体' : ontologyFormMode === 'edit' ? '编辑本体' : '查看本体' }}</h3>
+    </div>
+    <div class="panel-content">
+      <x-form [formGroup]="ontologyForm" [controls]="[
+          { control: 'input', id: 'name', label: '名称', required: true },
+          { control: 'textarea', id: 'description', label: '描述' },
+          { control: 'input', id: 'label', label: '标签' }
+        ]" [disabled]="ontologyFormMode === 'view'" direction="row" labelSuffix=":" labelWidth="5rem" width="100%"
+        labelAlign="end" span="20" space="1"></x-form>
+      <div class="form-actions">
+        <x-buttons space="0.3">
+          <x-button (click)="cancelOntologyForm()" size="small">取消</x-button>
+          <x-button type="primary" (click)="action('save')" size="small" 
+            [disabled]="ontologyForm.invalid || ontologyFormMode === 'view'">保存</x-button>
+        </x-buttons>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom template for ontology tree nodes -->
+<ng-template #ontologyNodeTpl let-node="$node" let-level="$level">
+  <div class="ontology-node">
+    <x-icon [type]="node.icon || 'fto-box'" class="node-icon"></x-icon>
+    <span class="node-label">{{ node.label || node.name }}</span>
+    <x-tag *ngIf="node.tags && node.tags.length > 0" size="mini" [style.margin-left.rem]="0.3">
+      {{ node.tags[0] }}
+    </x-tag>
+  </div>
+</ng-template>
