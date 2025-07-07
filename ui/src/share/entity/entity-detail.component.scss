@@ -597,3 +597,261 @@ html {
     background-color: rgba(255, 255, 0, 0.2);
   }
 }
+
+// 编辑页面左右布局样式
+.edit-layout {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  min-height: calc(100vh - 200px);
+
+  @media (max-width: $breakpoint-lg) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.edit-left-panel {
+  flex: 0 0 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: $breakpoint-lg) {
+    flex: none;
+    width: 100%;
+  }
+
+  .basic-info-card {
+    height: fit-content;
+
+    .card-header {
+      padding: 16px 16px 8px 16px;
+      border-bottom: 1px solid $border-color;
+      margin-bottom: 16px;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+
+    ::ng-deep .x-card-body {
+      padding: 0 16px 16px 16px;
+    }
+
+    ::ng-deep {
+      .x-form-row {
+        margin-bottom: 16px;
+      }
+
+      .x-form-label {
+        font-weight: 500;
+        color: $text-primary;
+        margin-bottom: 4px;
+      }
+
+      .x-input,
+      .x-textarea,
+      .x-select {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.edit-right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+
+  .properties-card,
+  .location-card,
+  .media-card {
+    flex: 0 0 auto;
+
+    .card-header {
+      padding: 16px 16px 8px 16px;
+      border-bottom: 1px solid $border-color;
+      margin-bottom: 16px;
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+
+    ::ng-deep .x-card-body {
+      padding: 0 16px 16px 16px;
+    }
+  }
+
+  .properties-card {
+    .custom-table {
+      margin-bottom: 16px;
+
+      th {
+        background-color: $github-bg;
+        font-weight: 600;
+        font-size: 13px;
+        color: $text-primary;
+      }
+
+      td {
+        padding: 8px 12px;
+        vertical-align: middle;
+      }
+
+      input, .x-input, .x-select {
+        font-size: 13px;
+        height: 32px;
+      }
+
+      .media-input-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        ::ng-deep {
+          .x-input {
+            flex: 1;
+          }
+
+          .x-upload {
+            flex: 0 0 auto;
+          }
+        }
+      }
+
+      .full-width {
+        width: 100%;
+
+        ::ng-deep {
+          .x-select,
+          .x-input,
+          .x-input-number,
+          .x-date-picker,
+          .x-find {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .location-card {
+    ::ng-deep {
+      .leaflet-container {
+        border-radius: $radius-sm;
+        border: 1px solid $border-color;
+      }
+    }
+  }
+
+  .media-card {
+    .gallery {
+      margin-top: 16px;
+
+      .warp {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+
+      .thumbnail {
+        height: 80px;
+        border-radius: $radius-sm;
+        border: 1px solid $border-color;
+      }
+    }
+  }
+}
+
+.edit-footer {
+  margin-top: 24px;
+  padding: 16px 0;
+  border-top: 1px solid $border-color;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+// 优化卡片样式
+::ng-deep {
+  .basic-info-card,
+  .properties-card,
+  .location-card,
+  .media-card {
+    .x-card {
+      border: 1px solid $border-color;
+      border-radius: $radius-md;
+      box-shadow: $github-card-shadow;
+      background: $github-header;
+    }
+  }
+}
+
+// 响应式优化
+@media (max-width: $breakpoint-md) {
+  .edit-layout {
+    .edit-left-panel {
+      flex: none;
+    }
+
+    .edit-right-panel {
+      .custom-table {
+        font-size: 12px;
+
+        th, td {
+          padding: 6px 8px;
+        }
+      }
+
+      .gallery .warp {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+  }
+}
+
+.entity-input-group {
+  position: relative;
+  width: 100%;
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.4;
+    background-color: #fff;
+    transition: border-color 0.2s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border-color: #0969da;
+      box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.1);
+    }
+
+    &::placeholder {
+      color: #656d76;
+    }
+  }
+
+  datalist {
+    display: none; // datalist本身是隐藏的，只在输入时显示选项
+  }
+
+  ::ng-deep {
+    .x-input {
+      width: 100%;
+    }
+  }
+}

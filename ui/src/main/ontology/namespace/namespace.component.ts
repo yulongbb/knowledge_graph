@@ -59,7 +59,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
     { id: 'ontologies', label: '本体' },
     { id: 'properties', label: '属性' },
     { id: 'qualifiers', label: '限定' },
-    { id: 'tags', label: '标签字典' },
+    { id: 'tags', label: '字典字典' },
   ];
   activeTab = 'ontologies';
   selectedNamespace: any = null;
@@ -115,7 +115,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   ontologyControls: XControl[] = [
     { control: 'input', id: 'name', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
-    { control: 'input', id: 'label', label: '标签' },
+    { control: 'input', id: 'label', label: '字典' },
     {
       control: 'select',
       id: 'namespace',
@@ -128,7 +128,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
   propertyFormMode: 'add' | 'edit' | 'view' | null = null;
   propertyForm = new UntypedFormGroup({});
   propertyControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID', required: true },
     { control: 'input', id: 'name', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     {
@@ -137,23 +136,23 @@ export class NamespaceComponent extends PageBase implements OnInit {
       label: '值类型',
       required: true,
       data: [
-        'commonsMedia',
-        'external-id',
-        'string',
-        'url',
-        'math',
-        'monolingualtext',
-        'musical-notation',
-        'globe-coordinate',
-        'quantity',
-        'time',
-        'tabular-data',
-        'geo-shape',
-        'wikibase-item',
-        'wikibase-property',
-        'wikibase-lexeme',
-        'wikibase-form',
-        'wikibase-sense',
+        { label: 'commonsMedia', value: 'string' },
+        { label: 'external-id', value: 'string' },
+        { label: 'string', value: 'string' },
+        { label: 'url', value: 'string' },
+        { label: 'math', value: 'string' },
+        { label: 'monolingualtext', value: 'monolingualtext' },
+        { label: 'musical-notation', value: 'string' },
+        { label: 'globe-coordinate', value: 'globecoordinate' },
+        { label: 'quantity', value: 'quantity' },
+        { label: 'time', value: 'time' },
+        { label: 'tabular-data', value: 'string' },
+        { label: 'geo-shape', value: 'string' },
+        { label: 'wikibase-item', value: 'wikibase-entityid' },
+        { label: 'wikibase-property', value: 'wikibase-entityid' },
+        { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
+        { label: 'wikibase-form', value: 'wikibase-entityid' },
+        { label: 'wikibase-sense', value: 'wikibase-entityid' }
       ],
     },
     { control: 'input', id: 'group', label: '分组' },
@@ -164,7 +163,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
   qualifierFormMode: 'add' | 'edit' | 'view' | null = null;
   qualifierForm = new UntypedFormGroup({});
   qualifierControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID' },
     { control: 'input', id: 'label', label: '名称', required: true },
     { control: 'textarea', id: 'description', label: '描述' },
     {
@@ -173,40 +171,45 @@ export class NamespaceComponent extends PageBase implements OnInit {
       label: '值类型',
       required: true,
       data: [
-        'commonsMedia',
-        'external-id',
-        'string',
-        'url',
-        'math',
-        'monolingualtext',
-        'musical-notation',
-        'globe-coordinate',
-        'quantity',
-        'time',
-        'tabular-data',
-        'geo-shape',
-        'wikibase-item',
-        'wikibase-qualify',
-        'wikibase-lexeme',
-        'wikibase-form',
-        'wikibase-sense',
+        { label: 'commonsMedia', value: 'string' },
+        { label: 'external-id', value: 'string' },
+        { label: 'string', value: 'string' },
+        { label: 'url', value: 'string' },
+        { label: 'math', value: 'string' },
+        { label: 'monolingualtext', value: 'monolingualtext' },
+        { label: 'musical-notation', value: 'string' },
+        { label: 'globe-coordinate', value: 'globecoordinate' },
+        { label: 'quantity', value: 'quantity' },
+        { label: 'time', value: 'time' },
+        { label: 'tabular-data', value: 'string' },
+        { label: 'geo-shape', value: 'string' },
+        { label: 'wikibase-item', value: 'wikibase-entityid' },
+        { label: 'wikibase-qualify', value: 'wikibase-entityid' },
+        { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
+        { label: 'wikibase-form', value: 'wikibase-entityid' },
+        { label: 'wikibase-sense', value: 'wikibase-entityid' }
       ],
     },
-    { control: 'switch', id: 'isPrimary', label: '是否为主限定' },
   ];
 
   // Add tag form related variables
   tagFormMode: 'add' | 'edit' | 'view' | null = null;
   tagForm = new UntypedFormGroup({});
   tagControls: XControl[] = [
-    { control: 'input', id: 'id', label: 'ID' },
     { control: 'input', id: 'name', label: '名称', required: true },
     {
       control: 'select',
       id: 'type',
       label: '类型',
       required: true,
-      data: ['string', 'number', 'date', 'object', 'array', 'boolean'],
+      data: [
+        { label: 'string', value: 'string' },
+        { label: 'monolingualtext', value: 'monolingualtext' },
+        { label: 'globecoordinate', value: 'globecoordinate' },
+        { label: 'quantity', value: 'quantity' },
+        { label: 'time', value: 'time' },
+        { label: 'wikibase-entityid', value: 'wikibase-entityid' }
+      ],
     },
   ];
 
@@ -245,29 +248,27 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
   // Load namespaces for the dropdown
   loadNamespaces() {
-    this.namespaceService
-      .getList(1, 1000)
-      .subscribe({
-        next: (response: any) => {
-          this.namespaces = response.list || [];
-          // 下拉选项的 value 改为 name
-          this.namespaceOptions = this.namespaces.map((ns) => ({
-            label: ns.name as string,
-            value: String(ns.name),
-          }));
+    this.namespaceService.getList(1, 1000).subscribe({
+      next: (response: any) => {
+        this.namespaces = response.list || [];
+        // 下拉选项的 value 改为 name
+        this.namespaceOptions = this.namespaces.map((ns) => ({
+          label: ns.name as string,
+          value: String(ns.name),
+        }));
 
-          console.log('Namespace options:', this.namespaceOptions);
+        console.log('Namespace options:', this.namespaceOptions);
 
-          if (this.namespaces.length > 0) {
-            this.selectedNamespaceId = String(this.namespaces[0].name);
-            this.onNamespaceSelected(this.selectedNamespaceId);
-          }
-        },
-        error: (error) => {
-          console.error('Failed to load namespaces:', error);
-          this.message.error('加载命名空间失败');
-        },
-      });
+        if (this.namespaces.length > 0) {
+          this.selectedNamespaceId = String(this.namespaces[0].name);
+          this.onNamespaceSelected(this.selectedNamespaceId);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load namespaces:', error);
+        this.message.error('加载命名空间失败');
+      },
+    });
   }
 
   // Select a namespace and update the dropdown
@@ -430,7 +431,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load tags for property:', error);
-        this.message.error('加载属性标签失败');
+        this.message.error('加载属性字典失败');
         this.tagLoading = false;
       },
     });
@@ -492,18 +493,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-            {
-              field: 'namespaceId',
-              value: '',
-              operation: 'isNull' as XOperation,
-            },
-          ]
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
           : [
-            {
-              field: 'namespaceId',
-              value: this.selectedNamespace.id.toString(),
-            },
-          ];
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
@@ -521,18 +522,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-            {
-              field: 'namespaceId',
-              value: '',
-              operation: 'isNull' as XOperation,
-            },
-          ]
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
           : [
-            {
-              field: 'namespaceId',
-              value: this.selectedNamespace.id.toString(),
-            },
-          ];
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
@@ -555,7 +556,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
           namespace: this.selectedNamespace.id,
           namespaceId: this.selectedNamespace.id,
           properties: this.selectedProperty ? [this.selectedProperty] : [],
-
         });
         break;
 
@@ -566,7 +566,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.qualifyService.get(item.id).subscribe((data: any) => {
           this.qualifierForm.patchValue({
             ...data,
-            namespace: data.namespaceId
+            namespace: data.namespaceId,
           });
         });
         break;
@@ -595,10 +595,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
                 error: (error) => {
                   console.error('Failed to delete qualifier:', error);
                   this.message.error('删除限定失败');
-                }
+                },
               });
             }
-          }
+          },
         });
         break;
     }
@@ -615,7 +615,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
     const qualifierData = {
       ...formData,
       properties: this.selectedProperty ? [this.selectedProperty] : [],
-      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null)
+      namespaceId:
+        formData.namespace ||
+        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.qualifierFormMode === 'add') {
@@ -629,7 +631,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to add qualifier:', error);
           this.message.error('新增限定失败: ' + error.message);
-        }
+        },
       });
     } else if (this.qualifierFormMode === 'edit') {
       this.qualifyService.put(qualifierData).subscribe({
@@ -641,7 +643,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         error: (error) => {
           console.error('Failed to edit qualifier:', error);
           this.message.error('编辑限定失败: ' + error.message);
-        }
+        },
       });
     }
   }
@@ -655,7 +657,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
   // Add method to generate unique qualifier ID
   private generateUniqueQualifierId(): string {
     const timestamp = new Date().getTime();
-    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `qual-${timestamp}-${randomPart}`;
   }
 
@@ -672,7 +676,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.message.info('添加新限定');
         break;
       case 'tag':
-        this.message.info('添加新标签');
+        this.message.info('添加新字典');
         break;
     }
   }
@@ -756,18 +760,18 @@ export class NamespaceComponent extends PageBase implements OnInit {
       const filter =
         this.selectedNamespace.name === 'default'
           ? [
-            {
-              field: 'namespaceId',
-              value: '',
-              operation: 'isNull' as XOperation,
-            },
-          ]
+              {
+                field: 'namespaceId',
+                value: '',
+                operation: 'isNull' as XOperation,
+              },
+            ]
           : [
-            {
-              field: 'namespaceId',
-              value: this.selectedNamespace.id.toString(),
-            },
-          ];
+              {
+                field: 'namespaceId',
+                value: this.selectedNamespace.id.toString(),
+              },
+            ];
 
       const finalQuery = {
         ...query,
@@ -777,7 +781,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     };
     this.tagDataLoaded = true;
   }
-
 
   // Add methods for adding qualifiers and tags associated with a selected property
   addQualifierForProperty(property: any) {
@@ -866,12 +869,48 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.tagFormMode = 'add';
         this.tagForm.reset();
 
+        // 获取属性类型，找到对应的字典类型
+        let tagType = '';
+        if (this.selectedProperty && this.selectedProperty.type) {
+          const typeMap: Record<string, string> = {
+            'commonsMedia': 'string',
+            'external-id': 'string',
+            'string': 'string',
+            'url': 'string',
+            'math': 'string',
+            'monolingualtext': 'monolingualtext',
+            'musical-notation': 'string',
+            'globe-coordinate': 'globecoordinate',
+            'quantity': 'quantity',
+            'time': 'time',
+            'tabular-data': 'string',
+            'geo-shape': 'string',
+            'wikibase-item': 'wikibase-entityid',
+            'wikibase-qualify': 'wikibase-entityid',
+            'wikibase-lexeme': 'wikibase-entityid',
+            'wikibase-form': 'wikibase-entityid',
+            'wikibase-sense': 'wikibase-entityid'
+          };
+          tagType = typeMap[this.selectedProperty.type] || '';
+        }
+
         this.tagForm.patchValue({
           id: newId,
           namespace: this.selectedNamespace.id,
           namespaceId: this.selectedNamespace.id,
-          properties: this.selectedProperty ? [this.selectedProperty] : []
+          properties: this.selectedProperty ? [this.selectedProperty] : [],
+          type: tagType
         });
+
+        // 强制触发 type 控件的 disable 和 value 赋值
+        setTimeout(() => {
+          const typeControl = this.tagForm.get('type');
+          if (typeControl) {
+            typeControl.setValue(tagType);
+            typeControl.disable();
+          }
+        });
+
         break;
 
       case 'edit':
@@ -881,8 +920,10 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.tagService.get(item.id).subscribe((data: any) => {
           this.tagForm.patchValue({
             ...data,
-            namespace: data.namespaceId
+            namespace: data.namespaceId,
           });
+          const typeControlEdit = this.tagForm.get('type');
+          if (typeControlEdit) typeControlEdit.disable();
         });
         break;
 
@@ -892,28 +933,36 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
         this.tagService.get(item.id).subscribe((data) => {
           this.tagForm.patchValue(data);
+          // 强制设置 type 控件的值并禁用，确保选中正确类型
+          setTimeout(() => {
+            const typeControlInfo = this.tagForm.get('type');
+            if (typeControlInfo) {
+              typeControlInfo.setValue(data.type || '');
+              typeControlInfo.disable();
+            }
+          });
         });
         break;
 
       case 'delete':
         this.msgBox.confirm({
           title: '确认删除',
-          content: `确定要删除标签 "${item.name}" 吗？`,
+          content: `确定要删除字典 "${item.name}" 吗？`,
           type: 'warning',
           callback: (action: XMessageBoxAction) => {
             if (action === 'confirm') {
               this.tagService.delete(item.id).subscribe({
                 next: () => {
-                  this.message.success('删除标签成功');
+                  this.message.success('删除字典成功');
                   this.loadTagsForProperty(this.selectedProperty);
                 },
                 error: (error) => {
                   console.error('Failed to delete tag:', error);
-                  this.message.error('删除标签失败');
-                }
+                  this.message.error('删除字典失败');
+                },
               });
             }
-          }
+          },
         });
         break;
     }
@@ -925,36 +974,42 @@ export class NamespaceComponent extends PageBase implements OnInit {
       return;
     }
 
+    // 保存前恢复 type 控件可编辑（防止后续操作受影响）
+    const typeControl = this.tagForm.get('type');
+    if (typeControl) typeControl.enable();
+
     const formData = this.tagForm.value;
     const tagData = {
       ...formData,
       properties: this.selectedProperty ? [this.selectedProperty] : [],
-      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null)
+      namespaceId:
+        formData.namespace ||
+        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.tagFormMode === 'add') {
       this.tagService.post(tagData).subscribe({
         next: () => {
-          this.message.success('新增标签成功');
+          this.message.success('新增字典成功');
           this.cancelTagForm();
           this.loadTagsForProperty(this.selectedProperty);
         },
         error: (error) => {
           console.error('Failed to add tag:', error);
-          this.message.error('新增标签失败: ' + error.message);
-        }
+          this.message.error('新增字典失败: ' + error.message);
+        },
       });
     } else if (this.tagFormMode === 'edit') {
       this.tagService.put(tagData).subscribe({
         next: () => {
-          this.message.success('编辑标签成功');
+          this.message.success('编辑字典成功');
           this.cancelTagForm();
           this.loadTagsForProperty(this.selectedProperty);
         },
         error: (error) => {
           console.error('Failed to edit tag:', error);
-          this.message.error('编辑标签失败: ' + error.message);
-        }
+          this.message.error('编辑字典失败: ' + error.message);
+        },
       });
     }
   }
@@ -962,11 +1017,16 @@ export class NamespaceComponent extends PageBase implements OnInit {
   cancelTagForm() {
     this.tagFormMode = null;
     this.tagForm.reset();
+    // 恢复 type 控件可编辑
+    const typeControl = this.tagForm.get('type');
+    if (typeControl) typeControl.enable();
   }
 
   private generateUniqueTagId(): string {
     const timestamp = new Date().getTime();
-    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `tag-${timestamp}-${randomPart}`;
   }
 
@@ -974,7 +1034,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
   handlePropertyAction(type: string, item?: any) {
     switch (type) {
       case 'add':
-        const newId = this.generateUniquePropertyId();
         this.propertyFormMode = 'add';
         this.propertyForm.reset();
 
@@ -1045,7 +1104,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
     const propertyData = {
       ...formData,
-      namespaceId: formData.namespace || (this.selectedNamespace ? this.selectedNamespace.id : null),
+      namespaceId:
+        formData.namespace ||
+        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.propertyFormMode === 'add') {
@@ -1090,8 +1151,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
   private generateUniquePropertyId(): string {
     const timestamp = new Date().getTime();
-    const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `prop-${timestamp}-${randomPart}`;
   }
 }
-

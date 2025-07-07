@@ -22,12 +22,12 @@
           <!-- 必填字段 -->
           <div class="required-section">
             <div class="form-field">
-              <label class="field-label required">类型</label>
+              <label class="field-label required">本体类型</label>
               <div class="custom-tree-select">
                 <x-input
                   [(ngModel)]="selectedTypeName" 
                   readonly 
-                  placeholder="请选择类型 (来自{{formData.namespace}})"
+                  placeholder="请选择本体类型 (来自{{formData.namespace}}命名空间)"
                   (click)="toggleTypeSelect($event)"
                   suffix="angle-down">
                 </x-input>
@@ -37,14 +37,19 @@
                     <div class="tree-search">
                       <x-input
                         [(ngModel)]="typeSearchText" 
-                        placeholder="搜索{{formData.namespace}}命名空间下的类型..."
+                        placeholder="搜索{{formData.namespace}}命名空间下的本体..."
                         prefix="search"
                         size="small">
                       </x-input>
                     </div>
-                    <div class="tree-list">
-                      <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: typeTree }">
-                      </ng-container>
+                    <div class="tree-content">
+                      <x-tree 
+                        [data]="typeTree"
+                        expandedLevel="1"
+                        checkbox="false"
+                        [nodeHeight]="2"
+                        (activatedChange)="onTreeNodeActivated($event)">
+                      </x-tree>
                     </div>
                   </div>
                 </div>
@@ -117,26 +122,3 @@
     <x-button type="primary" [disabled]="!isFormValid()" (click)="save()">保存</x-button>
   </div>
 </div>
-
-<ng-template #treeNode let-nodes>
-  <ul class="tree-list">
-    <li *ngFor="let node of filterNodes(nodes)" class="tree-item">
-      <div class="tree-item-content" (click)="selectType(node, $event)">
-        <x-icon 
-          *ngIf="node.children?.length" 
-          class="tree-toggle" 
-          [class.expanded]="node.expanded"
-          [type]="node.expanded ? 'angle-down' : 'angle-right'"
-          (click)="toggleNode(node, $event)">
-        </x-icon>
-        <span class="tree-label" [class.selected]="node.id === formData.type">
-          {{ node.name }}
-        </span>
-      </div>
-      <div class="tree-children" *ngIf="node.children?.length && node.expanded">
-        <ng-container *ngTemplateOutlet="treeNode; context: { $implicit: node.children }">
-        </ng-container>
-      </div>
-    </li>
-  </ul>
-</ng-template>

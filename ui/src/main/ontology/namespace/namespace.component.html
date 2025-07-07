@@ -117,7 +117,7 @@
           <!-- Lower section: Tags -->
           <div class="tag-section">
             <div class="section-header">
-              <h4>标签</h4>
+              <h4>字典</h4>
               <div class="section-actions" *ngIf="selectedProperty">
                 <x-button type="primary" icon="fto-plus" (click)="handleTagAction('add', selectedProperty)" size="mini">
                   新增
@@ -131,14 +131,14 @@
                 [data]="tagData" [bodyColumnTpl]="{ actions: tagActionsTpl }" [hiddenWrapBorder]="true"
                 [showHeader]="false" [showPagination]="false" loading></x-table>
               <div class="empty-message" *ngIf="selectedProperty && !hasTags">
-                <p>该属性没有关联的标签</p>
+                <p>该属性没有关联的字典</p>
               </div>
             </div>
 
             <!-- Show tag form when adding/editing -->
             <div *ngIf="tagFormMode">
               <div class="form-header">
-                <h4>{{ tagFormMode === 'add' ? '新增标签' : tagFormMode === 'edit' ? '编辑标签' : '查看标签' }}</h4>
+                <h4>{{ tagFormMode === 'add' ? '新增字典' : tagFormMode === 'edit' ? '编辑字典' : '查看字典' }}</h4>
               </div>
               <x-form [formGroup]="tagForm" [controls]="tagControls" [disabled]="tagFormMode === 'view'" direction="row"
                 labelSuffix=":" labelWidth="5rem" width="100%" labelAlign="end" span="20" space="1"></x-form>

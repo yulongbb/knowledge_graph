@@ -91,6 +91,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   videoLoaded: boolean = false;
 
+  // 添加标签选项缓存
+  private tagOptionsCache: Map<string, any[]> = new Map();
+
   options = {
     layers: [
       tileLayer('http://localhost/gis/{z}/{x}/{y}.jpg', {
@@ -648,6 +651,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
             type: 'string',
           },
           datatype: 'string',
+          label: '', // 添加 label 字段用于显示
         },
         type: 'statement',
         rank: 'normal',
@@ -671,18 +675,18 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
     };
     console.log(row);
-    // if (row._key) {
-    //   this.nodeService.updateEdge(row).subscribe(() => {
-    //     this.message.success('更新成功！');
-    //   });
-    // } else {
-    //   this.nodeService.addEdge(row).subscribe((data) => {
-    //     console.log(data);
-    //     const index = this.statements().findIndex((x: any) => x === row);
-    //     this.statements()[index]['_key'] = data['_key'];
-    //     this.message.success('新增成功！');
-    //   });
-    // }
+    if (row._key) {
+      this.nodeService.updateEdge(row).subscribe(() => {
+        this.message.success('更新成功！');
+      });
+    } else {
+      this.nodeService.addEdge(row).subscribe((data) => {
+        console.log(data);
+        const index = this.statements().findIndex((x: any) => x === row);
+        this.statements()[index]['_key'] = data['_key'];
+        this.message.success('新增成功！');
+      });
+    }
   }
 
   del(row: any) {
@@ -716,9 +720,27 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   change(statements: any) {
-    statements.mainsnak.datatype = this.properties().filter(
-      (p: any) => p.name == statements.mainsnak.label
-    )[0].type;
+    console.log('Property changed:', statements);
+    
+    // 根据选择的属性名找到对应的属性配置
+    const selectedProperty = this.properties().find(
+      (p: any) => p.name === statements.mainsnak.label
+    );
+    
+    if (!selectedProperty) {
+      console.log('No property found for:', statements.mainsnak.label);
+      return;
+    }
+
+    console.log('Property changed to:', selectedProperty);
+
+    statements.mainsnak.datatype = selectedProperty.type;
+    statements.mainsnak.property = `P${selectedProperty.id}`;
+
+    // 立即预加载该属性的标签
+    this.loadTagsForProperty(selectedProperty.id.toString());
+
+    // 根据数据类型初始化对应的数据结构
     switch (statements.mainsnak.datatype) {
       case 'commonsMedia':
       case 'external-id':
@@ -727,20 +749,12 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       case 'math':
       case 'monolingualtext':
       case 'musical-notation':
-        statements.mainsnak.property = `P${this.properties().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
         statements.mainsnak.datavalue = {
           value: '',
           type: 'string',
         };
         break;
       case 'globe-coordinate':
-        statements.mainsnak.property = `P${this.properties().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
         statements.mainsnak.datavalue = {
           value: {
             latitude: 0,
@@ -753,10 +767,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         };
         break;
       case 'quantity':
-        statements.mainsnak.property = `P${this.properties().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
         statements.mainsnak.datavalue = {
           value: {
             amount: 0,
@@ -768,10 +778,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         };
         break;
       case 'time':
-        statements.mainsnak.property = `P${this.properties().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
         statements.mainsnak.datavalue = {
           value: {
             time: '',
@@ -789,31 +795,137 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       case 'wikibase-lexeme':
       case 'wikibase-form':
       case 'wikibase-sense':
-        statements.mainsnak.property = `P${this.properties().filter(
-          (p: any) => p.name == statements.mainsnak.label
-        )[0].id
-          }`;
         statements.mainsnak.datavalue = {
           value: {
-            'entity-type': statements.mainsnak.datatype.replace(
-              'wikibase-',
-              ''
-            ),
+            'entity-type': statements.mainsnak.datatype.replace('wikibase-', ''),
             'numeric-id': 0,
             id: '',
+            label: '', // 添加 label 字段用于显示
           },
           type: 'wikibase-entityid',
         };
         break;
     }
-    console.log(statements);
+    
+    console.log('Updated statements:', statements);
   }
 
-  trustUrl(url: string) {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  // 新增：获取属性选择选项
+  getPropertyOptions(): any[] {
+    return this.properties()?.map((property: any) => ({
+      label: property.name,
+      value: property.name,
+      type: property.type
+    })) || [];
   }
 
-  renderedContent: string = '';
+  // 新增：获取实体选择选项
+  getEntityOptions(): any[] {
+    // 这里可以根据需要返回可选的实体列表
+    // 暂时返回空数组，可以后续扩展为从API获取实体列表
+    return [];
+  }
+
+  // 新增：获取属性对应的标签选项
+  getTagOptionsForProperty(propertyName: string): any[] {
+    if (!propertyName || !this.properties()) {
+      return [];
+    }
+
+    // 找到对应的属性配置
+    const property = this.properties().find((p: any) => p.name === propertyName);
+    if (!property || !property.id) {
+      return [];
+    }
+
+    // 这里应该调用标签服务获取该属性关联的标签
+    // 暂时返回空数组，需要在实际使用时加载数据
+    return this.getTagsForProperty(property.id);
+  }
+
+  // 修改：获取特定属性行的标签选项 - 移除调试信息，专注于功能
+  getTagOptionsForRow(row: any): any[] {
+    if (!row?.mainsnak?.label) {
+      return [];
+    }
+
+    // 直接使用属性名称找到对应的属性配置
+    const property = this.properties()?.find((p: any) => p.name === row.mainsnak.label);
+    if (!property || !property.id) {
+      return [];
+    }
+    
+    // 使用属性ID获取标签
+    const tags = this.getTagsForProperty(property.id.toString());
+    
+    // 确保返回的数据格式正确
+    return tags.filter(tag => tag && tag.value);
+  }
+
+  // 修改：根据属性ID获取标签数据
+  getTagsForProperty(propertyId: string): any[] {
+    // 从缓存中获取
+    if (this.tagOptionsCache.has(propertyId)) {
+      return this.tagOptionsCache.get(propertyId) || [];
+    }
+
+    // 如果缓存中没有，异步加载
+    this.loadTagsForProperty(propertyId);
+    return [];
+  }
+
+  // 修改：异步加载属性对应的标签
+  private loadTagsForProperty(propertyId: string): void {
+    if (!propertyId) {
+      return;
+    }
+
+    this.tagService.getList(1, 100, {
+      filter: [
+        {
+          field: 'id',
+          value: propertyId,
+          relation: 'properties',
+          operation: '=',
+        },
+      ],
+    }).subscribe({
+      next: (response: any) => {
+        const tags = response.list || [];
+        const tagOptions = tags.map((tag: any) => ({
+          label: tag.name,
+          value: tag.name, // 确保value就是name，用于输入框填充
+          id: tag.id // 保留id作为引用
+        }));
+        
+        // 缓存结果
+        this.tagOptionsCache.set(propertyId, tagOptions);
+        
+        // 触发变更检测以更新UI
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Failed to load tags for property:', error);
+        this.tagOptionsCache.set(propertyId, []);
+      }
+    });
+  }
+
+  // 新增：为现有属性预加载标签
+  private preloadTagsForExistingProperties(): void {
+    if (!this.statements() || !this.properties()) {
+      return;
+    }
+
+    this.statements().forEach((statement: any) => {
+      if (statement.mainsnak?.label) {
+        const property = this.properties().find((p: any) => p.name === statement.mainsnak.label);
+        if (property && property.id) {
+          this.loadTagsForProperty(property.id.toString());
+        }
+      }
+    });
+  }
 
   action(type: string) {
     switch (type) {
@@ -864,25 +976,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               .getAllParentIds(this.item.type)
               .subscribe((parents: any) => {
                 parents.push(this.item.type);
-                // this.tagService
-                //   .getList(1, 500, {
-                //     filter: [
-                //       {
-                //         field: 'id',
-                //         value: parents as string[],
-                //         relation: 'schemas',
-                //         operation: 'IN',
-                //       },
-                //     ],
-                //   })
-                //   .subscribe((data: any) => {
-                //     let tags: any = {};
-                //     data.list.forEach((tag: any) => {
-                //       tags[tag.type] = tags[tag.type] ?? [];
-                //       tags[tag.type].push(tag.name);
-                //     });
-                //     this.tags = tags;
-                //   });
                 this.propertyService
                   .getList(1, 50, {
                     filter: [
@@ -931,6 +1024,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                           this.statements = signal(statements);
                           this.claims = signal(statements);
                         });
+                        
+                        // 预加载现有属性的标签
+                        this.preloadTagsForExistingProperties();
                       });
                   });
               });
@@ -1228,4 +1324,39 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   editTemplate() {
     this.router.navigate(['/start/search/template', this.id]);
   }
+
+  // 修改：处理实体值变更 - 确保使用name值
+  onEntityValueChange(selectedValue: string, row: any): void {
+    console.log('Selected value:', selectedValue);
+    if (!selectedValue || !row?.mainsnak?.datavalue) {
+      return;
+    }
+
+    // 根据数据类型处理不同的值设置
+    switch (row.mainsnak.datatype) {
+      case 'wikibase-item':
+        if (row.mainsnak.datavalue.value) {
+          row.mainsnak.datavalue.value.label = selectedValue;
+          row.mainsnak.datavalue.value.id = selectedValue; // 直接使用名称作为ID
+        }
+        break;
+      case 'string':
+      default:
+        // 对于string类型和其他类型，直接设置值
+        row.mainsnak.datavalue.value = selectedValue;
+        break;
+    }
+  }
+
+  // 修改：处理标签选择变更 - 确保使用name值
+  onTagValueChange(selectedValue: string, row: any): void {
+    console.log('Tag value selected:', selectedValue);
+    if (!selectedValue || !row?.mainsnak?.datavalue) {
+      return;
+    }
+
+    // 无论选择还是手动输入，都直接使用输入的值
+    row.mainsnak.datavalue.value = selectedValue;
+  }
 }
+       

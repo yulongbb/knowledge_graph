@@ -179,131 +179,178 @@
         (ngModelChange)="onNamespaceChange($event)">
       </x-select>
 
-      <x-collapse bordered>
-        <x-collapse-panel label="基本信息" active="true">
-          <x-form #form [disabled]="disabled" [controls]="controls" direction="row" labelSuffix=":" labelWidth="6rem"
-            width="100%" labelAlign="end" span="24" space="2"></x-form>
-          <br />
-        </x-collapse-panel>
-      </x-collapse>
-
-      <x-collapse>
-        <x-collapse-panel label="属性信息" active="true">
-          <!-- Standard HTML Table with Optimized Styles -->
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th width="100px" class="sticky-left">序号</th>
-                <th width="200px">属性名</th>
-                <th>属性值</th>
-                <th width="200px">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of statements(); let i = index">
-                <!-- Index Column -->
-                <td class="sticky-left">{{ i + 1 }}</td>
-
-                <!-- Property Column -->
-                <td>
-                  <input class="full-width" list="options" id="property" name="property"
-                    [(ngModel)]="row.mainsnak.label">
-
-                  <datalist id="options">
-                    <option *ngFor="let property of properties()" [value]="property.name">
-                  </datalist>
-                  <!-- <x-select class="full-width" [nodeTpl]="nodeTpl" [(ngModel)]="row.mainsnak.label"
-                      [data]="properties" (ngModelChange)="change(row)"></x-select> -->
-                </td>
-
-                <!-- Name Column -->
-                <td>
-                  <ng-container [ngSwitch]="row?.mainsnak?.datatype">
-                    <!-- Monolingual Text -->
-                    <quill-editor *ngSwitchCase="'monolingualtext'"
-                      [(ngModel)]="row.mainsnak.datavalue.value"></quill-editor>
-                    <!-- String, URL, Commons Media, Wikibase Item -->
-                    <x-input *ngSwitchCase="'string'" class="full-width"
-                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                    <x-input *ngSwitchCase="'url'" class="full-width"
-                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                    <x-input *ngSwitchCase="'commonsMedia'" class="full-width"
-                      [(ngModel)]="row.mainsnak.datavalue.value"></x-input>
-                    <x-input *ngSwitchCase="'wikibase-item'" class="full-width"
-                      [(ngModel)]="row.mainsnak.datavalue.value.label"></x-input>
-                    <!-- Quantity -->
-                    <x-input-number *ngSwitchCase="'quantity'" class="full-width"
-                      [(ngModel)]="row.mainsnak.datavalue.value.amount"></x-input-number>
-                    <!-- Time -->
-                    <x-date-picker *ngSwitchCase="'time'"
-                      [(ngModel)]="row.mainsnak.datavalue.value.time"></x-date-picker>
-                    <!-- Globe Coordinate -->
-                    <x-input-group *ngSwitchCase="'globe-coordinate'" class="full-width" compact>
-                      <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="经度"></x-input>
-                      <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="纬度"></x-input>
-                    </x-input-group>
-                    <!-- File Upload (if needed) -->
-                    <x-upload *ngIf="row?.mainsnak?.datatype === 'commonsMedia'" (uploadSuccess)="upload($event, row)"
-                      action="http://localhost:3000/api/minio-client/uploadFile"></x-upload>
-                  </ng-container>
-                </td>
-
-                <!-- Actions Column -->
-                <td>
-                  <x-link type="primary" (click)="save(row)">保存</x-link>
-                  <x-link type="danger" (click)="del(row)">删除</x-link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Add Button -->
-          <x-button [style.marginTop.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
-
-          <!-- Node Template for Select -->
-          <ng-template #nodeTpl let-node="$node">
-            <ng-container *ngIf="node">
-              <span class="select-item">{{ node.label }}</span>
-            </ng-container>
-          </ng-template>
-        </x-collapse-panel>
-      </x-collapse>
-      <!-- 
-      <x-collapse>
-        <x-collapse-panel label="标签标注" style="overflow: scroll">
-          <div style="display: block; width: 100%; overflow: scroll">
-            <div *ngFor="let t of tags | keyvalue">
-              <x-checkbox [label]="t.key" direction="row" [data]="t.value" [(ngModel)]="tag" tagBordered="false"
-                tag></x-checkbox>
+      <!-- 编辑页面左右分栏布局 -->
+      <div class="edit-layout">
+        <!-- 左侧基本信息 -->
+        <div class="edit-left-panel">
+          <x-card class="basic-info-card">
+            <div class="card-header">
+              <h3>基本信息</h3>
             </div>
-          </div>
-          <div class="row">
-            标签：
-            <ng-container *ngFor="let item of tag(); trackBy: trackByFn">
-              <x-tag type="primary" closable (close)="close(item)">{{
-                item
-                }}</x-tag>
-            </ng-container>
-          </div>
-        </x-collapse-panel>
-      </x-collapse> -->
-      <x-collapse>
-        <x-collapse-panel label="地理位置">
-          <div style="height: 300px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
-            [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
-        </x-collapse-panel>
-      </x-collapse>
-      <x-collapse>
-        <x-collapse-panel label="上传图片" (paste)="onImagePaste($event)">
-          <div class="row">
+            <x-form #form [disabled]="disabled" [controls]="controls" direction="column" labelSuffix=":" 
+              labelWidth="100%" width="100%" labelAlign="start" span="24" space="2"></x-form>
+          </x-card>
+        </div>
+
+        <!-- 右侧属性和媒体信息 -->
+        <div class="edit-right-panel">
+          <!-- 属性信息 -->
+          <x-card class="properties-card">
+            <div class="card-header">
+              <h3>属性信息</h3>
+            </div>
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th width="60px" class="sticky-left">序号</th>
+                  <th width="150px">属性名</th>
+                  <th>属性值</th>
+                  <th width="120px">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of statements(); let i = index">
+                  <td class="sticky-left">{{ i + 1 }}</td>
+                  <td>
+                    <x-select 
+                      class="full-width" 
+                      [(ngModel)]="row.mainsnak.label"
+                      [data]="getPropertyOptions()"
+                      placeholder="请选择属性"
+                      (ngModelChange)="change(row)">
+                    </x-select>
+                  </td>
+                  <td>
+                    <ng-container [ngSwitch]="row?.mainsnak?.datatype">
+                      <quill-editor 
+                        *ngSwitchCase="'monolingualtext'"
+                        [(ngModel)]="row.mainsnak.datavalue.value">
+                      </quill-editor>
+                      
+                      <div *ngSwitchCase="'string'" class="entity-input-group">
+                        <input
+                          class="full-width"
+                          [(ngModel)]="row.mainsnak.datavalue.value"
+                          [attr.list]="'string-datalist-' + i"
+                          placeholder="请输入或选择值"
+                          (ngModelChange)="onTagValueChange($event, row)"
+                          type="text">
+                        <datalist [id]="'string-datalist-' + i">
+                          <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
+                            {{ option.label }}
+                          </option>
+                        </datalist>
+                      </div>
+                      
+                      <x-input 
+                        *ngSwitchCase="'url'" 
+                        class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value"
+                        placeholder="请输入URL">
+                      </x-input>
+                      
+                      <div *ngSwitchCase="'commonsMedia'" class="media-input-group">
+                        <x-input 
+                          class="full-width"
+                          [(ngModel)]="row.mainsnak.datavalue.value"
+                          placeholder="文件名或URL">
+                        </x-input>
+                        <x-upload 
+                          action="http://localhost:3000/api/minio-client/uploadFile"
+                          (uploadSuccess)="upload($event, row)"
+                          [text]="'上传文件'">
+                        </x-upload>
+                      </div>
+                      
+                      <div *ngSwitchCase="'wikibase-item'" class="entity-input-group">
+                        <input
+                          class="full-width"
+                          [(ngModel)]="row.mainsnak.datavalue.value.label"
+                          [attr.list]="'entity-datalist-' + i"
+                          placeholder="请输入或选择实体"
+                          (ngModelChange)="onEntityValueChange($event, row)"
+                          type="text">
+                        <datalist [id]="'entity-datalist-' + i">
+                          <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
+                            {{ option.label }}
+                          </option>
+                        </datalist>
+                      </div>
+                      
+                      <x-input-number 
+                        *ngSwitchCase="'quantity'" 
+                        class="full-width"
+                        [(ngModel)]="row.mainsnak.datavalue.value.amount"
+                        placeholder="请输入数量">
+                      </x-input-number>
+                      
+                      <x-date-picker 
+                        *ngSwitchCase="'time'"
+                        [(ngModel)]="row.mainsnak.datavalue.value.time"
+                        placeholder="请选择日期">
+                      </x-date-picker>
+                      
+                      <x-input-group 
+                        *ngSwitchCase="'globe-coordinate'" 
+                        class="full-width" 
+                        compact>
+                        <x-input 
+                          [(ngModel)]="row.mainsnak.datavalue.value.latitude" 
+                          placeholder="纬度">
+                        </x-input>
+                        <x-input 
+                          [(ngModel)]="row.mainsnak.datavalue.value.longitude" 
+                          placeholder="经度">
+                        </x-input>
+                      </x-input-group>
+                      
+                      <!-- 默认情况 -->
+                      <div *ngSwitchDefault class="entity-input-group">
+                        <input
+                          class="full-width"
+                          [(ngModel)]="row.mainsnak.datavalue.value"
+                          [attr.list]="'default-datalist-' + i"
+                          placeholder="请输入或选择值"
+                          (ngModelChange)="onTagValueChange($event, row)"
+                          type="text">
+                        <datalist [id]="'default-datalist-' + i">
+                          <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
+                            {{ option.label }}
+                          </option>
+                        </datalist>
+                      </div>
+                    </ng-container>
+                  </td>
+                  <td>
+                    <x-link type="primary" (click)="save(row)">保存</x-link>
+                    <x-link type="danger" (click)="del(row)">删除</x-link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <x-button [style.marginTop.rem]="1" (click)="add()" icon="fto-plus" type="primary">新增</x-button>
+          </x-card>
+
+          <!-- 地理位置 -->
+          <x-card class="location-card">
+            <div class="card-header">
+              <h3>地理位置</h3>
+            </div>
+            <div style="height: 250px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
+              [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
+          </x-card>
+
+          <!-- 图片管理 -->
+          <x-card class="media-card">
+            <div class="card-header">
+              <h3>图片管理</h3>
+            </div>
             <x-upload action="http://localhost:3000/api/minio-client/uploadFile" [text]="textTpl" multiple
               [(ngModel)]="imgs" (uploadSuccess)="uploadImage($event)" multipleModel="add"></x-upload>
-
             <ng-template #textTpl>
               <x-icon class="upload-icon" type="fto-upload"></x-icon>
               <span>选择图片</span>
             </ng-template>
-
             <div class="gallery" *ngIf="imgs.length > 0">
               <div class="warp">
                 <div *ngFor="let file of imgs">
@@ -311,45 +358,38 @@
                 </div>
               </div>
             </div>
-          </div>
-        </x-collapse-panel>
-      </x-collapse>
-      <x-collapse>
-        <x-collapse-panel label="上传视频">
-          <div class="row">
+          </x-card>
+
+          <!-- 视频管理 -->
+          <x-card class="media-card">
+            <div class="card-header">
+              <h3>视频管理</h3>
+            </div>
             <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="videos"
               (uploadSuccess)="uploadVideo($event)" multipleModel="add"></x-upload>
-            <ng-template #textTpl>
-              <x-icon class="upload-icon" type="fto-upload"></x-icon>
-              <span>选择视频</span>
-            </ng-template>
             <div class="gallery" *ngIf="vids.length > 0">
               <div class="warp">
                 <div *ngFor="let file of vids">
                   <img [src]="'data:image/jpeg;base64,'+file.thumbnail" class="thumbnail">
                   <x-button (click)="updateTideohumbnail(file.url)" type="primary">更新封面</x-button>
-
                 </div>
               </div>
             </div>
+          </x-card>
 
-          </div>
-        </x-collapse-panel>
-      </x-collapse>
-      <x-collapse>
-        <x-collapse-panel label="上传文件">
-          <div class="row">
+          <!-- 文件管理 -->
+          <x-card class="media-card">
+            <div class="card-header">
+              <h3>文件管理</h3>
+            </div>
             <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="files"
               (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
-            <ng-template #textTpl>
-              <x-icon class="upload-icon" type="fto-upload"></x-icon>
-              <span>选择文件</span>
-            </ng-template>
-          </div>
-        </x-collapse-panel>
-      </x-collapse>
-      <h3>{{ title }}</h3>
-      <div class="app-footer">
+          </x-card>
+        </div>
+      </div>
+
+      <!-- 底部操作按钮 -->
+      <div class="edit-footer">
         <x-buttons space="0.5">
           <x-button (click)="action('cancel')">取消</x-button>
           <x-button type="primary" (click)="!formInvalid && action('save')"
