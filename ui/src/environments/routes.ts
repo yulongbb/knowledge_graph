@@ -1,247 +1,261 @@
-import { Routes } from "@angular/router";
-import { environment } from "./environment";
-import { AuthGuard } from "../services/auth-guard";
+import { Routes } from '@angular/router';
+import { environment } from './environment';
+import { AuthGuard } from '../services/auth-guard';
 
 // 公共路由
 export const shareRoutes: Routes = [
   // 没有权限的显示模块
   {
-    path: "no-auth",
+    path: 'no-auth',
     loadChildren: () =>
-      import("../main/no-auth/no-auth.module").then(x => x.NoAuthModule)
+      import('../main/no-auth/no-auth.module').then((x) => x.NoAuthModule),
   },
   // 错误的路由或不存在的路由指向的模块
   {
-    path: "**",
+    path: '**',
     loadChildren: () =>
-      import("../main/exception/404.module").then(x => x.Exception404Module)
-  }
+      import('../main/exception/404.module').then((x) => x.Exception404Module),
+  },
 ];
 
 // 顶级路由，指向框架页
 export const mainRoutes: Routes = [
   // 登录页
   {
-    path: "login",
+    path: 'login',
     loadChildren: () =>
-      import("../main/login/login.module").then(x => x.LoginModule)
+      import('../main/login/login.module').then((x) => x.LoginModule),
   },
   // index
   {
-    path: "index",
+    path: 'index',
     loadChildren: () =>
-      import("../layout/index/index.module").then(x => x.IndexModule),
+      import('../layout/index/index.module').then((x) => x.IndexModule),
     canActivateChild: [AuthGuard],
-    canLoad: [AuthGuard]
+    canLoad: [AuthGuard],
   },
   {
-    path: "home",
+    path: 'home',
     loadChildren: () =>
-      import("../main/start/home/home.module").then(x => x.HomeModule)
+      import('../main/start/home/home.module').then((x) => x.HomeModule),
   },
   {
-    path: "start",
+    path: 'start',
     loadChildren: () =>
-      import("../main/start/start.module").then(x => x.StartModule),
+      import('../main/start/start.module').then((x) => x.StartModule),
+  },
+  {
+    path: 'visualization',
+    loadChildren: () =>
+      import('../main/visualization/visualization-dashboard.module').then(
+        (x) => x.VisualizationDashboardModule
+      ),
   },
   // 如果路由为空就指向 index
-  { path: "", redirectTo: environment.index, pathMatch: "full" },
-  ...shareRoutes
+  { path: '', redirectTo: environment.index, pathMatch: 'full' },
+  ...shareRoutes,
 ];
 
 // 框架页中对应的路由，指向具体的页面，框架页面中的路由都会带上顶级路由 index 如：/index/workplace
 export const layoutRoutes: Routes = [
-
   // 仪表盘
   {
-    path: "dashboard",
+    path: 'dashboard',
     loadChildren: () =>
-      import("../main/dashboard/dashboard.module").then(x => x.DashboardModule),
-    canLoad: [AuthGuard],
-    data: {
-      title: "dashboard"
-    }
-  },
-  // 仪表盘
-  {
-    path: "graph",
-    loadChildren: () =>
-      import("../main/graph/graph.module").then(x => x.GraphModule),
-    canLoad: [AuthGuard],
-    data: {
-      title: "graph"
-    }
-  },
-  // 仪表盘
-  {
-    path: "map",
-    loadChildren: () =>
-      import("../main/map/map.module").then(x => x.MapModule),
-    canLoad: [AuthGuard],
-    data: {
-      title: "map"
-    }
-  },
-  // 用户管理
-  {
-    path: "users",
-    loadChildren: () =>
-      import("../main/system/users/users.module").then(x => x.UsersModule),
-    canLoad: [AuthGuard],
-    data: {
-      title: "users"
-    }
-  },
-  // 角色管理
-  {
-    path: "roles",
-    loadChildren: () =>
-      import("../main/system/roles/roles.module").then(x => x.RolesModule),
-    canLoad: [AuthGuard],
-    data: {
-      shouldReuse: true
-    }
-  },
-  // 组织管理
-  {
-    path: "organization",
-    loadChildren: () =>
-      import("../main/system/organization/organization.module").then(
-        x => x.OrganizationModule
+      import('../main/dashboard/dashboard.module').then(
+        (x) => x.DashboardModule
       ),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      title: 'dashboard',
+    },
+  },
+
+  // 仪表盘
+  {
+    path: 'graph',
+    loadChildren: () =>
+      import('../main/graph/graph.module').then((x) => x.GraphModule),
+    canLoad: [AuthGuard],
+    data: {
+      title: 'graph',
+    },
+  },
+  // 仪表盘
+  {
+    path: 'map',
+    loadChildren: () =>
+      import('../main/map/map.module').then((x) => x.MapModule),
+    canLoad: [AuthGuard],
+    data: {
+      title: 'map',
+    },
+  },
+  // 用户管理
+  {
+    path: 'users',
+    loadChildren: () =>
+      import('../main/system/users/users.module').then((x) => x.UsersModule),
+    canLoad: [AuthGuard],
+    data: {
+      title: 'users',
+    },
+  },
+  // 角色管理
+  {
+    path: 'roles',
+    loadChildren: () =>
+      import('../main/system/roles/roles.module').then((x) => x.RolesModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true,
+    },
+  },
+  // 组织管理
+  {
+    path: 'organization',
+    loadChildren: () =>
+      import('../main/system/organization/organization.module').then(
+        (x) => x.OrganizationModule
+      ),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true,
+    },
   },
   // 菜单管理
   {
-    path: "menus",
+    path: 'menus',
     loadChildren: () =>
-      import("../main/system/menus/menus.module").then(x => x.MenusModule),
+      import('../main/system/menus/menus.module').then((x) => x.MenusModule),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   // 本体
   {
-    path: "namespace",
+    path: 'namespace',
     loadChildren: () =>
-      import("../main/ontology/namespace/namespace.module").then(x => x.NamespaceModule),
+      import('../main/ontology/namespace/namespace.module').then(
+        (x) => x.NamespaceModule
+      ),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   // 本体
   {
-    path: "ontology",
+    path: 'ontology',
     loadChildren: () =>
-      import("../main/ontology/ontology/ontology.module").then(x => x.OntologyModule),
+      import('../main/ontology/ontology/ontology.module').then(
+        (x) => x.OntologyModule
+      ),
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   // 属性
   {
-    path: "property",
+    path: 'property',
     loadChildren: () =>
-      import("../main/ontology/property/property.module").then(x => x.PropertyModule),
+      import('../main/ontology/property/property.module').then(
+        (x) => x.PropertyModule
+      ),
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   // 属性
   {
-    path: "qualify",
+    path: 'qualify',
     loadChildren: () =>
-      import("../main/ontology/qualify/qualify.module").then(x => x.QualifyModule),
+      import('../main/ontology/qualify/qualify.module').then(
+        (x) => x.QualifyModule
+      ),
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   // 标签
   {
-    path: "tag",
+    path: 'tag',
     loadChildren: () =>
-      import("../main/ontology/tag/tag.module").then(x => x.TagModule),
+      import('../main/ontology/tag/tag.module').then((x) => x.TagModule),
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
   // 数据集
   {
-    path: "dataset",
+    path: 'dataset',
     loadChildren: () =>
-      import("../main/dataset/dataset.module").then(
-        x => x.DatasetModule
-      ),
+      import('../main/dataset/dataset.module').then((x) => x.DatasetModule),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
   // 数据集
   {
-    path: "algorithm",
+    path: 'algorithm',
     loadChildren: () =>
-      import("../main/etl/etl.module").then(
-        x => x.EtlModule
-      ),
+      import('../main/etl/etl.module').then((x) => x.EtlModule),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
   // 抽取
   {
-    path: "extraction",
+    path: 'extraction',
     loadChildren: () =>
-      import("../main/extraction/extraction.module").then(
-        x => x.ExtractionModule
+      import('../main/extraction/extraction.module').then(
+        (x) => x.ExtractionModule
       ),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
   {
-    path: "applications",
+    path: 'applications',
     loadChildren: () =>
-      import("../main/ontology/application/application.module").then(x => x.ApplicationModule),
+      import('../main/ontology/application/application.module').then(
+        (x) => x.ApplicationModule
+      ),
     // canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
 
   {
-    path: "entity",
+    path: 'entity',
     loadChildren: () =>
-      import("../main/entity/entity.module").then(x => x.EntityModule),
+      import('../main/entity/entity.module').then((x) => x.EntityModule),
     // canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
   // 抽取
   {
-    path: "category",
+    path: 'category',
     loadChildren: () =>
-      import("../main/category/category.module").then(
-        x => x.CategoryModule
-      ),
+      import('../main/category/category.module').then((x) => x.CategoryModule),
     canLoad: [AuthGuard],
     data: {
-      shouldReuse: true
-    }
+      shouldReuse: true,
+    },
   },
+
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页
@@ -260,7 +274,7 @@ export const layoutRoutes: Routes = [
   // { path: 'module', loadChildren: 'src/main/module/module.module#ModuleModule', canLoad: [AuthGuard] },
 
   // 如果路由为空就指向配置的默认首页
-  { path: "", redirectTo: environment.defaultPage, pathMatch: "full" },
+  { path: '', redirectTo: environment.defaultPage, pathMatch: 'full' },
 
-  ...shareRoutes
+  ...shareRoutes,
 ];

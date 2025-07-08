@@ -1,0 +1,69 @@
+<div class="data-source-panel">
+  <div class="panel-header">
+    <button class="add-source-btn" (click)="addDataSource()">+ 添加数据源</button>
+  </div>
+  
+  <div class="data-source-list">
+    <div 
+      class="data-source-item" 
+      *ngFor="let source of dataSources; trackBy: trackByFn"
+      [class.connected]="source.connected"
+      [class.selected]="selectedSource?.id === source.id"
+      (click)="selectDataSource(source)"
+    >
+      <div class="source-info">
+        <span class="source-name">{{ source.name }}</span>
+        <span class="source-type">{{ getTypeLabel(source.type) }}</span>
+      </div>
+      <div class="source-actions">
+        <button 
+          class="action-btn connect-btn" 
+          [class.connected]="source.connected"
+          (click)="toggleConnection(source, $event)"
+          [title]="source.connected ? '断开连接' : '连接'"
+        >
+          {{ source.connected ? '已连接' : '未连接' }}
+        </button>
+        <button 
+          class="action-btn config-btn" 
+          (click)="configureDataSource(source, $event)"
+          title="配置"
+        >
+          ⚙️
+        </button>
+        <button 
+          class="action-btn delete-btn" 
+          (click)="deleteDataSource(source, $event)"
+          title="删除"
+        >
+          🗑️
+        </button>
+      </div>
+      <span class="source-status" [class.connected]="source.connected"></span>
+    </div>
+  </div>
+
+  <div class="data-preview" *ngIf="selectedSource">
+    <h4>数据预览 - {{ selectedSource.name }}</h4>
+    <div class="preview-content">
+      <div *ngIf="!selectedSource.connected" class="no-connection">
+        <div class="no-connection-icon">🔌</div>
+        <div>请先连接数据源</div>
+      </div>
+      <div *ngIf="selectedSource.connected" class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th *ngFor="let col of previewColumns">{{ col }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of previewData">
+              <td *ngFor="let col of previewColumns">{{ row[col] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

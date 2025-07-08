@@ -52,39 +52,110 @@
                 </div>
             </header>
 
-            <!-- 正文内容 -->
-            <div class="wiki-body">
-                <!-- 多媒体内容区域 -->
-                <div class="media-content" *ngIf="hasMediaContent()">
-                    <!-- 图片展示 -->
-                    <div class="image-gallery" *ngIf="imgs?.length">
-                        <div class="image-item" *ngFor="let img of imgs">
-                            <img [src]="img.url" (click)="openImage(img.url)" alt="图片">
+            <!-- 正文和属性表格左右布局 -->
+            <div class="entity-detail-layout">
+                <!-- 左侧正文内容 -->
+                <div class="entity-main">
+                    <!-- 多媒体内容区域 -->
+                    <div class="media-content" *ngIf="hasMediaContent()">
+                        <!-- 图片展示 -->
+                        <div class="image-gallery" *ngIf="imgs?.length">
+                            <div class="image-item" *ngFor="let img of imgs">
+                                <img [src]="img.url" (click)="openImage(img.url)" alt="图片">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- 视频展示 -->
-                    <div class="video-gallery" *ngIf="videos?.length">
-                        <div class="video-item" *ngFor="let video of videos">
-                            <video controls>
-                                <source [src]="video.url" [type]="video.type">
-                                你的浏览器不支持视频播放
-                            </video>
+                        
+                        <!-- 视频展示 -->
+                        <div class="video-gallery" *ngIf="videos?.length">
+                            <div class="video-item" *ngFor="let video of videos">
+                                <video controls>
+                                    <source [src]="video.url" [type]="video.type">
+                                    你的浏览器不支持视频播放
+                                </video>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- PDF展示 -->
-                    <div class="pdf-gallery" *ngIf="pdfs?.length">
-                        <div class="pdf-item" *ngFor="let pdf of pdfs">
-                            <div class="pdf-preview" (click)="openPdf(pdf.url)">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>{{pdf.name}}</span>
+                        
+                        <!-- PDF展示 -->
+                        <div class="pdf-gallery" *ngIf="pdfs?.length">
+                            <div class="pdf-item" *ngFor="let pdf of pdfs">
+                                <div class="pdf-preview" (click)="openPdf(pdf.url)">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>{{pdf.name}}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div [innerHTML]="renderedContent | safeHtml"></div>
                 </div>
-                
-                <div [innerHTML]="renderedContent | safeHtml"></div>
+                <!-- 右侧属性信息表格 -->
+                <aside class="entity-properties" *ngIf="hasProperties()">
+                    <div class="properties-section">
+                        <!-- 名称加粗居中显示在图片上方 -->
+                        <ng-container *ngIf="getImageProperty() as imageProp">
+                            <div class="property-title-center" *ngIf="item?.labels?.zh?.value">
+                                <strong>{{item?.labels?.zh?.value}}</strong>
+                            </div>
+                            <div class="property-image-preview" *ngIf="imageProp">
+                                <img [src]="getImageUrl(imageProp.value)" alt="图像" />
+                            </div>
+                        </ng-container>
+                        <div class="properties-table" *ngIf="getBasicProperties().length > 0">
+                            <div class="table-header">概况</div>
+                            <div class="property-row" *ngFor="let prop of getBasicProperties(); let i = index">
+                                <ng-container *ngIf="prop.label !== '图像'">
+                                    <div class="property-label">{{prop.label}}</div>
+                                    <div class="property-value">
+                                        <ng-container *ngIf="statements()[i]?.mainsnak?.datatype === 'wikibase-item' && statements()[i]?.mainsnak?.datavalue?.value?.id; else normalValue">
+                                            <a [routerLink]="['/start/search/info', statements()[i].mainsnak.datavalue.value.id]" style="color: #0969da; text-decoration: underline;">
+                                                {{statements()[i].mainsnak.datavalue.value.label || statements()[i].mainsnak.datavalue.value.id}}
+                                            </a>
+                                        </ng-container>
+                                        <ng-template #normalValue>
+                                            {{prop.value}}
+                                        </ng-template>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="properties-table" *ngIf="getTechnicalProperties().length > 0">
+                            <div class="table-header">技术数据</div>
+                            <div class="property-row" *ngFor="let prop of getTechnicalProperties(); let i = index">
+                                <ng-container *ngIf="prop.label !== '图像'">
+                                    <div class="property-label">{{prop.label}}</div>
+                                    <div class="property-value">
+                                        <ng-container *ngIf="statements()[i]?.mainsnak?.datatype === 'wikibase-item' && statements()[i]?.mainsnak?.datavalue?.value?.id; else normalValue2">
+                                            <a [routerLink]="['/start/search/info', statements()[i].mainsnak.datavalue.value.id]" style="color: #0969da; text-decoration: underline;">
+                                                {{statements()[i].mainsnak.datavalue.value.label || statements()[i].mainsnak.datavalue.value.id}}
+                                            </a>
+                                        </ng-container>
+                                        <ng-template #normalValue2>
+                                            {{prop.value}}
+                                        </ng-template>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="properties-table" *ngIf="getBasicProperties().length === 0 && getTechnicalProperties().length === 0 && statements().length > 0">
+                            <div class="table-header">属性信息</div>
+                            <div class="property-row" *ngFor="let statement of statements()">
+                                <ng-container *ngIf="statement.mainsnak?.label !== '图像'">
+                                    <div class="property-label">{{statement.mainsnak?.label}}</div>
+                                    <div class="property-value">
+                                        <ng-container *ngIf="statement.mainsnak?.datatype === 'wikibase-item' && statement.mainsnak?.datavalue?.value?.id; else normalValue3">
+                                            <a [routerLink]="['/start/search/info', statement.mainsnak.datavalue.value.id]" style="color: #0969da; text-decoration: underline;">
+                                                {{statement.mainsnak.datavalue.value.label || statement.mainsnak.datavalue.value.id}}
+                                            </a>
+                                        </ng-container>
+                                        <ng-template #normalValue3>
+                                            {{formatPropertyValue(statement)}}
+                                        </ng-template>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
     </main>

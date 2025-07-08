@@ -22,6 +22,7 @@ import { XTextareaModule } from '@ng-nest/ui/textarea';
 import { XPageHeaderModule } from '@ng-nest/ui/page-header';
 import { XUploadModule } from '@ng-nest/ui/upload';
 import { XCollapseModule } from '@ng-nest/ui/collapse';
+import { XDatePickerModule } from '@ng-nest/ui';
 
 // 模块
 const modules = [
@@ -47,7 +48,8 @@ const modules = [
   XTextareaModule,
   XPageHeaderModule,
   XUploadModule,
-  XCollapseModule
+  XCollapseModule,
+  XDatePickerModule
 ];
 
 /**

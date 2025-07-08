@@ -1,0 +1,210 @@
+<div class="style-panel">
+  <div class="style-config" *ngIf="selectedItem">
+    <!-- 基础属性 -->
+    <div class="style-section">
+      <h4 class="section-title">位置和尺寸</h4>
+      <div class="style-group">
+        <div class="style-label">位置</div>
+        <div class="style-inputs">
+          <input 
+            type="number" 
+            [value]="selectedItem.x" 
+            (input)="updateProperty('x', $event)"
+            placeholder="X" 
+            class="style-input"
+          >
+          <input 
+            type="number" 
+            [value]="selectedItem.y" 
+            (input)="updateProperty('y', $event)"
+            placeholder="Y" 
+            class="style-input"
+          >
+        </div>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">尺寸</div>
+        <div class="style-inputs">
+          <input 
+            type="number" 
+            [value]="selectedItem.width || 100" 
+            (input)="updateProperty('width', $event)"
+            placeholder="宽度" 
+            class="style-input"
+          >
+          <input 
+            type="number" 
+            [value]="selectedItem.height || 50" 
+            (input)="updateProperty('height', $event)"
+            placeholder="高度" 
+            class="style-input"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- 文本样式 -->
+    <div class="style-section" *ngIf="selectedItem.type === 'text' || selectedItem.type === 'button'">
+      <h4 class="section-title">文本样式</h4>
+      <div class="style-group">
+        <div class="style-label">内容</div>
+        <textarea 
+          [value]="selectedItem.content || ''" 
+          (input)="updateProperty('content', $event)"
+          class="style-textarea"
+          rows="3"
+        ></textarea>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">字体大小</div>
+        <div class="input-with-unit">
+          <input 
+            type="number" 
+            [value]="selectedItem.fontSize || 14" 
+            (input)="updateProperty('fontSize', $event)"
+            class="style-input"
+            min="8"
+            max="72"
+          >
+          <span class="unit">px</span>
+        </div>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">字体粗细</div>
+        <select 
+          [value]="selectedItem.fontWeight || 'normal'" 
+          (change)="updateProperty('fontWeight', $event)"
+          class="style-select"
+        >
+          <option value="normal">正常</option>
+          <option value="bold">粗体</option>
+          <option value="lighter">细体</option>
+        </select>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">文字颜色</div>
+        <div class="color-input-group">
+          <input 
+            type="color" 
+            [value]="selectedItem.color || '#000000'" 
+            (input)="updateProperty('color', $event)"
+            class="style-color"
+          >
+          <input 
+            type="text" 
+            [value]="selectedItem.color || '#000000'" 
+            (input)="updateProperty('color', $event)"
+            class="color-text"
+            placeholder="#000000"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片样式 -->
+    <div class="style-section" *ngIf="selectedItem.type === 'image'">
+      <h4 class="section-title">图片属性</h4>
+      <div class="style-group">
+        <div class="style-label">图片地址</div>
+        <input 
+          type="url" 
+          [value]="selectedItem.src || ''" 
+          (input)="updateProperty('src', $event)"
+          class="style-input"
+          placeholder="请输入图片URL"
+        >
+      </div>
+      <div class="style-group">
+        <div class="style-label">预览</div>
+        <div class="image-preview" *ngIf="selectedItem.src">
+          <img [src]="selectedItem.src" alt="预览图" />
+        </div>
+        <div class="no-image" *ngIf="!selectedItem.src">
+          暂无图片
+        </div>
+      </div>
+    </div>
+
+    <!-- 外观样式 -->
+    <div class="style-section">
+      <h4 class="section-title">外观</h4>
+      <div class="style-group">
+        <div class="style-label">背景颜色</div>
+        <div class="color-input-group">
+          <input 
+            type="color" 
+            [value]="selectedItem.backgroundColor || '#ffffff'" 
+            (input)="updateProperty('backgroundColor', $event)"
+            class="style-color"
+          >
+          <input 
+            type="text" 
+            [value]="selectedItem.backgroundColor || '#ffffff'" 
+            (input)="updateProperty('backgroundColor', $event)"
+            class="color-text"
+            placeholder="#ffffff"
+          >
+        </div>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">圆角</div>
+        <div class="input-with-unit">
+          <input 
+            type="number" 
+            [value]="selectedItem.borderRadius || 0" 
+            (input)="updateProperty('borderRadius', $event)"
+            class="style-input"
+            min="0"
+            max="50"
+          >
+          <span class="unit">px</span>
+        </div>
+      </div>
+      
+      <div class="style-group">
+        <div class="style-label">透明度</div>
+        <div class="range-input-group">
+          <input 
+            type="range" 
+            [value]="(selectedItem.opacity || 1) * 100" 
+            (input)="updateOpacity($event)"
+            class="style-range"
+            min="0"
+            max="100"
+          >
+          <span class="range-value">{{ Math.round((selectedItem.opacity || 1) * 100) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="style-section">
+      <h4 class="section-title">操作</h4>
+      <div class="action-buttons">
+        <button class="action-btn copy" (click)="copyItem()">
+          <span class="btn-icon">📋</span>
+          复制
+        </button>
+        <button class="action-btn delete" (click)="deleteItem()">
+          <span class="btn-icon">🗑️</span>
+          删除
+        </button>
+        <button class="action-btn reset" (click)="resetStyles()">
+          <span class="btn-icon">🔄</span>
+          重置样式
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="no-selection" *ngIf="!selectedItem">
+    <div class="no-selection-icon">🎨</div>
+    <div class="no-selection-text">请选择一个组件</div>
+    <div class="no-selection-hint">点击画布上的组件来编辑其样式</div>
+  </div>
+</div>

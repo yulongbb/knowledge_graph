@@ -253,8 +253,16 @@
                         <x-input 
                           class="full-width"
                           [(ngModel)]="row.mainsnak.datavalue.value"
-                          placeholder="文件名或URL">
+                          placeholder="文件名或URL"
+                          [readonly]="true">
                         </x-input>
+                        <ng-container *ngIf="row.mainsnak.datavalue.value">
+                          <img 
+                            [src]="getFullImageUrl(row.mainsnak.datavalue.value)" 
+                            alt="图片预览" 
+                            style="max-width:60px;max-height:60px;margin-left:8px;cursor:pointer;border-radius:4px;border:1px solid #eee;"
+                            (click)="preview(row.mainsnak.datavalue.value)">
+                        </ng-container>
                         <x-upload 
                           action="http://localhost:3000/api/minio-client/uploadFile"
                           (uploadSuccess)="upload($event, row)"
@@ -280,15 +288,21 @@
                       <x-input-number 
                         *ngSwitchCase="'quantity'" 
                         class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value.amount"
-                        placeholder="请输入数量">
+                        [ngModel]="row.mainsnak.datavalue.value.amount && row.mainsnak.datavalue.value.unit && row.mainsnak.datavalue.value.unit !== '1' ? row.mainsnak.datavalue.value.amount + ' ' + row.mainsnak.datavalue.value.unit : row.mainsnak.datavalue.value.amount"
+                        (ngModelChange)="onQuantityInputChange($event, row)"
+                        placeholder="请输入数量（如：123kg、123 kg、123.5千克、123）"
+                        type="text"
+                      >
                       </x-input-number>
                       
-                      <x-date-picker 
-                        *ngSwitchCase="'time'"
-                        [(ngModel)]="row.mainsnak.datavalue.value.time"
-                        placeholder="请选择日期">
-                      </x-date-picker>
+                      <div *ngSwitchCase="'time'" class="entity-input-group">
+                        <input
+                          class="full-width"
+                          [(ngModel)]="row.mainsnak.datavalue.value.time"
+                          placeholder="请输入日期（如：2023、2023-05、2023-05-12）"
+                          (ngModelChange)="onTimeStringInput($event, row)"
+                          type="text">
+                      </div>
                       
                       <x-input-group 
                         *ngSwitchCase="'globe-coordinate'" 
@@ -332,16 +346,16 @@
           </x-card>
 
           <!-- 地理位置 -->
-          <x-card class="location-card">
+          <!-- <x-card class="location-card">
             <div class="card-header">
               <h3>地理位置</h3>
             </div>
             <div style="height: 250px" leaflet [leafletOptions]="options" (leafletClick)="onMapClick($event)"
               [leafletLayers]="markers" (leafletMapReady)="onMapReady($event)"></div>
-          </x-card>
+          </x-card> -->
 
           <!-- 图片管理 -->
-          <x-card class="media-card">
+          <!-- <x-card class="media-card">
             <div class="card-header">
               <h3>图片管理</h3>
             </div>
@@ -358,10 +372,10 @@
                 </div>
               </div>
             </div>
-          </x-card>
+          </x-card> -->
 
           <!-- 视频管理 -->
-          <x-card class="media-card">
+          <!-- <x-card class="media-card">
             <div class="card-header">
               <h3>视频管理</h3>
             </div>
@@ -375,16 +389,16 @@
                 </div>
               </div>
             </div>
-          </x-card>
+          </x-card> -->
 
           <!-- 文件管理 -->
-          <x-card class="media-card">
+          <!-- <x-card class="media-card">
             <div class="card-header">
               <h3>文件管理</h3>
             </div>
             <x-upload action="http://localhost:3000/api/minio-client/uploadFile" multiple [(ngModel)]="files"
               (uploadSuccess)="uploadDocument($event)" multipleModel="add"></x-upload>
-          </x-card>
+          </x-card> -->
         </div>
       </div>
 

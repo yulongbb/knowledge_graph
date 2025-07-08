@@ -1,0 +1,20 @@
+@import '../palette-base.component.scss';
+
+.palette-item {
+  .item-icon {
+    margin-right: 8px;
+    font-size: 18px;
+    filter: grayscale(0.3);
+    transition: filter 0.2s;
+  }
+
+  .item-label {
+    color: #262626;
+    font-weight: 500;
+  }
+
+  &:hover .item-icon {
+    filter: grayscale(0);
+    transform: scale(1.1);
+  }
+}

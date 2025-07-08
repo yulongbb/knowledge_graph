@@ -12,6 +12,8 @@ import { HttpClient } from '@angular/common/http';
 import { EsService } from 'src/main/start/search/es.service';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Signal, signal } from '@angular/core';
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { PropertyService } from 'src/main/ontology/property/property.service';
 
 @Component({
   selector: 'app-entity-info',
@@ -36,12 +38,20 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
   isTocVisible: boolean = false;
   hasTableOfContents: boolean = true;
 
+  // 添加属性相关的属性
+  properties: any = signal([]);
+  statements: any = signal([]);
+  claims: any = signal([]);
+
   constructor(
     private router: Router,
     private esService: EsService,
     private entityService: EntityService,
     private cdr: ChangeDetectorRef,
-    private http: HttpClient
+    private http: HttpClient,
+    // 添加新的服务
+    private ontologyService: OntologyService,
+    private propertyService: PropertyService
   ) {}
 
   ngOnInit() {
@@ -142,6 +152,9 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
           name: pdf.split('/').pop(),
         })) || [];
 
+      // 加载属性信息
+      this.loadPropertiesAndStatements();
+
       // 调用文章API保存模板内容
       this.http.get(`/api/article/render/${this.item.template}`).subscribe({
         next: (response: any) => {
@@ -191,8 +204,69 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         },
         error: (error) => {
           console.error('Failed to save template as article:', error);
-          // 即使模板保存失败，仍然保存实体
         },
+      });
+    });
+  }
+
+  // 添加加载属性和声明的方法
+  private loadPropertiesAndStatements() {
+    if (!this.item?.type) {
+      return;
+    }
+
+    // 获取实体类型信息
+    this.ontologyService.get(this.item.type).subscribe((type: any) => {
+      // 获取所有父类型ID
+      this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
+        parents.push(this.item.type);
+        
+        // 获取相关属性
+        this.propertyService.getList(1, 50, {
+          filter: [
+            {
+              field: 'id',
+              value: parents as string[],
+              relation: 'schemas',
+              operation: 'IN',
+            },
+          ],
+        }).subscribe((propertiesResponse: any) => {
+          this.properties.set(propertiesResponse.list || []);
+          
+          // 获取实体的声明/属性值
+          this.entityService.getLinks(1, 50, this.id, {}).subscribe((linksResponse: any) => {
+            let statements: any = [];
+            
+            if (linksResponse.list) {
+              linksResponse.list.forEach((p: any) => {
+                if (p.edges[0].mainsnak.property !== 'P31') {
+                  // 找到对应的属性名称
+                  const property = propertiesResponse.list.find(
+                    (prop: any) => p.edges[0].mainsnak.property === `P${prop.id}`
+                  );
+                  
+                  if (property) {
+                    p.edges[0].mainsnak.label = property.name;
+                    p.edges[0].mainsnak.group = property.group;
+                    
+                    // 处理关联实体的显示
+                    if (p.edges[0]['_from'] !== p.edges[0]['_to'] && p.vertices[1]) {
+                      p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
+                      p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
+                    }
+                    
+                    statements.push(p.edges[0]);
+                  }
+                }
+              });
+            }
+            
+            this.statements.set(statements);
+            this.claims.set(statements);
+            this.cdr.detectChanges();
+          });
+        });
       });
     });
   }
@@ -318,5 +392,155 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphen
       .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
+  }
+
+  hasProperties(): boolean {
+    return this.getBasicProperties().length > 0 || this.getTechnicalProperties().length > 0;
+  }
+
+  getBasicProperties(): { label: string; value: string }[] {
+    if (!this.statements() || this.statements().length === 0) {
+      return [];
+    }
+    
+    const basicProps: { label: string; value: string }[] = [];
+    
+    // 基本信息组的属性
+    const basicGroups = ['基本信息', '概况', '基础属性'];
+    
+    this.statements().forEach((statement: any) => {
+      if (statement.mainsnak?.label && statement.mainsnak?.group) {
+        // 检查是否属于基本信息组
+        if (basicGroups.includes(statement.mainsnak.group)) {
+          const value = this.formatPropertyValue(statement);
+          if (value) {
+            basicProps.push({
+              label: statement.mainsnak.label,
+              value: value
+            });
+          }
+        }
+      }
+    });
+    
+    return basicProps;
+  }
+
+  // 获取“图像”属性（只取第一个）
+  public getImageProperty(): { label: string; value: string } | null {
+    const allProps = [
+      ...this.getBasicProperties(),
+      ...this.getTechnicalProperties(),
+      ...(this.statements() || []).map((statement: any) => ({
+        label: statement.mainsnak?.label,
+        value: this.formatPropertyValue(statement)
+      }))
+    ];
+    const imgProp = allProps.find(prop => prop.label === '图像' && prop.value);
+    return imgProp || null;
+  }
+
+  // 获取图片URL（支持直接URL或文件名）
+  public getImageUrl(val: string): string {
+    if (!val) return '';
+    if (/^https?:\/\//.test(val)) return val;
+    return `http://localhost:9000/kgms/${val}`;
+  }
+
+  getTechnicalProperties(): { label: string; value: string }[] {
+    if (!this.statements() || this.statements().length === 0) {
+      return [];
+    }
+    
+    const techProps: { label: string; value: string }[] = [];
+    
+    // 技术信息组的属性
+    const techGroups = ['技术参数', '技术数据', '规格参数', '性能参数'];
+    
+    this.statements().forEach((statement: any) => {
+      if (statement.mainsnak?.label && statement.mainsnak?.group) {
+        // 检查是否属于技术信息组
+        if (techGroups.includes(statement.mainsnak.group)) {
+          const value = this.formatPropertyValue(statement);
+          if (value) {
+            techProps.push({
+              label: statement.mainsnak.label,
+              value: value
+            });
+          }
+        }
+      }
+    });
+    
+    return techProps;
+  }
+
+  // 修改访问修饰符为 public
+  public formatPropertyValue(statement: any): string {
+    if (!statement.mainsnak?.datavalue?.value) {
+      return '';
+    }
+
+    const datavalue = statement.mainsnak.datavalue;
+    const datatype = statement.mainsnak.datatype;
+
+    switch (datatype) {
+      case 'string':
+      case 'external-id':
+      case 'url':
+        return datavalue.value.toString();
+      
+      case 'wikibase-item':
+        return datavalue.value.label || datavalue.value.id || '';
+      
+      case 'quantity':
+        const amount = datavalue.value.amount;
+        const unit = datavalue.value.unit;
+        return unit && unit !== '1' ? `${amount} ${unit}` : amount.toString();
+      
+      case 'time':
+        // 处理wikidata时间格式
+        const time = datavalue.value.time;
+        if (typeof time === 'string' && time.startsWith('+')) {
+          // 例：+2023-00-00T00:00:00Z
+          const match = /^\+(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?T/.exec(time);
+          if (match) {
+            const year = match[1];
+            const month = match[2];
+            const day = match[3];
+            if (day && day !== '00') {
+              return `${year}-${month || '01'}-${day}日`;
+            } else if (month && month !== '00') {
+              return `${year}-${month}月`;
+            } else {
+              return `${year}年`;
+            }
+          }
+        }
+        // 兼容直接存储的字符串
+        if (typeof time === 'string' && time.length > 0) {
+          // 自动识别单位
+          const t = time.replace(/^(\+)?/, '').replace(/T.*$/, '');
+          if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return `${t}日`;
+          if (/^\d{4}-\d{2}$/.test(t)) return `${t}月`;
+          if (/^\d{4}$/.test(t)) return `${t}年`;
+          return t;
+        }
+        return '';
+      
+      case 'globe-coordinate':
+        const lat = datavalue.value.latitude;
+        const lon = datavalue.value.longitude;
+        return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+      
+      case 'monolingualtext':
+        return datavalue.value.text || datavalue.value.toString();
+      
+      case 'commonsMedia':
+        return datavalue.value.toString();
+      
+      default:
+        return datavalue.value.toString();
+    }
   }
 }

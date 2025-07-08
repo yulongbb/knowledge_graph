@@ -1,0 +1,17 @@
+@import '../palette-base.component.scss';
+
+.palette-item {
+  .item-icon {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .item-label {
+    color: #262626;
+    font-weight: 500;
+  }
+
+  &:hover .item-icon {
+    transform: scale(1.1);
+  }
+}

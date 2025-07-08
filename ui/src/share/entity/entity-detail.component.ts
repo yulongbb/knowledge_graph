@@ -1358,5 +1358,95 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     // 无论选择还是手动输入，都直接使用输入的值
     row.mainsnak.datavalue.value = selectedValue;
   }
+
+  // 日期输入变化时自动识别并校验
+  onTimeInputChange(value: string, row: any) {
+    if (!row?.mainsnak?.datavalue) return;
+    // 支持年、年月、年月日
+    const yearReg = /^\d{4}$/;
+    const yearMonthReg = /^\d{4}-\d{1,2}$/;
+    const yearMonthDayReg = /^\d{4}-\d{1,2}-\d{1,2}$/;
+
+    let valid = false;
+    if (yearReg.test(value)) {
+      valid = true;
+    } else if (yearMonthReg.test(value)) {
+      const [y, m] = value.split('-').map(Number);
+      valid = m >= 1 && m <= 12;
+    } else if (yearMonthDayReg.test(value)) {
+      const [y, m, d] = value.split('-').map(Number);
+      valid = m >= 1 && m <= 12 && d >= 1 && d <= 31;
+    }
+
+    if (!valid && value) {
+      this.message.warning('请输入有效的日期格式，如：2023、2023-05、2023-05-12');
+      row.mainsnak.datavalue.value.time = '';
+    } else {
+      row.mainsnak.datavalue.value.time = value;
+    }
+  }
+
+  // 字符串输入时间，自动识别并格式化到datavalue.value（无校验，只做格式转换）
+  onTimeStringInput(value: string, row: any) {
+    if (!row?.mainsnak?.datavalue) return;
+    // 支持年、年月、年月日
+    const yearReg = /^\d{4}$/;
+    const yearMonthReg = /^\d{4}-\d{1,2}$/;
+    const yearMonthDayReg = /^\d{4}-\d{1,2}-\d{1,2}$/;
+
+    let precision = 0;
+    let isoTime = '';
+
+    if (yearReg.test(value)) {
+      precision = 9; // 年
+      isoTime = `+${value}-00-00T00:00:00Z`;
+    } else if (yearMonthReg.test(value)) {
+      const [y, m] = value.split('-').map(Number);
+      precision = 10; // 月
+      isoTime = `+${y}-${m.toString().padStart(2, '0')}-00T00:00:00Z`;
+    } else if (yearMonthDayReg.test(value)) {
+      const [y, m, d] = value.split('-').map(Number);
+      precision = 11; // 日
+      isoTime = `+${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}T00:00:00Z`;
+    } else {
+      // 其它格式直接存储
+      isoTime = value;
+      precision = 0;
+    }
+
+    row.mainsnak.datavalue.value = {
+      after: 0,
+      before: 0,
+      calendarmodel: "http://www.wikidata.org/entity/Q1985727",
+      precision: precision,
+      time: isoTime,
+      timezone: 0
+    };
+  }
+
+  // 数量类型输入自动提取数值和单位
+  onQuantityInputChange(value: string, row: any) {
+    if (!row?.mainsnak?.datavalue) return;
+    // 匹配“数值+单位”或纯数值
+    // 支持：123kg、123 kg、123.5千克、123
+    const match = value.match(/^\s*([+-]?\d+(?:\.\d+)?)(?:\s*([^\d\s]+))?\s*$/);
+    if (match) {
+      const amount = parseFloat(match[1]);
+      const unit = match[2] ? match[2].trim() : '1';
+      row.mainsnak.datavalue.value = {
+        amount: amount,
+        unit: unit,
+        upperBound: null,
+        lowerBound: null
+      };
+    } else {
+      // 无法解析时全部存到amount，单位为1
+      row.mainsnak.datavalue.value = {
+        amount: value,
+        unit: '1',
+        upperBound: null,
+        lowerBound: null
+      };
+    }
+  }
 }
-       

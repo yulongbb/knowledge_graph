@@ -1,0 +1,56 @@
+@import '../palette-base.component.scss';
+
+.palette-item.template-item {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 16px;
+  min-height: 120px;
+
+  .template-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .item-icon {
+      margin-right: 8px;
+      font-size: 20px;
+    }
+
+    .item-label {
+      color: #262626;
+      font-weight: 600;
+      font-size: 15px;
+    }
+  }
+
+  .template-description {
+    color: #8c8c8c;
+    font-size: 12px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .template-preview {
+    background: #f0f2f5;
+    border: 1px dashed #d9d9d9;
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    color: #8c8c8c;
+    margin-top: auto;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    .template-preview {
+      background: #e6f7ff;
+      border-color: #1890ff;
+      color: #1890ff;
+    }
+
+    .item-icon {
+      transform: scale(1.1);
+    }
+  }
+}
