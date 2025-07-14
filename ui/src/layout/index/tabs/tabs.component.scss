@@ -1,16 +1,19 @@
 @import 'src/layout/index/index.param';
 
 app-tabs {
-  background-color: #fff;
+  background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   width: calc(100% - #{$sider-width});
   height: $tabs-height;
-  padding-right: calc(#{$tabs-height} * #{$nav-num} + calc(#{$--x-padding-medium} * 2));
+  padding-right: $--x-padding-medium;
   position: fixed;
-  top: 0;
+  top: $header-height;
   left: $sider-width;
   z-index: 13;
   transition: left $transition-duration, width $transition-duration;
   font-size: 0.875rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
   .x-slider-scroll > ul > li x-link.x-size-big {
     padding: 0;
   }
@@ -18,25 +21,34 @@ app-tabs {
     border: none;
     border-radius: 0;
   }
+
+  .slider {
+    height: 100%;
+    overflow: hidden;
+
+    // 当没有折叠按钮时，slider占满整个宽度
+    .sider-hidden & {
+      padding-left: 0;
+    }
+  }
+
   .toggle {
     float: left;
     .x-link {
       width: $tabs-height;
       height: $tabs-height;
-      .x-icon {
-        font-size: $--x-font-size-large;
-      }
-    }
-  }
+      color: $header-background-color;
+      transition: color $transition-duration, background-color $transition-duration;
 
-  .nav {
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 0 $--x-padding-medium;
-    .x-link {
-      width: $tabs-height;
-      height: $tabs-height;
+      &:hover {
+        background-color: rgba(0, 21, 41, 0.08);
+      }
+
+      &.selected {
+        color: $--x-primary;
+        background-color: rgba(24, 144, 255, 0.1);
+      }
+
       .x-icon {
         font-size: $--x-font-size-large;
       }
@@ -55,6 +67,7 @@ app-tabs {
     user-select: none;
     position: relative;
     transition: background-color $transition-duration;
+
     span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -62,6 +75,7 @@ app-tabs {
       margin-left: 0.375rem;
       flex: 1;
     }
+
     .close {
       margin-right: 0.25rem;
       display: flex;
@@ -69,6 +83,7 @@ app-tabs {
       align-items: center;
       position: absolute;
       right: 0;
+
       .x-icon {
         font-weight: bold;
         opacity: 0;
@@ -76,18 +91,22 @@ app-tabs {
         padding: 0.125rem;
       }
     }
+
     &.active {
       background-color: $--x-background;
+
       span {
         color: $--x-text;
       }
     }
+
     &.active,
     &:hover {
       .close {
         .x-icon {
           color: $--x-text-100;
           opacity: 1;
+
           &:hover {
             color: $--x-text;
           }

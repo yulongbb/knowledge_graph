@@ -13,6 +13,10 @@ export class IndexComponent implements OnInit {
     return this.indexService.local.siderShrink;
   }
 
+  @HostBinding('class.sider-hidden') get siderHidden() {
+    return !this.indexService.shouldShowSider;
+  }
+
   constructor(private indexService: IndexService, private nav: NavService) {
     this.nav.init();
   }

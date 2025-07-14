@@ -1,0 +1,179 @@
+@import '../index.param';
+
+app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: $header-height;
+  background: linear-gradient(135deg, $header-background-color 0%, lighten($header-background-color, 5%) 100%);
+  color: $header-color;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .logo {
+    display: flex;
+    align-items: center;
+    .title {
+      font-size: $--x-font-size-big;
+      font-weight: 600;
+      color: $header-color;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .top-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 0.625rem 1.25rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all $transition-duration ease;
+      user-select: none;
+      position: relative;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+      font-size: 0.875rem;
+
+      x-icon {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        border-radius: 6px;
+        opacity: 0;
+        transition: opacity $transition-duration ease;
+      }
+
+      &:hover {
+        color: #ffffff;
+        background-color: $header-nav-hover-bg;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &.active {
+        color: #ffffff;
+        background: linear-gradient(135deg, $header-nav-active-bg 0%, rgba(255, 255, 255, 0.1) 100%);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60%;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, $--x-primary, transparent);
+          border-radius: 1px;
+        }
+
+        &:hover {
+          background: linear-gradient(135deg, lighten($header-nav-active-bg, 5%) 0%, rgba(255, 255, 255, 0.15) 100%);
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+
+  .right-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all $transition-duration ease;
+      user-select: none;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+      font-size: 0.8rem;
+      white-space: nowrap;
+
+      x-icon {
+        margin-right: 0.375rem;
+        font-size: 0.875rem;
+      }
+
+      &:hover {
+        color: #ffffff;
+        background-color: $header-nav-hover-bg;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &:first-child {
+        cursor: default;
+        &:hover {
+          transform: none;
+          box-shadow: none;
+        }
+      }
+
+      // 只显示图标的样式
+      &.icon-only {
+        padding: 0.5rem;
+        min-width: 2.25rem;
+        height: 2.25rem;
+        justify-content: center;
+        
+        x-icon {
+          margin-right: 0;
+          font-size: 1rem;
+        }
+
+        &:first-child {
+          cursor: default;
+        }
+      }
+    }
+  }
+}
+
+// 暗黑模式适配
+@media (prefers-color-scheme: dark) {
+  app-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    
+    .top-nav,
+    .right-nav {
+      .nav-item {
+        color: rgba(255, 255, 255, 0.9);
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        &.active {
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+      }
+    }
+  }
+}

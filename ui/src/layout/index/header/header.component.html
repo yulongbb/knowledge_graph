@@ -2,3 +2,32 @@
   <!-- <img src="assets/img/logo/logo-48x48.png" /> -->
   <span class="title">知识图谱</span>
 </div>
+
+<nav class="top-nav">
+  <div class="nav-item" 
+       *ngFor="let menu of indexService.topMenus"
+       [class.active]="indexService.activeTopMenu?.id === menu.id"
+       (click)="onTopMenuClick(menu)">
+    <x-icon *ngIf="menu.icon" [type]="menu.icon"></x-icon>
+    <span>{{ menu.label }}</span>
+  </div>
+</nav>
+
+<div class="right-nav">
+  <div class="nav-item icon-only" [title]="auth.user.name">
+    <x-icon type="ado-user"></x-icon>
+  </div>
+  <div class="nav-item icon-only" title="设置" (click)="settingVisible = true">
+    <x-icon type="ado-setting"></x-icon>
+  </div>
+  <div class="nav-item icon-only" title="退出" *ngIf="auth.user.name" (click)="logout()">
+    <x-icon type="ado-logout"></x-icon>
+  </div>
+</div>
+
+<x-drawer title="设置" size="38rem" [visible]="settingVisible" (close)="settingVisible = false">
+  <!-- <x-theme showDark [(dark)]="settingDark" (darkChange)="darkChange($event)" (defaultClick)="defaultClick($event)"></x-theme> -->
+</x-drawer>
+<x-drawer title="设置" size="38rem" [visible]="settingVisible" (close)="settingVisible = false">
+  <!-- <x-theme showDark [(dark)]="settingDark" (darkChange)="darkChange($event)" (defaultClick)="defaultClick($event)"></x-theme> -->
+</x-drawer>

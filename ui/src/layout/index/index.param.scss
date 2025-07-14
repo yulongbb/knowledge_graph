@@ -2,14 +2,20 @@
 
 // 字体颜色
 $font-color: $--x-text;
-// 头部背景色
-$header-background-color: rgba(0, 0, 0, 0.8);
-// 头部文字颜色
-$header-color: $--x-text;
+// 头部背景色 - 优化为更现代的深色
+$header-background-color: #001529;
+// 头部文字颜色 - 优化为更清晰的白色
+$header-color: #ffffff;
+// 头部导航激活颜色
+$header-nav-active-color: $--x-primary;
+// 头部导航悬停背景色
+$header-nav-hover-bg: rgba(255, 255, 255, 0.1);
+// 头部导航激活背景色
+$header-nav-active-bg: rgba(255, 255, 255, 0.15);
 // 菜单栏背景色
 $sider-background-color: rgba(0, 0, 0, 0.8);
-// 顶部右侧菜单个数
-$nav-num: 5;
+// 顶部右侧菜单个数（现在为0，因为已移到header）
+$nav-num: 0;
 // 正文背景色
 $content-background-color: $--x-background;
 // 头部高度

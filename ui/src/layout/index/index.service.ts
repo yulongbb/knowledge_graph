@@ -41,6 +41,9 @@ export class IndexService {
   // 当前会话存储
   private _session!: Session;
 
+  // 当前激活的一级菜单
+  private _activeTopMenu: Menu | null = null;
+
   constructor(
     public auth: AuthService,
     public settings: SettingService,
@@ -175,6 +178,12 @@ export class IndexService {
       let param = url.param;
       let menu = _.find(this.menus, (x) => x.router == router) as Menu;
       if (menu) {
+        // 设置当前激活的一级菜单
+        const topMenu = this.findTopMenu(menu);
+        if (topMenu) {
+          this.setActiveTopMenu(topMenu);
+        }
+
         let tabsPage = this.session.tabsPage as Menu[];
         let tab = _.find(tabsPage, (x) => x.router == menu.router);
         if (tab) {
@@ -196,6 +205,17 @@ export class IndexService {
         this.menuChange.next({ previous: previous as string, current: router });
       }
     }
+  }
+
+  /**
+   * 查找菜单的顶级父菜单
+   */
+  private findTopMenu(menu: Menu): Menu | null {
+    if (menu.pid === null || menu.pid === '') {
+      return menu;
+    }
+    const parent = _.find(this.menus, (x) => x.id === menu.pid);
+    return parent ? this.findTopMenu(parent) : null;
   }
 
   /**
@@ -230,6 +250,39 @@ export class IndexService {
       x.router = x.router != null ? `./${environment.layout}/${x.router}` : x.router;
       return x;
     });
+  }
+
+  // 获取一级菜单
+  public get topMenus(): Menu[] {
+    return this.menus.filter(menu => menu.pid === null || menu.pid === '');
+  }
+
+  // 获取当前激活的一级菜单
+  public get activeTopMenu(): Menu | null {
+    return this._activeTopMenu;
+  }
+
+  // 设置当前激活的一级菜单
+  public setActiveTopMenu(menu: Menu): void {
+    this._activeTopMenu = menu;
+    // 触发侧边栏菜单更新
+    this.menuChange.next({ previous: this._activeTopMenu?.id || '', current: menu.id || '' });
+  }
+
+  // 获取当前激活一级菜单的子菜单
+  public get sideMenus(): Menu[] {
+    if (!this._activeTopMenu) return [];
+    return this.menus.filter(menu => menu.pid === this._activeTopMenu?.id);
+  }
+
+  // 判断当前是否有二级菜单
+  public get hasSideMenus(): boolean {
+    return this.sideMenus.length > 0;
+  }
+
+  // 判断是否应该显示侧边栏
+  public get shouldShowSider(): boolean {
+    return this.hasSideMenus;
   }
 }
 

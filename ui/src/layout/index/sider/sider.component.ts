@@ -10,7 +10,9 @@ import * as _ from 'lodash';
 })
 export class SiderComponent implements OnInit {
   // 输入参数-菜单数据
-  option: any = _.filter(this.indexService.menus, (x) => x.pid === null);
+  get option() {
+    return this.indexService.sideMenus;
+  }
 
   // 输出参数-节点点击
   nodeEmit = new EventEmitter<object>();
@@ -20,5 +22,10 @@ export class SiderComponent implements OnInit {
 
   constructor(private indexService: IndexService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    // 监听一级菜单变化
+    this.indexService.menuChange.subscribe(() => {
+      // 菜单变化时，这里可以添加其他逻辑
+    });
+  }
 }

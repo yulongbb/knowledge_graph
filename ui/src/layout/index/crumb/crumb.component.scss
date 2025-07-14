@@ -1,10 +1,12 @@
 @import 'src/layout/index/index.param';
 
 app-crumb {
+  background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   width: calc(100% - #{$sider-width});
   height: $crumb-height;
   position: fixed;
-  top: $tabs-height;
+  top: $header-height + $tabs-height;
   left: $sider-width;
   z-index: 12;
   transition: left $transition-duration, width $transition-duration;
@@ -12,22 +14,36 @@ app-crumb {
   display: flex;
   align-items: center;
   padding: 0 $content-padding/2;
+
   .crumb-operation {
     .x-icon {
       font-size: 1.125rem;
       padding: 0.25rem;
       transition: background-color $transition-duration;
       border-radius: 0.125rem;
+      color: $header-background-color;
+
       &:hover {
-        background-color: $--x-background-a100;
+        background-color: rgba(0, 21, 41, 0.08);
+        color: $--x-primary;
       }
+
       &.disabled {
         color: $--x-primary-500;
         pointer-events: none;
       }
     }
   }
+
   .x-crumb {
     margin-left: $--x-padding-medium;
+
+    .x-crumb-node {
+      color: $header-background-color;
+
+      &:hover {
+        color: $--x-primary;
+      }
+    }
   }
 }
