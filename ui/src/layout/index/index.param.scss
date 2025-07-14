@@ -2,18 +2,18 @@
 
 // 字体颜色
 $font-color: $--x-text;
-// 头部背景色 - 优化为更现代的深色
-$header-background-color: #001529;
-// 头部文字颜色 - 优化为更清晰的白色
-$header-color: #ffffff;
+// 头部背景色 - 优化为更清爽的白色
+$header-background-color: #ffffff;
+// 头部文字颜色 - 优化为深色文字
+$header-color: #333333;
 // 头部导航激活颜色
 $header-nav-active-color: $--x-primary;
 // 头部导航悬停背景色
-$header-nav-hover-bg: rgba(255, 255, 255, 0.1);
+$header-nav-hover-bg: rgba(24, 144, 255, 0.06);
 // 头部导航激活背景色
-$header-nav-active-bg: rgba(255, 255, 255, 0.15);
+$header-nav-active-bg: rgba(24, 144, 255, 0.1);
 // 菜单栏背景色
-$sider-background-color: rgba(0, 0, 0, 0.8);
+$sider-background-color: #ffffff;
 // 顶部右侧菜单个数（现在为0，因为已移到header）
 $nav-num: 0;
 // 正文背景色
@@ -29,76 +29,147 @@ $sider-width: 15rem;
 // 内容区域的内边距
 $content-padding: $--x-padding-large;
 // 悬停背景色
-$sider-node-hover-background-color: rgba(0, 0, 0, 0.02);
+$sider-node-hover-background-color: rgba(24, 144, 255, 0.06);
 // 悬停文字颜色
-$sider-node-hover-color: $--x-text;
+$sider-node-hover-color: $--x-primary;
 // 选中背景颜色
-$selected-background-color: rgba(0, 0, 0, 0.03);
+$selected-background-color: rgba(24, 144, 255, 0.12);
 // 选中文字颜色
 $selected-color: $--x-primary;
 // 动画时间
 $transition-duration: 0.3s;
+
 @mixin hover {
   color: $selected-color;
   background-color: $sider-node-hover-background-color;
+  border-radius: 4px;
 }
 
 // 选中效果
 @mixin activated {
   color: $selected-color;
   background-color: $selected-background-color;
-  border-right: 0.125rem solid $selected-color;
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: $--x-primary;
+    border-radius: 0 2px 2px 0;
+  }
 }
 
 // 菜单样式
 @mixin silder {
   li {
+    margin: 2px 8px;
+    
     a {
-      padding: 0 0.875rem;
-      transition: background-color $transition-duration, border-color $transition-duration;
+      padding: 0.5rem 0.75rem;
+      margin: 0 0.125rem;
+      transition: all $transition-duration ease;
       display: flex;
       align-items: center;
-      height: $tabs-height;
+      height: auto;
+      min-height: 2.25rem;
       font-size: 0.875rem;
       color: $font-color;
       user-select: none;
       position: relative;
+      border-radius: 4px;
+      
       span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin: 0 0.375rem;
-        transition: visibility $transition-duration, opacity $transition-duration;
+        margin: 0 0.5rem;
+        transition: all $transition-duration ease;
         flex: 1;
+        font-weight: 500;
       }
+      
       .x-icon {
-        font-size: 1.125rem;
+        font-size: 1rem;
+        transition: all $transition-duration ease;
+        
         &.sider-arrow {
-          font-size: 0.875rem;
-          transition: visibility $transition-duration, opacity $transition-duration, transform $transition-duration;
+          font-size: 0.75rem;
+          transition: all $transition-duration ease;
+          margin-left: auto;
+          
           &.show {
             transform: rotate(90deg);
           }
         }
       }
+      
       &:hover {
         @include hover;
+        transform: translateX(2px);
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
       }
+      
       &.active {
         @include activated;
+        font-weight: 600;
+        box-shadow: 0 2px 12px rgba(24, 144, 255, 0.2);
+        
+        span {
+          font-weight: 600;
+        }
+        
         &:hover {
           @include activated;
+          transform: translateX(2px);
         }
       }
     }
+    
     &.childrenShow {
       > a {
-        background-color: $selected-background-color;
+        background-color: $sider-node-hover-background-color;
+        border-radius: 4px;
+        
+        .sider-arrow {
+          color: $--x-primary;
+        }
       }
     }
+    
     &.floatShow {
       > a {
         @include hover;
+      }
+    }
+    
+    // 子菜单样式
+    ul {
+      margin-left: 0.5rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid rgba(24, 144, 255, 0.1);
+      
+      li {
+        margin: 1px 4px;
+        
+        a {
+          padding: 0.375rem 0.5rem;
+          min-height: 2rem;
+          font-size: 0.8125rem;
+          
+          span {
+            margin: 0 0.375rem;
+          }
+          
+          .x-icon {
+            font-size: 0.875rem;
+          }
+        }
       }
     }
   }

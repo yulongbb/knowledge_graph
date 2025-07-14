@@ -1,8 +1,8 @@
 @import 'src/layout/index/index.param';
 
 app-tabs {
-  background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
   width: calc(100% - #{$sider-width});
   height: $tabs-height;
   padding-right: $--x-padding-medium;
@@ -37,16 +37,22 @@ app-tabs {
     .x-link {
       width: $tabs-height;
       height: $tabs-height;
-      color: $header-background-color;
-      transition: color $transition-duration, background-color $transition-duration;
+      color: #666666;
+      transition: all $transition-duration ease;
+      border-radius: 4px;
+      margin: 0.25rem;
 
       &:hover {
-        background-color: rgba(0, 21, 41, 0.08);
+        background-color: rgba(24, 144, 255, 0.06);
+        color: $--x-primary;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
       }
 
       &.selected {
         color: $--x-primary;
         background-color: rgba(24, 144, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
       }
 
       .x-icon {
@@ -66,7 +72,9 @@ app-tabs {
     box-sizing: border-box;
     user-select: none;
     position: relative;
-    transition: background-color $transition-duration;
+    transition: all $transition-duration ease;
+    border-radius: 6px 6px 0 0;
+    margin: 0 2px;
 
     span {
       overflow: hidden;
@@ -74,6 +82,7 @@ app-tabs {
       white-space: nowrap;
       margin-left: 0.375rem;
       flex: 1;
+      font-weight: 500;
     }
 
     .close {
@@ -83,20 +92,51 @@ app-tabs {
       align-items: center;
       position: absolute;
       right: 0;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      transition: all $transition-duration ease;
 
       .x-icon {
         font-weight: bold;
         opacity: 0;
-        transition: color $transition-duration;
+        transition: all $transition-duration ease;
         padding: 0.125rem;
+        font-size: 0.75rem;
+      }
+      
+      &:hover {
+        background-color: rgba(255, 77, 79, 0.1);
+        
+        .x-icon {
+          color: #ff4d4f;
+        }
+      }
+    }
+
+    &:hover {
+      background-color: rgba(24, 144, 255, 0.04);
+      transform: translateY(-1px);
+      
+      .close .x-icon {
+        opacity: 1;
       }
     }
 
     &.active {
       background-color: $--x-background;
+      border-bottom: 2px solid $--x-primary;
+      box-shadow: 0 -2px 8px rgba(24, 144, 255, 0.1);
+      transform: translateY(-1px);
 
       span {
-        color: $--x-text;
+        color: $--x-primary;
+        font-weight: 600;
+      }
+      
+      .close .x-icon {
+        opacity: 1;
+        color: $--x-primary;
       }
     }
 
@@ -104,12 +144,46 @@ app-tabs {
     &:hover {
       .close {
         .x-icon {
-          color: $--x-text-100;
           opacity: 1;
 
           &:hover {
-            color: $--x-text;
+            color: #ff4d4f;
           }
+        }
+      }
+    }
+  }
+}
+
+// 暗黑模式适配
+@media (prefers-color-scheme: dark) {
+  app-tabs {
+    background: #1f1f1f;
+    border-bottom-color: #3a3a3a;
+    
+    .toggle .x-link {
+      color: #b3b3b3;
+      
+      &:hover {
+        background-color: rgba(24, 144, 255, 0.15);
+        color: $--x-primary;
+      }
+      
+      &.selected {
+        background-color: rgba(24, 144, 255, 0.2);
+      }
+    }
+    
+    .tab {
+      &:hover {
+        background-color: rgba(24, 144, 255, 0.1);
+      }
+      
+      &.active {
+        background-color: #2a2a2a;
+        
+        span {
+          color: $--x-primary;
         }
       }
     }

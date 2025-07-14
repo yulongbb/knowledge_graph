@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
@@ -17,6 +17,7 @@ import { XColorsTheme, XBoolean } from '@ng-nest/ui/core';
 })
 export class HeaderComponent implements OnInit {
   settingVisible = false;
+  userDropdownVisible = false;
   settingDark: XBoolean = false;
   settingForm = new UntypedFormGroup({});
   settingControls: XControl[] = [
@@ -42,6 +43,16 @@ export class HeaderComponent implements OnInit {
     this.settingDark = this.config.dark;
   }
 
+  // 监听全局点击事件，关闭下拉菜单
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const dropdown = target.closest('.user-dropdown');
+    if (!dropdown && this.userDropdownVisible) {
+      this.userDropdownVisible = false;
+    }
+  }
+
   /**
    * 顶部菜单点击事件
    */
@@ -54,9 +65,17 @@ export class HeaderComponent implements OnInit {
   }
 
   /**
+   * 切换用户下拉菜单
+   */
+  toggleUserDropdown() {
+    this.userDropdownVisible = !this.userDropdownVisible;
+  }
+
+  /**
    * 退出
    */
   logout() {
+    this.userDropdownVisible = false;
     this.auth.logout().subscribe((x) => {
       if (x) {
         this.indexService.removeSession();

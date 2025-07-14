@@ -28,33 +28,6 @@
   </x-input-group>
 </div>
 
-<!-- 置顶应用展示区 -->
-<div class="pinned-apps" *ngIf="pinnedApplications.length > 0">
-  <h3>置顶应用</h3>
-  <div class="pinned-grid">
-    <div class="pinned-card" *ngFor="let app of pinnedApplications">
-      <img [src]="app.image" [alt]="app.name" class="app-icon" />
-      <div class="app-info">
-        <h4>{{app.name}}</h4>
-        <div class="app-rating">
-          <!-- 修复可能undefined的情况 -->
-          <span class="stars">{{getStarRating(app.rating)}}</span>
-          <span class="reviews">({{app.reviews || 0}})</span>
-        </div>
-        <!-- 修复可能undefined的情况 -->
-        <p class="app-description">
-          {{app.description ? (app.description | slice:0:100) : ''}}
-          {{app.description && app.description.length > 100 ? '...' : ''}}
-        </p>
-      </div>
-      <div class="app-actions">
-        <x-button type="primary" (click)="action('visit', app)" [disabled]="!app.url">访问</x-button>
-        <x-button (click)="action('info', app)">详情</x-button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <x-table
   #tableCom
   [columns]="columns"

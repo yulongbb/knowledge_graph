@@ -7,18 +7,36 @@ app-sider {
   top: $header-height;
   left: 0;
   z-index: 11;
+  background: #fafafa;
+  border-right: 1px solid #e8e8e8;
   transition: width $transition-duration, background-color $transition-duration;
   @include silder;
+  
   > ul {
     overflow-y: auto;
     height: 100%;
     position: relative;
     z-index: 10;
+    padding: 0.5rem 0;
+    
     &::-webkit-scrollbar {
-      width: 0;
-      height: 0;
+      width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 2px;
+      
+      &:hover {
+        background: #bfbfbf;
+      }
     }
   }
+  
   > .silder-image {
     position: absolute;
     z-index: 1;
@@ -29,6 +47,7 @@ app-sider {
     left: 0;
     background-size: cover;
     background-position: 50%;
+    
     &:after {
       position: absolute;
       z-index: 3;
@@ -36,7 +55,8 @@ app-sider {
       height: 100%;
       content: '';
       display: block;
-      opacity: 0.93;
+      opacity: 0.95;
+      background: #fafafa;
     }
   }
 }
@@ -47,8 +67,40 @@ app-float-node {
     padding: 0.5rem 0;
     max-width: $sider-width;
     min-width: $sider-width - 2rem;
-    box-shadow: $--x-box-shadow-light;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
   }
   @include silder;
 }
-   
+
+// 暗黑模式适配
+@media (prefers-color-scheme: dark) {
+  app-sider {
+    background: #1f1f1f;
+    border-right-color: #3a3a3a;
+    
+    > .silder-image {
+      &:after {
+        background: #1f1f1f;
+      }
+    }
+    
+    > ul {
+      &::-webkit-scrollbar-thumb {
+        background: #4a4a4a;
+        
+        &:hover {
+          background: #5a5a5a;
+        }
+      }
+    }
+  }
+  
+  app-float-node {
+    > ul {
+      background-color: #2a2a2a;
+      border-color: #3a3a3a;
+    }
+  }
+}
