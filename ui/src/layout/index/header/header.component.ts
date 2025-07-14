@@ -58,9 +58,21 @@ export class HeaderComponent implements OnInit {
    */
   onTopMenuClick(menu: any) {
     this.indexService.setActiveTopMenu(menu);
-    // 如果一级菜单有直接路由，则跳转
-    if (menu.router && menu.router !== '$') {
-      this.router.navigate([`/index/${menu.router}`]);
+    
+    // 获取当前一级菜单的子菜单
+    const subMenus = this.indexService.menus.filter(m => m.pid === menu.id);
+    
+    if (subMenus.length > 0) {
+      // 如果有子菜单，跳转到第一个子菜单
+      const firstSubMenu = subMenus[0];
+      if (firstSubMenu.router && firstSubMenu.router !== '$') {
+        this.router.navigate([`/index/${firstSubMenu.router}`]);
+      }
+    } else {
+      // 如果没有子菜单且一级菜单有直接路由，则跳转到一级菜单
+      if (menu.router && menu.router !== '$') {
+        this.router.navigate([`/index/${menu.router}`]);
+      }
     }
   }
 

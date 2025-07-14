@@ -61,6 +61,8 @@ export class SiderNodeComponent implements OnInit {
    */
   toggle(event: Event, option: Menu) {
     event.stopPropagation();
+    
+    // 如果侧边栏收缩且是第一级菜单且不是浮动菜单，显示浮动菜单
     if (this.indexService.local.siderShrink && this.level == 1 && !this.float) {
       this.indexService.portal = this.portal.attach({
         content: FloatNodeComponent,
@@ -87,10 +89,21 @@ export class SiderNodeComponent implements OnInit {
         this.indexService.portal.overlayRef?.detach();
       });
     } else {
-      if (this.child.length > 0) option.childrenShow = !option.childrenShow;
+      // 如果有子菜单，切换展开/收起状态
+      if (this.child.length > 0) {
+        option.childrenShow = !option.childrenShow;
+      } else {
+        // 如果没有子菜单且有路由，直接跳转
+        if (option.router && option.router !== '$') {
+          this.sider(option);
+        }
+      }
     }
   }
 
+  /**
+   * 侧边栏菜单点击处理
+   */
   sider(option: Menu) {
     let tab = find(this.indexService.session.tabsPage, (x) => x.router == option.router);
     if (tab && tab.subPage) {

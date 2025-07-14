@@ -1,5 +1,5 @@
 <a
-  *ngIf="option.router && option.router != '$'"
+  *ngIf="option.router && option.router != '$' && child.length === 0"
   (click)="sider(option)"
   [routerLink]="option.router"
   [routerLinkActive]="'active'"
@@ -9,7 +9,7 @@
   <ng-container *ngTemplateOutlet="itemTemp; context: { option: option }"></ng-container>
 </a>
 <a
-  *ngIf="!option.router || option.router == '$'"
+  *ngIf="!option.router || option.router == '$' || child.length > 0"
   (click)="toggle($event, option)"
   [title]="option.label"
   [ngStyle]="{ 'padding-left.rem': 0.875 * level }"

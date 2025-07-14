@@ -211,11 +211,26 @@ export class IndexService {
    * 查找菜单的顶级父菜单
    */
   private findTopMenu(menu: Menu): Menu | null {
-    if (menu.pid === null || menu.pid === '') {
+    if (!menu.pid || menu.pid === null || menu.pid === '') {
       return menu;
     }
     const parent = _.find(this.menus, (x) => x.id === menu.pid);
     return parent ? this.findTopMenu(parent) : null;
+  }
+
+  /**
+   * 获取指定菜单的第一个子菜单
+   */
+  public getFirstSubMenu(parentMenuId: string): Menu | null {
+    const subMenus = this.menus.filter(menu => menu.pid === parentMenuId);
+    return subMenus.length > 0 ? subMenus[0] : null;
+  }
+
+  /**
+   * 检查菜单是否有子菜单
+   */
+  public hasSubMenus(menuId: string): boolean {
+    return this.menus.some(menu => menu.pid === menuId);
   }
 
   /**
