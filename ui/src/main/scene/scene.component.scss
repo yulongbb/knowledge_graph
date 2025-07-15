@@ -1,167 +1,152 @@
 :host {
-  padding: 1rem;
-  display: block;
-  background-color: #f8f9fa;
-  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-  > x-container:not(:first-child) {
-    margin-top: 1rem;
+  .scene-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
-  x-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .scene-header {
+    flex-shrink: 0;
+    padding-bottom: 1rem;
+  }
 
-    x-card-header {
-      background-color: #fff;
-      border-bottom: 1px solid #e9ecef;
-      padding: 1rem 1.5rem;
+  .scene-table {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
 
-      x-card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #495057;
+    x-table {
+      height: 100%;
+
+      ::ng-deep {
+        .x-table-wrapper {
+          height: 100% !important;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .x-table-header {
+          flex-shrink: 0;
+          overflow: hidden;
+
+          .x-table-header-wrapper {
+            overflow: hidden;
+
+            &::-webkit-scrollbar {
+              display: none;
+            }
+
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+        }
+
+        .x-table-body {
+          flex: 1;
+          overflow: auto;
+          min-height: 0;
+
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .x-table-footer {
+          flex-shrink: 0;
+          padding: 0.5rem 1rem;
+
+          .x-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .x-pagination-sizes {
+              margin-right: auto;
+            }
+
+            .x-pagination-jumper {
+              margin-left: 1rem;
+            }
+          }
+        }
+
+        .x-table-virtual-body {
+          height: 100% !important;
+
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .x-table-body-wrapper {
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        * {
+          &::-webkit-scrollbar:horizontal {
+            display: none !important;
+          }
+        }
       }
-    }
-
-    x-card-content {
-      padding: 1.5rem;
     }
   }
 
-  .search-container {
-    background-color: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-
-    x-input-group {
-      display: flex;
-      width: 100%;
-
-      x-input {
-        flex: 1;
-        margin-right: 0.5rem;
-      }
-
-      x-button {
-        flex-shrink: 0;
-        min-width: 80px;
-      }
-    }
-  }
-
-  .action-buttons {
+  .au-table-actions {
     display: flex;
     gap: 0.5rem;
-    height: 100%;
+    justify-content: center;
     align-items: center;
 
-    x-button {
-      min-width: 80px;
-    }
-  }
+    x-link {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
 
-  x-table {
-    ::ng-deep {
-      .x-table-wrapper {
-        border-radius: 6px;
-        overflow: hidden;
+      &:hover {
+        transform: translateY(-1px);
       }
 
-      .x-table-header {
-        background-color: #f8f9fa;
-        font-weight: 600;
+      &[type='info'] {
+        color: #17a2b8;
 
-        th {
-          padding: 1rem 0.75rem;
-          border-bottom: 2px solid #dee2e6;
+        &:hover {
+          background-color: rgba(23, 162, 184, 0.1);
         }
       }
 
-      .x-table-body {
-        tr {
-          transition: background-color 0.2s ease;
+      &[type='primary'] {
+        color: #007bff;
 
-          &:hover {
-            background-color: #f8f9fa;
-          }
+        &:hover {
+          background-color: rgba(0, 123, 255, 0.1);
+        }
+      }
 
-          td {
-            padding: 1rem 0.75rem;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: middle;
-          }
+      &[type='danger'] {
+        color: #dc3545;
+
+        &:hover {
+          background-color: rgba(220, 53, 69, 0.1);
         }
       }
     }
   }
 }
-
-.au-table-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
-
-  x-link {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-    }
-
-    &[type='info'] {
-      color: #17a2b8;
-
-      &:hover {
-        background-color: rgba(23, 162, 184, 0.1);
-      }
-    }
-
-    &[type='primary'] {
-      color: #007bff;
-
-      &:hover {
-        background-color: rgba(0, 123, 255, 0.1);
-      }
-    }
-
-    &[type='danger'] {
-      color: #dc3545;
-
-      &:hover {
-        background-color: rgba(220, 53, 69, 0.1);
-      }
-    }
-  }
-}
-
-// 响应式设计
-@media (max-width: 768px) {
-  :host {
-    padding: 0.5rem;
-
-    .search-container {
-      padding: 1rem;
-
-      x-row {
-        x-col {
-          margin-bottom: 1rem;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-
-    x-card {
-      x-card-content {
-        padding: 1rem;
-      }
-    }
-  }
-}
+        
