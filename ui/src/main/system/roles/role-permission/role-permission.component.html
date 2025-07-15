@@ -6,7 +6,6 @@
       au-adaption
       [outerHeight]="100"
       [data]="treeData"
-      expandedLevel="0"
       [activatedId]="activatedId"
       [nodeHeight]="1.875"
       (activatedChange)="action('menu-actions', $event)"
@@ -17,7 +16,7 @@
     <au-tool>
       <x-buttons space="0.5">
         <x-button icon="fto-chevron-left" (click)="action('cancel', selected)">返回</x-button>
-        <x-button type="primary" icon="fto-plus" (click)="!disabled && action('save', selected)" [disabled]="disabled">保存</x-button>
+        <x-button type="primary" icon="fto-save" (click)="!disabled && action('save', selected)" [disabled]="disabled">保存</x-button>
       </x-buttons>
     </au-tool>
     <x-table
@@ -34,6 +33,7 @@
       [bodyHeight]="100"
       [bodyColumnTpl]="{ icon: iconTpl }"
       [adaptionHeight]="128"
+      (activatedRowChange)="action('activated-row-change', $event)"
       virtualScroll
       loading
     ></x-table>

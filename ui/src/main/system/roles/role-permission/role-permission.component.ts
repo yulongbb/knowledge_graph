@@ -78,12 +78,12 @@ export class RolePermissionComponent implements OnInit {
       case 'actions':
         this.roles.getActions(this.id as string, this.selected?.id).subscribe((x: Action[]) => {
           this.checkedRow = { checked: x.map((y) => y.id) };
-          this.activatedTemp = x;
+          this.activatedTemp = [...x]; // 确保数组拷贝
         });
         break;
       case 'menu-actions':
         this.type = type;
-        this.selected = node;
+        this.selected = node as Menu;
         let filter = { field: 'menuId', value: node.id, operation: '=' } as any;
         if (!this.query.filter || this.query.filter.length == 0) {
           this.query.filter = [filter];
@@ -98,21 +98,26 @@ export class RolePermissionComponent implements OnInit {
         this.action('actions', node);
         break;
       case 'save':
-        this.roles.putActions(this.id as string, this.selected?.id, this.activatedTemp).subscribe(() => {
-          this.message.success('保存成功！');
-        });
+        if (this.selected && this.id) {
+          this.roles.putActions(this.id as string, this.selected.id, this.activatedTemp).subscribe(() => {
+            this.message.success('保存成功！');
+          });
+        } else {
+          this.message.warning('请先选择菜单！');
+        }
         break;
       case 'cancel':
         this.nav.back();
         break;
       case 'activated-row-change':
-        if (node.checked) {
-          this.activatedTemp = [...this.activatedTemp, node];
+        const tableRow = node as XTableRow;
+        if (tableRow['checked']) {
+          // 避免重复添加
+          if (!this.activatedTemp.find(x => x.id === tableRow.id)) {
+            this.activatedTemp = [...this.activatedTemp, tableRow as Action];
+          }
         } else {
-          this.activatedTemp.splice(
-            (this.activatedTemp as Array<any>).findIndex((x) => x.id === node.id),
-            1
-          );
+          this.activatedTemp = this.activatedTemp.filter(x => x.id !== tableRow.id);
         }
         break;
     }

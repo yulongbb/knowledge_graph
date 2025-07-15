@@ -4,11 +4,11 @@
 
 export const environment = {
   production: false,
-  index: 'index',
+  index: 'index/dataset',
   // 框架页
   layout: 'index',
   // 默认的首页
-  defaultPage: 'dashboard',
+  defaultPage: 'dataset',
   // Api请求地址
   api: 'http://localhost:3333/',
   // ip: '10.117.2.46'
