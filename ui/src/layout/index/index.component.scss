@@ -28,7 +28,7 @@ app-index {
   }
 
   > app-content {
-    padding-top: $header-height + $tabs-height + $crumb-height;
+    padding-top: $header-height + $tabs-height ;
     padding-left: $sider-width;
   }
 }

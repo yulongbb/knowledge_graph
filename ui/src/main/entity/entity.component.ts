@@ -65,7 +65,6 @@ export class EntityComponent extends PageBase {
     private activatedRoute: ActivatedRoute,
     private message: XMessageService,
     private msgBox: XMessageBoxService,
-
   ) {
     super(indexService);
     this.activatedRoute.paramMap.subscribe((x: ParamMap) => {
@@ -83,7 +82,12 @@ export class EntityComponent extends PageBase {
               console.log(properties)
 
               data.types.forEach((m: any) => {
-                menu.push({ id: m.key, label: properties?.filter((p: any) => p?.id == m.key)[0]?.name })
+                let typeName = properties?.filter((p: any) => p?.id == m.key)[0]?.name;
+                // 处理undefined类型
+                if (!typeName || m.key === 'undefined' || m.key === undefined || m.key === null) {
+                  typeName = '其他';
+                }
+                menu.push({ id: m.key, label: typeName })
               })
               let menuMerge = [];
               menuMerge = data.types.map((m: any, index: any) => {
@@ -170,7 +174,25 @@ export class EntityComponent extends PageBase {
   }
 
   getType(type: any) {
-    return this.menus?.filter((m: any) => m.key == type)[0].label.split('(')[0];
+    console.log('getType called with:', type, 'menus:', this.menus);
+    
+    // 处理空值、undefined、null、字符串"undefined"等情况
+    if (!type || type === 'undefined' || type === undefined || type === null || !this.menus) {
+      console.log('Returning 其他 for type:', type);
+      return '其他';
+    }
+    
+    const foundType = this.menus.find((m: any) => m.key === type);
+    console.log('Found type:', foundType);
+    
+    if (!foundType || !foundType.label) {
+      console.log('No type found, returning 其他');
+      return '其他';
+    }
+    
+    const result = foundType.label.split('(')[0] || '其他';
+    console.log('Returning result:', result);
+    return result;
   }
 
   action(type: string, item?: any) {
@@ -364,6 +386,12 @@ export class EntityComponent extends PageBase {
 
     console.log(mergedEntity);
     return mergedEntity;
+  }
+
+  onSizeChange(newSize: number) {
+    this.size = newSize;
+    this.index = 1; // 重置到第一页
+    this.tableCom.change(this.index);
   }
 }
 

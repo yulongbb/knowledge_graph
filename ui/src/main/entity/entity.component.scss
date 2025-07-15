@@ -1,71 +1,156 @@
 :host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
-    x-input-group {
-      display: block;
-    }
-  
-    x-input-group:not(:first-child) {
-      margin-top: 1rem;
-    }
-  
-    .row:not(:first-child) {
-      margin-top: 1rem;
-    }
-  
-    .row x-card:not(:first-child) {
-      margin-left: 2rem;
-    }
-  
-    .row .card img {
-      width: 100%;
-      display: block;
-    }
-  
-    .row .card .bottom {
-      padding: 0.5rem;
-    }
-  
-    .row .card .bottom>p {
-      margin: 0;
-      font-size: 1rem;
-    }
-  
-    .row .card .bottom>.time {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-  
-    .row .card .bottom>.time>span {
-      color: var(--x-text-400);
+  .entity-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .entity-header {
+    flex-shrink: 0;
+    padding-bottom: 1rem;
+  }
+
+  .entity-table {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0; // 确保flex子项能够正确收缩
+    
+    x-table {
+      height: 100%;
+      
+      ::ng-deep {
+        .x-table-wrapper {
+          height: 100% !important;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .x-table-header {
+          flex-shrink: 0;
+          overflow: hidden; // 隐藏表头的溢出内容
+          
+          .x-table-header-wrapper {
+            overflow: hidden; // 隐藏表头包装器的溢出内容
+            
+            &::-webkit-scrollbar {
+              display: none;
+            }
+            
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+        }
+        
+        .x-table-body {
+          flex: 1;
+          overflow: auto;
+          min-height: 0;
+          
+          // 隐藏横向滚动条
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+          
+          // Firefox
+          scrollbar-width: none;
+          
+          // IE
+          -ms-overflow-style: none;
+        }
+        
+        .x-table-footer {
+          flex-shrink: 0;
+          padding: 0.5rem 1rem;
+          
+          .x-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            
+            .x-pagination-sizes {
+              margin-right: auto;
+            }
+            
+            .x-pagination-jumper {
+              margin-left: 1rem;
+            }
+          }
+        }
+        
+        .x-table-virtual-body {
+          height: 100% !important;
+          
+          // 隐藏横向滚动条
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+          
+          // Firefox
+          scrollbar-width: none;
+          
+          // IE
+          -ms-overflow-style: none;
+        }
+        
+        // 隐藏表格容器的横向滚动条
+        .x-table-body-wrapper {
+          &::-webkit-scrollbar:horizontal {
+            display: none;
+          }
+          
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        
+        // 隐藏所有可能的横向滚动条
+        * {
+          &::-webkit-scrollbar:horizontal {
+            display: none !important;
+          }
+        }
+      }
     }
   }
 
+  x-input-group {
+    display: block;
+  }
 
+  .row:not(:first-child) {
+    margin-top: 1rem;
+  }
   
-
-.row:not(:first-child) {
-  margin-top: 1rem;
-}
-.row x-card:not(:first-child) {
-  margin-left: 2rem;
-}
-.row .card img {
-  width: 100%;
-  display: block;
-}
-.row .card .bottom {
-  padding: 0.625rem;
-}
-.row .card .bottom > p {
-  margin: 0;
-  font-size: 1rem;
-}
-.row .card .bottom > .time {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.row .card .bottom > .time > span {
-  color: var(--x-text-400);
+  .row x-card:not(:first-child) {
+    margin-left: 2rem;
+  }
+  
+  .row .card img {
+    width: 100%;
+    display: block;
+  }
+  
+  .row .card .bottom {
+    padding: 0.625rem;
+  }
+  
+  .row .card .bottom > p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .row .card .bottom > .time {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .row .card .bottom > .time > span {
+    color: var(--x-text-400);
+  }
 }

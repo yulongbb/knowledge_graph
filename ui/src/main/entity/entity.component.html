@@ -1,37 +1,38 @@
-<x-input-group compact>
-  <x-input [style.width.%]="25" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
-  <x-button icon="fto-search" (click)="search(keyword)"></x-button>
-</x-input-group>
+<div class="entity-container">
+  <div class="entity-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <x-input-group compact>
+        <x-input style="width: 300px;" placeholder="输入内容" [(ngModel)]="keyword" (keyup.enter)="search(keyword)"></x-input>
+        <x-button icon="fto-search" (click)="search(keyword)"></x-button>
+      </x-input-group>
 
+      <div>
+        <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+        <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+      </div>
+    </div>
 
-<au-tool>
-  <div>
-    <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
-    <x-button type="primary" icon="fto-database" (click)="action('import')" [disabled]="checkedRows.length === 0">创建批处理任务</x-button>
-    <x-button type="success" icon="fto-plus" (click)="action('fusion')">融合</x-button>
-    <x-button type="warning" icon="fto-plus" (click)="action('restore')">还原</x-button>
-    <x-button type="danger" icon="fto-plus" (click)="action('delete')">删除</x-button>
+    <ng-template #nodeTpl let-node="$node">
+      <span class="select-item"> {{ node?.name }} </span>
+    </ng-template>
+    <x-menu [data]="types()" (nodeClick)="selectType($event)"> </x-menu>
   </div>
-</au-tool>
 
-<ng-template #nodeTpl let-node="$node">
-  <span class="select-item"> {{ node?.name }} </span>
-</ng-template>
-<x-menu [data]="types()" (nodeClick)="selectType($event)"> </x-menu>
+  <div class="entity-table">
+    <!-- 表格栏 -->
+    <x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
+     virtualScroll
+      [scroll]="{ x: 1500, y: 520 }"
+      [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl  ,    description:descriptionTpl ,    aliase:aliaseTpl  }"
+      (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
+      (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
+    </x-table>
+  </div>
+</div>
 
-
-
-<!-- 表格栏 -->
-<x-table #tableCom au-adaption [columns]="columns" [data]="data" [size]="size"
- virtualScroll
-  [scroll]="{ x: 1500, y: 850 }"
-  [bodyColumnTpl]="{ actions: actionsTpl, type: typeTpl, label: labelTpl  ,    description:descriptionTpl ,    aliase:aliaseTpl  }"
-  (activatedChange)="action('info', $event)" loading [allowSelectRow]="true"
-  (headCheckboxChange)="headCheckboxChange($event)" (bodyCheckboxChange)="bodyCheckboxChange($event)">
-</x-table>
 <ng-template #typeTpl let-column="$column" let-row="$row">
   <div>
-  {{getType(row['_source'].type)}}
+    {{getType(row['_source']?.type)}}
   </div>
 </ng-template>
 
