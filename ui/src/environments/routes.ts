@@ -134,6 +134,16 @@ export const layoutRoutes: Routes = [
     },
   },
 
+  {
+    path: 'scene',
+    loadChildren: () =>
+      import('../main/scene/scene.module').then((x) => x.SceneModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true,
+    },
+  },
+
   // 本体
   {
     path: 'namespace',
@@ -227,7 +237,7 @@ export const layoutRoutes: Routes = [
   {
     path: 'applications',
     loadChildren: () =>
-      import('../main/ontology/application/application.module').then(
+      import('../main/application/application.module').then(
         (x) => x.ApplicationModule
       ),
     // canLoad: [AuthGuard],

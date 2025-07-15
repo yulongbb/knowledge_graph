@@ -1,0 +1,86 @@
+<x-container>
+  <x-row>
+    <x-col>
+      <x-card>
+        <x-card-header>
+          <x-card-title>命名空间管理</x-card-title>
+        </x-card-header>
+        <x-card-content>
+          <div class="search-container">
+            <x-row space="1">
+              <x-col span="6">
+                <x-input-group>
+                  <x-input
+                    [(ngModel)]="name"
+                    placeholder="名称"
+                    (keyup.enter)="searchName(name)"
+                    clearable
+                  ></x-input>
+                  <x-button type="primary" (click)="searchName(name)">搜索</x-button>
+                </x-input-group>
+              </x-col>
+              <x-col span="6">
+                <x-input-group>
+                  <x-input
+                    [(ngModel)]="prefix"
+                    placeholder="前缀"
+                    (keyup.enter)="searchPrefix(prefix)"
+                    clearable
+                  ></x-input>
+                  <x-button type="primary" (click)="searchPrefix(prefix)">搜索</x-button>
+                </x-input-group>
+              </x-col>
+              <x-col span="6">
+                <x-input-group>
+                  <x-input
+                    [(ngModel)]="description"
+                    placeholder="描述"
+                    (keyup.enter)="searchDescription(description)"
+                    clearable
+                  ></x-input>
+                  <x-button type="primary" (click)="searchDescription(description)">搜索</x-button>
+                </x-input-group>
+              </x-col>
+              <x-col span="6">
+                <div class="action-buttons">
+                  <x-button type="primary" (click)="action('add')" icon="fto-plus">新增</x-button>
+                  <x-button type="text" (click)="resetSearch()" icon="fto-refresh-cw">重置</x-button>
+                </div>
+              </x-col>
+            </x-row>
+          </div>
+        </x-card-content>
+      </x-card>
+    </x-col>
+  </x-row>
+  <x-row>
+    <x-col>
+      <x-card>
+        <x-card-content>
+          <x-table
+            #tableCom
+            [data]="data"
+            [columns]="columns"
+            [index]="index"
+            [size]="size"
+            [query]="query"
+            [bodyColumnTpl]="{ actions: actionsTpl }"
+            [bordered]="true"
+            [showHeader]="true"
+            [showPagination]="true"
+            [adaptionHeight]="600"
+            loading
+          ></x-table>
+        </x-card-content>
+      </x-card>
+    </x-col>
+  </x-row>
+</x-container>
+
+<ng-template #actionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-eye" (click)="action('info', row)" title="查看" type="info"></x-link>
+    <x-link icon="fto-edit" (click)="action('edit', row)" title="修改" type="primary"></x-link>
+    <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除" type="danger"></x-link>
+  </div>
+</ng-template>

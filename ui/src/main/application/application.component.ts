@@ -14,8 +14,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, tap } from 'rxjs';
 import { Application, ApplicationService } from './application.sevice';
-import { OntologyService } from '../ontology/ontology.service';
-import { NamespaceService } from '../namespace/namespace.service';
+import { NamespaceService } from '../ontology/namespace/namespace.service';
 
 @Component({
   selector: 'app-application',

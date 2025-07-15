@@ -27,7 +27,16 @@ import { TagService } from '../tag/tag.sevice';
   styleUrls: ['./namespace.component.scss'],
 })
 export class NamespaceComponent extends PageBase implements OnInit {
-  // Namespace management
+  // Remove table-related properties
+  // @ViewChild('tableCom') tableCom!: XTableComponent;
+  // index = 1;
+  // size = 15;
+  // query: any;
+  // data = (index: number, size: number, query: any) =>
+  //   this.namespaceService.getList(index, size, query).pipe(map((x: any) => x));
+  // columns: XTableColumn[] = [...];
+
+  // Keep only entity management properties
   formGroup = new UntypedFormGroup({});
   name = '';
   prefix = '';
@@ -35,24 +44,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
   selected!: Namespace;
   type = 'add';
   loading = true;
-
-  index = 1;
-  size = 15;
-
-  query: any;
-
-  data = (index: number, size: number, query: any) =>
-    this.namespaceService.getList(index, size, query).pipe(map((x: any) => x));
-
-  columns: XTableColumn[] = [
-    { id: 'id', label: '序号', flex: 0.4, left: 0 },
-    { id: 'actions', label: '操作', width: 150 },
-    { id: 'name', label: '名称', flex: 0.8, sort: true },
-    { id: 'prefix', label: '前缀', flex: 0.5, sort: true },
-    { id: 'uri', label: 'URI', flex: 1, sort: true },
-    { id: 'description', label: '描述', flex: 1, sort: true },
-  ];
-  @ViewChild('tableCom') tableCom!: XTableComponent;
 
   // Tab management
   tabs = [
@@ -313,22 +304,23 @@ export class NamespaceComponent extends PageBase implements OnInit {
   }
 
   // Namespace methods
-  searchName(name: any) {
-    this.query.filter = [{ field: 'name', value: name as string }];
-    this.tableCom.change(1);
-  }
+  // Remove table-related methods
+  // searchName(name: any) {
+  //   this.query.filter = [{ field: 'name', value: name as string }];
+  //   this.tableCom.change(1);
+  // }
 
-  searchPrefix(prefix: any) {
-    this.query.filter = [{ field: 'prefix', value: prefix as string }];
-    this.tableCom.change(1);
-  }
+  // searchPrefix(prefix: any) {
+  //   this.query.filter = [{ field: 'prefix', value: prefix as string }];
+  //   this.tableCom.change(1);
+  // }
 
-  searchDescription(description: any) {
-    this.query.filter = [
-      { field: 'description', value: description as string },
-    ];
-    this.tableCom.change(1);
-  }
+  // searchDescription(description: any) {
+  //   this.query.filter = [
+  //     { field: 'description', value: description as string },
+  //   ];
+  //   this.tableCom.change(1);
+  // }
 
   // Namespace selection and tab switching
   clearSelectedNamespace() {
@@ -685,50 +677,41 @@ export class NamespaceComponent extends PageBase implements OnInit {
   action(type: string, item?: any) {
     switch (type) {
       case 'add':
-        this.router.navigate([`./${type}`], {
-          relativeTo: this.activatedRoute,
-        });
-        break;
-      case 'info':
-        this.router.navigate([`./${type}/${item.id}`], {
-          relativeTo: this.activatedRoute,
-        });
+        this.router.navigate(['/index/namespace/add']);
         break;
       case 'edit':
-        this.router.navigate([`./${type}/${item.id}`], {
-          relativeTo: this.activatedRoute,
-        });
+        if (item) {
+          this.router.navigate(['/index/namespace/edit', item.id]);
+        }
         break;
       case 'delete':
-        if (item.name === 'default') {
+        if (item && item.name === 'default') {
           this.message.warning('默认命名空间不能删除！');
           return;
         }
-        this.msgBox.confirm({
-          title: '提示',
-          content: `此操作将永久删除此条数据：${item.name}，是否继续？`,
-          type: 'warning',
-          callback: (action: XMessageBoxAction) => {
-            if (action === 'confirm') {
-              this.namespaceService.delete(item.id).subscribe(() => {
-                this.message.success('删除成功！');
-
-                // Refresh namespace list
-                this.loadNamespaces();
-
-                // If currently selected namespace is deleted, clear selection
-                if (
-                  this.selectedNamespace &&
-                  this.selectedNamespace.id === item.id
-                ) {
-                  this.selectedNamespace = null;
-                  this.selectedNamespaceId = null;
-                  this.clearTabData();
-                }
-              });
-            }
-          },
-        });
+        if (item) {
+          this.msgBox.confirm({
+            title: '提示',
+            content: `此操作将永久删除此条数据：${item.name}，是否继续？`,
+            type: 'warning',
+            callback: (action: XMessageBoxAction) => {
+              if (action === 'confirm') {
+                this.namespaceService.delete(item.id).subscribe(() => {
+                  this.message.success('删除成功！');
+                  this.loadNamespaces();
+                  if (
+                    this.selectedNamespace &&
+                    this.selectedNamespace.id === item.id
+                  ) {
+                    this.selectedNamespace = null;
+                    this.selectedNamespaceId = null;
+                    this.clearTabData();
+                  }
+                });
+              }
+            },
+          });
+        }
         break;
     }
   }
@@ -1157,3 +1140,4 @@ export class NamespaceComponent extends PageBase implements OnInit {
     return `prop-${timestamp}-${randomPart}`;
   }
 }
+    

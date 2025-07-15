@@ -9,9 +9,9 @@ import { XQuery } from '@ng-nest/ui/core';
 import { XFormComponent, XControl } from '@ng-nest/ui/form';
 import { XMessageService } from '@ng-nest/ui/message';
 import { forkJoin, map } from 'rxjs';
-import { OntologyService } from '../../ontology/ontology.service';
 import { ApplicationService } from '../application.sevice';
-import { NamespaceService } from '../../namespace/namespace.service'; // 修正路径
+import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
 
 @Component({
   selector: 'app-application-detail',
