@@ -12,14 +12,18 @@ import {
   XCardModule 
 } from '@ng-nest/ui';
 import { SceneComponent } from './scene.component';
+import { NamespaceDetailComponent } from './namespace-detail/namespace-detail.component';
 
 const routes = [
-  { path: '', component: SceneComponent, data: { title: '命名空间管理' } }
+  { path: '', component: SceneComponent, data: { title: '命名空间管理' } },
+    { path: ':type', component: NamespaceDetailComponent },
+  { path: ':type/:id', component: NamespaceDetailComponent }
 ];
 
 @NgModule({
-  declarations: [SceneComponent],
-  imports: [
+  declarations: [SceneComponent, NamespaceDetailComponent,
+  ],
+  imports: [ 
     CommonModule,
     ShareModule,
     NgNestModule,

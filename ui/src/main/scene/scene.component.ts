@@ -103,13 +103,13 @@ export class SceneComponent extends PageBase implements OnInit {
   action(type: string, item?: any) {
     switch (type) {
       case 'add':
-        this.router.navigate(['/index/namespace/add']);
+        this.router.navigate(['/index/scene/add']);
         break;
       case 'info':
-        this.router.navigate(['/index/namespace/info', item.id]);
+        this.router.navigate(['/index/scene/info', item.id]);
         break;
       case 'edit':
-        this.router.navigate(['/index/namespace/edit', item.id]);
+        this.router.navigate(['/index/scene/edit', item.id]);
         break;
       case 'delete':
         if (this.checkedRows.length > 0) {

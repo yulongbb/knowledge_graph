@@ -10,7 +10,6 @@ import { XListModule } from '@ng-nest/ui/list';
 import { XTableModule } from '@ng-nest/ui/table';
 import { XCardModule } from '@ng-nest/ui/card';
 import { XCrumbModule } from '@ng-nest/ui/crumb';
-import { NamespaceDetailComponent } from './namespace-detail/namespace-detail.component';
 import { NamespaceRoutesModule } from './namespace-routes.module';
 import { NamespaceComponent } from './namespace.component';
 import { OntologyTreeComponent } from './ontology-tree/ontology-tree.component';
@@ -22,7 +21,6 @@ import { TagModule } from '../tag/tag.module';
 @NgModule({
   declarations: [
     NamespaceComponent, 
-    NamespaceDetailComponent,
     OntologyTreeComponent
   ],
   imports: [
