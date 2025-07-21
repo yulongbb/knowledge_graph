@@ -221,6 +221,16 @@ export const layoutRoutes: Routes = [
     },
   },
 
+  // 抽取
+  {
+    path: 'api',
+    loadChildren: () =>
+      import('../main/api/api.module').then((x) => x.ApiModule),
+    canLoad: [AuthGuard],
+    data: {
+      shouldReuse: true,
+    },
+  },
   // 示例功能
   // { path: 'examples', loadChildren: 'src/main/examples/example.module#ExampleModule', canLoad: [AuthGuard] },
   // // 工作型首页
