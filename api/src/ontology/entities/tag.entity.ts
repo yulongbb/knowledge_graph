@@ -1,5 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne } from 'typeorm';
-import { Schema } from 'src/ontology/entities/schema.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Namespace } from './namespace.entity';
 import { Property } from './property.entity';
 

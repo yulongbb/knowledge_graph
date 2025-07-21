@@ -7,7 +7,6 @@ import { AuToolModule } from "src/share/tool/tool.module";
 import { AuAdaptionModule } from "src/share/adaption/adaption.module";
 import { NgNestModule } from "src/share/ng-nest.module";
 import { XTreeModule } from '@ng-nest/ui/tree';
-import { OntologyPropertiesComponent } from "./ontology-properties/ontology-properties.component";
 
 
 @NgModule({
@@ -20,6 +19,6 @@ import { OntologyPropertiesComponent } from "./ontology-properties/ontology-prop
     XTreeModule,
     OntologyRoutesModule
   ],
-  declarations: [OntologyComponent, OntologyPropertiesComponent,]
+  declarations: [OntologyComponent,]
 })
 export class OntologyModule { }

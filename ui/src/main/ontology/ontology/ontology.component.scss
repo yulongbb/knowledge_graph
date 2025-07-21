@@ -21,4 +21,32 @@
   .design-td-name {
     font-weight: 600;
   }
+  .ontology-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .ontology-header {
+    flex-shrink: 0;
+    padding-bottom: 1rem;
+  }
+  .ontology-table {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+    x-table {
+      height: 100%;
+      ::ng-deep .x-table-wrapper {
+        height: 100% !important;
+        display: flex;
+        flex-direction: column;
+      }
+      ::ng-deep .x-table-body {
+        flex: 1;
+        overflow: auto;
+        min-height: 0;
+      }
+    }
+  }
 }

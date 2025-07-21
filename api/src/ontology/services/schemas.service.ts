@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SchemasService extends XRepositoryService<Schema, XQuery> {
-
   constructor(
     @InjectRepository(Schema)
     public readonly schemasRepository: Repository<Schema>,
@@ -27,10 +26,15 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     return schema;
   }
 
-  async getByNameAndNamespace(name: string, namespaceId?: string): Promise<Schema> {
+  async getByNameAndNamespace(
+    name: string,
+    namespaceId?: string,
+  ): Promise<Schema> {
     const query = { name };
     if (namespaceId) {
-      return this.schemasRepository.findOne({ where: { ...query, namespaceId } });
+      return this.schemasRepository.findOne({
+        where: { ...query, namespaceId },
+      });
     }
     return this.schemasRepository.findOne({ where: query });
   }
@@ -45,7 +49,10 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     return children;
   }
 
-  private async getChildrenIdsRecursively(schemaId: string, children: any): Promise<void> {
+  private async getChildrenIdsRecursively(
+    schemaId: string,
+    children: any,
+  ): Promise<void> {
     const schema: any = await this.schemasRepository.findOne({
       where: { id: schemaId },
       relations: ['children'],
@@ -58,7 +65,10 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
     }
   }
 
-  private async getParentIdsRecursively(schemaId: string, parentIds: string[]): Promise<void> {
+  private async getParentIdsRecursively(
+    schemaId: string,
+    parentIds: string[],
+  ): Promise<void> {
     const schema = await this.schemasRepository.findOne({
       where: { id: schemaId },
       relations: ['parent'],
@@ -112,5 +122,29 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
       await this.schemasRepository.remove(move);
     }
     return remove;
+  }
+
+  // 重写find方法，兼容pid为null和''的根节点筛选
+  async find(query: XQuery): Promise<[Schema[], number]> {
+    // 检查是否有pid筛选条件
+    if (
+      query?.filter?.some(
+        (f) =>
+          f.field === 'pid' &&
+          f.operation === 'IN' &&
+          Array.isArray(f.value) &&
+          f.value.length === 1 &&
+          (f.value[0] === '' || f.value[0] === null),
+      )
+    ) {
+      // 查询pid为null或''的根节点
+      const [list, total] = await this.schemasRepository
+        .createQueryBuilder('schema')
+        .where("schema.pid IS NULL OR schema.pid = ''")
+        .getManyAndCount();
+      return [list, total];
+    }
+    // 默认行为
+    return super.find(query);
   }
 }

@@ -1,64 +1,25 @@
-<x-inner class="au-inner">
-  <div class="au-panel au-tree-left" style="width: 22rem;">
-    <h4>
-      <span>概念树</span>
-      <x-link icon="fto-plus" title="增加根节点" (click)="action('add-root', selected)"></x-link>
-    </h4>
-    <x-tree #treeCom au-adaption [outerHeight]="100" [data]="data" expandedLevel="0" [nodeHeight]="1.875"
-      [actions]="treeActions" (activatedChange)="action('info', $event)"></x-tree>
-  </div>
-  <div class="au-form-right">
-    <au-tool>
-      <x-buttons [space]="0.5">
-        <x-button icon="fto-save" type="primary" (click)="!formGroup.invalid && !disabled && action('save', selected)"
-          [disabled]="formGroup.invalid || disabled">
-          保存
-        </x-button>
-      </x-buttons>
-    </au-tool>
-    <x-form #form class="au-panel au-overflow-auto" au-adaption [outerHeight]="128" [formGroup]="formGroup"
-      [controls]="controls" [disabled]="disabled" direction="row" labelSuffix=":" labelWidth="6rem" width="24rem"
-      labelAlign="end" span="20" space="2"></x-form>
-    <!-- <div class="cytoscape-container" #cyContainer></div> -->
-  </div>
-</x-inner>
-
-<div class="ontology-manager">
-  <!-- Ontology list -->
-  <div class="ontology-list">
-    <x-tree
-      #treeCom
-      [data]="data"
-      expandedLevel="0"
-      [nodeHeight]="1.875"
-      [actions]="treeActions"
-      (activatedChange)="handleOntologyAction('view', $event)"
-    ></x-tree>
-  </div>
-
-  <!-- Ontology form -->
-  <div class="ontology-form" *ngIf="ontologyFormMode">
-    <h3>{{ ontologyFormMode === 'add' ? '新增本体' : ontologyFormMode === 'edit' ? '编辑本体' : '查看本体' }}</h3>
-    <x-form
-      [formGroup]="ontologyFormData"
-      [controls]="[
-        { control: 'input', id: 'name', label: '名称', required: true },
-        { control: 'textarea', id: 'description', label: '描述' }
-      ]"
-      [disabled]="ontologyFormMode === 'view'"
-      direction="row"
-      labelSuffix=":"
-      labelWidth="6rem"
-      width="30rem"
-      labelAlign="end"
-      span="20"
-      space="2"
-    ></x-form>
-    <div class="form-actions" *ngIf="ontologyFormMode !== 'view'">
-      <x-buttons space="0.5">
-        <x-button (click)="cancelOntologyForm()">取消</x-button>
-        <x-button type="primary" (click)="saveOntology()">保存</x-button>
-      </x-buttons>
+<div class="ontology-container">
+  <div class="ontology-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 1.2rem; font-weight: bold;">本体管理</span>
+      <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
     </div>
   </div>
+  <div class="ontology-table">
+    <x-table
+      [columns]="columns"
+      [data]="data"
+      [size]="20"
+      [bodyColumnTpl]="{ actions: actionsTpl }"
+      (headCheckboxChange)="headCheckboxChange($event)"
+      (bodyCheckboxChange)="bodyCheckboxChange($event)">
+    </x-table>
+  </div>
 </div>
+
+<ng-template #actionsTpl let-column="$column" let-row="$row">
+  <div class="au-table-actions">
+    <x-link icon="fto-edit" (click)="action('edit', row)" title="修改"></x-link>
+    <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除"></x-link>
+  </div>
+</ng-template>

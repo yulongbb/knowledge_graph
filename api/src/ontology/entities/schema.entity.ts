@@ -8,8 +8,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Property } from 'src/ontology/entities/property.entity';
-import { Tag } from './tag.entity';
-import { Application } from './application.entity';
 import { Namespace } from './namespace.entity';
 
 @Entity('ontology_schema')
@@ -41,14 +39,15 @@ export class Schema {
   @Column({ nullable: true, type: 'text' })
   color?: string;
   @Column({ nullable: true, type: 'text' })
-
   @ManyToOne(() => Schema, (schema) => schema.children)
   parent: Schema;
 
   @OneToMany(() => Schema, (schema) => schema.parent)
   children: Schema[];
 
-  @ManyToOne(() => Namespace, (namespace) => namespace.schemas, { nullable: true })
+  @ManyToOne(() => Namespace, (namespace) => namespace.schemas, {
+    nullable: true,
+  })
   namespace: Namespace;
 
   @Column({ nullable: true })
@@ -69,7 +68,4 @@ export class Schema {
     inverseJoinColumn: { name: 'propertyId' },
   })
   values: Property[];
-
-
-
 }

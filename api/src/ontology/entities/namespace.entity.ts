@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Schema } from './schema.entity';
 import { Property } from './property.entity';
 import { Qualify } from './qualify.entity';
@@ -37,7 +44,6 @@ export class Namespace {
 
   @OneToMany(() => Tag, (tag) => tag.namespace)
   tags: Tag[];
-
 
   @ManyToMany(() => Application, (application) => application.namespaces)
   @JoinTable({

@@ -148,8 +148,8 @@ export const layoutRoutes: Routes = [
   {
     path: 'ontology',
     loadChildren: () =>
-      import('../main/ontology/namespace/namespace.module').then(
-        (x) => x.NamespaceModule
+      import('../main/ontology/ontology/ontology.module').then(
+        (x) => x.OntologyModule
       ),
     canLoad: [AuthGuard],
     data: {

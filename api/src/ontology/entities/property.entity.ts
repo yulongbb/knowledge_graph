@@ -1,4 +1,11 @@
-import { Entity, JoinTable, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  JoinTable,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Schema } from 'src/ontology/entities/schema.entity';
 import { Qualify } from 'src/ontology/entities/qualify.entity';
 import { Namespace } from './namespace.entity';
@@ -41,7 +48,6 @@ export class Property {
   })
   qualifiers: Qualify[];
 
-
   @ManyToMany(() => Tag, (tag) => tag.properties)
   @JoinTable({
     name: 'ontology_property_tag',
@@ -53,7 +59,9 @@ export class Property {
   @Column('boolean', { nullable: true })
   isPrimary: string;
 
-  @ManyToOne(() => Namespace, (namespace) => namespace.properties, { nullable: true })
+  @ManyToOne(() => Namespace, (namespace) => namespace.properties, {
+    nullable: true,
+  })
   namespace: Namespace;
 
   @Column({ nullable: true })
