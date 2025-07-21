@@ -13,10 +13,6 @@ import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { NamespaceRoutesModule } from './namespace-routes.module';
 import { NamespaceComponent } from './namespace.component';
 import { OntologyTreeComponent } from './ontology-tree/ontology-tree.component';
-import { OntologyModule } from '../ontology/ontology.module';
-import { PropertyModule } from '../property/property.module';
-import { QualifyModule } from '../qualify/qualify.module';
-import { TagModule } from '../tag/tag.module';
 
 @NgModule({
   declarations: [
@@ -40,10 +36,7 @@ import { TagModule } from '../tag/tag.module';
     XTabsModule,
     XButtonModule,
     NamespaceRoutesModule,
-    OntologyModule,
-    PropertyModule,
-    QualifyModule,
-    TagModule
+
   ],
   exports: [RouterModule],
   providers: [],

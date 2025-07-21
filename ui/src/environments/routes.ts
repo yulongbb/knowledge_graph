@@ -146,7 +146,7 @@ export const layoutRoutes: Routes = [
 
   // 本体
   {
-    path: 'namespace',
+    path: 'ontology',
     loadChildren: () =>
       import('../main/ontology/namespace/namespace.module').then(
         (x) => x.NamespaceModule
@@ -157,51 +157,6 @@ export const layoutRoutes: Routes = [
     },
   },
 
-  // 本体
-  {
-    path: 'ontology',
-    loadChildren: () =>
-      import('../main/ontology/ontology/ontology.module').then(
-        (x) => x.OntologyModule
-      ),
-    data: {
-      shouldReuse: true,
-    },
-  },
-
-  // 属性
-  {
-    path: 'property',
-    loadChildren: () =>
-      import('../main/ontology/property/property.module').then(
-        (x) => x.PropertyModule
-      ),
-    data: {
-      shouldReuse: true,
-    },
-  },
-
-  // 属性
-  {
-    path: 'qualify',
-    loadChildren: () =>
-      import('../main/ontology/qualify/qualify.module').then(
-        (x) => x.QualifyModule
-      ),
-    data: {
-      shouldReuse: true,
-    },
-  },
-
-  // 标签
-  {
-    path: 'tag',
-    loadChildren: () =>
-      import('../main/ontology/tag/tag.module').then((x) => x.TagModule),
-    data: {
-      shouldReuse: true,
-    },
-  },
   // 数据集
   {
     path: 'dataset',

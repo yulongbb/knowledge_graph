@@ -1,16 +1,4 @@
 <div class="namespace-manager">
-  <!-- Namespace selection header -->
-  <div class="namespace-header">
-    <div class="namespace-selection-area">
-      <x-select [(ngModel)]="selectedNamespaceId" placeholder="请选择域" [data]="namespaceOptions"
-        (ngModelChange)="onNamespaceSelected($event)" [style.width.%]="60"></x-select>
-      <x-button type="primary" icon="fto-plus" (click)="action('add')" title="新增域" size="mini">新增</x-button>
-      <x-button *ngIf="selectedNamespace" icon="fto-edit" (click)="action('edit', selectedNamespace)" title="编辑当前域"
-        size="mini">编辑</x-button>
-      <x-button *ngIf="selectedNamespace && selectedNamespace.name !== 'default'" icon="fto-trash-2"
-        (click)="action('delete', selectedNamespace)" title="删除当前域" size="mini">删除</x-button>
-    </div>
-  </div>
 
   <!-- Three-panel layout -->
   <div class="entity-manager" *ngIf="selectedNamespace">
