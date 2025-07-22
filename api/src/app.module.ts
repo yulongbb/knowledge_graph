@@ -12,6 +12,7 @@ import { ArticleModule } from './article/article.module';
 import { ProjectModule } from './project/project.module';
 import { ExtractionModule } from './extraction/extraction.module';
 import { CategoryModule } from './category/category.module';
+import { SourceModule } from './source/source.moduel';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { CategoryModule } from './category/category.module';
     ProjectModule,
     ExtractionModule,
     CategoryModule,
+    SourceModule,
   ],
   controllers: [],
   providers: [],

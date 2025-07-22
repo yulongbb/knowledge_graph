@@ -145,6 +145,8 @@ export class SchemasService extends XRepositoryService<Schema, XQuery> {
       return [list, total];
     }
     // 默认行为
-    return super.find(query);
+    // 这里需要自己实现 find 的逻辑，因为父类没有 find 方法
+    const [list, total] = await this.schemasRepository.findAndCount();
+    return [list, total];
   }
 }

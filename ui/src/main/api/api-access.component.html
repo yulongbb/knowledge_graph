@@ -3,13 +3,20 @@
     <!-- 左侧接口树结构 -->
     <div class="api-manage-panel">
       <div class="panel-header">
-        <span
-          class="panel-header-btn panel-header-icon"
-          (click)="addInterface()"
-          title="新增接口"
+        <x-dropdown
+          [data]="interfaceTypes"
+          trigger="click"
+          placement="bottom-start"
+          (nodeClick)="onSelectAddType($event)"
         >
-          <x-icon type="fto-plus"></x-icon>
-        </span>
+          <span
+            class="panel-header-btn panel-header-icon"
+            title="新增接口"
+            style="position: relative;"
+          >
+            <x-icon type="fto-plus"></x-icon>
+          </span>
+        </x-dropdown>
         <x-input
           class="panel-header-search"
           placeholder="搜索接口"
@@ -85,177 +92,208 @@
         </div>
       </div>
 
-      <!-- 新增接口表单 -->
-      <div *ngIf="isCreating()" class="api-detail-card">
-        <div class="detail-header">
-          <span>新增接口</span>
-        </div>
-        <form [formGroup]="interfaceForm" class="api-form">
-          <x-form-item label="接口名称" [required]="true">
-            <x-input formControlName="interfaceName"></x-input>
-          </x-form-item>
-          <x-form-item label="类型" [required]="true">
-            <x-select formControlName="type" [data]="interfaceTypes"></x-select>
-          </x-form-item>
-          <x-form-item label="接口地址" [required]="true">
-            <x-input formControlName="url"></x-input>
-          </x-form-item>
-          <x-form-item
-            label="SPARQL查询"
-            *ngIf="interfaceForm.get('type')?.value === 'SPARQL'"
-            [required]="true"
-          >
-            <x-input formControlName="query" autosize="true"></x-input>
-          </x-form-item>
-          <x-form-item label="请求方式" [required]="true">
-            <x-select
-              formControlName="method"
-              [data]="methodOptions"
-            ></x-select>
-          </x-form-item>
-          <div class="form-actions">
+      {{ interfaceForm.get("type")?.value.value | json }}
+
+      <!-- 编辑/测试 tab 切换 -->
+      <ng-container *ngIf="isCreating() || selectedIdx() !== null">
+        <div class="api-detail-card">
+          <!-- 顶部保存/取消按钮 -->
+          <div class="form-actions" style="margin-bottom: 1.2rem;">
             <x-button type="primary" icon="fto-save" (click)="saveInterface()"
               >保存</x-button
             >
             <x-button icon="fto-x" (click)="cancelEdit()">取消</x-button>
           </div>
-        </form>
-      </div>
-
-      <!-- 编辑/测试 tab 切换 -->
-      <div
-        *ngIf="!isCreating() && selectedIdx() !== null"
-        class="api-detail-card"
-      >
-        <!-- 顶部保存/取消按钮 -->
-        <div class="form-actions" style="margin-bottom: 1.2rem;">
-          <x-button type="primary" icon="fto-save" (click)="saveInterface()">保存</x-button>
-          <x-button icon="fto-x" (click)="cancelEdit()">取消</x-button>
-        </div>
-        <form [formGroup]="interfaceForm" style="height:100%;display:flex;flex-direction:column;">
-          <ng-container *ngIf="interfaceForm.get('type')?.value === 'REST'; else sparqlEdit">
-            <div class="api-edit-header">
-              <span class="api-edit-method">
-                <x-select
-                  [data]="methodOptions"
-                  formControlName="method"
-                  [ngStyle]="{ width: '80px' }"
-                  size="small"
-                ></x-select>
-              </span>
-              <x-input
-                class="api-edit-url"
-                formControlName="url"
-                placeholder="Enter URL or paste text"
-              ></x-input>
-              <x-button
-                type="primary"
-                class="api-edit-send-btn"
-                [disabled]="selectedIdx() === null"
-                (click)="selectedIdx() !== null && testInterface(selectedIdx()!)"
-              >Send</x-button>
-            </div>
-            <!-- 标签页 -->
-            <div class="api-edit-tabs">
-              <span
-                class="api-edit-tab"
-                [class.active]="apiEditTab === 'params'"
-                (click)="apiEditTab = 'params'"
-                >Params</span
-              >
-              <span
-                class="api-edit-tab"
-                [class.active]="apiEditTab === 'headers'"
-                (click)="apiEditTab = 'headers'"
-                >Headers</span
-              >
-              <span
-                class="api-edit-tab"
-                [class.active]="apiEditTab === 'body'"
-                (click)="apiEditTab = 'body'"
-                >Body</span
-              >
-              <span
-                class="api-edit-tab"
-                [class.active]="apiEditTab === 'settings'"
-                (click)="apiEditTab = 'settings'"
-                >Settings</span
-              >
-            </div>
-            <!-- Params内容（仅示例，实际可扩展）-->
-            <div *ngIf="apiEditTab === 'params'" class="api-edit-tab-content">
-              <x-row class="api-edit-param-row api-edit-param-header">
-                <x-col span="6">Key</x-col>
-                <x-col span="9">Value</x-col>
-                <x-col span="9">Description</x-col>
-              </x-row>
-              <x-row class="api-edit-param-row">
-                <x-col span="6">
-                  <x-input class="api-edit-param-input" placeholder="Key"></x-input>
-                </x-col>
-                <x-col span="9">
-                  <x-input class="api-edit-param-input" placeholder="Value"></x-input>
-                </x-col>
-                <x-col span="9">
-                  <x-input class="api-edit-param-input" placeholder="Description"></x-input>
-                </x-col>
-              </x-row>
-            </div>
-            <!-- 响应区 -->
-            <div class="api-edit-response">
-              <div class="api-edit-response-title">Response</div>
-              <div class="api-edit-response-empty">
-                <x-icon type="fto-activity" style="font-size: 2.5rem; color: #e0e0e0;"></x-icon>
-                <div>Enter the URL and click Send to get a response</div>
+          <!-- REST 卡片 -->
+          <ng-container *ngIf="interfaceForm.get('type')?.value === 'REST'">
+            <form
+              [formGroup]="interfaceForm"
+              style="height:100%;display:flex;flex-direction:column;"
+            >
+              <!-- 新增：接口名称输入 -->
+              <x-form-item label="接口名称" [required]="true">
+                <x-input
+                  formControlName="interfaceName"
+                  placeholder="请输入接口名称"
+                ></x-input>
+              </x-form-item>
+              <div class="api-edit-header">
+                <span class="api-edit-method">
+                  <x-select
+                    [data]="methodOptions"
+                    formControlName="method"
+                    [ngStyle]="{ width: '80px' }"
+                    size="small"
+                  ></x-select>
+                </span>
+                <x-input
+                  class="api-edit-url"
+                  formControlName="url"
+                  placeholder="Enter URL or paste text"
+                ></x-input>
+                <x-button
+                  type="primary"
+                  class="api-edit-send-btn"
+                  [disabled]="!interfaceForm.get('url')?.value"
+                  (click)="selectedIdx() !== null && testInterface(selectedIdx()!)"
+                >Send</x-button>
               </div>
-            </div>
-          </ng-container>
-          <ng-template #sparqlEdit>
-            <div class="sparql-edit-header">
-              <span class="sparql-edit-title">
-                <x-icon type="fto-terminal" style="margin-right:8px;"></x-icon>
-                SPARQL 查询编辑
-              </span>
-              <x-button type="primary" class="sparql-run-btn" (click)="testInterface(selectedIdx()!)">
-                <x-icon type="fto-play"></x-icon> 运行
-              </x-button>
-            </div>
-            <div class="sparql-edit-query-area">
-              <app-sparql-editor
-                [query]="interfaceForm.get('query')?.value"
-                (queryChange)="interfaceForm.get('query')?.setValue($event)"
-              ></app-sparql-editor>
-            </div>
-            <div class="sparql-edit-result">
-              <div class="sparql-edit-result-header">
-                <x-icon type="fto-table"></x-icon>
-                <span>查询结果</span>
-                <span class="sparql-edit-result-count" *ngIf="testData().length > 0">共 {{ testData().length }} 条</span>
+              <!-- 标签页 -->
+              <div class="api-edit-tabs">
+                <span
+                  class="api-edit-tab"
+                  [class.active]="apiEditTab === 'params'"
+                  (click)="apiEditTab = 'params'"
+                  >Params</span
+                >
+                <span
+                  class="api-edit-tab"
+                  [class.active]="apiEditTab === 'headers'"
+                  (click)="apiEditTab = 'headers'"
+                  >Headers</span
+                >
+                <span
+                  class="api-edit-tab"
+                  [class.active]="apiEditTab === 'body'"
+                  (click)="apiEditTab = 'body'"
+                  >Body</span
+                >
+                <span
+                  class="api-edit-tab"
+                  [class.active]="apiEditTab === 'settings'"
+                  (click)="apiEditTab = 'settings'"
+                  >Settings</span
+                >
               </div>
-              <div class="sparql-edit-result-table" *ngIf="testData().length > 0; else noResult">
-                <table>
-                  <thead>
-                    <tr>
-                      <th *ngFor="let key of getFieldKeys(testData())">{{ key }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let row of testData()">
-                      <td *ngFor="let key of getFieldKeys(testData())">{{ row[key] }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <!-- Params内容（仅示例，实际可扩展）-->
+              <div *ngIf="apiEditTab === 'params'" class="api-edit-tab-content">
+                <x-row class="api-edit-param-row api-edit-param-header">
+                  <x-col span="6">Key</x-col>
+                  <x-col span="9">Value</x-col>
+                  <x-col span="9">Description</x-col>
+                </x-row>
+                <x-row class="api-edit-param-row">
+                  <x-col span="6">
+                    <x-input
+                      class="api-edit-param-input"
+                      placeholder="Key"
+                    ></x-input>
+                  </x-col>
+                  <x-col span="9">
+                    <x-input
+                      class="api-edit-param-input"
+                      placeholder="Value"
+                    ></x-input>
+                  </x-col>
+                  <x-col span="9">
+                    <x-input
+                      class="api-edit-param-input"
+                      placeholder="Description"
+                    ></x-input>
+                  </x-col>
+                </x-row>
               </div>
-              <ng-template #noResult>
-                <div class="sparql-edit-result-empty">
-                  <x-icon type="fto-info"></x-icon>
-                  暂无数据，请运行查询
+              <!-- 响应区 -->
+              <div class="api-edit-response">
+                <div class="api-edit-response-title">Response</div>
+                <div class="api-edit-response-empty">
+                  <x-icon
+                    type="fto-activity"
+                    style="font-size: 2.5rem; color: #e0e0e0;"
+                  ></x-icon>
+                  <div>Enter the URL and click Send to get a response</div>
                 </div>
-              </ng-template>
-            </div>
-          </ng-template>
-        </form>
-      </div>
+              </div>
+            </form>
+          </ng-container>
+          <!-- SPARQL 卡片 -->
+          <ng-container *ngIf="interfaceForm.get('type')?.value === 'SPARQL'">
+            <form
+              [formGroup]="interfaceForm"
+              style="height:100%;display:flex;flex-direction:column;"
+            >
+              <div class="sparql-edit-header">
+                <span class="sparql-edit-title">
+                  <x-icon
+                    type="fto-terminal"
+                    style="margin-right:8px;"
+                  ></x-icon>
+                  SPARQL 查询编辑
+                </span>
+                <x-button
+                  type="primary"
+                  class="sparql-run-btn"
+                  (click)="testInterface(selectedIdx() ?? 0)"
+                >
+                  <x-icon type="fto-play"></x-icon> 运行
+                </x-button>
+              </div>
+              <x-form-item label="接口名称" [required]="true">
+                <x-input
+                  formControlName="interfaceName"
+                  placeholder="请输入接口名称"
+                ></x-input>
+              </x-form-item>
+              <div class="sparql-edit-query-area">
+                <app-sparql-editor
+                  [query]="interfaceForm.get('query')?.value"
+                  (queryChange)="interfaceForm.get('query')?.setValue($event)"
+                ></app-sparql-editor>
+              </div>
+              <div class="sparql-edit-result">
+                <!-- 新增loading效果 -->
+                <div
+                  *ngIf="loading()"
+                  style="text-align:center; color:#888; margin:1.5rem 0;"
+                >
+                  <x-icon
+                    type="fto-loader"
+                    spin
+                    style="font-size:2rem;"
+                  ></x-icon>
+                  <div>查询中，请稍候...</div>
+                </div>
+                <div
+                  class="sparql-edit-result-table"
+                  *ngIf="!loading() && testData().length > 0; else noResult"
+                >
+                  <div class="sparql-edit-result-header">
+                    <x-icon type="fto-table"></x-icon>
+                    <span>查询结果</span>
+                    <span
+                      class="sparql-edit-result-count"
+                      *ngIf="testData().length > 0"
+                      >共 {{ testData().length }} 条</span
+                    >
+                  </div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th *ngFor="let key of getFieldKeys(testData())">
+                          {{ key }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let row of testData()">
+                        <td *ngFor="let key of getFieldKeys(testData())">
+                          {{ row[key] }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <ng-template #noResult>
+                  <div class="sparql-edit-result-empty" *ngIf="!loading()">
+                    <x-icon type="fto-info"></x-icon>
+                    暂无数据，请运行查询
+                  </div>
+                </ng-template>
+              </div>
+            </form>
+          </ng-container>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

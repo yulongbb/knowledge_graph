@@ -14,6 +14,7 @@ import { ApiRoutesModule } from './api-routes.module';
 import { XDropdownModule, XIconModule, XTextareaModule } from '@ng-nest/ui';
 import { SparqlEditorComponent } from './sparql-editor/sparql-editor.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { ApiService } from './api.service';
 
 @NgModule({
   imports: [
@@ -32,10 +33,11 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
     XDropdownModule,
     XIconModule,
     XTextareaModule,
-    MonacoEditorModule.forRoot(),
+    MonacoEditorModule.forRoot()
   ],
   declarations: [ApiAccessComponent, SparqlEditorComponent],
   exports: [ApiAccessComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  providers: [ApiService], // 确保 NamespaceService 已注册
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ApiModule {}

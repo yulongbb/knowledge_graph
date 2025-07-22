@@ -2,6 +2,7 @@ import { Component, OnInit, signal, effect, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XTreeNode } from '@ng-nest/ui/tree';
+import { ApiService, DataInterface } from './api.service';
 declare const monaco: any;
 
 type InterfaceType = 'REST' | 'SPARQL';
@@ -11,15 +12,6 @@ interface FieldMapping {
     role: 'id' | 'attr' | 'ignore';
     type: string;
   };
-}
-
-interface DataInterface {
-  interfaceName: string;
-  type: InterfaceType;
-  url: string;
-  query?: string;
-  method: string;
-  fieldMapping: FieldMapping;
 }
 
 @Component({
@@ -130,11 +122,15 @@ export class ApiAccessComponent implements OnInit {
 
   actions = signal(['编辑', '删除']);
 
-  constructor(private fb: FormBuilder, private message: XMessageService) {
+  constructor(
+    private fb: FormBuilder,
+    private message: XMessageService,
+    private apiService: ApiService // 注入ApiService
+  ) {
     this.interfaceForm = this.fb.group({
       interfaceName: ['', [Validators.required]],
       type: ['REST', [Validators.required]],
-      url: ['', [Validators.required]],
+      url: [''], // 默认空，后面根据类型设置
       query: [''],
       method: ['GET', [Validators.required]],
     });
@@ -145,16 +141,27 @@ export class ApiAccessComponent implements OnInit {
         const type = this.interfaceForm.get('type')?.value;
         if (type === 'SPARQL') {
           this.interfaceForm.get('query')?.setValidators([Validators.required]);
+          this.interfaceForm.get('url')?.clearValidators();
+          // SPARQL类型时自动填充默认url
+          if (!this.interfaceForm.get('url')?.value) {
+            this.interfaceForm.get('url')?.setValue('https://query.wikidata.org/sparql');
+          }
         } else {
           this.interfaceForm.get('query')?.clearValidators();
+          this.interfaceForm.get('url')?.setValidators([Validators.required]);
+          // REST类型时清空url
+          if (this.interfaceForm.get('url')?.value === 'https://query.wikidata.org/sparql') {
+            this.interfaceForm.get('url')?.setValue('');
+          }
         }
         this.interfaceForm.get('query')?.updateValueAndValidity();
+        this.interfaceForm.get('url')?.updateValueAndValidity();
       }
     });
   }
 
   ngOnInit(): void {
-    this.setSampleInterfaces();
+    this.loadInterfaces();
     this.buildTreeData();
     this.registerSparqlLanguage();
     this.monacoOptions = {
@@ -169,42 +176,20 @@ export class ApiAccessComponent implements OnInit {
     };
   }
 
-  // 优化：从树结构样例生成 interfaces 列表和 treeData
-  private setSampleInterfaces() {
-    const flatList: DataInterface[] = [];
-    let flatIndex = 0;
-    const walk = (nodes: any) => {
-      for (const node of nodes) {
-        if (node.leaf && node.data) {
-          flatList.push({
-            interfaceName: node.title,
-            type: node.data.type,
-            url: node.data.url,
-            query: node.data.query,
-            method: node.data.method,
-            fieldMapping: node.data.fieldMapping,
-          });
-          // 给节点加 _flatIndex 便于选中
-          node.data._flatIndex = flatIndex++;
-        }
-        if (node.children) walk(node.children);
-      }
-    };
-    walk(this.sampleTreeData);
-    this.interfaces.set(flatList);
-    // 直接用样例树结构作为 treeData
-    this.treeData = JSON.parse(JSON.stringify(this.sampleTreeData));
-    this.expandedKeys = this.treeData.map((g) => g.id as string);
-    if (this.selectedIdx() !== null) {
-      this.selectedTreeKeys = ['iface-' + this.selectedIdx()];
-    } else {
-      this.selectedTreeKeys = [];
-    }
+  // 加载接口列表
+  loadInterfaces() {
+    this.apiService.getList(1, 1000).subscribe({
+      next: (res) => {
+        this.interfaces.set(res.list || []);
+        this.buildTreeData();
+      },
+      error: () => this.message.error('接口列表加载失败'),
+    });
   }
 
   // 构建x-tree数据
   buildTreeData() {
-    const list = this.interfaces();
+    // 默认两个根节点
     const groups: { [type: string]: XTreeNode } = {
       REST: {
         id: 'REST',
@@ -220,6 +205,7 @@ export class ApiAccessComponent implements OnInit {
       },
     };
     let flatIndex = 0;
+    const list = this.interfaces();
     for (const iface of list) {
       const node: XTreeNode = {
         id: 'iface-' + flatIndex,
@@ -227,13 +213,21 @@ export class ApiAccessComponent implements OnInit {
         leaf: true,
         data: { ...iface, _flatIndex: flatIndex },
       };
+      // 保证类型分组存在
+      if (!groups[iface.type]) {
+        groups[iface.type] = {
+          id: iface.type,
+          title: iface.type,
+          expanded: true,
+          children: [],
+        };
+      }
       groups[iface.type].children!.push(node);
       flatIndex++;
     }
-    this.treeData = Object.values(groups).filter(
-      (g) => g.children && g.children.length > 0
-    );
-    this.expandedKeys = this.treeData.map((g) => g.id as string);
+    // 始终显示两个根节点
+    this.treeData = Object.values(groups);
+    this.expandedKeys = Object.keys(groups);
     // 保持选中
     if (this.selectedIdx() !== null) {
       this.selectedTreeKeys = ['iface-' + this.selectedIdx()];
@@ -257,17 +251,10 @@ export class ApiAccessComponent implements OnInit {
 
   // 数据接口管理相关
   addInterface() {
-    this.isCreating.set(true);
-    this.isEditing.set(false);
-    this.selectedIdx.set(null);
-    this.interfaceForm.reset({ type: 'REST', method: 'GET' });
-    this.selectedTreeKeys = [];
+    this.onAddButtonClick(new MouseEvent('click'));
   }
 
   editInterface(idx: number) {
-    this.selectedIdx.set(idx);
-    this.isEditing.set(true);
-    this.isCreating.set(false);
     const iface = this.interfaces()[idx];
     this.interfaceForm.reset({
       interfaceName: iface.interfaceName,
@@ -279,18 +266,22 @@ export class ApiAccessComponent implements OnInit {
   }
 
   deleteInterface(idx: number) {
+    const iface = this.interfaces()[idx];
+    if (!iface?.id) return;
     if (!confirm('确认删除该接口？')) return;
-    const arr = [...this.interfaces()];
-    arr.splice(idx, 1);
-    this.interfaces.set(arr);
-    this.buildTreeData();
-    if (this.selectedIdx() === idx) {
-      this.selectedIdx.set(null);
-      this.isEditing.set(false);
-    }
+    this.apiService.delete(iface.id).subscribe({
+      next: () => {
+        this.message.success('删除成功');
+        this.loadInterfaces();
+        this.selectedIdx.set(null);
+        this.isEditing.set(false);
+      },
+      error: () => this.message.error('删除失败'),
+    });
   }
 
   saveInterface() {
+    console.log(this.interfaceForm.value);
     if (this.interfaceForm.invalid) {
       Object.values(this.interfaceForm.controls).forEach((c) =>
         c.markAsTouched()
@@ -299,26 +290,32 @@ export class ApiAccessComponent implements OnInit {
       return;
     }
     const value = this.interfaceForm.value;
+    // 新增：如果有查询结果，存储到 resultData 字段
+    const resultData = this.testData() && this.testData().length > 0 ? this.testData() : undefined;
     if (this.isCreating()) {
-      this.interfaces.set([
-        ...this.interfaces(),
-        {
-          ...value,
-          fieldMapping: {},
+      this.apiService.post({ ...value, fieldMapping: {}, resultData }).subscribe({
+        next: () => {
+          this.message.success('新增成功');
+          // this.isCreating.set(false); // 不关闭当前卡片
+          this.loadInterfaces();
         },
-      ]);
+        error: () => this.message.error('新增失败'),
+      });
     } else if (this.isEditing() && this.selectedIdx() !== null) {
-      const arr = [...this.interfaces()];
-      arr[this.selectedIdx()!] = {
-        ...arr[this.selectedIdx()!],
-        ...value,
-      };
-      this.interfaces.set(arr);
+      const iface = this.interfaces()[this.selectedIdx()!];
+      if (!iface?.id) return;
+      this.apiService
+        .put({ ...iface, ...value, resultData })
+        .subscribe({
+          next: () => {
+            this.message.success('保存成功');
+            // this.isEditing.set(false); // 不关闭当前卡片
+            // this.selectedIdx.set(null);
+            this.loadInterfaces();
+          },
+          error: () => this.message.error('保存失败'),
+        });
     }
-    this.isCreating.set(false);
-    this.isEditing.set(false);
-    this.selectedIdx.set(null);
-    this.buildTreeData();
   }
 
   cancelEdit() {
@@ -331,9 +328,25 @@ export class ApiAccessComponent implements OnInit {
   testInterface(idx: number) {
     this.selectedIdx.set(idx);
     this.isTesting.set(true);
-    this.loading.set(true);
+    this.loading.set(true); // loading 开始
     this.testError.set(null);
-    const iface = this.interfaces()[idx];
+
+    let iface: DataInterface;
+    if (this.interfaceForm.get('type')?.value === 'SPARQL') {
+      iface = {
+        ...this.interfaceForm.value,
+        query: this.interfaceForm.get('query')?.value
+      };
+    } else {
+      // REST: 取当前表单内容
+      iface = {
+        ...this.interfaceForm.value
+      };
+    }
+
+    console.log('测试接口:', iface);
+
+    // 修正：REST类型点击Send按钮时也能请求接口并返回数据
     this.fetchData(iface)
       .then((data) => {
         this.testData.set(data);
@@ -348,23 +361,39 @@ export class ApiAccessComponent implements OnInit {
             ? iface.fieldMapping
             : mapping
         );
+        // 新增：同步保存查询结果到数据表
+        if (this.isCreating()) {
+          this.apiService.post({ ...this.interfaceForm.value, fieldMapping: mapping }).subscribe({
+            next: (res) => {
+              this.message.success('接口和查询结果已保存');
+              this.loadInterfaces();
+            },
+            error: () => this.message.error('接口保存失败'),
+          });
+        }
       })
       .catch((e) => {
         this.testError.set('接口测试失败: ' + (e?.message || e));
         this.testData.set([]);
       })
-      .finally(() => this.loading.set(false));
+      .finally(() => {
+        this.loading.set(false); // loading 结束
+      });
   }
 
   saveFieldMapping() {
     if (this.selectedIdx() === null) return;
-    const arr = [...this.interfaces()];
-    arr[this.selectedIdx()!] = {
-      ...arr[this.selectedIdx()!],
-      fieldMapping: this.fieldMapping(),
-    };
-    this.interfaces.set(arr);
-    this.message.success('字段映射已保存');
+    const iface = this.interfaces()[this.selectedIdx()!];
+    if (!iface?.id) return;
+    this.apiService
+      .put({
+        ...iface,
+        fieldMapping: this.fieldMapping(),
+      })
+      .subscribe({
+        next: () => this.message.success('字段映射已保存'),
+        error: () => this.message.error('字段映射保存失败'),
+      });
   }
 
   closeTest() {
@@ -373,13 +402,13 @@ export class ApiAccessComponent implements OnInit {
     this.testError.set(null);
   }
 
-  // 新增：选中接口并进入编辑模式
+  // 新增：编辑/查看时自动显示已保存的查询结果
   onSelectInterface(idx: number) {
     this.selectedIdx.set(idx);
     this.isEditing.set(true);
     this.isCreating.set(false);
     // 自动填充表单并触发Angular变更检测
-    const iface = this.interfaces()[idx];
+    const iface: any = this.interfaces()[idx];
     setTimeout(() => {
       this.interfaceForm.setValue({
         interfaceName: iface.interfaceName,
@@ -388,6 +417,14 @@ export class ApiAccessComponent implements OnInit {
         query: iface.query || '',
         method: iface.method,
       });
+      // 如果有 resultData，自动显示到 testData
+      if (iface.resultData && Array.isArray(iface.resultData) && iface.resultData.length > 0) {
+        this.testData.set(iface.resultData);
+        // 查询结果条数提示
+        this.message.info(`查询结果共 ${iface.resultData.length} 条`);
+      } else {
+        this.testData.set([]);
+      }
     });
     this.selectedTreeKeys = ['iface-' + idx];
   }
@@ -490,4 +527,59 @@ export class ApiAccessComponent implements OnInit {
       });
     }
   }
+
+  // 新增：控制新增类型下拉菜单
+  showAddTypeDropdown = signal<boolean>(false);
+
+  // 新增：点击新增按钮，显示类型选择下拉
+  onAddButtonClick(event: MouseEvent) {
+    event.stopPropagation();
+    this.showAddTypeDropdown.set(!this.showAddTypeDropdown());
+  }
+
+  // 新增：选择新增类型
+  onSelectAddType(type: any) {
+    this.showAddTypeDropdown.set(false);
+    this.isCreating.set(true);
+    this.isEditing.set(false);
+    this.selectedIdx.set(null);
+    this.interfaceForm.reset({
+      type: type.value,
+      method: 'GET',
+      url: type.value === 'SPARQL' ? 'https://query.wikidata.org/sparql' : ''
+    });
+    this.selectedTreeKeys = [];
+  }
+
+  // SPARQL 卡片需要填写的信息字段
+  sparqlFormFields = [
+    {
+      key: 'interfaceName',
+      label: '接口名称',
+      required: true,
+      placeholder: '请输入接口名称'
+    },
+    {
+      key: 'url',
+      label: 'SPARQL Endpoint',
+      required: true,
+      placeholder: '请输入SPARQL服务地址'
+    },
+    {
+      key: 'query',
+      label: 'SPARQL 查询语句',
+      required: true,
+      placeholder: '请输入SPARQL查询'
+    },
+    {
+      key: 'method',
+      label: '请求方式',
+      required: true,
+      type: 'select',
+      options: [
+        { label: 'GET', value: 'GET' },
+        { label: 'POST', value: 'POST' }
+      ]
+    }
+  ];
 }
