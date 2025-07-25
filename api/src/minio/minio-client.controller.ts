@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -17,7 +18,6 @@ import { MinioClientService } from './minio-client.service';
 import { ThumbnailService } from './thumbnail.service';
 import * as path from 'path';
 import axios from 'axios';
-import { Query } from '@nestjs/common';
 
 @ApiTags('文件上传') // 分组
 @Controller('minio-client')
@@ -154,5 +154,59 @@ export class MinioClientController {
       console.error('Proxy image error:', error);
       throw new HttpException('无法获取远程图片', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Get('folders')
+  async getFolders() {
+    // 获取所有对象（递归），只返回文件对象的 name 字段
+    const allObjects = await this.minioClientService.listAllObjectsRecursively('');
+    const arr = Array.isArray(allObjects) ? allObjects : [];
+    console.log('所有对象:', arr);
+    // 提取所有文件路径，按 / 分割，生成目录树
+    const root: any = {};
+    for (const obj of arr) {
+      if (typeof obj.name === 'string') {
+        const parts = obj.name.split('/');
+        // 移除最后一段（文件名），只保留目录部分
+        if (parts.length > 1) {
+          parts.pop();
+          let node = root;
+          for (const part of parts) {
+            if (!node[part]) node[part] = {};
+            node = node[part];
+          }
+        }
+      }
+    }
+    // 递归转换为树结构
+    function toTree(obj: any, parentPath = ''): any[] {
+      return Object.keys(obj).map(key => {
+        const fullPath = parentPath ? `${parentPath}/${key}` : key;
+        return {
+          label: key,
+          id: fullPath,
+          children: toTree(obj[key], fullPath)
+        };
+      });
+    }
+    return toTree(root);
+  }
+
+  @Get('files')
+  async getFiles(@Query('folder') folder: string = '') {
+    return await this.minioClientService.listFilesByFolder(folder);
+  }
+
+  @Post('moveFile')
+  async moveFile(
+    @Query('oldName') oldName: string,
+    @Query('newFolder') newFolder: string,
+  ) {
+    return await this.minioClientService.moveFile(oldName, newFolder);
+  }
+
+  @Get('all-objects')
+  async getAllObjects(@Query('prefix') prefix: string = '') {
+    return await this.minioClientService.listAllObjectsRecursively(prefix);
   }
 }

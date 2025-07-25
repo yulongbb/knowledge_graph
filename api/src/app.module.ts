@@ -6,7 +6,6 @@ import { OntologynModule } from 'src/ontology/ontology.module';
 import { MinioClientModule } from './minio/minio-client.module';
 import { RedisModule } from './redis/redis.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
-import { DatasetModule } from './dataset/dataset.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ArticleModule } from './article/article.module';
 import { ProjectModule } from './project/project.module';
@@ -44,7 +43,6 @@ import { SourceModule } from './source/source.moduel';
     MinioClientModule,
     AuthModule,
     RedisModule,
-    DatasetModule,
     ArticleModule,
     ProjectModule,
     ExtractionModule,

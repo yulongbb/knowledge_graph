@@ -1,0 +1,13 @@
+.file-manager {
+  display: flex;
+  height: 100%;
+  .sidebar {
+    width: 240px;
+    border-right: 1px solid #eee;
+    padding: 1rem;
+  }
+  .main {
+    flex: 1;
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,22 @@
+<div class="file-manager">
+  <div class="sidebar">
+    <x-tree [data]="folders"
+            (nodeClick)="onFolderSelect($event)">
+      <ng-template #nodeTpl let-node>
+        <span>{{ node.label }}</span>
+        <span *ngIf="node.loading" style="margin-left:8px;color:#999;">加载中...</span>
+      </ng-template>
+    </x-tree>
+  </div>
+  <div class="main">
+    <x-upload action="/api/minio-client/uploadFile" (uploadSuccess)="loadFiles(selectedFolder)"></x-upload>
+    <x-table [data]="files" [columns]="[
+      { id: 'name', label: '文件名' },
+      { id: 'actions', label: '操作', width: 120 }
+    ]" [bodyColumnTpl]="{ actions: actionsTpl }"></x-table>
+    <ng-template #actionsTpl let-row="$row">
+      <x-button type="danger" (click)="deleteFile(row)">删除</x-button>
+      <x-button (click)="moveFile(row, '目标文件夹名')">移动</x-button>
+    </ng-template>
+  </div>
+</div>

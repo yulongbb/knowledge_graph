@@ -10,7 +10,7 @@ export class MinioClientService {
 
   constructor(
     private readonly minio: MinioService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {
     const minioConfig = getMinioConfig(this.configService);
     this.baseBucket = minioConfig.MINIO_BUCKET;
@@ -104,6 +104,59 @@ export class MinioClientService {
 
   async download(fileName) {
     return await this.client.getObject(this.baseBucket, fileName);
+  }
+
+  // 获取所有文件夹（前缀树）
+  async listFolders(prefix: string = '') {
+    const stream = this.client.listObjectsV2(this.baseBucket, prefix, false);
+    const folders = new Set<string>();
+    return new Promise<string[]>((resolve, reject) => {
+      stream.on('data', (obj) => {
+        // 只根据 obj.prefix 判断文件夹（MinIO SDK返回的文件夹对象有prefix属性）
+        if (typeof obj.prefix === 'string' && obj.prefix.length > 1) {
+          // 去掉结尾的斜杠
+          const folderPath = obj.prefix.replace(/\/$/, '');
+          // 多层目录支持：如 demo/a/b 拆分为 demo, demo/a, demo/a/b
+          const parts = folderPath.split('/');
+          let path = '';
+          for (const part of parts) {
+            path = path ? `${path}/${part}` : part;
+            folders.add(path);
+          }
+        }
+      });
+      stream.on('end', () => resolve(Array.from(folders)));
+      stream.on('error', (err) => reject(err));
+    });
+  }
+
+  // 按文件夹列出文件
+  async listFilesByFolder(folder: string) {
+    const prefix = folder ? `${folder}/` : '';
+    const stream = this.client.listObjectsV2(this.baseBucket, prefix, false);
+    return this.readData(stream);
+  }
+
+  // 移动文件（重命名/移动到新文件夹）
+  async moveFile(oldName: string, newFolder: string) {
+    const newName = newFolder
+      ? `${newFolder}/${oldName.split('/').pop()}`
+      : oldName.split('/').pop();
+    await this.client.copyObject(
+      this.baseBucket,
+      newName,
+      `/${this.baseBucket}/${oldName}`,
+      null, // 补充 conditions 参数
+    );
+    await this.client.removeObject(this.baseBucket, oldName);
+    return { name: newName };
+  }
+
+  // 查询所有层级的目录和文件（递归）
+  async listAllObjectsRecursively(prefix: string = '') {
+    // recursive=true，返回所有层级的对象
+    const stream = this.client.listObjectsV2(this.baseBucket, prefix, true);
+    return this.readData(stream);
   }
 
   readData = async (stream) =>

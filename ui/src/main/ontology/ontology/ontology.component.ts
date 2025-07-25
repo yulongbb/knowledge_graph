@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { PageBase } from 'src/share/base/base-page';
 import { IndexService } from 'src/layout/index/index.service';
-import { XTableColumn, XTableRow } from '@ng-nest/ui/table';
+import { XTableColumn, XTableComponent, XTableRow } from '@ng-nest/ui/table';
 import { XMessageService } from '@ng-nest/ui/message';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { OntologyService, Schema } from 'src/main/ontology/ontology/ontology.service';
 import { UntypedFormGroup } from '@angular/forms';
 import { tap, map } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
+import { XOperation } from '@ng-nest/ui';
 
 @Component({
   selector: 'app-ontology',
@@ -25,8 +26,16 @@ export class OntologyComponent extends PageBase {
     { id: 'label', label: '标签', flex: 1 },
     { id: 'description', label: '描述', flex: 2 }
   ];
-  data: any;
+  data = (index: number, size: number, query: any) =>
+    this.service.getList(index, size, {filter: [{ field: 'pid',
+                    value: '',
+                    operation: 'isNull' as XOperation}]}).pipe((x: any) => {
+      return x;
+    });
+
   checkedRows: XTableRow[] = [];
+  query: any = { filter: [] };
+  @ViewChild('tableCom') tableCom!: XTableComponent;
 
   constructor(
     private service: OntologyService,
@@ -37,13 +46,6 @@ export class OntologyComponent extends PageBase {
     private msgBox: XMessageBoxService
   ) {
     super(indexService);
-    this.data = (index: number, size: number, query: any) =>
-      this.service.getList(index, size, {
-        filter: [{ field: 'pid', value: [''], operation: 'IN' }]
-      }).pipe(
-        tap((x) => console.log(x)),
-        map((x) => x.list)
-      );
   }
 
   action(type: string, row?: any) {

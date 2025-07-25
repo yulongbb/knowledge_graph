@@ -14,13 +14,14 @@ import { XCardModule } from '@ng-nest/ui/card';
 import { XCrumbModule } from '@ng-nest/ui/crumb';
 import { DatasetRoutesModule } from './dataset-routes.module';
 import { DatasetDetailComponent } from './dataset-detail/dataset-detail.component';
+import { FileManagerComponent } from './file-manager.component';
 
 
 
 
 
 @NgModule({
-  declarations: [DatasetComponent, DatasetDetailComponent],
+  declarations: [DatasetComponent, DatasetDetailComponent, FileManagerComponent],
   imports: [
     CommonModule,
     ShareModule,
