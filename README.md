@@ -197,3 +197,4 @@ api/
 
 项目采用 MIT 许可证 - 详见 LICENSE 文件
 
+ng serve --proxy-config proxy.conf.json
