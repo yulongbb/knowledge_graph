@@ -26,7 +26,7 @@ import { ApplicationRoutesModule } from './application-routes.module';
 import { ApplicationDetailComponent } from './application-detail/application-detail.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonPipeModule } from 'src/share/pipe/pipe.module';
-import { NamespaceService } from '../ontology/namespace/namespace.service';
+import { NamespaceService } from 'src/main/ontology/ontology/namespace/namespace.service';
 
 @NgModule({
   declarations: [ApplicationComponent, ApplicationDetailComponent],

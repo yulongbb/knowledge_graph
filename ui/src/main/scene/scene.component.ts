@@ -11,7 +11,7 @@ import {
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { Namespace, NamespaceService } from '../ontology/namespace/namespace.service';
+import { NamespaceService } from '../ontology/ontology/namespace/namespace.service';
 
 @Component({
   selector: 'app-scene',

@@ -5,9 +5,9 @@ import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { map, switchMap } from 'rxjs/operators';
-import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
 import { XOperation, XTreeNode } from '@ng-nest/ui'; 
 import { HttpClient } from '@angular/common/http';
+import { NamespaceService } from 'src/main/scene/namespace.service';
 
 // 修改TreeNode接口以符合ng-nest树组件的要求
 interface TreeNode {

@@ -54,7 +54,8 @@ export class OntologyComponent extends PageBase {
         this.router.navigate(['./add'], { relativeTo: this.activatedRoute });
         break;
       case 'edit':
-        this.router.navigate(['./edit', row.id], { relativeTo: this.activatedRoute });
+        // 跳转到本体编辑页面（去掉namespace）
+        this.router.navigate(['/index/ontology/edit', row.id]);
         break;
       case 'delete':
         this.msgBox.confirm({

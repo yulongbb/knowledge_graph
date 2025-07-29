@@ -9,10 +9,10 @@ import {
 import { UntypedFormGroup } from '@angular/forms';
 import { XTreeAction, XControl, XMessageService } from '@ng-nest/ui';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
-import { OntologyService, Schema } from '../../ontology/ontology.service';
 import { Namespace } from '../namespace.service';
 import { XGuid } from '@ng-nest/ui/core';
 import { forkJoin } from 'rxjs';
+import { OntologyService } from '../../ontology.service';
 
 @Component({
   selector: 'app-ontology-tree',
@@ -131,7 +131,7 @@ export class OntologyTreeComponent implements OnChanges {
           this.ontologyDataLoaded.emit(true);
           this.selectedOntology = null;
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to load ontology data:', error);
           this.message.error('加载本体数据失败');
           this.ontologyDataLoaded.emit(false);
@@ -306,7 +306,7 @@ export class OntologyTreeComponent implements OnChanges {
           }
           this.loadOntologyData();
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to add ontology:', error);
           this.message.error('新增本体失败: ' + error.message);
         },
@@ -318,7 +318,7 @@ export class OntologyTreeComponent implements OnChanges {
           this.cancelOntologyForm();
           this.loadOntologyData();
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to edit ontology:', error);
           this.message.error('编辑本体失败: ' + error.message);
         },

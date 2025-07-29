@@ -114,6 +114,9 @@ export class XRepositoryService<Entity extends XId, Query extends XQuery> {
             case 'IN':
               rep.andWhere(`entity.${x.field} IN (:...param${index})`);
               break;
+            case 'isNull':
+              rep.andWhere(`entity.${x.field} IS NULL`);
+              break;
             default:
               // '%'模糊查询
               rep.andWhere(`entity.${x.field} LIKE concat('%', :param${index}, '%')`);

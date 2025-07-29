@@ -15,10 +15,27 @@ import { EntityAddImageComponent } from './entity/components/entity-add-image/en
 import { NgNestModule } from './ng-nest.module';
 
 // 视图
-const declarations = [AuAuthDirective, EntityDetailComponent, EntityInfoComponent, EntityAddComponent, EntityAddImageComponent, SafeHtmlPipe];
+const declarations = [
+  AuAuthDirective,
+  EntityDetailComponent,
+  EntityInfoComponent,
+  EntityAddComponent,
+  EntityAddImageComponent,
+  SafeHtmlPipe
+];
 
 // 模块
-const modules = [FormsModule, CommonModule, RouterModule, FontAwesomeModule, ReactiveFormsModule, HttpClientModule, NgNestModule, LeafletModule, QuillModule];
+const modules = [
+  FormsModule,
+  CommonModule,
+  RouterModule,
+  FontAwesomeModule,
+  ReactiveFormsModule,
+  HttpClientModule,
+  NgNestModule,
+  LeafletModule,
+  QuillModule
+];
 
 /**
  * 共享模块
@@ -28,4 +45,4 @@ const modules = [FormsModule, CommonModule, RouterModule, FontAwesomeModule, Rea
   imports: [...modules],
   exports: [...modules, ...declarations]
 })
-export class ShareModule { }
+export class ShareModule {}

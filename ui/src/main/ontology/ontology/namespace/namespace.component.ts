@@ -15,11 +15,11 @@ import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { Namespace, NamespaceService } from './namespace.service';
-import { OntologyService } from '../ontology/ontology.service';
-import { PropertyService } from '../property/property.service';
-import { QualifyService } from '../qualify/qualify.service';
-import { TagService } from '../tag/tag.sevice';
+import { Namespace, NamespaceService } from 'src/main/ontology/ontology/namespace/namespace.service';
+import { Schema, OntologyService } from 'src/main/ontology/ontology/ontology.service';
+import { PropertyService } from 'src/main/ontology/ontology/property/property.service';
+import { QualifyService } from 'src/main/ontology/ontology/qualify/qualify.service';
+import { TagService } from 'src/main/ontology/ontology/tag/tag.service';
 
 @Component({
   selector: 'app-namespace',
@@ -165,20 +165,33 @@ export class NamespaceComponent extends PageBase implements OnInit {
         { label: 'commonsMedia', value: 'string' },
         { label: 'external-id', value: 'string' },
         { label: 'string', value: 'string' },
-        { label: 'url', value: 'string' },
-        { label: 'math', value: 'string' },
-        { label: 'monolingualtext', value: 'monolingualtext' },
-        { label: 'musical-notation', value: 'string' },
-        { label: 'globe-coordinate', value: 'globecoordinate' },
-        { label: 'quantity', value: 'quantity' },
-        { label: 'time', value: 'time' },
-        { label: 'tabular-data', value: 'string' },
-        { label: 'geo-shape', value: 'string' },
-        { label: 'wikibase-item', value: 'wikibase-entityid' },
-        { label: 'wikibase-qualify', value: 'wikibase-entityid' },
-        { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
-        { label: 'wikibase-form', value: 'wikibase-entityid' },
-        { label: 'wikibase-sense', value: 'wikibase-entityid' }
+        { control: 'input', id: 'name', label: '名称', required: true },
+        { control: 'textarea', id: 'description', label: '描述' },
+        {
+          control: 'select',
+          id: 'type',
+          label: '值类型',
+          required: true,
+          data: [
+            { label: 'commonsMedia', value: 'string' },
+            { label: 'external-id', value: 'string' },
+            { label: 'string', value: 'string' },
+            { label: 'url', value: 'string' },
+            { label: 'math', value: 'string' },
+            { label: 'monolingualtext', value: 'monolingualtext' },
+            { label: 'musical-notation', value: 'string' },
+            { label: 'globe-coordinate', value: 'globecoordinate' },
+            { label: 'quantity', value: 'quantity' },
+            { label: 'time', value: 'time' },
+            { label: 'tabular-data', value: 'string' },
+            { label: 'geo-shape', value: 'string' },
+            { label: 'wikibase-item', value: 'wikibase-entityid' },
+            { label: 'wikibase-qualify', value: 'wikibase-entityid' },
+            { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
+            { label: 'wikibase-form', value: 'wikibase-entityid' },
+            { label: 'wikibase-sense', value: 'wikibase-entityid' }
+          ],
+        },
       ],
     },
   ];
@@ -204,6 +217,11 @@ export class NamespaceComponent extends PageBase implements OnInit {
     },
   ];
 
+  // 新增本体编辑相关属性
+  ontologyEditMode: boolean = false;
+  editingOntologyId: string | null = null;
+  editingOntology: Schema | null = null;
+
   constructor(
     private namespaceService: NamespaceService,
     public override indexService: IndexService,
@@ -220,21 +238,92 @@ export class NamespaceComponent extends PageBase implements OnInit {
   }
 
   ngOnInit() {
-    // Load namespaces for the dropdown in the ontology form
-    this.namespaceService.getList(1, 1000).subscribe((response) => {
-      const namespaceControl = this.ontologyControls.find(
-        (c) => c.id === 'namespace'
-      );
-      if (namespaceControl) {
-        namespaceControl['data'] = (response.list || []).map((ns) => ({
-          label: ns.name,
-          value: String(ns.id), // 保证为字符串
-        }));
+    // 检查是否为本体编辑模式
+    this.activatedRoute.paramMap.subscribe(params => {
+      const ontologyId = params.get('id');
+      if (ontologyId) {
+        this.ontologyEditMode = true;
+        this.editingOntologyId = ontologyId;
+        this.loadOntologyForEdit(ontologyId);
+      } else {
+        this.ontologyEditMode = false;
+        this.editingOntologyId = null;
+        // Load namespaces for the dropdown in the ontology form
+        this.namespaceService.getList(1, 1000).subscribe((response) => {
+          const namespaceControl = this.ontologyControls.find(
+            (c) => c.id === 'namespace'
+          );
+          if (namespaceControl) {
+            namespaceControl['data'] = (response.list || []).map((ns) => ({
+              label: ns.name,
+              value: String(ns.id), // 保证为字符串
+            }));
+          }
+        });
+
+        // First ensure the default namespace exists, then load all namespaces
+        this.loadNamespaces();
       }
     });
+  }
 
-    // First ensure the default namespace exists, then load all namespaces
-    this.loadNamespaces();
+  // 加载本体数据用于编辑
+  loadOntologyForEdit(id: string) {
+    this.ontologyService.get(id).subscribe({
+      next: (ontology: Schema) => {
+        this.editingOntology = ontology;
+        // 修正 TS4111 错误，使用索引访问
+        this.ontologyForm.patchValue({
+          name: ontology['name'],
+          label: ontology['label'],
+          description: ontology['description'],
+          namespace: ontology['namespaceId'] || '', // 假设有 namespaceId 字段
+        });
+        // 加载命名空间下拉
+        this.namespaceService.getList(1, 1000).subscribe((response) => {
+          const namespaceControl = this.ontologyControls.find(
+            (c) => c.id === 'namespace'
+          );
+          if (namespaceControl) {
+            namespaceControl['data'] = (response.list || []).map((ns) => ({
+              label: ns.name,
+              value: String(ns.id),
+            }));
+          }
+        });
+      },
+      error: (err: any) => {
+        this.message.error('加载本体失败');
+      }
+    });
+  }
+
+  // 保存本体
+  saveOntology() {
+    if (this.ontologyForm.invalid) {
+      this.message.warning('请填写必填字段');
+      return;
+    }
+    const formData = this.ontologyForm.value;
+    const updateData = {
+      ...this.editingOntology,
+      ...formData,
+      namespaceId: formData.namespace,
+    };
+    this.ontologyService.put(updateData).subscribe({
+      next: () => {
+        this.message.success('本体保存成功');
+        this.router.navigate(['/index/ontology']);
+      },
+      error: (err: any) => {
+        this.message.error('保存本体失败');
+      }
+    });
+  }
+
+  // 取消本体编辑
+  cancelOntologyEdit() {
+    this.router.navigate(['/index/ontology']);
   }
 
   // Load namespaces for the dropdown
@@ -255,7 +344,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           this.onNamespaceSelected(this.selectedNamespaceId);
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load namespaces:', error);
         this.message.error('加载命名空间失败');
       },
@@ -386,7 +475,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.qualifierDataLoaded = true;
         this.qualifierLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load qualifiers for property:', error);
         this.message.error('加载属性限定失败');
         this.qualifierLoading = false;
@@ -421,7 +510,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.tagDataLoaded = true;
         this.tagLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load tags for property:', error);
         this.message.error('加载属性字典失败');
         this.tagLoading = false;
@@ -567,7 +656,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.qualifierFormMode = 'view';
         this.qualifierForm.reset();
 
-        this.qualifyService.get(item.id).subscribe((data) => {
+        this.qualifyService.get(item.id).subscribe((data: any) => {
           this.qualifierForm.patchValue(data);
         });
         break;
@@ -584,7 +673,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
                   this.message.success('删除限定成功');
                   this.loadQualifiersForProperty(this.selectedProperty);
                 },
-                error: (error) => {
+                error: (error:any) => {
                   console.error('Failed to delete qualifier:', error);
                   this.message.error('删除限定失败');
                 },
@@ -620,7 +709,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           this.cancelQualifierForm();
           this.loadQualifiersForProperty(this.selectedProperty);
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to add qualifier:', error);
           this.message.error('新增限定失败: ' + error.message);
         },
@@ -632,7 +721,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           this.cancelQualifierForm();
           this.loadQualifiersForProperty(this.selectedProperty);
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to edit qualifier:', error);
           this.message.error('编辑限定失败: ' + error.message);
         },
@@ -816,7 +905,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.propertyDataLoaded = true;
         this.propertyLoading = false;
       },
-      error: (error) => {
+      error: (error:any) => {
         console.error('Failed to load properties for ontology:', error);
         this.message.error('加载本体属性失败');
         this.propertyLoading = false;
@@ -914,7 +1003,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.tagFormMode = 'view';
         this.tagForm.reset();
 
-        this.tagService.get(item.id).subscribe((data) => {
+        this.tagService.get(item.id).subscribe((data: any) => {
           this.tagForm.patchValue(data);
           // 强制设置 type 控件的值并禁用，确保选中正确类型
           setTimeout(() => {
@@ -939,7 +1028,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
                   this.message.success('删除字典成功');
                   this.loadTagsForProperty(this.selectedProperty);
                 },
-                error: (error) => {
+                error: (error:any) => {
                   console.error('Failed to delete tag:', error);
                   this.message.error('删除字典失败');
                 },
@@ -977,7 +1066,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           this.cancelTagForm();
           this.loadTagsForProperty(this.selectedProperty);
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to add tag:', error);
           this.message.error('新增字典失败: ' + error.message);
         },
@@ -989,7 +1078,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
           this.cancelTagForm();
           this.loadTagsForProperty(this.selectedProperty);
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to edit tag:', error);
           this.message.error('编辑字典失败: ' + error.message);
         },
@@ -1040,7 +1129,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
       case 'info':
         this.propertyFormMode = 'view';
         this.propertyForm.reset();
-        this.propertyService.get(item.id).subscribe((data) => {
+        this.propertyService.get(item.id).subscribe((data: any) => {
           this.propertyForm.patchValue(data);
         });
         break;
@@ -1061,7 +1150,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
                     this.loadPropertyData();
                   }
                 },
-                error: (error) => {
+                error: (error:any) => {
                   console.error('Failed to delete property:', error);
                   this.message.error('删除属性失败');
                 },
@@ -1103,7 +1192,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
             this.loadPropertyData();
           }
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to add property:', error);
           this.message.error('新增属性失败: ' + error.message);
         },
@@ -1119,7 +1208,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
             this.loadPropertyData();
           }
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('Failed to edit property:', error);
           this.message.error('编辑属性失败: ' + error.message);
         },
@@ -1140,4 +1229,3 @@ export class NamespaceComponent extends PageBase implements OnInit {
     return `prop-${timestamp}-${randomPart}`;
   }
 }
-    

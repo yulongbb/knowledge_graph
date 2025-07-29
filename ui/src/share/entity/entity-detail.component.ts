@@ -36,8 +36,8 @@ import * as L from 'leaflet';
 import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import * as Plyr from 'plyr';
-import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
 import { HttpClient } from '@angular/common/http';
+import { NamespaceService } from 'src/main/scene/namespace.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -254,7 +254,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         // Set default namespace
         this.namespace = 'default';
       },
-      error: (error) => {
+      error: (error:any) => {
         console.error('Failed to load namespaces:', error);
         this.message.error('加载命名空间失败');
         // Ensure at least default namespace is available
@@ -291,7 +291,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           // ...现有的数据加载逻辑...
           this.cdr.detectChanges();
         },
-        error: (error) => {
+        error: (error:any) => {
           console.error('加载数据失败:', error);
           this.message.error('加载数据失败');
         }
@@ -476,7 +476,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                 console.log('上传成功:', data);
                 this.uploadImage({ body: { name: data.name } });
               })
-              .catch((error) => {
+              .catch((error:any) => {
                 console.error('上传失败:', error);
               });
           }
@@ -517,7 +517,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(this.vids);
         console.log(this.imgs);
       })
-      .catch((error) => {
+      .catch((error:any) => {
         console.error('封面上传失败:', error);
       });
   }
@@ -562,11 +562,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
             console.log('更新后的 video 数据:', this.vids);
           })
-          .catch((error) => {
+          .catch((error:any) => {
             console.error('封面获取失败:', error);
           });
       })
-      .catch((error) => {
+      .catch((error:any) => {
         console.error('视频下载失败:', error);
       });
   }
@@ -594,7 +594,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         });
         console.log(this.fs);
       })
-      .catch((error) => {
+      .catch((error:any) => {
         console.error('封面上传失败:', error);
       });
   }
@@ -700,7 +700,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         this.message.success('删除成功！');
         this.location.back();  // 删除成功后返回上一页
       },
-      error: (error) => {
+      error: (error:any) => {
         this.message.error('删除失败：' + error.message);
       }
     });
@@ -904,7 +904,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         // 触发变更检测以更新UI
         this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: (error:any) => {
         console.error('Failed to load tags for property:', error);
         this.tagOptionsCache.set(propertyId, []);
       }
@@ -1159,7 +1159,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               this.message.success('编辑成功！');
               this.back();
             },
-            error: (error) => {
+            error: (error:any) => {
               this.message.error('编辑失败：' + error.message);
               console.error('更新失败:', error);
             }

@@ -33,7 +33,16 @@ export interface XFilter {
 /**
  * 属性匹配规则
  */
-export type XOperation = '%' | '=' | '>' | '>=' | '<' | '<=' | 'IN'| '';
+export type XOperation =
+  | '%'
+  | '='
+  | '>'
+  | '>='
+  | '<'
+  | '<='
+  | 'IN'
+  | 'isNull'
+  | '';
 
 /**
  * 排序规则

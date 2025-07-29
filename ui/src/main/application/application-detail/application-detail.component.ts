@@ -11,7 +11,7 @@ import { XMessageService } from '@ng-nest/ui/message';
 import { forkJoin, map } from 'rxjs';
 import { ApplicationService } from '../application.sevice';
 import { OntologyService } from 'src/main/ontology/ontology/ontology.service';
-import { NamespaceService } from 'src/main/ontology/namespace/namespace.service';
+import { NamespaceService } from 'src/main/scene/namespace.service';
 
 @Component({
   selector: 'app-application-detail',
