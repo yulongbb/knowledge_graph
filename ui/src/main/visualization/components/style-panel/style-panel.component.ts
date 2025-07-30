@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 
 interface CanvasItem {
   id: number;
-  type: 'text' | 'image' | 'chart' | 'button';
+  type: 'text' | 'image' | 'chart' | 'button' | 'echart';
   x: number;
   y: number;
   content?: string;
@@ -15,6 +15,7 @@ interface CanvasItem {
   fontWeight?: string;
   borderRadius?: number;
   opacity?: number;
+  echartType?: string; // 可选
 }
 
 @Component({

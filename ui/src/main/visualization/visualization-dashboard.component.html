@@ -1,13 +1,8 @@
 <div class="visualization-dashboard">
   <!-- 左侧菜单栏 -->
   <div class="menu-sidebar">
-    <div
-      *ngFor="let menu of paletteMenus"
-      class="menu-item"
-      [class.active]="activeMenu === menu.type"
-      (click)="switchMenu(menu.type)"
-      [title]="menu.label"
-    >
+    <div *ngFor="let menu of paletteMenus" class="menu-item" [class.active]="activeMenu === menu.type"
+      (click)="switchMenu(menu.type)" [title]="menu.label">
       <span class="menu-icon">{{ menu.icon }}</span>
       <span class="menu-label">{{ menu.label }}</span>
     </div>
@@ -16,10 +11,10 @@
   <!-- 组件库 -->
   <div class="palette">
     <div class="palette-title">{{ getCurrentMenuLabel() }}</div>
-    <app-chart-palette *ngIf="activeMenu === 'chart'"></app-chart-palette>
-    <app-material-palette *ngIf="activeMenu === 'material'"></app-material-palette>
-    <app-resource-palette *ngIf="activeMenu === 'resource'"></app-resource-palette>
-    <app-template-palette *ngIf="activeMenu === 'template'"></app-template-palette>
+    <app-chart-palette *ngIf="activeMenu === 'chart'" (itemSelected)="onPaletteItemSelected($event)"></app-chart-palette>
+    <app-material-palette *ngIf="activeMenu === 'material'" (itemSelected)="onPaletteItemSelected($event)"></app-material-palette>
+    <app-resource-palette *ngIf="activeMenu === 'resource'" (itemSelected)="onPaletteItemSelected($event)"></app-resource-palette>
+    <app-template-palette *ngIf="activeMenu === 'template'" (itemSelected)="onPaletteItemSelected($event)"></app-template-palette>
   </div>
 
   <!-- 中间画布区域 -->
@@ -35,7 +30,7 @@
         <button class="action-btn primary" (click)="saveDesign()">保存</button>
       </div>
     </div>
-    
+
     <div class="canvas-wrapper">
       <!-- 浮动工具栏 -->
       <div class="canvas-toolbar">
@@ -52,72 +47,44 @@
         </div>
       </div>
 
-      <div
-        *ngIf="activeCanvas"
-        class="canvas"
-        [class.drag-over]="isDragOver"
-        [ngStyle]="getCanvasStyle()"
-        cdkDropList
-        [cdkDropListEnterPredicate]="enterPredicate"
-        (cdkDropListDropped)="onDrop($event)"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (mousedown)="onCanvasMouseDown($event)"
-        (mousemove)="onCanvasMouseMove($event)"
-        (mouseup)="onCanvasMouseUp($event)"
-        (mouseleave)="onCanvasMouseUp($event)"
-        (wheel)="onCanvasWheel($event)"
-      >
-        <div
-          *ngFor="let item of canvasItems; trackBy: trackByFn"
-          class="canvas-item"
-          [class.selected]="selectedItem?.id === item.id"
-          [ngStyle]="{ left: item.x + 'px', top: item.y + 'px' }"
-          cdkDrag
-          [cdkDragData]="item"
-          (cdkDragEnded)="onItemDragEnd($event, item)"
-          (click)="selectItem(item)"
-        >
-          <!-- 控制按钮 -->
-          <div class="item-controls">
-            <button class="control-btn copy-btn" (click)="copyItem(item)" title="复制">⧉</button>
-            <button class="control-btn delete-btn" (click)="removeItem(item)" title="删除">×</button>
-          </div>
-          
-          <!-- 文本组件 -->
-          <div 
-            *ngIf="item.type === 'text'" 
-            class="canvas-text"
-            contenteditable="true"
-            (blur)="updateContent(item, $event)"
-            (click)="$event.stopPropagation()"
-          >{{ item.content }}</div>
-          
-          <!-- 图片组件 -->
-          <img 
-            *ngIf="item.type === 'image'" 
-            [src]="item.src" 
-            class="canvas-image"
-            (click)="$event.stopPropagation()"
-          />
-
-          <!-- 图表组件 -->
-          <div 
-            *ngIf="item.type === 'chart'" 
-            class="canvas-chart"
-            (click)="$event.stopPropagation()"
-          >
-            <div style="width: 200px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #999;">
-              图表组件
+      <div *ngIf="activeCanvas" class="canvas" [class.drag-over]="isDragOver" [ngStyle]="getCanvasStyle()" cdkDropList
+        [cdkDropListEnterPredicate]="enterPredicate" (cdkDropListDropped)="onDrop($event)"
+        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (mousedown)="onCanvasMouseDown($event)"
+        (mousemove)="onCanvasMouseMove($event)" (mouseup)="onCanvasMouseUp($event)"
+        (mouseleave)="onCanvasMouseUp($event)" (wheel)="onCanvasWheel($event)">
+        <div *ngFor="let item of canvasItems; trackBy: trackByFn" class="canvas-item"
+          [class.selected]="selectedItem?.id === item.id" [ngStyle]="{ left: item.x + 'px', top: item.y + 'px' }"
+          (click)="selectItem(item)">
+          <!-- 可拖拽组件（非echart） -->
+          <ng-container *ngIf="item.type !== 'echart'; else echartBlock">
+            <div cdkDrag [cdkDragData]="item" (cdkDragEnded)="onItemDragEnd($event, item)" class="canvas-item-inner">
+              <div class="item-controls">
+                <button class="control-btn copy-btn" (click)="copyItem(item)" title="复制">⧉</button>
+                <button class="control-btn delete-btn" (click)="removeItem(item)" title="删除">×</button>
+              </div>
+              <div *ngIf="item.type === 'text'" class="canvas-text" contenteditable="true"
+                (blur)="updateContent(item, $event)" (click)="$event.stopPropagation()">{{ item.content }}</div>
+              <img *ngIf="item.type === 'image'" [src]="item.src" class="canvas-image"
+                (click)="$event.stopPropagation()" />
+              <div *ngIf="item.type === 'chart'" class="canvas-chart" (click)="$event.stopPropagation()">
+                <div
+                  style="width: 200px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #999;">
+                  图表组件
+                </div>
+              </div>
+              <button *ngIf="item.type === 'button'" class="canvas-button" (click)="$event.stopPropagation()">{{
+                item.content || '按钮' }}</button>
             </div>
-          </div>
-
-          <!-- 按钮组件 -->
-          <button 
-            *ngIf="item.type === 'button'" 
-            class="canvas-button"
-            (click)="$event.stopPropagation()"
-          >{{ item.content || '按钮' }}</button>
+          </ng-container>
+          <!-- echart组件（不可拖拽移动） -->
+          <ng-template #echartBlock>
+            <div class="canvas-echart" (click)="$event.stopPropagation()">
+              <div style="width: 200px; height: 150px;">
+                <echarts-angular [options]="getEchartOptions(item.echartType || '')" [autoResize]="true"
+                  style="width: 100%; height: 100%;"></echarts-angular>
+              </div>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -125,33 +92,16 @@
     <!-- 画布底部信息栏 -->
     <div class="canvas-footer">
       <div class="canvas-tabs">
-        <div
-          *ngFor="let canvas of canvases"
-          class="canvas-tab"
-          [class.active]="canvas.id === activeCanvasId"
-          (click)="switchCanvas(canvas.id)"
-        >
-          <span
-            *ngIf="editingCanvasId !== canvas.id"
-            class="canvas-name"
-            (dblclick)="startRenaming(canvas.id, $event)"
-          >
+        <div *ngFor="let canvas of canvases" class="canvas-tab" [class.active]="canvas.id === activeCanvasId"
+          (click)="switchCanvas(canvas.id)">
+          <span *ngIf="editingCanvasId !== canvas.id" class="canvas-name" (dblclick)="startRenaming(canvas.id, $event)">
             {{ canvas.name }}
           </span>
-          <input
-            *ngIf="editingCanvasId === canvas.id"
-            class="canvas-name-input"
-            [value]="canvas.name"
+          <input *ngIf="editingCanvasId === canvas.id" class="canvas-name-input" [value]="canvas.name"
             (blur)="saveCanvasName(canvas.id, $any($event.target).value)"
-            (keydown)="onCanvasNameKeydown($event, canvas.id)"
-            #nameInput
-          />
-          <button
-            *ngIf="canvases.length > 1"
-            class="delete-canvas-btn"
-            (click)="deleteCanvas(canvas.id, $event)"
-            title="删除画布"
-          >
+            (keydown)="onCanvasNameKeydown($event, canvas.id)" #nameInput />
+          <button *ngIf="canvases.length > 1" class="delete-canvas-btn" (click)="deleteCanvas(canvas.id, $event)"
+            title="删除画布">
             ×
           </button>
         </div>
@@ -184,12 +134,8 @@
           <span class="column-title">样式</span>
         </div>
         <div class="column-content">
-          <app-style-panel 
-            [selectedItem]="selectedItem"
-            (itemUpdated)="onItemUpdated($event)"
-            (itemCopied)="onItemCopied($event)"
-            (itemDeleted)="onItemDeleted($event)"
-          ></app-style-panel>
+          <app-style-panel [selectedItem]="selectedItem" (itemUpdated)="onItemUpdated($event)"
+            (itemCopied)="onItemCopied($event)" (itemDeleted)="onItemDeleted($event)"></app-style-panel>
         </div>
       </div>
     </div>

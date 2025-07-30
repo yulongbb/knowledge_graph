@@ -1,18 +1,17 @@
 <div class="palette-list">
-  <div
-    class="palette-item template-item"
-    *ngFor="let item of templateItems"
-    cdkDrag
-    [cdkDragData]="item"
-    [cdkDragDisabled]="false"
-    cdkDragPreviewClass="palette-drag-preview"
-    (click)="onItemClick(item)"
-  >
-    <div class="template-header">
-      <span class="item-icon">{{ item.icon }}</span>
-      <span class="item-label">{{ item.label }}</span>
+  <ng-container *ngFor="let item of templateItems">
+    <div
+      class="palette-item template-item"
+      (mousedown)="onItemClick(item)"
+      (touchstart)="onItemClick(item)"
+      (click)="onItemClick(item)"
+    >
+      <div class="template-header">
+        <span class="item-icon">{{ item.icon }}</span>
+        <span class="item-label">{{ item.label }}</span>
+      </div>
+      <div class="template-description">{{ item.description }}</div>
+      <div class="template-preview">预览</div>
     </div>
-    <div class="template-description">{{ item.description }}</div>
-    <div class="template-preview">预览</div>
-  </div>
+  </ng-container>
 </div>

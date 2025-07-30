@@ -159,7 +159,7 @@ export const layoutRoutes: Routes = [
 
   // 数据集
   {
-    path: 'dataset',
+    path: 'ftp',
     loadChildren: () =>
       import('../main/dataset/dataset.module').then((x) => x.DatasetModule),
     canLoad: [AuthGuard],

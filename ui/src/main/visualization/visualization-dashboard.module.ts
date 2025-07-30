@@ -1,7 +1,8 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 import { VisualizationDashboardComponent } from './visualization-dashboard.component';
 import { ChartPaletteComponent } from './components/chart-palette/chart-palette.component';
@@ -26,10 +27,12 @@ import { VisualizationDashboardRoutingModule } from './visualization-dashboard-r
     VisualizationDashboardRoutingModule,
     CommonModule,
     FormsModule,
-    DragDropModule
+    DragDropModule,
+    NgxEchartsModule.forRoot({ echarts: () => import('echarts') })
   ],
   exports: [
     VisualizationDashboardComponent
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class VisualizationDashboardModule {}

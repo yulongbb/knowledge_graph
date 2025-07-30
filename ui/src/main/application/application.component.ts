@@ -230,6 +230,12 @@ export class ApplicationComponent extends PageBase {
           this.fetchPinnedApplications();
         });
         break;
+      case 'visualize':
+        if (item?.id) {
+          const url = `/visualization/${item.id}`;
+          window.open(url, '_blank');
+        }
+        break;
     }
   }
 

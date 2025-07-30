@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { CdkDragDrop, CdkDragEnd, CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
+import { ActivatedRoute } from '@angular/router';
 
 interface PaletteItem {
   type?: string;
@@ -9,11 +10,12 @@ interface PaletteItem {
 
 interface CanvasItem {
   id: number;
-  type: 'text' | 'image' | 'chart' | 'button';
+  type: 'text' | 'image' | 'chart' | 'button' | 'echart';
   x: number;
   y: number;
   content?: string;
   src?: string;
+  echartType?: string; // 仅 'echart' 类型使用
 }
 
 interface CanvasState {
@@ -37,7 +39,7 @@ export class VisualizationDashboardComponent implements AfterViewInit {
     { type: 'resource', label: '资源', icon: '📦' },
     { type: 'template', label: '模版', icon: '📄' }
   ];
-  
+
   activeMenu: string = 'chart';
 
   // 画布状态
@@ -58,10 +60,22 @@ export class VisualizationDashboardComponent implements AfterViewInit {
   isDraggingCanvas = false;
   dragStartPos = { x: 0, y: 0 };
 
-  constructor() {
+  // 应用 ID
+  applicationId: string | null = null;
+
+  constructor(private route: ActivatedRoute) {
     console.log('VisualizationDashboardComponent constructor called');
     this.addCanvas();
     console.log('Initial canvas added:', this.canvases);
+
+    // 通过 ActivatedRoute 获取应用 id
+    this.route.paramMap.subscribe(params => {
+      this.applicationId = params.get('id');
+      if (this.applicationId) {
+        console.log('当前应用ID:', this.applicationId);
+        // 可在此处根据应用ID加载相关数据
+      }
+    });
   }
 
   // 获取当前激活的画布
@@ -103,24 +117,26 @@ export class VisualizationDashboardComponent implements AfterViewInit {
 
   // 进入条件检查函数 - 只允许从组件库拖入（复制拖拽）
   enterPredicate = (drag: CdkDrag, drop: CdkDropList) => {
-    // 只允许 palette（组件库）中的组件（无id）拖入画布
+    // 允许 palette（组件库）中的组件（无id）拖入画布，支持 echart 类型
     return drag.data && drag.data.type && !drag.data.id;
   };
 
   // 从组件库拖拽到画布时触发（复制拖拽）
   onDrop(event: CdkDragDrop<any>) {
     this.isDragOver = false;
+    // 只允许 palette（组件库）中的组件（无id）拖入画布，进行复制
     if (!event.item.data || !event.item.data.type || event.item.data.id || !this.activeCanvas) {
       return;
     }
 
     const type = event.item.data.type;
+    const extra = event.item.data;
     const canvasEl = event.container.element.nativeElement as HTMLElement;
     const canvasRect = canvasEl.getBoundingClientRect();
-    
+
     let clientX: number;
     let clientY: number;
-    
+
     if (event.event instanceof MouseEvent) {
       clientX = event.event.clientX;
       clientY = event.event.clientY;
@@ -131,23 +147,29 @@ export class VisualizationDashboardComponent implements AfterViewInit {
       clientX = canvasRect.left + canvasRect.width / 2;
       clientY = canvasRect.top + canvasRect.height / 2;
     }
-    
+
     const xInCanvas = clientX - canvasRect.left;
     const yInCanvas = clientY - canvasRect.top;
     const x = xInCanvas / this.canvasScale;
     const y = yInCanvas / this.canvasScale;
 
-    const item = this.createItem(type, x - 50, y - 20);
+    // 复制一个新组件到画布
+    const item = this.createItem(type, x - 50, y - 20, extra);
     this.activeCanvas.items.push(item);
     this.selectItem(item);
   }
 
   // 创建组件
-  createItem(type: string, x: number, y: number): CanvasItem {
+  createItem(type: string, x: number, y: number, extra?: any): CanvasItem {
     const baseItem = {
       id: this.nextId++,
       x, y
     };
+
+    // 支持 echart 类型
+    if (['bar', 'line', 'pie', 'scatter', 'radar'].includes(type)) {
+      return { ...baseItem, type: 'echart', echartType: type };
+    }
 
     switch (type) {
       case 'text':
@@ -175,10 +197,10 @@ export class VisualizationDashboardComponent implements AfterViewInit {
     const wrapper = document.querySelector('.canvas-wrapper') as HTMLElement;
     if (wrapper && this.activeCanvas) {
       wrapper.offsetHeight;
-      
+
       const wrapperWidth = wrapper.offsetWidth;
       const wrapperHeight = wrapper.offsetHeight;
-      
+
       this.canvasScale = (wrapperWidth - 60) / 1920;
       this.canvasOffset = {
         x: (wrapperWidth - 1920 * this.canvasScale) / 2,
@@ -228,10 +250,10 @@ export class VisualizationDashboardComponent implements AfterViewInit {
   onCanvasWheel(event: WheelEvent) {
     event.preventDefault();
     if (!this.activeCanvas) return;
-    
+
     const delta = event.deltaY > 0 ? -0.1 : 0.1;
     const newScale = Math.max(0.1, Math.min(3, this.canvasScale + delta));
-    
+
     if (newScale !== this.canvasScale) {
       this.canvasScale = newScale;
     }
@@ -281,17 +303,17 @@ export class VisualizationDashboardComponent implements AfterViewInit {
   onItemDragEnd(event: CdkDragEnd, item: CanvasItem) {
     const el = event.source.element.nativeElement as HTMLElement;
     const transform = el.style.transform;
-    
+
     if (transform) {
       const match = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(transform);
       if (match) {
         const dx = parseFloat(match[1]);
         const dy = parseFloat(match[2]);
-        
+
         // 移除边界限制，允许组件在画布任意位置
         item.x += dx;
         item.y += dy;
-        
+
         el.style.transform = '';
       }
     }
@@ -305,11 +327,11 @@ export class VisualizationDashboardComponent implements AfterViewInit {
   // 复制组件
   copyItem(item: CanvasItem) {
     if (!this.activeCanvas) return;
-    const newItem = { 
-      ...item, 
-      id: this.nextId++, 
-      x: item.x + 20, 
-      y: item.y + 20 
+    const newItem = {
+      ...item,
+      id: this.nextId++,
+      x: item.x + 20,
+      y: item.y + 20
     };
     this.activeCanvas.items.push(newItem);
     this.selectItem(newItem);
@@ -437,7 +459,7 @@ export class VisualizationDashboardComponent implements AfterViewInit {
     const index = this.canvases.findIndex(c => c.id === id);
     if (index > -1) {
       this.canvases.splice(index, 1);
-      
+
       // 如果删除的是当前画布，切换到第一个画布
       if (id === this.activeCanvasId) {
         this.switchCanvas(this.canvases[0].id);
@@ -469,5 +491,75 @@ export class VisualizationDashboardComponent implements AfterViewInit {
   // 处理样式面板中的删除操作
   onItemDeleted(item: CanvasItem) {
     this.removeItem(item);
+  }
+
+  getEchartOptions(type: string): any {
+    switch (type) {
+      case 'bar':
+        return {
+          xAxis: { type: 'category', data: ['A', 'B', 'C', 'D'] },
+          yAxis: { type: 'value' },
+          series: [{ data: [23, 45, 12, 36], type: 'bar' }]
+        };
+      case 'line':
+        return {
+          xAxis: { type: 'category', data: ['A', 'B', 'C', 'D'] },
+          yAxis: { type: 'value' },
+          series: [{ data: [12, 34, 22, 18], type: 'line' }]
+        };
+      case 'pie':
+        return {
+          series: [{
+            type: 'pie',
+            data: [
+              { value: 40, name: 'A' },
+              { value: 30, name: 'B' },
+              { value: 20, name: 'C' },
+              { value: 10, name: 'D' }
+            ]
+          }]
+        };
+      case 'scatter':
+        return {
+          xAxis: {},
+          yAxis: {},
+          series: [{
+            symbolSize: 20,
+            data: [[10, 20], [20, 30], [30, 10], [40, 50]],
+            type: 'scatter'
+          }]
+        };
+      case 'radar':
+        return {
+          radar: {
+            indicator: [
+              { name: 'A', max: 100 },
+              { name: 'B', max: 100 },
+              { name: 'C', max: 100 }
+            ]
+          },
+          series: [{
+            type: 'radar',
+            data: [
+              { value: [60, 80, 70], name: '示例' }
+            ]
+          }]
+        };
+      default:
+        return {};
+    }
+  }
+
+  onPaletteItemSelected(item: PaletteItem) {
+    if (!this.activeCanvas || !item.type) return;
+    // 居中显示
+    const canvasWidth = 1920;
+    const canvasHeight = 1080;
+    const x = canvasWidth / 2 - 50;
+    const y = canvasHeight / 2 - 20;
+    // 复用 createItem 逻辑
+    const newItem = this.createItem(item.type, x, y, item);
+    this.activeCanvas.items.push(newItem);
+    this.selectItem(newItem);
   }
 }

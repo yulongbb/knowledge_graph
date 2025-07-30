@@ -3,7 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { VisualizationDashboardComponent } from './visualization-dashboard.component';
 
 const routes: Routes = [
-  { path: '', component: VisualizationDashboardComponent }
+  { path: '', component: VisualizationDashboardComponent },
+  { path: ':id', component: VisualizationDashboardComponent }
 ];
 
 @NgModule({
