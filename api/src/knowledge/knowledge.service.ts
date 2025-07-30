@@ -160,7 +160,7 @@ export class KnowledgeService {
 
         const source = {
           type: entity.type.id,
-          namespace: entity.namespace,
+          scenes: entity.scenes,
           labels: entity?.labels,
           descriptions: entity?.descriptions,
           aliases: entity?.aliases,

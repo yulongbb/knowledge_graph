@@ -9,7 +9,6 @@ import {
 import { UntypedFormGroup } from '@angular/forms';
 import { XTreeAction, XControl, XMessageService } from '@ng-nest/ui';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
-import { Namespace } from '../namespace.service';
 import { XGuid } from '@ng-nest/ui/core';
 import { forkJoin } from 'rxjs';
 import { OntologyService } from '../../ontology.service';
@@ -20,8 +19,7 @@ import { OntologyService } from '../../ontology.service';
   styleUrls: ['./ontology-tree.component.scss'],
 })
 export class OntologyTreeComponent implements OnChanges {
-  @Input() selectedNamespace: Namespace | null = null;
-  @Input() namespaceOptions: { label: string; value: string }[] = [];
+  @Input() ontologyId: string | null = null;
 
   @Output() ontologySelected = new EventEmitter<any>();
   @Output() ontologyDataLoaded = new EventEmitter<boolean>();
@@ -77,29 +75,16 @@ export class OntologyTreeComponent implements OnChanges {
     private ontologyService: OntologyService,
     private message: XMessageService,
     private msgBox: XMessageBoxService
-  ) {}
+  ) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['selectedNamespace'] && this.selectedNamespace) {
+    if (changes['ontologyId'] && this.ontologyId) {
       this.loadOntologyData();
-    }
-
-    if (changes['namespaceOptions'] && this.namespaceOptions) {
-      this.updateNamespaceControl();
-    }
-  }
-
-  private updateNamespaceControl() {
-    const namespaceControl = this.ontologyControls.find(
-      (c) => c.id === 'namespace'
-    );
-    if (namespaceControl) {
-      namespaceControl['data'] = this.namespaceOptions;
     }
   }
 
   loadOntologyData() {
-    if (!this.selectedNamespace) {
+    if (!this.ontologyId) {
       this.isOntologyDataLoaded = false;
       this.ontologyDataLoaded.emit(false);
       return;
@@ -108,10 +93,11 @@ export class OntologyTreeComponent implements OnChanges {
     this.isOntologyDataLoaded = false;
     this.ontologyDataLoaded.emit(false);
 
+    // Query by ontologyId
     const filter = [
       {
-        field: 'namespaceId',
-        value: this.selectedNamespace.id?.toString() || '',
+        field: 'pid',
+        value: this.ontologyId,
       },
     ];
 
@@ -126,13 +112,19 @@ export class OntologyTreeComponent implements OnChanges {
       .subscribe({
         next: (response: any) => {
           console.log('Ontology data loaded:', response);
-          this.ontologyData = this.enhanceOntologyData(response.list);
-          this.isOntologyDataLoaded = true;
-          this.ontologyDataLoaded.emit(true);
-          this.selectedOntology = null;
+          this.ontologyService.get(this.ontologyId ?? '').subscribe((rootOntology: any) => {
+            if (rootOntology) {
+              console.log('Root ontology:', rootOntology);
+              response.list.push(rootOntology);
+              this.ontologyData = this.enhanceOntologyData(response.list);
+              this.isOntologyDataLoaded = true;
+              this.ontologyDataLoaded.emit(true);
+              this.selectedOntology = null;
+            }
+          });
+
         },
-        error: (error:any) => {
-          console.error('Failed to load ontology data:', error);
+        error: (error: any) => {
           this.message.error('加载本体数据失败');
           this.ontologyDataLoaded.emit(false);
         },
@@ -188,9 +180,7 @@ export class OntologyTreeComponent implements OnChanges {
         this.ontologyForm.reset();
         this.ontologyForm.patchValue({
           id: XGuid(),
-          pid: null,
-          namespace: this.selectedNamespace?.id,
-          namespaceId: this.selectedNamespace?.id,
+          pid: null
         });
         break;
       case 'add':
@@ -198,9 +188,7 @@ export class OntologyTreeComponent implements OnChanges {
         this.ontologyForm.reset();
         this.ontologyForm.patchValue({
           id: XGuid(),
-          pid: schema?.id,
-          namespace: this.selectedNamespace?.id,
-          namespaceId: this.selectedNamespace?.id,
+          pid: schema?.id
         });
         break;
       case 'save':
@@ -218,8 +206,7 @@ export class OntologyTreeComponent implements OnChanges {
                   id: XGuid(),
                   name: t,
                   label: t,
-                  pid: this.ontologyForm.value.pid ?? this.selectedOntology?.id ?? null,
-                  namespaceId: this.ontologyForm.value.namespace ?? this.selectedNamespace?.id ?? null,
+                  pid: this.ontologyForm.value.pid ?? this.selectedOntology?.id ?? null
                 })
               );
             });
@@ -234,7 +221,6 @@ export class OntologyTreeComponent implements OnChanges {
             if (!data.id) data.id = XGuid();
             // 确保 pid 和 namespaceId 正确
             data.pid = data.pid ?? this.selectedOntology?.id ?? null;
-            data.namespaceId = data.namespace ?? this.selectedNamespace?.id ?? null;
             this.ontologyService.post(data).subscribe((x) => {
               this.ontologyFormMode = null;
               this.message.success('新增成功！');
@@ -289,7 +275,6 @@ export class OntologyTreeComponent implements OnChanges {
     const ontologyData = {
       ...formData,
       pid: this.selectedOntology?.id || null,
-      namespaceId: formData.namespace || this.selectedNamespace?.id || null,
     };
 
     if (this.ontologyFormMode === 'add') {
@@ -299,14 +284,13 @@ export class OntologyTreeComponent implements OnChanges {
           this.cancelOntologyForm();
           if (ontologyData.pid && this.selectedOntology) {
             this.message.info(
-              `已创建为 "${
-                this.selectedOntology.name || this.selectedOntology.label
+              `已创建为 "${this.selectedOntology.name || this.selectedOntology.label
               }" 的子本体`
             );
           }
           this.loadOntologyData();
         },
-        error: (error:any) => {
+        error: (error: any) => {
           console.error('Failed to add ontology:', error);
           this.message.error('新增本体失败: ' + error.message);
         },
@@ -318,7 +302,7 @@ export class OntologyTreeComponent implements OnChanges {
           this.cancelOntologyForm();
           this.loadOntologyData();
         },
-        error: (error:any) => {
+        error: (error: any) => {
           console.error('Failed to edit ontology:', error);
           this.message.error('编辑本体失败: ' + error.message);
         },

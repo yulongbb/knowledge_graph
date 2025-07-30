@@ -25,43 +25,6 @@
     flex-direction: column;
     height: 100%;
 
-    .namespace-header {
-      margin-bottom: 0.8rem;
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-
-      h3 {
-        margin: 0;
-        font-size: 1.2rem;
-        white-space: nowrap;
-        margin-right: 1rem;
-      }
-
-      .namespace-selection-area {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex: 1;
-      }
-
-      .selected-namespace-info {
-        margin-top: 0.5rem;
-        padding: 0.5rem;
-        background-color: var(--x-background);
-        border-radius: 4px;
-        border-left: 4px solid var(--x-primary);
-
-        div {
-          margin-bottom: 0.3rem;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
-      }
-    }
-
     .entity-manager {
       flex: 1;
       display: flex;
@@ -299,43 +262,6 @@
   .panel-actions {
     display: flex;
     gap: 0.3rem;
-  }
-}
-
-.no-namespace-selected {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--x-border);
-  border-radius: 4px;
-
-  .message {
-    color: var(--x-warning);
-    font-size: 1.1rem;
-    text-align: center;
-    padding: 1.5rem;
-  }
-}
-
-.tab-container {
-  margin: 0.7rem 0;
-
-  .namespace-select-info {
-    color: var(--x-warning);
-    font-weight: bold;
-    margin-bottom: 0.4rem;
-  }
-
-  .selected-namespace {
-    color: var(--x-success);
-    margin-bottom: 0.4rem;
-  }
-}
-
-.au-table-actions {
-  x-link:not(:last-child) {
-    margin-right: 0.3rem;
   }
 }
 

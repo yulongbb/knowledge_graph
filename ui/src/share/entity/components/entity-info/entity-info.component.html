@@ -59,31 +59,31 @@
                     <!-- 多媒体内容区域 -->
                     <div class="media-content" *ngIf="hasMediaContent()">
                         <!-- 图片展示 -->
-                        <div class="image-gallery" *ngIf="imgs?.length">
+                        <!-- <div class="image-gallery" *ngIf="imgs?.length">
                             <div class="image-item" *ngFor="let img of imgs">
                                 <img [src]="img.url" (click)="openImage(img.url)" alt="图片">
                             </div>
-                        </div>
+                        </div> -->
                         
                         <!-- 视频展示 -->
-                        <div class="video-gallery" *ngIf="videos?.length">
+                        <!-- <div class="video-gallery" *ngIf="videos?.length">
                             <div class="video-item" *ngFor="let video of videos">
                                 <video controls>
                                     <source [src]="video.url" [type]="video.type">
                                     你的浏览器不支持视频播放
                                 </video>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <!-- PDF展示 -->
-                        <div class="pdf-gallery" *ngIf="pdfs?.length">
+                        <!-- <div class="pdf-gallery" *ngIf="pdfs?.length">
                             <div class="pdf-item" *ngFor="let pdf of pdfs">
                                 <div class="pdf-preview" (click)="openPdf(pdf.url)">
                                     <i class="fas fa-file-pdf"></i>
                                     <span>{{pdf.name}}</span>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     
                     <div [innerHTML]="renderedContent | safeHtml"></div>

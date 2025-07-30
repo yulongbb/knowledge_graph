@@ -1,14 +1,12 @@
 <div class="namespace-manager">
-
   <!-- Three-panel layout -->
-  <div class="entity-manager" *ngIf="selectedNamespace">
+  <div class="entity-manager">
     <!-- Three-panel container -->
     <div class="three-panel-container">
       <!-- Left panel: Ontology tree component -->
       <div class="panel ontology-panel">
         <app-ontology-tree 
-          [selectedNamespace]="selectedNamespace"
-          [namespaceOptions]="namespaceOptions"
+          [ontologyId]="ontologyId"
           (ontologySelected)="onOntologySelected($event)"
           (ontologyDataLoaded)="onOntologyDataLoaded($event)">
         </app-ontology-tree>
@@ -142,10 +140,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="no-namespace-selected" *ngIf="!selectedNamespace">
-    <div class="message">请选择一个域以管理相关实体</div>
   </div>
 </div>
 
@@ -206,14 +200,13 @@
 
 <div *ngIf="!ontologyEditMode">
   <!-- Three-panel layout -->
-  <div class="entity-manager" *ngIf="selectedNamespace">
+  <div class="entity-manager">
     <!-- Three-panel container -->
     <div class="three-panel-container">
       <!-- Left panel: Ontology tree component -->
       <div class="panel ontology-panel">
         <app-ontology-tree 
-          [selectedNamespace]="selectedNamespace"
-          [namespaceOptions]="namespaceOptions"
+          [ontologyId]="ontologyId"
           (ontologySelected)="onOntologySelected($event)"
           (ontologyDataLoaded)="onOntologyDataLoaded($event)">
         </app-ontology-tree>
@@ -347,10 +340,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="no-namespace-selected" *ngIf="!selectedNamespace">
-    <div class="message">请选择一个域以管理相关实体</div>
   </div>
 </div>
 

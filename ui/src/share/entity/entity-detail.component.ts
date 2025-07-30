@@ -37,7 +37,6 @@ import { EntityService } from 'src/main/entity/entity.service';
 import { Location } from '@angular/common';
 import * as Plyr from 'plyr';
 import { HttpClient } from '@angular/common/http';
-import { NamespaceService } from 'src/main/scene/namespace.service';
 
 @Component({
   selector: 'app-entity-detail',
@@ -212,7 +211,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     private ontologyService: OntologyService,
     public propertyService: PropertyService,
     private esService: EsService,
-    private namespaceService: NamespaceService, // Added namespace service
     private http: HttpClient,
     public tagService: TagService,
     private nodeService: EntityService,
@@ -225,62 +223,13 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
       if (newId !== this.id || newType !== this.type) {
         this.id = newId as string;
         this.type = newType as string;
-        // 当 ID 或类型改变时，强制重新加载数据
         if (this.id) {
-          setTimeout(() => {
-            this.loadData();
-            this.loadNamespaces();
-          });
+          this.loadData();
         }
       }
     });
   }
 
-  // Load namespaces for the dropdown
-  loadNamespaces() {
-    this.namespaceService.getList(1, 1000).subscribe({
-      next: (response: any) => {
-        const namespaces = response.list || [];
-        this.namespaceOptions = namespaces.map((ns: any) => ({
-          label: ns.name,
-          value: ns.name
-        }));
-
-        // Ensure default namespace is selected
-        if (!this.namespaceOptions.some(opt => opt.value === 'default')) {
-          this.namespaceOptions.unshift({ label: 'default', value: 'default' });
-        }
-
-        // Set default namespace
-        this.namespace = 'default';
-      },
-      error: (error:any) => {
-        console.error('Failed to load namespaces:', error);
-        this.message.error('加载命名空间失败');
-        // Ensure at least default namespace is available
-        this.namespaceOptions = [{ label: 'default', value: 'default' }];
-      }
-    });
-  }
-
-  // When namespace changes, refresh the types tree
-  onNamespaceChange(namespace: string) {
-    console.log('Selected namespace:', namespace);
-    this.namespaceService.findByName(namespace).subscribe({
-      next: (namespaceData: any) => {
-        console.log('Found namespace:', namespaceData);
-        this.filter = [{
-          field: 'namespaceId',
-          value: namespaceData.id,
-          operation: '=' as XOperation
-        }];
-      },
-      error: (error: any) => {
-        console.error('Error finding namespace:', error);
-      }
-    });
-
-  }
 
 
   // 新增加载数据的方法
@@ -291,7 +240,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           // ...现有的数据加载逻辑...
           this.cdr.detectChanges();
         },
-        error: (error:any) => {
+        error: (error: any) => {
           console.error('加载数据失败:', error);
           this.message.error('加载数据失败');
         }
@@ -476,7 +425,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                 console.log('上传成功:', data);
                 this.uploadImage({ body: { name: data.name } });
               })
-              .catch((error:any) => {
+              .catch((error: any) => {
                 console.error('上传失败:', error);
               });
           }
@@ -517,7 +466,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         console.log(this.vids);
         console.log(this.imgs);
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         console.error('封面上传失败:', error);
       });
   }
@@ -562,11 +511,11 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
             console.log('更新后的 video 数据:', this.vids);
           })
-          .catch((error:any) => {
+          .catch((error: any) => {
             console.error('封面获取失败:', error);
           });
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         console.error('视频下载失败:', error);
       });
   }
@@ -594,7 +543,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         });
         console.log(this.fs);
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         console.error('封面上传失败:', error);
       });
   }
@@ -614,6 +563,9 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   upload($event: any, row: any) {
     row.mainsnak.datavalue.value = $event.body.name;
+    this.imgs.push({
+      url: $event.body.name,
+    });
   }
 
   onMapClick(event: any) {
@@ -700,7 +652,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         this.message.success('删除成功！');
         this.location.back();  // 删除成功后返回上一页
       },
-      error: (error:any) => {
+      error: (error: any) => {
         this.message.error('删除失败：' + error.message);
       }
     });
@@ -721,12 +673,12 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   change(statements: any) {
     console.log('Property changed:', statements);
-    
+
     // 根据选择的属性名找到对应的属性配置
     const selectedProperty = this.properties().find(
       (p: any) => p.name === statements.mainsnak.label
     );
-    
+
     if (!selectedProperty) {
       console.log('No property found for:', statements.mainsnak.label);
       return;
@@ -806,7 +758,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
         };
         break;
     }
-    
+
     console.log('Updated statements:', statements);
   }
 
@@ -854,10 +806,10 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     if (!property || !property.id) {
       return [];
     }
-    
+
     // 使用属性ID获取标签
     const tags = this.getTagsForProperty(property.id.toString());
-    
+
     // 确保返回的数据格式正确
     return tags.filter(tag => tag && tag.value);
   }
@@ -897,14 +849,14 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
           value: tag.name, // 确保value就是name，用于输入框填充
           id: tag.id // 保留id作为引用
         }));
-        
+
         // 缓存结果
         this.tagOptionsCache.set(propertyId, tagOptions);
-        
+
         // 触发变更检测以更新UI
         this.cdr.detectChanges();
       },
-      error: (error:any) => {
+      error: (error: any) => {
         console.error('Failed to load tags for property:', error);
         this.tagOptionsCache.set(propertyId, []);
       }
@@ -931,15 +883,6 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     switch (type) {
       case 'info':
         this.esService.getEntity(this.id).subscribe((x: any) => {
-          console.log(x);
-          this.namespaceService.get(x._source.namespace).subscribe((namespace: any) => {
-            this.namespace = namespace.name;
-            this.filter = [{
-              field: 'namespaceId',
-              value: namespace.id,
-              operation: '=' as XOperation
-            }];
-          });
           this.entity = signal({ value: x });
           this.item = x._source;
           this.imgs = [];
@@ -1024,7 +967,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
                           this.statements = signal(statements);
                           this.claims = signal(statements);
                         });
-                        
+
                         // 预加载现有属性的标签
                         this.preloadTagsForExistingProperties();
                       });
@@ -1159,7 +1102,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
               this.message.success('编辑成功！');
               this.back();
             },
-            error: (error:any) => {
+            error: (error: any) => {
               this.message.error('编辑失败：' + error.message);
               console.error('更新失败:', error);
             }
@@ -1294,7 +1237,7 @@ export class EntityDetailComponent implements OnInit, OnChanges, AfterViewInit {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    return 'http://localhost:9000/kgms/' + imagePath;
+    return 'http://10.117.1.238:9000/kgms/' + imagePath;
   }
 
   back() {

@@ -5,6 +5,6 @@ import { HttpService } from 'src/services/http.service';
 @Injectable({ providedIn: 'root' })
 export class QualifyService extends RepositoryService<any> {
   constructor(public override http: HttpService) {
-    super(http, { controller: { name: 'api/qualifies' } });
+    super(http, { controller: { name: 'api/qualifers' } });
   }
 }

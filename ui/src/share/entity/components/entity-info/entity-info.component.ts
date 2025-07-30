@@ -52,7 +52,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
     // 添加新的服务
     private ontologyService: OntologyService,
     private propertyService: PropertyService
-  ) {}
+  ) { }
 
   ngOnInit() {
     window.addEventListener('hashchange', () => this.onHashChange());
@@ -135,20 +135,20 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
       // Handle images
       this.imgs =
         this.item?.images?.map((image: any) => ({
-          url: `http://localhost:9000/kgms/${image}`,
+          url: `http://10.117.1.238:9000/kgms/${image}`,
         })) || [];
 
       // Handle videos
       this.videos =
         this.item?.videos?.map((video: any) => ({
-          url: `http://localhost:9000/kgms/${video.url}`,
+          url: `http://10.117.1.238:9000/kgms/${video.url}`,
           type: this.getVideoType(video.url),
         })) || [];
 
       // Handle PDFs
       this.pdfs =
         this.item?.pdfs?.map((pdf: any) => ({
-          url: `http://localhost:9000/kgms/${pdf}`,
+          url: `http://10.117.1.238:9000/kgms/${pdf}`,
           name: pdf.split('/').pop(),
         })) || [];
 
@@ -220,7 +220,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
       // 获取所有父类型ID
       this.ontologyService.getAllParentIds(this.item.type).subscribe((parents: any) => {
         parents.push(this.item.type);
-        
+
         // 获取相关属性
         this.propertyService.getList(1, 50, {
           filter: [
@@ -233,11 +233,11 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
           ],
         }).subscribe((propertiesResponse: any) => {
           this.properties.set(propertiesResponse.list || []);
-          
+
           // 获取实体的声明/属性值
           this.entityService.getLinks(1, 50, this.id, {}).subscribe((linksResponse: any) => {
             let statements: any = [];
-            
+
             if (linksResponse.list) {
               linksResponse.list.forEach((p: any) => {
                 if (p.edges[0].mainsnak.property !== 'P31') {
@@ -245,23 +245,23 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
                   const property = propertiesResponse.list.find(
                     (prop: any) => p.edges[0].mainsnak.property === `P${prop.id}`
                   );
-                  
+
                   if (property) {
                     p.edges[0].mainsnak.label = property.name;
                     p.edges[0].mainsnak.group = property.group;
-                    
+
                     // 处理关联实体的显示
                     if (p.edges[0]['_from'] !== p.edges[0]['_to'] && p.vertices[1]) {
                       p.edges[0].mainsnak.datavalue.value.id = p.vertices[1]?.id;
                       p.edges[0].mainsnak.datavalue.value.label = p.vertices[1]?.labels?.zh?.value;
                     }
-                    
+
                     statements.push(p.edges[0]);
                   }
                 }
               });
             }
-            
+
             this.statements.set(statements);
             this.claims.set(statements);
             this.cdr.detectChanges();
@@ -318,7 +318,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
             alert('删除失败：' + response.message);
           }
         },
-        error: (error:any) => {
+        error: (error: any) => {
           alert('删除失败：' + error.message);
         },
       });
@@ -402,12 +402,12 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
     if (!this.statements() || this.statements().length === 0) {
       return [];
     }
-    
+
     const basicProps: { label: string; value: string }[] = [];
-    
+
     // 基本信息组的属性
     const basicGroups = ['基本信息', '概况', '基础属性'];
-    
+
     this.statements().forEach((statement: any) => {
       if (statement.mainsnak?.label && statement.mainsnak?.group) {
         // 检查是否属于基本信息组
@@ -422,7 +422,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    
+
     return basicProps;
   }
 
@@ -444,19 +444,19 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
   public getImageUrl(val: string): string {
     if (!val) return '';
     if (/^https?:\/\//.test(val)) return val;
-    return `http://localhost:9000/kgms/${val}`;
+    return `http://10.117.1.238:9000/kgms/${val}`;
   }
 
   getTechnicalProperties(): { label: string; value: string }[] {
     if (!this.statements() || this.statements().length === 0) {
       return [];
     }
-    
+
     const techProps: { label: string; value: string }[] = [];
-    
+
     // 技术信息组的属性
     const techGroups = ['技术参数', '技术数据', '规格参数', '性能参数'];
-    
+
     this.statements().forEach((statement: any) => {
       if (statement.mainsnak?.label && statement.mainsnak?.group) {
         // 检查是否属于技术信息组
@@ -471,7 +471,7 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    
+
     return techProps;
   }
 
@@ -489,15 +489,15 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
       case 'external-id':
       case 'url':
         return datavalue.value.toString();
-      
+
       case 'wikibase-item':
         return datavalue.value.label || datavalue.value.id || '';
-      
+
       case 'quantity':
         const amount = datavalue.value.amount;
         const unit = datavalue.value.unit;
         return unit && unit !== '1' ? `${amount} ${unit}` : amount.toString();
-      
+
       case 'time':
         // 处理wikidata时间格式
         const time = datavalue.value.time;
@@ -527,18 +527,18 @@ export class EntityInfoComponent implements OnInit, AfterViewInit {
           return t;
         }
         return '';
-      
+
       case 'globe-coordinate':
         const lat = datavalue.value.latitude;
         const lon = datavalue.value.longitude;
         return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-      
+
       case 'monolingualtext':
         return datavalue.value.text || datavalue.value.toString();
-      
+
       case 'commonsMedia':
         return datavalue.value.toString();
-      
+
       default:
         return datavalue.value.toString();
     }

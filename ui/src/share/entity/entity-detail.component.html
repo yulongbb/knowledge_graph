@@ -175,10 +175,6 @@
         [subTitle]="entity()?.value?._id" (backClick)="back()">
       </x-page-header>
 
-      <x-select style="float: right;" [(ngModel)]="namespace" [data]="namespaceOptions" placeholder="请选择命名空间"
-        (ngModelChange)="onNamespaceChange($event)">
-      </x-select>
-
       <!-- 编辑页面左右分栏布局 -->
       <div class="edit-layout">
         <!-- 左侧基本信息 -->
@@ -187,7 +183,7 @@
             <div class="card-header">
               <h3>基本信息</h3>
             </div>
-            <x-form #form [disabled]="disabled" [controls]="controls" direction="column" labelSuffix=":" 
+            <x-form #form [disabled]="disabled" [controls]="controls" direction="column" labelSuffix=":"
               labelWidth="100%" width="100%" labelAlign="start" span="24" space="2"></x-form>
           </x-card>
         </div>
@@ -212,121 +208,79 @@
                 <tr *ngFor="let row of statements(); let i = index">
                   <td class="sticky-left">{{ i + 1 }}</td>
                   <td>
-                    <x-select 
-                      class="full-width" 
-                      [(ngModel)]="row.mainsnak.label"
-                      [data]="getPropertyOptions()"
-                      placeholder="请选择属性"
-                      (ngModelChange)="change(row)">
+                    <x-select class="full-width" [(ngModel)]="row.mainsnak.label" [data]="getPropertyOptions()"
+                      placeholder="请选择属性" (ngModelChange)="change(row)">
                     </x-select>
                   </td>
                   <td>
                     <ng-container [ngSwitch]="row?.mainsnak?.datatype">
-                      <quill-editor 
-                        *ngSwitchCase="'monolingualtext'"
-                        [(ngModel)]="row.mainsnak.datavalue.value">
+                      <quill-editor *ngSwitchCase="'monolingualtext'" [(ngModel)]="row.mainsnak.datavalue.value">
                       </quill-editor>
-                      
+
                       <div *ngSwitchCase="'string'" class="entity-input-group">
-                        <input
-                          class="full-width"
-                          [(ngModel)]="row.mainsnak.datavalue.value"
-                          [attr.list]="'string-datalist-' + i"
-                          placeholder="请输入或选择值"
-                          (ngModelChange)="onTagValueChange($event, row)"
-                          type="text">
+                        <input class="full-width" [(ngModel)]="row.mainsnak.datavalue.value"
+                          [attr.list]="'string-datalist-' + i" placeholder="请输入或选择值"
+                          (ngModelChange)="onTagValueChange($event, row)" type="text">
                         <datalist [id]="'string-datalist-' + i">
                           <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
                             {{ option.label }}
                           </option>
                         </datalist>
                       </div>
-                      
-                      <x-input 
-                        *ngSwitchCase="'url'" 
-                        class="full-width"
-                        [(ngModel)]="row.mainsnak.datavalue.value"
+
+                      <x-input *ngSwitchCase="'url'" class="full-width" [(ngModel)]="row.mainsnak.datavalue.value"
                         placeholder="请输入URL">
                       </x-input>
-                      
+
                       <div *ngSwitchCase="'commonsMedia'" class="media-input-group">
-                        <x-input 
-                          class="full-width"
-                          [(ngModel)]="row.mainsnak.datavalue.value"
-                          placeholder="文件名或URL"
+                        <x-input class="full-width" [(ngModel)]="row.mainsnak.datavalue.value" placeholder="文件名或URL"
                           [readonly]="true">
                         </x-input>
                         <ng-container *ngIf="row.mainsnak.datavalue.value">
-                          <img 
-                            [src]="getFullImageUrl(row.mainsnak.datavalue.value)" 
-                            alt="图片预览" 
+                          <img [src]="getFullImageUrl(row.mainsnak.datavalue.value)" alt="图片预览"
                             style="max-width:60px;max-height:60px;margin-left:8px;cursor:pointer;border-radius:4px;border:1px solid #eee;"
                             (click)="preview(row.mainsnak.datavalue.value)">
                         </ng-container>
-                        <x-upload 
-                          action="http://localhost:3000/api/minio-client/uploadFile"
-                          (uploadSuccess)="upload($event, row)"
-                          [text]="'上传文件'">
+                        <x-upload action="http://localhost:3000/api/minio-client/uploadFile"
+                          (uploadSuccess)="upload($event, row)" [text]="'上传文件'">
                         </x-upload>
                       </div>
-                      
+
                       <div *ngSwitchCase="'wikibase-item'" class="entity-input-group">
-                        <input
-                          class="full-width"
-                          [(ngModel)]="row.mainsnak.datavalue.value.label"
-                          [attr.list]="'entity-datalist-' + i"
-                          placeholder="请输入或选择实体"
-                          (ngModelChange)="onEntityValueChange($event, row)"
-                          type="text">
+                        <input class="full-width" [(ngModel)]="row.mainsnak.datavalue.value.label"
+                          [attr.list]="'entity-datalist-' + i" placeholder="请输入或选择实体"
+                          (ngModelChange)="onEntityValueChange($event, row)" type="text">
                         <datalist [id]="'entity-datalist-' + i">
                           <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
                             {{ option.label }}
                           </option>
                         </datalist>
                       </div>
-                      
-                      <x-input-number 
-                        *ngSwitchCase="'quantity'" 
-                        class="full-width"
+
+                      <x-input-number *ngSwitchCase="'quantity'" class="full-width"
                         [ngModel]="row.mainsnak.datavalue.value.amount && row.mainsnak.datavalue.value.unit && row.mainsnak.datavalue.value.unit !== '1' ? row.mainsnak.datavalue.value.amount + ' ' + row.mainsnak.datavalue.value.unit : row.mainsnak.datavalue.value.amount"
                         (ngModelChange)="onQuantityInputChange($event, row)"
-                        placeholder="请输入数量（如：123kg、123 kg、123.5千克、123）"
-                        type="text"
-                      >
+                        placeholder="请输入数量（如：123kg、123 kg、123.5千克、123）" type="text">
                       </x-input-number>
-                      
+
                       <div *ngSwitchCase="'time'" class="entity-input-group">
-                        <input
-                          class="full-width"
-                          [(ngModel)]="row.mainsnak.datavalue.value.time"
+                        <input class="full-width" [(ngModel)]="row.mainsnak.datavalue.value.time"
                           placeholder="请输入日期（如：2023、2023-05、2023-05-12）"
-                          (ngModelChange)="onTimeStringInput($event, row)"
-                          type="text">
+                          (ngModelChange)="onTimeStringInput($event, row)" type="text">
                       </div>
-                      
-                      <x-input-group 
-                        *ngSwitchCase="'globe-coordinate'" 
-                        class="full-width" 
-                        compact>
-                        <x-input 
-                          [(ngModel)]="row.mainsnak.datavalue.value.latitude" 
-                          placeholder="纬度">
+
+                      <x-input-group *ngSwitchCase="'globe-coordinate'" class="full-width" compact>
+                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.latitude" placeholder="纬度">
                         </x-input>
-                        <x-input 
-                          [(ngModel)]="row.mainsnak.datavalue.value.longitude" 
-                          placeholder="经度">
+                        <x-input [(ngModel)]="row.mainsnak.datavalue.value.longitude" placeholder="经度">
                         </x-input>
                       </x-input-group>
-                      
+
                       <!-- 默认情况 -->
                       <div *ngSwitchDefault class="entity-input-group">
-                        <input
-                          class="full-width"
-                          [(ngModel)]="row.mainsnak.datavalue.value"
-                          [attr.list]="'default-datalist-' + i"
-                          placeholder="请输入或选择值"
-                          (ngModelChange)="onTagValueChange($event, row)"
-                          type="text">
+                        <input class="full-width" [(ngModel)]="row.mainsnak.datavalue.value"
+                          [attr.list]="'default-datalist-' + i" placeholder="请输入或选择值"
+                          (ngModelChange)="onTagValueChange($event, row)" type="text">
                         <datalist [id]="'default-datalist-' + i">
                           <option *ngFor="let option of getTagOptionsForRow(row)" [value]="option.value">
                             {{ option.label }}

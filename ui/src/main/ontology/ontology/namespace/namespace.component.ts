@@ -1,5 +1,5 @@
 import { PageBase } from 'src/share/base/base-page';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IndexService } from 'src/layout/index/index.service';
 import {
   XMessageService,
@@ -13,9 +13,6 @@ import {
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { Namespace, NamespaceService } from 'src/main/ontology/ontology/namespace/namespace.service';
 import { Schema, OntologyService } from 'src/main/ontology/ontology/ontology.service';
 import { PropertyService } from 'src/main/ontology/ontology/property/property.service';
 import { QualifyService } from 'src/main/ontology/ontology/qualify/qualify.service';
@@ -27,21 +24,11 @@ import { TagService } from 'src/main/ontology/ontology/tag/tag.service';
   styleUrls: ['./namespace.component.scss'],
 })
 export class NamespaceComponent extends PageBase implements OnInit {
-  // Remove table-related properties
-  // @ViewChild('tableCom') tableCom!: XTableComponent;
-  // index = 1;
-  // size = 15;
-  // query: any;
-  // data = (index: number, size: number, query: any) =>
-  //   this.namespaceService.getList(index, size, query).pipe(map((x: any) => x));
-  // columns: XTableColumn[] = [...];
-
   // Keep only entity management properties
   formGroup = new UntypedFormGroup({});
   name = '';
   prefix = '';
   description = '';
-  selected!: Namespace;
   type = 'add';
   loading = true;
 
@@ -53,7 +40,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     { id: 'tags', label: '字典字典' },
   ];
   activeTab = 'ontologies';
-  selectedNamespace: any = null;
 
   // Property management
   propertyDataLoaded = false;
@@ -85,21 +71,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
   tagPageSize = 100;
   tagPageIndex = 1;
 
-  // Added for namespace dropdown
-  selectedNamespaceId: string | null = null;
-  namespaceOptions: { label: string; value: string }[] = [];
-  namespaces: Namespace[] = [];
-
-  // Add these new properties to the NamespaceComponent class:
-  selectedOntology: any = null;
-  selectedProperty: any = null;
-  isItemProperty = true; // true for item properties (show qualifiers), false for non-item properties (show tags)
-  propertyLoading = false;
-  qualifierLoading = false;
-  tagLoading = false;
-  hasProperties = false;
-  hasQualifiers = false;
-  hasTags = false;
+  // Add property for ontologyId from route
+  ontologyId: string | null = null;
 
   // Add to class properties
   ontologyForm = new UntypedFormGroup({});
@@ -165,33 +138,20 @@ export class NamespaceComponent extends PageBase implements OnInit {
         { label: 'commonsMedia', value: 'string' },
         { label: 'external-id', value: 'string' },
         { label: 'string', value: 'string' },
-        { control: 'input', id: 'name', label: '名称', required: true },
-        { control: 'textarea', id: 'description', label: '描述' },
-        {
-          control: 'select',
-          id: 'type',
-          label: '值类型',
-          required: true,
-          data: [
-            { label: 'commonsMedia', value: 'string' },
-            { label: 'external-id', value: 'string' },
-            { label: 'string', value: 'string' },
-            { label: 'url', value: 'string' },
-            { label: 'math', value: 'string' },
-            { label: 'monolingualtext', value: 'monolingualtext' },
-            { label: 'musical-notation', value: 'string' },
-            { label: 'globe-coordinate', value: 'globecoordinate' },
-            { label: 'quantity', value: 'quantity' },
-            { label: 'time', value: 'time' },
-            { label: 'tabular-data', value: 'string' },
-            { label: 'geo-shape', value: 'string' },
-            { label: 'wikibase-item', value: 'wikibase-entityid' },
-            { label: 'wikibase-qualify', value: 'wikibase-entityid' },
-            { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
-            { label: 'wikibase-form', value: 'wikibase-entityid' },
-            { label: 'wikibase-sense', value: 'wikibase-entityid' }
-          ],
-        },
+        { label: 'url', value: 'string' },
+        { label: 'math', value: 'string' },
+        { label: 'monolingualtext', value: 'monolingualtext' },
+        { label: 'musical-notation', value: 'string' },
+        { label: 'globe-coordinate', value: 'globecoordinate' },
+        { label: 'quantity', value: 'quantity' },
+        { label: 'time', value: 'time' },
+        { label: 'tabular-data', value: 'string' },
+        { label: 'geo-shape', value: 'string' },
+        { label: 'wikibase-item', value: 'wikibase-entityid' },
+        { label: 'wikibase-qualify', value: 'wikibase-entityid' },
+        { label: 'wikibase-lexeme', value: 'wikibase-entityid' },
+        { label: 'wikibase-form', value: 'wikibase-entityid' },
+        { label: 'wikibase-sense', value: 'wikibase-entityid' }
       ],
     },
   ];
@@ -221,9 +181,16 @@ export class NamespaceComponent extends PageBase implements OnInit {
   ontologyEditMode: boolean = false;
   editingOntologyId: string | null = null;
   editingOntology: Schema | null = null;
+  selectedOntology: any = null;
+  selectedProperty: any = null;
+  qualifierLoading: boolean   = false;
+  hasQualifiers: boolean = false;
+  tagLoading: boolean = false;
+  hasTags: boolean = false;
+  hasProperties: boolean = false;
+  propertyLoading: boolean  = false;
 
   constructor(
-    private namespaceService: NamespaceService,
     public override indexService: IndexService,
     private ontologyService: OntologyService,
     private propertyService: PropertyService,
@@ -238,31 +205,16 @@ export class NamespaceComponent extends PageBase implements OnInit {
   }
 
   ngOnInit() {
-    // 检查是否为本体编辑模式
+    // Only load ontologyId from route
     this.activatedRoute.paramMap.subscribe(params => {
-      const ontologyId = params.get('id');
-      if (ontologyId) {
+      this.ontologyId = params.get('id');
+      if (this.ontologyId) {
         this.ontologyEditMode = true;
-        this.editingOntologyId = ontologyId;
-        this.loadOntologyForEdit(ontologyId);
+        this.editingOntologyId = this.ontologyId;
+        this.loadOntologyForEdit(this.ontologyId);
       } else {
         this.ontologyEditMode = false;
         this.editingOntologyId = null;
-        // Load namespaces for the dropdown in the ontology form
-        this.namespaceService.getList(1, 1000).subscribe((response) => {
-          const namespaceControl = this.ontologyControls.find(
-            (c) => c.id === 'namespace'
-          );
-          if (namespaceControl) {
-            namespaceControl['data'] = (response.list || []).map((ns) => ({
-              label: ns.name,
-              value: String(ns.id), // 保证为字符串
-            }));
-          }
-        });
-
-        // First ensure the default namespace exists, then load all namespaces
-        this.loadNamespaces();
       }
     });
   }
@@ -272,24 +224,11 @@ export class NamespaceComponent extends PageBase implements OnInit {
     this.ontologyService.get(id).subscribe({
       next: (ontology: Schema) => {
         this.editingOntology = ontology;
-        // 修正 TS4111 错误，使用索引访问
         this.ontologyForm.patchValue({
           name: ontology['name'],
           label: ontology['label'],
           description: ontology['description'],
-          namespace: ontology['namespaceId'] || '', // 假设有 namespaceId 字段
-        });
-        // 加载命名空间下拉
-        this.namespaceService.getList(1, 1000).subscribe((response) => {
-          const namespaceControl = this.ontologyControls.find(
-            (c) => c.id === 'namespace'
-          );
-          if (namespaceControl) {
-            namespaceControl['data'] = (response.list || []).map((ns) => ({
-              label: ns.name,
-              value: String(ns.id),
-            }));
-          }
+          namespace: ontology['namespaceId'] || '',
         });
       },
       error: (err: any) => {
@@ -326,63 +265,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     this.router.navigate(['/index/ontology']);
   }
 
-  // Load namespaces for the dropdown
-  loadNamespaces() {
-    this.namespaceService.getList(1, 1000).subscribe({
-      next: (response: any) => {
-        this.namespaces = response.list || [];
-        // 下拉选项的 value 改为 name
-        this.namespaceOptions = this.namespaces.map((ns) => ({
-          label: ns.name as string,
-          value: String(ns.name),
-        }));
-
-        console.log('Namespace options:', this.namespaceOptions);
-
-        if (this.namespaces.length > 0) {
-          this.selectedNamespaceId = String(this.namespaces[0].name);
-          this.onNamespaceSelected(this.selectedNamespaceId);
-        }
-      },
-      error: (error: any) => {
-        console.error('Failed to load namespaces:', error);
-        this.message.error('加载命名空间失败');
-      },
-    });
-  }
-
-  // Select a namespace and update the dropdown
-  private selectNamespace(namespace: Namespace) {
-    this.selectedNamespace = namespace;
-    this.selectedNamespaceId = String(namespace.id); // 修改为id
-    console.log('Selected namespace:', namespace);
-  }
-
-  // Handle namespace selection from dropdown
-  onNamespaceSelected(namespaceId: string) {
-    console.log('Namespace selected:', namespaceId);
-    console.log('Namespace selected from dropdown:', namespaceId);
-
-    if (!namespaceId) {
-      this.selectedNamespace = null;
-      this.clearTabData();
-      return;
-    }
-
-    // 用 name 字段筛选
-    const selectedNs = this.namespaces.find(
-      (ns) => String(ns.name) === String(namespaceId)
-    );
-    if (selectedNs) {
-      this.selectedNamespace = selectedNs;
-      console.log('Found and set selected namespace:', selectedNs);
-      this.message.success(`已选择命名空间: ${selectedNs.name}`);
-    } else {
-      console.error('Namespace not found with name:', namespaceId);
-      this.message.error('未找到对应的命名空间');
-    }
-  }
-
   // Clear all tab data
   clearTabData() {
     this.clearPropertyData();
@@ -412,27 +294,20 @@ export class NamespaceComponent extends PageBase implements OnInit {
   // }
 
   // Namespace selection and tab switching
-  clearSelectedNamespace() {
-    this.selectedNamespace = null;
-    this.propertyDataLoaded = false;
-    this.qualifierDataLoaded = false;
-    this.tagDataLoaded = false;
-  }
-
   switchTab(tabId: string) {
     this.activeTab = tabId;
     this.loadTabData(tabId);
   }
 
   loadTabData(tabId: string) {
-    if (!this.selectedNamespace) {
-      this.message.warning('请先选择一个命名空间');
+    if (!this.selectedOntology) {
+      this.message.warning('请先选择一个本体');
       return;
     }
 
     console.log(
-      `Loading data for tab ${tabId} with namespace:`,
-      this.selectedNamespace
+      `Loading data for tab ${tabId} with ontology:`,
+      this.selectedOntology
     );
 
     switch (tabId) {
@@ -571,27 +446,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadPropertyData() {
     this.propertyDataLoaded = false;
     this.propertyData = (index: number, size: number, query: any) => {
-      const filter =
-        this.selectedNamespace.name === 'default'
-          ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
-          : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
-
-      const finalQuery = {
-        ...query,
-        filter: [...(query.filter || []), ...filter],
-      };
-      return this.propertyService.getList(index, size, finalQuery);
+      return this.propertyService.getList(index, size, query);
     };
     this.propertyDataLoaded = true;
   }
@@ -600,25 +455,9 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadQualifierData() {
     this.qualifierDataLoaded = false;
     this.qualifierData = (index: number, size: number, query: any) => {
-      const filter =
-        this.selectedNamespace.name === 'default'
-          ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
-          : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
-
       const finalQuery = {
         ...query,
-        filter: [...(query.filter || []), ...filter],
+        filter: [...(query.filter || [])],
       };
       console.log('Qualifier query:', finalQuery);
       return this.qualifyService.getList(index, size, finalQuery);
@@ -634,8 +473,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.qualifierForm.reset();
 
         this.qualifierForm.patchValue({
-          namespace: this.selectedNamespace.id,
-          namespaceId: this.selectedNamespace.id,
+          namespace: null,
+          namespaceId: null,
           properties: this.selectedProperty ? [this.selectedProperty] : [],
         });
         break;
@@ -696,9 +535,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     const qualifierData = {
       ...formData,
       properties: this.selectedProperty ? [this.selectedProperty] : [],
-      namespaceId:
-        formData.namespace ||
-        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.qualifierFormMode === 'add') {
@@ -762,48 +598,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
     }
   }
 
-  // Override action method to refresh namespace dropdown after changes
-  action(type: string, item?: any) {
-    switch (type) {
-      case 'add':
-        this.router.navigate(['/index/namespace/add']);
-        break;
-      case 'edit':
-        if (item) {
-          this.router.navigate(['/index/namespace/edit', item.id]);
-        }
-        break;
-      case 'delete':
-        if (item && item.name === 'default') {
-          this.message.warning('默认命名空间不能删除！');
-          return;
-        }
-        if (item) {
-          this.msgBox.confirm({
-            title: '提示',
-            content: `此操作将永久删除此条数据：${item.name}，是否继续？`,
-            type: 'warning',
-            callback: (action: XMessageBoxAction) => {
-              if (action === 'confirm') {
-                this.namespaceService.delete(item.id).subscribe(() => {
-                  this.message.success('删除成功！');
-                  this.loadNamespaces();
-                  if (
-                    this.selectedNamespace &&
-                    this.selectedNamespace.id === item.id
-                  ) {
-                    this.selectedNamespace = null;
-                    this.selectedNamespaceId = null;
-                    this.clearTabData();
-                  }
-                });
-              }
-            },
-          });
-        }
-        break;
-    }
-  }
+
 
   // Add methods to handle communication with ontology tree component
   onOntologySelected(ontology: any) {
@@ -829,27 +624,7 @@ export class NamespaceComponent extends PageBase implements OnInit {
   loadTagData() {
     this.tagDataLoaded = false;
     this.tagData = (index: number, size: number, query: any) => {
-      const filter =
-        this.selectedNamespace.name === 'default'
-          ? [
-              {
-                field: 'namespaceId',
-                value: '',
-                operation: 'isNull' as XOperation,
-              },
-            ]
-          : [
-              {
-                field: 'namespaceId',
-                value: this.selectedNamespace.id.toString(),
-              },
-            ];
-
-      const finalQuery = {
-        ...query,
-        filter: [...(query.filter || []), ...filter],
-      };
-      return this.tagService.getList(index, size, finalQuery);
+      return this.tagService.getList(index, size, query);
     };
     this.tagDataLoaded = true;
   }
@@ -968,8 +743,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
         this.tagForm.patchValue({
           id: newId,
-          namespace: this.selectedNamespace.id,
-          namespaceId: this.selectedNamespace.id,
+          namespace: null,
+          namespaceId: null,
           properties: this.selectedProperty ? [this.selectedProperty] : [],
           type: tagType
         });
@@ -1054,9 +829,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
     const tagData = {
       ...formData,
       properties: this.selectedProperty ? [this.selectedProperty] : [],
-      namespaceId:
-        formData.namespace ||
-        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.tagFormMode === 'add') {
@@ -1110,8 +882,8 @@ export class NamespaceComponent extends PageBase implements OnInit {
         this.propertyForm.reset();
 
         this.propertyForm.patchValue({
-          namespace: this.selectedNamespace.id,
-          namespaceId: this.selectedNamespace.id,
+          namespace: null,
+          namespaceId: null,
           schemas: this.selectedOntology ? [this.selectedOntology] : [],
         });
         break;
@@ -1176,9 +948,6 @@ export class NamespaceComponent extends PageBase implements OnInit {
 
     const propertyData = {
       ...formData,
-      namespaceId:
-        formData.namespace ||
-        (this.selectedNamespace ? this.selectedNamespace.id : null),
     };
 
     if (this.propertyFormMode === 'add') {
@@ -1229,3 +998,5 @@ export class NamespaceComponent extends PageBase implements OnInit {
     return `prop-${timestamp}-${randomPart}`;
   }
 }
+ 
+      

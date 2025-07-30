@@ -5,49 +5,27 @@
       <x-card>
         <div class="card-header">
           <h3>基本信息</h3>
-          <!-- 命名空间选择器 -->
-          <div class="namespace-selector">
-            <x-select 
-              [(ngModel)]="formData.namespace" 
-              [data]="namespaceOptions" 
-              placeholder="请选择命名空间"
-              size="small"
-              clearable
-              (ngModelChange)="onNamespaceChange($event)">
-            </x-select>
-          </div>
         </div>
-        
+
         <div class="card-content">
           <!-- 必填字段 -->
           <div class="required-section">
             <div class="form-field">
               <label class="field-label required">本体类型</label>
               <div class="custom-tree-select">
-                <x-input
-                  [(ngModel)]="selectedTypeName" 
-                  readonly 
-                  placeholder="请选择本体类型 (来自{{formData.namespace}}命名空间)"
-                  (click)="toggleTypeSelect($event)"
-                  suffix="angle-down">
+                <x-input [(ngModel)]="selectedTypeName" readonly placeholder="请选择本体类型"
+                  (click)="toggleTypeSelect($event)" suffix="angle-down">
                 </x-input>
 
                 <div class="tree-dropdown" *ngIf="showTypeSelect">
                   <div class="tree-container">
                     <div class="tree-search">
-                      <x-input
-                        [(ngModel)]="typeSearchText" 
-                        placeholder="搜索{{formData.namespace}}命名空间下的本体..."
-                        prefix="search"
-                        size="small">
+                      <x-input [(ngModel)]="typeSearchText" placeholder="搜索本体..."
+                        prefix="search" size="small">
                       </x-input>
                     </div>
                     <div class="tree-content">
-                      <x-tree 
-                        [data]="typeTree"
-                        expandedLevel="1"
-                        checkbox="false"
-                        [nodeHeight]="2"
+                      <x-tree [data]="typeTree" expandedLevel="1" checkbox="false" [nodeHeight]="2"
                         (activatedChange)="onTreeNodeActivated($event)">
                       </x-tree>
                     </div>
@@ -55,42 +33,33 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="form-field">
               <label class="field-label required">名称</label>
-              <x-input 
-                [(ngModel)]="formData.label" 
-                placeholder="请输入名称">
+              <x-input [(ngModel)]="formData.label" placeholder="请输入名称">
               </x-input>
             </div>
           </div>
 
           <!-- 分隔线 -->
           <div class="divider"></div>
-          
+
           <div class="optional-section">
             <div class="form-field">
               <label class="field-label">别名</label>
-              <x-input 
-                [(ngModel)]="formData.aliases" 
-                placeholder="多个别名用逗号分隔">
+              <x-input [(ngModel)]="formData.aliases" placeholder="多个别名用逗号分隔">
               </x-input>
             </div>
-            
+
             <div class="form-field">
               <label class="field-label">标签</label>
-              <x-input 
-                [(ngModel)]="formData.tags" 
-                placeholder="多个标签用#号分隔">
+              <x-input [(ngModel)]="formData.tags" placeholder="多个标签用#号分隔">
               </x-input>
             </div>
-            
+
             <div class="form-field">
               <label class="field-label">描述</label>
-              <x-textarea 
-                [(ngModel)]="formData.description" 
-                placeholder="请输入描述信息"
-                rows="3">
+              <x-textarea [(ngModel)]="formData.description" placeholder="请输入描述信息" rows="3">
               </x-textarea>
             </div>
           </div>
@@ -105,10 +74,7 @@
           <h3>知识模板</h3>
         </div>
         <div class="card-content template-content">
-          <quill-editor 
-            [(ngModel)]="template" 
-            [styles]="{width: '100%', height: '100%'}" 
-            [modules]="editorModules"
+          <quill-editor [(ngModel)]="template" [styles]="{width: '100%', height: '100%'}" [modules]="editorModules"
             placeholder="请输入知识模板内容...">
           </quill-editor>
         </div>
