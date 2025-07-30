@@ -12,6 +12,8 @@ import { ProjectModule } from './project/project.module';
 import { ExtractionModule } from './extraction/extraction.module';
 import { CategoryModule } from './category/category.module';
 import { SourceModule } from './source/source.moduel';
+import { ElasticsearchInitService } from './init/elasticsearch-init.service';
+import { ArangoDBInitService } from './init/arangodb-init.service';
 
 @Module({
   imports: [
@@ -50,7 +52,10 @@ import { SourceModule } from './source/source.moduel';
     SourceModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    ElasticsearchInitService,
+    ArangoDBInitService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

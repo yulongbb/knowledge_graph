@@ -36,7 +36,7 @@
     "@nestjs/serve-static": "^5.0.3",
     "@nestjs/swagger": "^7.1.10",
     "@nestjs/typeorm": "^10.0.0",
-    "arangojs": "^8.4.1",
+    "arangojs": "^8.8.1",
     "axios": "^1.7.9",
     "bullmq": "^5.34.0",
     "canvas": "^3.0.1",

@@ -4,6 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
 import { ConfigService } from '@nestjs/config';
+import { ElasticsearchInitService } from './init/elasticsearch-init.service';
+import { ArangoDBInitService } from './init/arangodb-init.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +29,14 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup(apiPrefix, app, document);
+
+  // 初始化ES索引
+  const esInitService = app.get(ElasticsearchInitService);
+  await esInitService.initIndices();
+
+  // 初始化ArangoDB数据库及集合和图
+  const arangoInitService = app.get(ArangoDBInitService);
+  await arangoInitService.initArango();
 
   const port = configService.get('APP_PORT');
   await app.listen(port);
