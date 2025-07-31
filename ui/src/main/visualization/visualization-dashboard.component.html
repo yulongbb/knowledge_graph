@@ -1,143 +1,181 @@
-<div class="visualization-dashboard">
-  <!-- 左侧菜单栏 -->
-  <div class="menu-sidebar">
-    <div *ngFor="let menu of paletteMenus" class="menu-item" [class.active]="activeMenu === menu.type"
-      (click)="switchMenu(menu.type)" [title]="menu.label">
-      <span class="menu-icon">{{ menu.icon }}</span>
-      <span class="menu-label">{{ menu.label }}</span>
-    </div>
-  </div>
-
-  <!-- 组件库 -->
-  <div class="palette">
-    <div class="palette-title">{{ getCurrentMenuLabel() }}</div>
-    <app-chart-palette *ngIf="activeMenu === 'chart'" (itemSelected)="onPaletteItemSelected($event)"></app-chart-palette>
-    <app-material-palette *ngIf="activeMenu === 'material'" (itemSelected)="onPaletteItemSelected($event)"></app-material-palette>
-    <app-resource-palette *ngIf="activeMenu === 'resource'" (itemSelected)="onPaletteItemSelected($event)"></app-resource-palette>
-    <app-template-palette *ngIf="activeMenu === 'template'" (itemSelected)="onPaletteItemSelected($event)"></app-template-palette>
-  </div>
-
-  <!-- 中间画布区域 -->
-  <div class="canvas-container">
-    <div class="canvas-header">
-      <div class="header-left">
-        <h3>可视化大屏设计器</h3>
-        <div class="canvas-info">拖拽组件到画布进行设计</div>
-      </div>
-      <div class="header-actions">
-        <button class="action-btn secondary" (click)="clearCanvas()">清空画布</button>
-        <button class="action-btn secondary" (click)="previewMode()">预览</button>
-        <button class="action-btn primary" (click)="saveDesign()">保存</button>
-      </div>
-    </div>
-
-    <div class="canvas-wrapper">
-      <!-- 浮动工具栏 -->
-      <div class="canvas-toolbar">
-        <div class="toolbar-group">
-          <button class="toolbar-btn" (click)="zoomOut()" title="缩小">-</button>
-          <span class="zoom-display">{{ getZoomPercent() }}%</span>
-          <button class="toolbar-btn" (click)="zoomIn()" title="放大">+</button>
-        </div>
-        <div class="toolbar-divider"></div>
-        <div class="toolbar-group">
-          <button class="toolbar-btn" (click)="resetCanvas()" title="重置视图">⌂</button>
-          <button class="toolbar-btn" (click)="fitToContainerWidth()" title="适应宽度">⟷</button>
-          <button class="toolbar-btn" (click)="fitToScreen()" title="适应屏幕">□</button>
-        </div>
-      </div>
-
-      <div *ngIf="activeCanvas" class="canvas" [class.drag-over]="isDragOver" [ngStyle]="getCanvasStyle()" cdkDropList
-        [cdkDropListEnterPredicate]="enterPredicate" (cdkDropListDropped)="onDrop($event)"
-        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (mousedown)="onCanvasMouseDown($event)"
-        (mousemove)="onCanvasMouseMove($event)" (mouseup)="onCanvasMouseUp($event)"
-        (mouseleave)="onCanvasMouseUp($event)" (wheel)="onCanvasWheel($event)">
-        <div *ngFor="let item of canvasItems; trackBy: trackByFn" class="canvas-item"
-          [class.selected]="selectedItem?.id === item.id" [ngStyle]="{ left: item.x + 'px', top: item.y + 'px' }"
-          (click)="selectItem(item)">
-          <!-- 可拖拽组件（非echart） -->
-          <ng-container *ngIf="item.type !== 'echart'; else echartBlock">
-            <div cdkDrag [cdkDragData]="item" (cdkDragEnded)="onItemDragEnd($event, item)" class="canvas-item-inner">
-              <div class="item-controls">
-                <button class="control-btn copy-btn" (click)="copyItem(item)" title="复制">⧉</button>
-                <button class="control-btn delete-btn" (click)="removeItem(item)" title="删除">×</button>
-              </div>
-              <div *ngIf="item.type === 'text'" class="canvas-text" contenteditable="true"
-                (blur)="updateContent(item, $event)" (click)="$event.stopPropagation()">{{ item.content }}</div>
-              <img *ngIf="item.type === 'image'" [src]="item.src" class="canvas-image"
-                (click)="$event.stopPropagation()" />
-              <div *ngIf="item.type === 'chart'" class="canvas-chart" (click)="$event.stopPropagation()">
-                <div
-                  style="width: 200px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #999;">
-                  图表组件
-                </div>
-              </div>
-              <button *ngIf="item.type === 'button'" class="canvas-button" (click)="$event.stopPropagation()">{{
-                item.content || '按钮' }}</button>
-            </div>
-          </ng-container>
-          <!-- echart组件（不可拖拽移动） -->
-          <ng-template #echartBlock>
-            <div class="canvas-echart" (click)="$event.stopPropagation()">
-              <div style="width: 200px; height: 150px;">
-                <echarts-angular [options]="getEchartOptions(item.echartType || '')" [autoResize]="true"
-                  style="width: 100%; height: 100%;"></echarts-angular>
-              </div>
-            </div>
-          </ng-template>
-        </div>
-      </div>
-    </div>
-
-    <!-- 画布底部信息栏 -->
-    <div class="canvas-footer">
-      <div class="canvas-tabs">
-        <div *ngFor="let canvas of canvases" class="canvas-tab" [class.active]="canvas.id === activeCanvasId"
-          (click)="switchCanvas(canvas.id)">
-          <span *ngIf="editingCanvasId !== canvas.id" class="canvas-name" (dblclick)="startRenaming(canvas.id, $event)">
-            {{ canvas.name }}
-          </span>
-          <input *ngIf="editingCanvasId === canvas.id" class="canvas-name-input" [value]="canvas.name"
-            (blur)="saveCanvasName(canvas.id, $any($event.target).value)"
-            (keydown)="onCanvasNameKeydown($event, canvas.id)" #nameInput />
-          <button *ngIf="canvases.length > 1" class="delete-canvas-btn" (click)="deleteCanvas(canvas.id, $event)"
-            title="删除画布">
-            ×
-          </button>
-        </div>
-        <button class="add-canvas-btn" (click)="addCanvas()" title="新建画布">+</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 右侧边栏 -->
-  <div class="right-sidebar">
-    <div class="sidebar-columns">
-      <!-- 数据源列 -->
-      <div class="sidebar-column data-column">
-        <div class="column-header">
-          <span class="column-title">数据源</span>
-          <div class="header-right">
-            <button class="style-toggle-btn" (click)="toggleStylePanel()" [title]="isStylePanelOpen ? '隐藏样式' : '显示样式'">
-              {{ isStylePanelOpen ? '隐藏样式' : '显示样式' }}
-            </button>
-          </div>
-        </div>
-        <div class="column-content">
-          <app-data-source-panel></app-data-source-panel>
-        </div>
-      </div>
-
-      <!-- 样式列 -->
-      <div class="sidebar-column style-column" *ngIf="isStylePanelOpen">
-        <div class="column-header">
-          <span class="column-title">样式</span>
-        </div>
-        <div class="column-content">
-          <app-style-panel [selectedItem]="selectedItem" (itemUpdated)="onItemUpdated($event)"
-            (itemCopied)="onItemCopied($event)" (itemDeleted)="onItemDeleted($event)"></app-style-panel>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="dashboard-title-bar">
+  <h2>{{ appName }}</h2>
+  <button class="preview-btn" (click)="showPreview()">预览</button>
 </div>
+<div class="dashboard-container">
+    <div class="sidebar-nav">
+        <button [class.active]="activeSidebar === 'layer'" (click)="setSidebar('layer')">图层</button>
+        <button [class.active]="activeSidebar === 'component'" (click)="setSidebar('component')">组件库</button>
+        <button [class.active]="activeSidebar === 'template'" (click)="setSidebar('template')">模板库</button>
+        <button [class.active]="activeSidebar === 'resource'" (click)="setSidebar('resource')">资源</button>
+    </div>
+    <div class="side-panel">
+        <div *ngIf="activeSidebar === 'layer'" class="layer-panel">
+            <div>图层管理</div>
+            <ul>
+                <li *ngFor="let layer of layers; let i = index" [class.active]="activeLayerIndex === i"
+                    (click)="setActiveLayer(i)">
+                    图层{{i + 1}}
+                    <button (click)="removeLayer(i); $event.stopPropagation();"
+                        [disabled]="layers.length <= 1">删除</button>
+                </li>
+            </ul>
+            <button (click)="addLayer()">添加图层</button>
+        </div>
+        <div *ngIf="activeSidebar === 'component'" class="component-lib">
+            <div>组件库内容</div>
+            <div class="component-preview-list">
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('echarts-bar')"
+                     (dragend)="onPaletteDragEnd($event)"
+                     (mouseenter)="onPreviewChartHover('bar')">
+                    <svg width="48" height="48">
+                        <rect x="12" y="30" width="4" height="8" fill="#1976d2" />
+                        <rect x="20" y="24" width="4" height="14" fill="#1976d2" />
+                        <rect x="28" y="18" width="4" height="20" fill="#1976d2" />
+                    </svg>
+                    <div class="preview-label">柱状图</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('echarts-pie')"
+                     (dragend)="onPaletteDragEnd($event)"
+                     (mouseenter)="onPreviewChartHover('pie')">
+                    <svg width="48" height="48">
+                        <circle cx="24" cy="24" r="20" fill="#eee" stroke="#1976d2" stroke-width="2" />
+                        <path d="M24,24 L44,24 A20,20 0 0,1 24,44 Z" fill="#1976d2" />
+                        <path d="M24,24 L24,4 A20,20 0 0,1 44,24 Z" fill="#ff9800" />
+                    </svg>
+                    <div class="preview-label">饼图</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('echarts-radar')"
+                     (dragend)="onPaletteDragEnd($event)"
+                     (mouseenter)="onPreviewChartHover('radar')">
+                    <svg width="48" height="48">
+                        <polygon points="24,8 40,24 32,40 16,40 8,24" fill="#e3eaf2" stroke="#1976d2"
+                            stroke-width="2" />
+                        <polygon points="24,16 34,24 30,34 18,34 14,24" fill="#1976d2" opacity="0.5" />
+                    </svg>
+                    <div class="preview-label">雷达图</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('echarts-wordcloud')"
+                     (dragend)="onPaletteDragEnd($event)"
+                     (mouseenter)="onPreviewChartHover('wordcloud')">
+                    <svg width="48" height="48">
+                        <rect x="4" y="12" width="40" height="24" fill="#fff" stroke="#1976d2" stroke-width="1" />
+                        <text x="24" y="28" text-anchor="middle" font-size="12" fill="#1976d2">词云</text>
+                    </svg>
+                    <div class="preview-label">词云</div>
+                </div>
+            </div>
+            <!-- 可在此处添加图表预览 -->
+            <div style="width:100px;height:60px;margin-top:8px;">
+                <ngx-echarts [options]="echartsPreviewOption"></ngx-echarts>
+            </div>
+        </div>
+        <div *ngIf="activeSidebar === 'template'" class="template-lib">
+            模板库内容
+        </div>
+        <div *ngIf="activeSidebar === 'resource'" class="resource-lib">
+            资源内容
+        </div>
+    </div>
+    <div class="canvas-area" #canvasContainer (drop)="onCanvasDrop($event)" (dragover)="onCanvasDragOver($event)">
+        <!-- Konva 画布将挂载在此 div 上 -->
+    </div>
+    <div class="component-palette">
+        <div>Palette</div>
+        <!-- 按钮已移到组件库，不再显示 -->
+        <div *ngIf="selectedNode || selectedEchartsId" class="style-editor">
+            <div>样式编辑</div>
+            <!-- 层级操作按钮，支持 Konva 元素和 ECharts 图表 -->
+            <div class="zindex-toolbar">
+                <button type="button" (click)="moveSelectedUp()">上移一层</button>
+                <button type="button" (click)="moveSelectedDown()">下移一层</button>
+                <button type="button" (click)="moveSelectedToTop()">置顶</button>
+                <button type="button" (click)="moveSelectedToBottom()">置底</button>
+            </div>
+            <!-- 图表数据编辑 -->
+            <div *ngIf="selectedChartData">
+                <div *ngIf="selectedChartData.type === 'bar'">
+                    <label>横轴数据（逗号分隔）:
+                        <input type="text" [(ngModel)]="selectedChartData.data.xAxis" />
+                    </label>
+                    <label>柱状数据（逗号分隔）:
+                        <input type="text" [(ngModel)]="selectedChartData.data.series" />
+                    </label>
+                </div>
+                <div *ngIf="selectedChartData.type === 'pie'">
+                    <label *ngFor="let item of selectedChartData.data.data; let i = index">
+                        名称: <input type="text" [(ngModel)]="item.name" style="width:60px;" />
+                        数值: <input type="number" [(ngModel)]="item.value" style="width:60px;" />
+                    </label>
+                </div>
+                <div *ngIf="selectedChartData.type === 'radar'">
+                    <label *ngFor="let ind of selectedChartData.data.indicator; let i = index">
+                        指标名: <input type="text" [(ngModel)]="ind.name" style="width:60px;" />
+                        最大值: <input type="number" [(ngModel)]="ind.max" style="width:60px;" />
+                    </label>
+                    <label>得分（逗号分隔）:
+                        <input type="text" [(ngModel)]="selectedChartData.data.value" />
+                    </label>
+                </div>
+                <div *ngIf="selectedChartData.type === 'wordcloud'">
+                    <label *ngFor="let item of selectedChartData.data.data; let i = index">
+                        词: <input type="text" [(ngModel)]="item.name" style="width:60px;" />
+                        权重: <input type="number" [(ngModel)]="item.value" style="width:60px;" />
+                    </label>
+                </div>
+                <button type="button" (click)="onChartDataSave()">保存</button>
+            </div>
+            <!-- 图表代码编辑 -->
+            <div *ngIf="selectedChartData">
+                <div style="margin-bottom:8px;">
+                    <label>option代码（直接编辑ECharts配置）:</label>
+                    <textarea [(ngModel)]="chartOptionCode" rows="12" style="width:100%;font-family:monospace;font-size:13px;"></textarea>
+                </div>
+                <button type="button" (click)="onChartOptionCodeSave()">保存</button>
+            </div>
+            <!-- 圆形/环形/自定义形状 -->
+            <div
+                *ngIf="selectedNode && (selectedNode.getClassName() === 'Circle' || selectedNode.getClassName() === 'Ring' || selectedNode.getClassName() === 'Shape')">
+                <label>填充色:
+                    <input type="color" [value]="getNodeFill(selectedNode)" (input)="updateNodeStyle('fill', $event)" />
+                </label>
+                <label>描边色:
+                    <input type="color" [value]="getNodeStroke(selectedNode)"
+                        (input)="updateNodeStyle('stroke', $event)" />
+                </label>
+                <label>描边宽:
+                    <input type="number" [value]="getNodeStrokeWidth(selectedNode)" min="0"
+                        (input)="updateNodeStyle('strokeWidth', $event)" />
+                </label>
+            </div>
+            <!-- 标签 -->
+            <div *ngIf="selectedNode && selectedNode.getClassName() === 'Label'">
+                <label>字体颜色:
+                    <input type="color" [value]="getLabelTextFill()" (input)="updateLabelTextStyle('fill', $event)" />
+                </label>
+                <label>字体大小:
+                    <input type="number" [value]="getLabelTextFontSize()" min="8"
+                        (input)="updateLabelTextStyle('fontSize', $event)" />
+                </label>
+                <label>文本:
+                    <input type="text" [value]="getLabelText()" (input)="updateLabelTextStyle('text', $event)" />
+                </label>
+            </div>
+            <!-- 图片 -->
+            <div *ngIf="selectedNode && selectedNode.getClassName() === 'Image'">
+                <label>图片地址:
+                    <input type="text" [value]="getImageSrc()" (change)="onImageSrcChange($event)" />
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 预览弹窗部分已正确集成 CanvasPreviewComponent -->

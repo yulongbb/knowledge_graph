@@ -1,0 +1,17 @@
+.canvas-preview-area {
+  border: 1px solid #eee;
+  background: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+}
+
+.echarts-preview {
+  box-shadow: 0 2px 8px #0001;
+  border-radius: 6px;
+}

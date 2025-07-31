@@ -1,0 +1,49 @@
+<div #previewArea
+     class="canvas-preview-area"
+     [style.width.px]="width"
+     [style.height.px]="height"
+     style="position:relative; background:#fff; border:1px solid #eee; overflow:auto;">
+  <ng-container *ngFor="let el of elements; let i = index">
+    <p *ngIf="el.type === 'text'"
+       [style.position]="'absolute'"
+       [style.left.px]="el.x"
+       [style.top.px]="el.y"
+       [style.width.px]="el.width"
+       [style.height.px]="el.height"
+       [style.fontSize.px]="el.fontSize || 16"
+       [style.color]="el.color || '#222'"
+       style="margin:0;">
+      {{ el.content }}
+    </p>
+    <button *ngIf="el.type === 'button'"
+       [style.position]="'absolute'"
+       [style.left.px]="el.x"
+       [style.top.px]="el.y"
+       [style.width.px]="el.width"
+       [style.height.px]="el.height"
+       [style.fontSize.px]="el.fontSize || 16"
+       [style.background]="el.background || '#1976d2'"
+       [style.color]="el.color || '#fff'">
+      {{ el.content }}
+    </button>
+    <img *ngIf="el.type === 'image'"
+       [src]="el.url"
+       [style.position]="'absolute'"
+       [style.left.px]="el.x"
+       [style.top.px]="el.y"
+       [style.width.px]="el.width"
+       [style.height.px]="el.height"
+       [alt]="el.alt || ''"
+       style="object-fit:contain; border-radius:4px;" />
+    <div *ngIf="el.type === 'echarts'"
+         class="echarts-preview"
+         [id]="'echarts-preview-' + i"
+         [style.position]="'absolute'"
+         [style.left.px]="el.x"
+         [style.top.px]="el.y"
+         [style.width.px]="el.width"
+         [style.height.px]="el.height"
+         style="background:#fff; border-radius:6px; box-shadow:0 2px 8px #0001;">
+    </div>
+  </ng-container>
+</div>
