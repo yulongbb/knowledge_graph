@@ -6,6 +6,7 @@
     <div class="sidebar-nav">
         <button [class.active]="activeSidebar === 'layer'" (click)="setSidebar('layer')">图层</button>
         <button [class.active]="activeSidebar === 'component'" (click)="setSidebar('component')">组件库</button>
+        <button [class.active]="activeSidebar === 'design'" (click)="setSidebar('design')">设计库</button>
         <button [class.active]="activeSidebar === 'template'" (click)="setSidebar('template')">模板库</button>
         <button [class.active]="activeSidebar === 'resource'" (click)="setSidebar('resource')">资源</button>
     </div>
@@ -83,6 +84,47 @@
         </div>
         <div *ngIf="activeSidebar === 'resource'" class="resource-lib">
             资源内容
+        </div>
+        <div *ngIf="activeSidebar === 'design'" class="design-lib">
+            <div>设计库</div>
+            <div class="component-preview-list">
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('text')"
+                     (dragend)="onPaletteDragEnd($event)">
+                    <svg width="48" height="48">
+                        <text x="24" y="32" text-anchor="middle" font-size="28" fill="#1976d2" font-family="Arial">T</text>
+                    </svg>
+                    <div class="preview-label">文字</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('rect')"
+                     (dragend)="onPaletteDragEnd($event)">
+                    <svg width="48" height="48">
+                        <rect x="8" y="12" width="32" height="24" fill="#e3eaf2" stroke="#1976d2" stroke-width="2"/>
+                    </svg>
+                    <div class="preview-label">矩形</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('circle')"
+                     (dragend)="onPaletteDragEnd($event)">
+                    <svg width="48" height="48">
+                        <circle cx="24" cy="24" r="14" fill="#e3eaf2" stroke="#1976d2" stroke-width="2"/>
+                    </svg>
+                    <div class="preview-label">圆形</div>
+                </div>
+                <div class="component-preview-item"
+                     draggable="true"
+                     (dragstart)="onPaletteDragStart('line')"
+                     (dragend)="onPaletteDragEnd($event)">
+                    <svg width="48" height="48">
+                        <line x1="8" y1="40" x2="40" y2="8" stroke="#1976d2" stroke-width="3"/>
+                    </svg>
+                    <div class="preview-label">直线</div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- 中间画布区域（参考 panel.component.html） -->

@@ -293,6 +293,75 @@ export class VisualizationDashboardComponent implements OnInit {
       }
       return;
     }
+
+    // 设计库基础形状
+    if (type === 'text') {
+      const text = new Konva.Text({
+        x: x ?? 100,
+        y: y ?? 100,
+        text: '双击编辑文字',
+        fontSize: 28,
+        fill: '#1976d2',
+        draggable: true
+      });
+      this.activeLayer.add(text);
+      text.on('mousedown', (evt) => this.selectElement(evt.target));
+      text.on('dblclick', (evt) => {
+        const node = evt.target as Konva.Text;
+        const newText = prompt('编辑文字内容', node.text());
+        if (newText !== null) {
+          node.text(newText);
+          this.activeLayer.batchDraw();
+        }
+      });
+      this.activeLayer.batchDraw();
+      return;
+    }
+    if (type === 'rect') {
+      const rect = new Konva.Rect({
+        x: x ?? 100,
+        y: y ?? 100,
+        width: 120,
+        height: 60,
+        fill: '#e3eaf2',
+        stroke: '#1976d2',
+        strokeWidth: 2,
+        draggable: true
+      });
+      this.activeLayer.add(rect);
+      rect.on('mousedown', (evt) => this.selectElement(evt.target));
+      this.activeLayer.batchDraw();
+      return;
+    }
+    if (type === 'circle') {
+      const circle = new Konva.Circle({
+        x: x ?? 160,
+        y: y ?? 160,
+        radius: 40,
+        fill: '#e3eaf2',
+        stroke: '#1976d2',
+        strokeWidth: 2,
+        draggable: true
+      });
+      this.activeLayer.add(circle);
+      circle.on('mousedown', (evt) => this.selectElement(evt.target));
+      this.activeLayer.batchDraw();
+      return;
+    }
+    if (type === 'line') {
+      const line = new Konva.Line({
+        points: [x ?? 100, y ?? 100, (x ?? 100) + 120, (y ?? 100) + 0],
+        stroke: '#1976d2',
+        strokeWidth: 3,
+        lineCap: 'round',
+        lineJoin: 'round',
+        draggable: true
+      });
+      this.activeLayer.add(line);
+      line.on('mousedown', (evt) => this.selectElement(evt.target));
+      this.activeLayer.batchDraw();
+      return;
+    }
   }
 
   // 提取图表数据用于编辑
@@ -322,10 +391,32 @@ export class VisualizationDashboardComponent implements OnInit {
     return {};
   }
 
+  private lastCursorNode: Konva.Node | null = null;
+
   selectElement(node: Konva.Node) {
+    // 先移除上一个节点的 cursor 事件
+    if (this.lastCursorNode) {
+      this.lastCursorNode.off('mouseenter.visual-cursor');
+      this.lastCursorNode.off('mouseleave.visual-cursor');
+      // 恢复画布 cursor
+      const container = this.canvasContainer?.nativeElement;
+      if (container) container.style.cursor = '';
+    }
     this.selectedNode = node;
     this.transformer.nodes([node]);
     this.activeLayer.batchDraw();
+
+    // 鼠标悬停时变为十字移动
+    node.on('mouseenter.visual-cursor', () => {
+      const container = this.canvasContainer?.nativeElement;
+      if (container) container.style.cursor = 'move';
+    });
+    node.on('mouseleave.visual-cursor', () => {
+      const container = this.canvasContainer?.nativeElement;
+      if (container) container.style.cursor = '';
+    });
+    this.lastCursorNode = node;
+
     // 图表代码编辑
     if (node instanceof Konva.Image && node.image()) {
       let chartType = '';
@@ -1038,6 +1129,14 @@ export class VisualizationDashboardComponent implements OnInit {
   // 清空画布
   clearCanvas() {
     if (this.activeLayer) {
+      // 清除 cursor 事件
+      if (this.lastCursorNode) {
+        this.lastCursorNode.off('mouseenter.visual-cursor');
+        this.lastCursorNode.off('mouseleave.visual-cursor');
+        const container = this.canvasContainer?.nativeElement;
+        if (container) container.style.cursor = '';
+        this.lastCursorNode = null;
+      }
       this.activeLayer.destroyChildren();
       this.selectedNode = null;
       this.cdr.markForCheck();
@@ -1105,9 +1204,10 @@ export class VisualizationDashboardComponent implements OnInit {
 
   // 画布样式
   getCanvasStyle() {
+    // 只在拖动画布时设置为grabbing，其余不设置cursor
     return {
       transform: `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px) scale(${this.canvasScale})`,
-      cursor: this.isDraggingCanvas ? 'grabbing' : 'grab'
+      cursor: this.isDraggingCanvas ? 'grabbing' : undefined
     };
   }
 
