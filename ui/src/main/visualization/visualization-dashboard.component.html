@@ -85,8 +85,58 @@
             资源内容
         </div>
     </div>
-    <div class="canvas-area" #canvasContainer (drop)="onCanvasDrop($event)" (dragover)="onCanvasDragOver($event)">
-        <!-- Konva 画布将挂载在此 div 上 -->
+    <!-- 中间画布区域（参考 panel.component.html） -->
+    <div class="canvas-container">
+      <div class="canvas-header">
+        <div class="header-left">
+          <h3>可视化大屏设计器</h3>
+          <div class="canvas-info">拖拽组件到画布进行设计</div>
+        </div>
+        <div class="header-actions">
+          <button class="action-btn secondary" (click)="clearCanvas()">清空画布</button>
+          <button class="action-btn secondary" (click)="previewCanvas()">预览</button>
+          <button class="action-btn primary" (click)="saveDesign()">保存</button>
+        </div>
+      </div>
+      <div class="canvas-wrapper">
+        <!-- 浮动工具栏 -->
+        <div class="canvas-toolbar">
+          <div class="toolbar-group">
+            <button class="toolbar-btn" (click)="zoomOut()" title="缩小">-</button>
+            <span class="zoom-display">{{ getZoomPercent() }}%</span>
+            <button class="toolbar-btn" (click)="zoomIn()" title="放大">+</button>
+          </div>
+          <div class="toolbar-divider"></div>
+          <div class="toolbar-group">
+            <button class="toolbar-btn" (click)="resetCanvas()" title="重置视图">⌂</button>
+            <button class="toolbar-btn" (click)="fitToContainerWidth()" title="适应宽度">⟷</button>
+            <button class="toolbar-btn" (click)="fitToScreen()" title="适应屏幕">□</button>
+          </div>
+        </div>
+        <!-- Konva 画布容器 -->
+        <div
+          class="canvas"
+          [ngStyle]="getCanvasStyle()"
+          (mousedown)="onCanvasMouseDown($event)"
+          (mousemove)="onCanvasMouseMove($event)"
+          (mouseup)="onCanvasMouseUp($event)"
+          (mouseleave)="onCanvasMouseUp($event)"
+          (wheel)="onCanvasWheel($event)"
+          (drop)="onCanvasDrop($event)"
+          (dragover)="onCanvasDragOver($event)"
+        >
+          <div #canvasContainer style="width:100%;height:100%;"></div>
+        </div>
+      </div>
+      <!-- 画布底部信息栏/标签页（可选，按需实现） -->
+      <!--
+      <div class="canvas-footer">
+        <div class="canvas-tabs">
+          <div class="canvas-tab active">画布1</div>
+          <button class="add-canvas-btn">+</button>
+        </div>
+      </div>
+      -->
     </div>
     <div class="component-palette">
         <div>Palette</div>

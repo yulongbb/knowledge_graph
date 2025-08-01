@@ -1,0 +1,197 @@
+<div class="visualization-dashboard">
+  <!-- 左侧菜单栏 -->
+  <div class="menu-sidebar">
+    <div
+      *ngFor="let menu of paletteMenus"
+      class="menu-item"
+      [class.active]="activeMenu === menu.type"
+      (click)="switchMenu(menu.type)"
+      [title]="menu.label"
+    >
+      <span class="menu-icon">{{ menu.icon }}</span>
+      <span class="menu-label">{{ menu.label }}</span>
+    </div>
+  </div>
+
+  <!-- 组件库 -->
+  <div class="palette">
+    <div class="palette-title">{{ getCurrentMenuLabel() }}</div>
+    <app-chart-palette *ngIf="activeMenu === 'chart'"></app-chart-palette>
+    <app-material-palette *ngIf="activeMenu === 'material'"></app-material-palette>
+    <app-resource-palette *ngIf="activeMenu === 'resource'"></app-resource-palette>
+    <app-template-palette *ngIf="activeMenu === 'template'"></app-template-palette>
+  </div>
+
+  <!-- 中间画布区域 -->
+  <div class="canvas-container">
+    <div class="canvas-header">
+      <div class="header-left">
+        <h3>可视化大屏设计器</h3>
+        <div class="canvas-info">拖拽组件到画布进行设计</div>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn secondary" (click)="clearCanvas()">清空画布</button>
+        <button class="action-btn secondary" (click)="previewMode()">预览</button>
+        <button class="action-btn primary" (click)="saveDesign()">保存</button>
+      </div>
+    </div>
+    
+    <div class="canvas-wrapper">
+      <!-- 浮动工具栏 -->
+      <div class="canvas-toolbar">
+        <div class="toolbar-group">
+          <button class="toolbar-btn" (click)="zoomOut()" title="缩小">-</button>
+          <span class="zoom-display">{{ getZoomPercent() }}%</span>
+          <button class="toolbar-btn" (click)="zoomIn()" title="放大">+</button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" (click)="resetCanvas()" title="重置视图">⌂</button>
+          <button class="toolbar-btn" (click)="fitToContainerWidth()" title="适应宽度">⟷</button>
+          <button class="toolbar-btn" (click)="fitToScreen()" title="适应屏幕">□</button>
+        </div>
+      </div>
+
+      <div
+        *ngIf="activeCanvas"
+        class="canvas"
+        [class.drag-over]="isDragOver"
+        [ngStyle]="getCanvasStyle()"
+        cdkDropList
+        [cdkDropListEnterPredicate]="enterPredicate"
+        (cdkDropListDropped)="onDrop($event)"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (mousedown)="onCanvasMouseDown($event)"
+        (mousemove)="onCanvasMouseMove($event)"
+        (mouseup)="onCanvasMouseUp($event)"
+        (mouseleave)="onCanvasMouseUp($event)"
+        (wheel)="onCanvasWheel($event)"
+      >
+        <div
+          *ngFor="let item of canvasItems; trackBy: trackByFn"
+          class="canvas-item"
+          [class.selected]="selectedItem?.id === item.id"
+          [ngStyle]="{ left: item.x + 'px', top: item.y + 'px' }"
+          cdkDrag
+          [cdkDragData]="item"
+          (cdkDragEnded)="onItemDragEnd($event, item)"
+          (click)="selectItem(item)"
+        >
+          <!-- 控制按钮 -->
+          <div class="item-controls">
+            <button class="control-btn copy-btn" (click)="copyItem(item)" title="复制">⧉</button>
+            <button class="control-btn delete-btn" (click)="removeItem(item)" title="删除">×</button>
+          </div>
+          
+          <!-- 文本组件 -->
+          <div 
+            *ngIf="item.type === 'text'" 
+            class="canvas-text"
+            contenteditable="true"
+            (blur)="updateContent(item, $event)"
+            (click)="$event.stopPropagation()"
+          >{{ item.content }}</div>
+          
+          <!-- 图片组件 -->
+          <img 
+            *ngIf="item.type === 'image'" 
+            [src]="item.src" 
+            class="canvas-image"
+            (click)="$event.stopPropagation()"
+          />
+
+          <!-- 图表组件 -->
+          <div 
+            *ngIf="item.type === 'chart'" 
+            class="canvas-chart"
+            (click)="$event.stopPropagation()"
+          >
+            <div style="width: 200px; height: 150px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #999;">
+              图表组件
+            </div>
+          </div>
+
+          <!-- 按钮组件 -->
+          <button 
+            *ngIf="item.type === 'button'" 
+            class="canvas-button"
+            (click)="$event.stopPropagation()"
+          >{{ item.content || '按钮' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画布底部信息栏 -->
+    <div class="canvas-footer">
+      <div class="canvas-tabs">
+        <div
+          *ngFor="let canvas of canvases"
+          class="canvas-tab"
+          [class.active]="canvas.id === activeCanvasId"
+          (click)="switchCanvas(canvas.id)"
+        >
+          <span
+            *ngIf="editingCanvasId !== canvas.id"
+            class="canvas-name"
+            (dblclick)="startRenaming(canvas.id, $event)"
+          >
+            {{ canvas.name }}
+          </span>
+          <input
+            *ngIf="editingCanvasId === canvas.id"
+            class="canvas-name-input"
+            [value]="canvas.name"
+            (blur)="saveCanvasName(canvas.id, $any($event.target).value)"
+            (keydown)="onCanvasNameKeydown($event, canvas.id)"
+            #nameInput
+          />
+          <button
+            *ngIf="canvases.length > 1"
+            class="delete-canvas-btn"
+            (click)="deleteCanvas(canvas.id, $event)"
+            title="删除画布"
+          >
+            ×
+          </button>
+        </div>
+        <button class="add-canvas-btn" (click)="addCanvas()" title="新建画布">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧边栏 -->
+  <div class="right-sidebar">
+    <div class="sidebar-columns">
+      <!-- 数据源列 -->
+      <div class="sidebar-column data-column">
+        <div class="column-header">
+          <span class="column-title">数据源</span>
+          <div class="header-right">
+            <button class="style-toggle-btn" (click)="toggleStylePanel()" [title]="isStylePanelOpen ? '隐藏样式' : '显示样式'">
+              {{ isStylePanelOpen ? '隐藏样式' : '显示样式' }}
+            </button>
+          </div>
+        </div>
+        <div class="column-content">
+          <app-data-source-panel></app-data-source-panel>
+        </div>
+      </div>
+
+      <!-- 样式列 -->
+      <div class="sidebar-column style-column" *ngIf="isStylePanelOpen">
+        <div class="column-header">
+          <span class="column-title">样式</span>
+        </div>
+        <div class="column-content">
+          <app-style-panel 
+            [selectedItem]="selectedItem"
+            (itemUpdated)="onItemUpdated($event)"
+            (itemCopied)="onItemCopied($event)"
+            (itemDeleted)="onItemDeleted($event)"
+          ></app-style-panel>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

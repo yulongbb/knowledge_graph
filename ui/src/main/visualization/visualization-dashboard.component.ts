@@ -94,6 +94,12 @@ export class VisualizationDashboardComponent implements OnInit {
   previewWidth = 900;
   previewHeight = 600;
 
+  // ====== 新增/补充属性和方法以支持 panel.component.html 画布操作 ======
+  canvasScale: number = 1;
+  canvasOffset = { x: 0, y: 0 };
+  isDraggingCanvas = false;
+  dragStartPos = { x: 0, y: 0 };
+
   constructor(
     private cdr: ChangeDetectorRef,
     private activatedRoute: ActivatedRoute,
@@ -200,8 +206,11 @@ export class VisualizationDashboardComponent implements OnInit {
     alert('Circle double-clicked!');
   }
 
-  onPaletteDragStart(type: string) {
+  onPaletteDragStart(type: string, event?: DragEvent) {
     this.draggingType = type;
+    if (event) {
+      event.dataTransfer!.effectAllowed = 'copy';
+    }
   }
 
   onPaletteDragEnd(event: DragEvent) {
@@ -211,9 +220,10 @@ export class VisualizationDashboardComponent implements OnInit {
   onCanvasDrop(event: DragEvent) {
     event.preventDefault();
     if (!this.draggingType) return;
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    // 计算缩放和平移后的坐标
+    const canvasRect = (event.target as HTMLElement).getBoundingClientRect();
+    const x = (event.clientX - canvasRect.left - this.canvasOffset.x) / this.canvasScale;
+    const y = (event.clientY - canvasRect.top - this.canvasOffset.y) / this.canvasScale;
     this.addElement(this.draggingType, x, y);
     this.draggingType = null;
   }
@@ -1024,4 +1034,130 @@ export class VisualizationDashboardComponent implements OnInit {
       this.echartsPreviewOption = this.echartsWordcloudOption;
     }
   }
+
+  // 清空画布
+  clearCanvas() {
+    if (this.activeLayer) {
+      this.activeLayer.destroyChildren();
+      this.selectedNode = null;
+      this.cdr.markForCheck();
+    }
+  }
+
+  // 保存设计（可自定义实现）
+  saveDesign() {
+    // 可扩展为保存 Konva JSON 或自定义格式
+    const json = this.stage ? this.stage.toJSON() : '';
+    console.log('保存设计', json);
+  }
+
+  // 放大
+  zoomIn() {
+    this.canvasScale = Math.min(3, this.canvasScale + 0.1);
+    this.applyCanvasTransform();
+  }
+
+  // 缩小
+  zoomOut() {
+    this.canvasScale = Math.max(0.1, this.canvasScale - 0.1);
+    this.applyCanvasTransform();
+  }
+
+  // 获取缩放百分比
+  getZoomPercent(): number {
+    return Math.round(this.canvasScale * 100);
+  }
+
+  // 重置画布
+  resetCanvas() {
+    this.canvasScale = 1;
+    this.canvasOffset = { x: 0, y: 0 };
+    this.applyCanvasTransform();
+  }
+
+  // 适应容器宽度
+  fitToContainerWidth() {
+    const wrapper = document.querySelector('.canvas-wrapper') as HTMLElement;
+    if (wrapper) {
+      this.canvasScale = (wrapper.offsetWidth - 60) / this.canvasWidth;
+      this.canvasOffset = {
+        x: (wrapper.offsetWidth - this.canvasWidth * this.canvasScale) / 2,
+        y: (wrapper.offsetHeight - this.canvasHeight * this.canvasScale) / 2
+      };
+      this.applyCanvasTransform();
+    }
+  }
+
+  // 适应屏幕
+  fitToScreen() {
+    const wrapper = document.querySelector('.canvas-wrapper') as HTMLElement;
+    if (wrapper) {
+      const scaleX = (wrapper.offsetWidth - 40) / this.canvasWidth;
+      const scaleY = (wrapper.offsetHeight - 40) / this.canvasHeight;
+      this.canvasScale = Math.min(scaleX, scaleY);
+      this.canvasOffset = {
+        x: (wrapper.offsetWidth - this.canvasWidth * this.canvasScale) / 2,
+        y: (wrapper.offsetHeight - this.canvasHeight * this.canvasScale) / 2
+      };
+      this.applyCanvasTransform();
+    }
+  }
+
+  // 画布样式
+  getCanvasStyle() {
+    return {
+      transform: `translate(${this.canvasOffset.x}px, ${this.canvasOffset.y}px) scale(${this.canvasScale})`,
+      cursor: this.isDraggingCanvas ? 'grabbing' : 'grab'
+    };
+  }
+
+  // 鼠标按下拖动画布
+  onCanvasMouseDown(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.isDraggingCanvas = true;
+      this.dragStartPos = {
+        x: event.clientX - this.canvasOffset.x,
+        y: event.clientY - this.canvasOffset.y
+      };
+      event.preventDefault();
+    }
+  }
+
+  // 鼠标移动拖动画布
+  onCanvasMouseMove(event: MouseEvent) {
+    if (this.isDraggingCanvas) {
+      this.canvasOffset = {
+        x: event.clientX - this.dragStartPos.x,
+        y: event.clientY - this.dragStartPos.y
+      };
+      this.applyCanvasTransform();
+      event.preventDefault();
+    }
+  }
+
+  // 鼠标松开
+  onCanvasMouseUp(event: MouseEvent) {
+    this.isDraggingCanvas = false;
+  }
+
+  // 滚轮缩放
+  onCanvasWheel(event: WheelEvent) {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    const newScale = Math.max(0.1, Math.min(3, this.canvasScale + delta));
+    if (newScale !== this.canvasScale) {
+      this.canvasScale = newScale;
+      this.applyCanvasTransform();
+    }
+  }
+
+  // 应用缩放和平移到 Konva 画布
+  applyCanvasTransform() {
+    if (this.stage) {
+      this.stage.scale({ x: this.canvasScale, y: this.canvasScale });
+      this.stage.position({ x: this.canvasOffset.x, y: this.canvasOffset.y });
+      this.stage.batchDraw();
+    }
+  }
+
 }
