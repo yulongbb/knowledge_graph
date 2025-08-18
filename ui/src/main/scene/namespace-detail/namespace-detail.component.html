@@ -1,26 +1,32 @@
-<h3>{{ title }}</h3>
-<x-form
-  #form
-  [disabled]="disabled"
-  [controls]="controls"
-  direction="row"
-  labelSuffix=":"
-  labelWidth="5rem"
-  width="30rem"
-  labelAlign="end"
-  span="20"
-  space="1"
-></x-form>
+<div class="namespace-detail-container">
+  <x-loading [loading]="loading">
+    <h3>{{ title }}</h3>
+    <x-form
+      #form
+      [disabled]="disabled || loading"
+      [controls]="controls"
+      direction="row"
+      labelSuffix=":"
+      labelWidth="5rem"
+      width="30rem"
+      labelAlign="end"
+      span="20"
+      space="1"
+    ></x-form>
 
-<div class="app-footer">
-  <x-buttons space="0.3">
-    <x-button (click)="action('cancel')" size="small">取消</x-button>
-    <x-button
-      type="primary"
-      (click)="!formInvalid && action('save')"
-      [disabled]="formInvalid || disabled"
-      size="small"
-      >保存</x-button
-    >
-  </x-buttons>
+    <div class="app-footer">
+      <x-buttons space="0.3">
+        <x-button (click)="action('cancel')" size="small" [disabled]="loading">取消</x-button>
+        <x-button
+          *ngIf="type !== 'info'"
+          type="primary"
+          (click)="!formInvalid && action('save')"
+          [disabled]="formInvalid || disabled || loading"
+          size="small"
+          [loading]="loading"
+          >保存</x-button
+        >
+      </x-buttons>
+    </div>
+  </x-loading>
 </div>

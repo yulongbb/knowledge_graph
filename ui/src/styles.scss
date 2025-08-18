@@ -6,6 +6,10 @@
 @import 'src/styles/core/index';
 @import '~highlight.js/styles/github.css';
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+// 导入统一表格样式
+@import 'src/styles/table-common.scss';
+
 @font-face {
   font-family: 'ubuntu';
   src: url('/src/assets/fonts/ubuntu.eot?#') format('eot'), url('/src/assets/fonts/ubuntu.ttf') format('truetype'),
@@ -14,21 +18,39 @@
   font-style: normal;
 }
 
+// 全局高度布局优化 - 统一设置，避免冲突
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; // 防止整体页面滚动
+  font-family: ubuntu, -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
+}
 
+app-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 主布局容器优化
+router-outlet + * {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 通用页面容器
+.page-wrapper {
+  height: 100%;
+  overflow: hidden;
+  background: #f8f9fa;
+}
 
 *:focus {
   outline: none;
-}
-
-html {
-  height: 100%;
-}
-
-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 
 body,
@@ -57,10 +79,6 @@ a {
 
 tt {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
-}
-
-html {
-  font-family: ubuntu, -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
 }
 
 

@@ -9,7 +9,10 @@ import {
   XButtonModule, 
   XInputModule, 
   XTableModule, 
-  XCardModule 
+  XCardModule,
+  XFormModule,
+  XLoadingModule,
+  XMessageModule
 } from '@ng-nest/ui';
 import { SceneComponent } from './scene.component';
 import { NamespaceDetailComponent } from './namespace-detail/namespace-detail.component';
@@ -33,6 +36,9 @@ const routes = [
     XInputModule,
     XTableModule,
     XCardModule,
+    XFormModule,
+    XLoadingModule,
+    XMessageModule,
     RouterModule.forChild(routes)
   ],
   exports: [RouterModule],

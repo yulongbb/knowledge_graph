@@ -1,6 +1,12 @@
 :host {
   padding: 0.7rem;
   display: block;
+
+  .namespace-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
   x-input-group {
     display: block;
     width: 100%;
@@ -9,17 +15,71 @@
   x-input-group:not(:first-child) {
     margin-top: 0.7rem;
   }
+
   > .app-footer,
-  > h3 {
+  > h3,
+  .namespace-detail-container > h3,
+  .namespace-detail-container > .app-footer {
     padding-left: 5rem;
   }
-  > h3 {
+
+  > h3,
+  .namespace-detail-container > h3 {
     margin: 0;
-    font-size: 1.1rem;
-    margin-bottom: 0.7rem;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 500;
   }
 
   .app-footer {
-    margin-top: 0.7rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+
+    x-button {
+      min-width: 80px;
+    }
+  }
+
+  ::ng-deep {
+    x-form {
+      .x-form-row {
+        margin-bottom: 1rem;
+      }
+
+      .x-input {
+        transition: all 0.2s ease;
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+      }
+
+      .x-textarea {
+        transition: all 0.2s ease;
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+      }
+
+      .x-form-control-invalid {
+        .x-input,
+        .x-textarea {
+          border-color: #ff4d4f;
+
+          &:focus {
+            box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+          }
+        }
+      }
+    }
+
+    x-loading {
+      .x-loading-overlay {
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+    }
   }
 }

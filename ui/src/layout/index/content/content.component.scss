@@ -1,15 +1,24 @@
 @import '../index.param';
 
 app-content {
-  height: 100%;
-  width: 100%;
-  overflow:auto;
-  padding-top: $tabs-height + $crumb-height;
-  padding-left: $sider-width;
-  transition: padding $transition-duration;
+  height: calc(100% - #{$tabs-height + $crumb-height}); // 计算实际可用高度
+  width: calc(100% - #{$sider-width}); // 计算实际可用宽度
+  overflow: hidden; // 改为hidden，防止页面级滚动
+  position: absolute;
+  top: $tabs-height + $crumb-height;
+  left: $sider-width;
+  transition: all $transition-duration;
   display: block;
+  
   > div {
     height: 100%;
     width: 100%;
+    overflow: hidden;
+  }
+  
+  // 确保router-outlet内容占满高度
+  > router-outlet + * {
+    height: 100%;
+    overflow: hidden;
   }
 }

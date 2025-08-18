@@ -1,71 +1,55 @@
-<au-tool>
-  <x-button type="primary" icon="fto-plus" (click)="action('add')">新增应用</x-button>
-</au-tool>
+<div class="application-container">
+  <div class="application-header">
+    <div class="header-actions">
+      <div class="search-group">
+        <x-input-group compact>
+          <x-input
+            class="search-input"
+            placeholder="搜索应用名称..."
+            [(ngModel)]="keyword"
+            (keyup.enter)="search(keyword)"
+            clearable
+          ></x-input>
+          <x-button icon="fto-search" (click)="search(keyword)">搜索</x-button>
+          <x-button type="text" icon="fto-refresh-cw" (click)="resetSearch()">重置</x-button>
+        </x-input-group>
+      </div>
+      <div class="action-buttons">
+        <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
+        <x-button type="danger" icon="fto-trash-2" (click)="action('delete')">删除</x-button>
+      </div>
+    </div>
+  </div>
+  <div class="application-table">
 
-<div class="search-section">
-  <x-input-group compact>
-    <x-input
-      [style.width.%]="33"
-      placeholder="搜索应用名称..."
-      [(ngModel)]="name"
-      (keyup.enter)="searchByName()"
-    ></x-input>
-    <x-select
-      [style.width.%]="33"
-      placeholder="选择分类..."
-      [(ngModel)]="category"
-      (ngModelChange)="searchByCategory()"
-    >
-      <!-- <x-option label="全部" value=""></x-option>
-      <x-option *ngFor="let cat of categories" [label]="cat" [value]="cat"></x-option> -->
-    </x-select>
-    <x-input
-      [style.width.%]="34"
-      placeholder="搜索描述内容..."
-      [(ngModel)]="description"
-      (keyup.enter)="searchByDescription()"
-    ></x-input>
-  </x-input-group>
-</div>
-
-<x-table
-  #tableCom
-  [columns]="columns"
-  [rowHeight]="60"
-  [data]="data"
-  [size]="size"
-  [(index)]="index"
-  [query]="query"
-  [bodyColumnTpl]="{
-    actions: actionsTpl,
-    image: imageTpl,
-    rating: ratingTpl,
-    isPinned: pinnedTpl
-  }"
-  loading
-></x-table>
-
-<ng-template #actionsTpl let-column="$column" let-row="$row">
+    <x-table
+      #tableCom
+      au-adaption
+      [columns]="columns"
+      [data]="data"
+      [size]="size"
+      [index]="index"
+      [query]="query"
+      [showPagination]="true"
+      [bordered]="false"
+      [showHeader]="true"
+      [bodyColumnTpl]="{
+        actions: actionsTpl,
+        image: imageTpl,
+        rating: ratingTpl,
+        isPinned: pinnedTpl
+      }"
+      (headCheckboxChange)="headCheckboxChange($event)"
+      (bodyCheckboxChange)="bodyCheckboxChange($event)"
+      loading
+    ></x-table>
+  </div>
+</div><ng-template #actionsTpl let-column="$column" let-row="$row">
   <div class="au-table-actions">
-    <x-link icon="fto-external-link" (click)="action('visit', row)" title="访问"></x-link>
-    <x-link icon="fto-eye" (click)="action('info', row)" title="查看"></x-link>
-    <x-link icon="fto-edit" (click)="action('edit', row)" title="修改"></x-link>
-    <x-link
-      icon="fto-bar-chart-2"
-      (click)="action('visualize', row)"
-      title="可视化编辑"
-    ></x-link>
-    <x-link
-      icon="fto-trash-2"
-      (click)="action('delete', row)"
-      title="删除"
-    ></x-link>
-    <x-link
-      [icon]="row.isPinned ? 'fto-arrow-down' : 'fto-arrow-up'"
-      (click)="action('toggle-pin', row)"
-      [title]="row.isPinned ? '取消置顶' : '置顶'"
-    ></x-link>
-    <x-link icon="fto-star" (click)="action('rate', row)" title="评分"></x-link>
+    <x-link icon="fto-external-link" (click)="action('visit', row)" title="访问" type="info"></x-link>
+    <x-link icon="fto-eye" (click)="action('info', row)" title="查看" type="info"></x-link>
+    <x-link icon="fto-edit" (click)="action('edit', row)" title="修改" type="primary"></x-link>
+    <x-link icon="fto-trash-2" (click)="action('delete', row)" title="删除" type="danger"></x-link>
   </div>
 </ng-template>
 

@@ -1,18 +1,20 @@
 <div class="scene-container">
   <div class="scene-header">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <x-input-group compact>
-        <x-input
-          style="width: 300px;"
-          placeholder="名称/前缀/描述"
-          [(ngModel)]="keyword"
-          (keyup.enter)="search(keyword)"
-          clearable
-        ></x-input>
-        <x-button icon="fto-search" (click)="search(keyword)">搜索</x-button>
-        <x-button type="text" icon="fto-refresh-cw" (click)="resetSearch()">重置</x-button>
-      </x-input-group>
-      <div>
+    <div class="header-actions">
+      <div class="search-group">
+        <x-input-group compact>
+          <x-input
+            class="search-input"
+            placeholder="名称/前缀/描述"
+            [(ngModel)]="keyword"
+            (keyup.enter)="search(keyword)"
+            clearable
+          ></x-input>
+          <x-button icon="fto-search" (click)="search(keyword)">搜索</x-button>
+          <x-button type="text" icon="fto-refresh-cw" (click)="resetSearch()">重置</x-button>
+        </x-input-group>
+      </div>
+      <div class="action-buttons">
         <x-button type="primary" icon="fto-plus" (click)="action('add')">新增</x-button>
         <x-button type="danger" icon="fto-trash-2" (click)="action('delete')">删除</x-button>
       </div>
@@ -28,9 +30,8 @@
       [index]="index"
       [query]="query"
       [showPagination]="true"
-      [bordered]="true"
+      [bordered]="false"
       [showHeader]="true"
-      [adaptionHeight]="600"
       [bodyColumnTpl]="{ actions: actionsTpl }"
       (headCheckboxChange)="headCheckboxChange($event)"
       (bodyCheckboxChange)="bodyCheckboxChange($event)"

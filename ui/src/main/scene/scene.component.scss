@@ -1,152 +1,52 @@
+@import '../../styles/table-common.scss';
+
 :host {
+  @extend .table-container-base;
+  
+  // 确保组件高度正确计算
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  box-sizing: border-box;
 
   .scene-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    @extend .table-container-base;
   }
 
   .scene-header {
-    flex-shrink: 0;
-    padding-bottom: 1rem;
+    @extend .table-header-base;
   }
 
   .scene-table {
-    flex: 1;
-    overflow: hidden;
-    min-height: 0;
-
-    x-table {
-      height: 100%;
-
-      ::ng-deep {
-        .x-table-wrapper {
-          height: 100% !important;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .x-table-header {
-          flex-shrink: 0;
-          overflow: hidden;
-
-          .x-table-header-wrapper {
-            overflow: hidden;
-
-            &::-webkit-scrollbar {
-              display: none;
-            }
-
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-        }
-
-        .x-table-body {
-          flex: 1;
-          overflow: auto;
-          min-height: 0;
-
-          &::-webkit-scrollbar:horizontal {
-            display: none;
-          }
-
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-
-        .x-table-footer {
-          flex-shrink: 0;
-          padding: 0.5rem 1rem;
-
-          .x-pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .x-pagination-sizes {
-              margin-right: auto;
-            }
-
-            .x-pagination-jumper {
-              margin-left: 1rem;
-            }
-          }
-        }
-
-        .x-table-virtual-body {
-          height: 100% !important;
-
-          &::-webkit-scrollbar:horizontal {
-            display: none;
-          }
-
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-
-        .x-table-body-wrapper {
-          &::-webkit-scrollbar:horizontal {
-            display: none;
-          }
-
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-
-        * {
-          &::-webkit-scrollbar:horizontal {
-            display: none !important;
-          }
-        }
-      }
-    }
+    @extend .table-content-base;
   }
 
-  .au-table-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    align-items: center;
+  // 命名空间管理特有样式
+  .namespace-info {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #007bff;
+  }
 
-    x-link {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-
-      &:hover {
-        transform: translateY(-1px);
-      }
-
-      &[type='info'] {
-        color: #17a2b8;
-
-        &:hover {
-          background-color: rgba(23, 162, 184, 0.1);
-        }
-      }
-
-      &[type='primary'] {
-        color: #007bff;
-
-        &:hover {
-          background-color: rgba(0, 123, 255, 0.1);
-        }
-      }
-
-      &[type='danger'] {
-        color: #dc3545;
-
-        &:hover {
-          background-color: rgba(220, 53, 69, 0.1);
-        }
-      }
+  // 表格行高度优化
+  ::ng-deep {
+    .x-table-body tr {
+      height: 64px; // 统一行高
+    }
+    
+    // URI列样式优化
+    .uri-cell {
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.875rem;
+      color: #6c757d;
+      word-break: break-all;
+    }
+    
+    // 前缀列样式
+    .prefix-cell {
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-weight: 600;
+      color: #007bff;
     }
   }
 }
-        

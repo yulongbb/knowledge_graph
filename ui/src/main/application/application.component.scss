@@ -1,87 +1,72 @@
+@import '../../styles/table-common.scss';
+
 :host {
-  > x-container:not(first-child) {
-    margin-top: 1rem;
+  @extend .table-container-base;
+  
+  // 确保组件高度正确计算
+  height: 100%;
+  box-sizing: border-box;
+
+  .application-container {
+    @extend .table-container-base;
   }
-  x-container{
-    height: 100%;
+
+  .application-header {
+    @extend .table-header-base;
   }
-  x-header{
-    min-height: 400px;
-  }
-  x-header {
-    background-color: var(--x-info-200);
-  }
-  x-footer {
-    background-color: var(--x-info-300);
-  }
-  x-main {
-    height: 500px;
-    background-color: var(--x-info-400);
-  }
-  x-aside {
-    min-width: 400px;
-    height: 900px;
-    background-color: var(--x-info-500);
+
+  .application-table {
+    @extend .table-content-base;
   }
   
-  x-input-group {
-    display: block;
-    width: 100%;
-  }
-  
-  x-input-group:not(:first-child) {
-    margin-top: 1rem;
-  }
-  
-  .search-section {
-    margin-bottom: 1.5rem;
-  }
-  
+  // 应用页面特有样式
   .app-image-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 60px; // 固定高度
     
     .app-table-image {
-      width: 40px;
-      height: 40px;
+      width: 48px; // 增加图标大小
+      height: 48px;
       object-fit: cover;
-      border-radius: 4px;
+      border-radius: 6px; // 统一圆角
+      border: 1px solid #e9ecef;
     }
     
     x-icon {
-      font-size: 2rem;
-      color: #ccc;
+      font-size: 2.5rem;
+      color: #adb5bd;
     }
   }
   
   .rating-display {
     display: flex;
     flex-direction: column;
+    align-items: center;
     
     .rating-stars {
-      color: #f5a623;
-      font-size: 1rem;
+      color: #ffc107;
+      font-size: 1.1rem;
       line-height: 1;
+      margin-bottom: 2px;
     }
     
     .rating-value {
-      font-size: 0.875rem;
-      color: #666;
-      margin-top: 2px;
+      font-size: 0.75rem;
+      color: #6c757d;
+      font-weight: 500;
     }
   }
-  
-  
-  .au-table-actions {
-    display: flex;
-    x-link {
-      margin-right: 8px;
-      
-      &:last-child {
-        margin-right: 0;
-      }
+
+  // 表格行高度优化
+  ::ng-deep {
+    .x-table-body tr {
+      height: 72px; // 统一行高
+    }
+    
+    .x-table-body td {
+      vertical-align: middle;
     }
   }
 }

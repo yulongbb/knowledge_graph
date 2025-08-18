@@ -1,0 +1,266 @@
+// 表格组件统一样式变量和类
+.table-container-base {
+  height: 100%; // 改为相对高度，而不是视口高度
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0; // 移除默认内边距
+  margin: 0; // 移除默认外边距
+}
+
+.table-header-base {
+  flex-shrink: 0;
+  padding: 1rem 1.5rem; // 统一内边距
+  background: #fff;
+  border-bottom: 1px solid #e9ecef; // 添加分隔线
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); // 添加轻微阴影
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .search-input {
+        width: 320px;
+        height: 36px; // 统一输入框高度
+      }
+      
+      x-button {
+        height: 36px; // 统一按钮高度
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem; // 增加按钮间距
+      
+      x-button {
+        height: 36px; // 统一按钮高度
+        padding: 0 1rem; // 统一按钮内边距
+      }
+    }
+  }
+}
+
+.table-content-base {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 1.5rem 1.5rem; // 左右和下方内边距
+
+  x-table {
+    height: 100%;
+    border: 1px solid #e9ecef; // 添加表格边框
+    border-radius: 6px; // 添加圆角
+    overflow: hidden; // 确保圆角效果
+
+    ::ng-deep {
+      .x-table-wrapper {
+        height: 100% !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; // 防止表格容器溢出
+      }
+
+      .x-table-header {
+        flex-shrink: 0;
+        overflow: hidden;
+        background: #f8f9fa; // 表头背景色
+
+        .x-table-header-wrapper {
+          overflow: hidden;
+          &::-webkit-scrollbar { display: none; }
+        }
+        
+        th {
+          padding: 0.875rem 1rem; // 统一表头内边距
+          font-weight: 600;
+          color: #495057;
+          border-bottom: 2px solid #e9ecef;
+        }
+      }
+
+      .x-table-body {
+        flex: 1;
+        overflow-y: auto; // 只允许垂直滚动
+        overflow-x: hidden; // 隐藏水平滚动
+        min-height: 0;
+        
+        // 自定义滚动条样式
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: #f8f9fa;
+          border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: #dee2e6;
+          border-radius: 3px;
+          
+          &:hover {
+            background: #adb5bd;
+          }
+        }
+        
+        td {
+          padding: 1rem; // 统一单元格内边距
+          border-bottom: 1px solid #e9ecef;
+          vertical-align: middle;
+        }
+        
+        tr:hover {
+          background-color: rgba(0, 123, 255, 0.05); // 鼠标悬停效果
+        }
+        
+        tr:last-child td {
+          border-bottom: none; // 移除最后一行的下边框
+        }
+      }
+
+      .x-table-footer {
+        flex-shrink: 0;
+        padding: 0.75rem 1.5rem; // 稍微减少padding避免溢出
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+
+        .x-pagination {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .x-pagination-sizes { 
+            margin-right: 1rem; 
+          }
+          
+          .x-pagination-jumper { 
+            margin-left: 1rem; 
+          }
+        }
+      }
+
+      .x-table-virtual-body {
+        height: 100% !important;
+        &::-webkit-scrollbar:horizontal { display: none; }
+      }
+
+      .x-table-body-wrapper {
+        &::-webkit-scrollbar:horizontal { display: none; }
+      }
+    }
+  }
+}
+
+// 表格操作按钮统一样式
+.au-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+
+  x-link {
+    padding: 0.375rem 0.75rem; // 增加按钮内边距
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover { 
+      transform: translateY(-1px); 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &[type='info'] {
+      color: #17a2b8;
+      &:hover { 
+        background-color: rgba(23, 162, 184, 0.1);
+        border: 1px solid rgba(23, 162, 184, 0.2);
+      }
+    }
+
+    &[type='primary'] {
+      color: #007bff;
+      &:hover { 
+        background-color: rgba(0, 123, 255, 0.1);
+        border: 1px solid rgba(0, 123, 255, 0.2);
+      }
+    }
+
+    &[type='danger'] {
+      color: #dc3545;
+      &:hover { 
+        background-color: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+      }
+    }
+
+    &[type='success'] {
+      color: #28a745;
+      &:hover { 
+        background-color: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.2);
+      }
+    }
+
+    &[type='warning'] {
+      color: #ffc107;
+      &:hover { 
+        background-color: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+      }
+    }
+  }
+}
+
+// 通用间距类
+.page-container {
+  height: 100vh;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+// 卡片容器样式
+.card-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin: 1rem;
+  overflow: hidden;
+}
+
+// 响应式间距
+@media (max-width: 768px) {
+  .table-header-base {
+    padding: 0.75rem 1rem;
+    
+    .header-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: stretch;
+      
+      .search-group .search-input {
+        width: 100%;
+      }
+      
+      .action-buttons {
+        justify-content: flex-end;
+      }
+    }
+  }
+  
+  .table-content-base {
+    padding: 0 1rem 1rem;
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, ChangeDetectorRef } from '@angular/core';
 import { PageBase } from 'src/share/base/base-page';
 import { IndexService } from 'src/layout/index/index.service';
 import {
@@ -10,8 +10,9 @@ import {
 } from '@ng-nest/ui';
 import { XMessageBoxService, XMessageBoxAction } from '@ng-nest/ui/message-box';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { NamespaceService } from '../ontology/ontology/namespace/namespace.service';
+import { map, catchError, finalize, tap } from 'rxjs/operators';
+import { of, forkJoin } from 'rxjs';
+import { NamespaceService } from './namespace.service';
 
 @Component({
   selector: 'app-scene',
@@ -23,15 +24,26 @@ export class SceneComponent extends PageBase implements OnInit {
 
   index = 1;
   size = 15;
-  query: any;
-  name = '';
-  prefix = '';
-  description = '';
+  query: any = {};
   keyword = '';
   checkedRows: XTableRow[] = [];
+  loading = false;
+  batchDeleting = false;
 
-  data = (index: number, size: number, query: any) =>
-    this.namespaceService.getList(index, size, query).pipe(map((x: any) => x));
+  data = (index: number, size: number, query: any) => {
+    this.loading = true;
+    return this.namespaceService.getList(index, size, query).pipe(
+      map((x: any) => {
+        this.loading = false;
+        return x;
+      }),
+      catchError((error) => {
+        this.loading = false;
+        this.message.error('数据加载失败：' + (error.message || '网络错误，请稍后重试'));
+        return of({ list: [], total: 0 });
+      })
+    );
+  };
 
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 },
@@ -59,20 +71,21 @@ export class SceneComponent extends PageBase implements OnInit {
   }
 
   search(keyword: string) {
+    this.loading = true;
     this.query = {};
-    if (keyword) {
-      this.query.filter = [
-        { field: 'name', value: keyword },
-        { field: 'prefix', value: keyword },
-        { field: 'description', value: keyword }
-      ];
+    if (keyword && keyword.trim()) {
+      // 使用OR逻辑搜索多个字段
+      this.query.search = keyword.trim();
     }
+    this.index = 1; // 重置到第一页
     this.tableCom.change(1);
   }
 
   resetSearch() {
     this.keyword = '';
     this.query = {};
+    this.index = 1;
+    this.loading = false;
     this.tableCom.change(1);
   }
 
@@ -113,47 +126,96 @@ export class SceneComponent extends PageBase implements OnInit {
         break;
       case 'delete':
         if (this.checkedRows.length > 0) {
-          if (this.checkedRows.some(row => row['name'] === 'default')) {
-            this.message.warning('默认命名空间不能删除！');
-            return;
-          }
-          this.msgBox.confirm({
-            title: '提示',
-            content: `此操作将永久删除${this.checkedRows.length}条数据，是否继续？`,
-            type: 'warning',
-            callback: (action: XMessageBoxAction) => {
-              if (action === 'confirm') {
-                this.checkedRows.forEach((row) => {
-                  this.namespaceService.delete(row.id).subscribe(() => {
-                    this.message.success('删除成功！');
-                    this.tableCom.change(1);
-                  });
-                });
-                this.checkedRows = [];
-              }
-            },
-          });
+          this.batchDelete();
         } else if (item) {
-          if (item.name === 'default') {
-            this.message.warning('默认命名空间不能删除！');
-            return;
-          }
-          this.msgBox.confirm({
-            title: '提示',
-            content: `此操作将永久删除此条数据：${item.name}，是否继续？`,
-            type: 'warning',
-            callback: (action: XMessageBoxAction) => {
-              if (action === 'confirm') {
-                this.namespaceService.delete(item.id).subscribe(() => {
-                  this.message.success('删除成功！');
-                  this.tableCom.change(1);
-                });
-              }
-            },
-          });
+          this.singleDelete(item);
+        } else {
+          this.message.warning('请选择要删除的数据！');
         }
         break;
     }
+  }
+
+  private batchDelete() {
+    // 检查是否包含默认命名空间
+    const defaultNamespaces = this.checkedRows.filter(row => row['name'] === 'default');
+    if (defaultNamespaces.length > 0) {
+      this.message.warning('默认命名空间不能删除！请取消选择后重试。');
+      return;
+    }
+
+    this.msgBox.confirm({
+      title: '批量删除确认',
+      content: `您确定要删除选中的 ${this.checkedRows.length} 条记录吗？此操作不可撤销！`,
+      type: 'warning',
+      callback: (action: XMessageBoxAction) => {
+        if (action === 'confirm') {
+          this.performBatchDelete();
+        }
+      },
+    });
+  }
+
+  private performBatchDelete() {
+    this.batchDeleting = true;
+    const deleteIds = this.checkedRows.map(row => row.id);
+    
+    // 使用 forkJoin 并发执行删除操作
+    const deleteRequests = deleteIds.map(id => 
+      this.namespaceService.delete(id).pipe(
+        catchError(error => {
+          console.error(`删除ID ${id} 失败:`, error);
+          return of({ success: false, id, error });
+        })
+      )
+    );
+
+    forkJoin(deleteRequests).subscribe({
+      next: (results) => {
+        this.batchDeleting = false;
+        const failedCount = results.filter((r: any) => r.success === false).length;
+        const successCount = results.length - failedCount;
+        
+        if (failedCount === 0) {
+          this.message.success(`成功删除 ${successCount} 条记录！`);
+        } else {
+          this.message.warning(`删除完成！成功：${successCount} 条，失败：${failedCount} 条`);
+        }
+        
+        this.checkedRows = [];
+        this.tableCom.change(this.index);
+      },
+      error: (error) => {
+        this.batchDeleting = false;
+        this.message.error('批量删除操作失败：' + (error.message || '未知错误'));
+      }
+    });
+  }
+
+  private singleDelete(item: any) {
+    if (item.name === 'default') {
+      this.message.warning('默认命名空间不能删除！');
+      return;
+    }
+
+    this.msgBox.confirm({
+      title: '删除确认',
+      content: `您确定要删除命名空间"${item.name}"吗？此操作不可撤销！`,
+      type: 'warning',
+      callback: (action: XMessageBoxAction) => {
+        if (action === 'confirm') {
+          this.namespaceService.delete(item.id).subscribe({
+            next: () => {
+              this.message.success('删除成功！');
+              this.tableCom.change(this.index);
+            },
+            error: (error) => {
+              this.message.error('删除失败：' + (error.message || '未知错误'));
+            }
+          });
+        }
+      },
+    });
   }
 
   onSizeChange(newSize: number) {

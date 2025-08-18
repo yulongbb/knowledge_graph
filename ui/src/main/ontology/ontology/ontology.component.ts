@@ -19,7 +19,9 @@ export class OntologyComponent extends PageBase {
   formGroup = new UntypedFormGroup({});
   type = 'info';
   selected!: Schema;
+  keyword = ''; // 添加keyword属性
   columns: XTableColumn[] = [
+    { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 }, // 添加checkbox列
     { id: 'actions', label: '操作', width: 120, right: 0 },
     { id: 'id', label: 'ID', width: 120 },
     { id: 'name', label: '名称', flex: 1 },
@@ -98,5 +100,35 @@ export class OntologyComponent extends PageBase {
 
   bodyCheckboxChange(row: XTableRow) {
     this.setCheckedRows(row['checked'], row);
+  }
+
+  // 添加搜索方法
+  search(keyword: string) {
+    this.query = { filter: [] };
+    if (keyword && keyword.trim()) {
+      this.query.filter = [
+        { field: 'name', value: keyword, operation: 'like' },
+        { field: 'label', value: keyword, operation: 'like' },
+        { field: 'description', value: keyword, operation: 'like' }
+      ];
+    } else {
+      this.query.filter = [{ 
+        field: 'pid', 
+        value: '', 
+        operation: 'isNull' as XOperation 
+      }];
+    }
+    this.tableCom.change(1);
+  }
+
+  // 添加重置搜索方法
+  resetSearch() {
+    this.keyword = '';
+    this.query = { filter: [{ 
+      field: 'pid', 
+      value: '', 
+      operation: 'isNull' as XOperation 
+    }] };
+    this.tableCom.change(1);
   }
 }

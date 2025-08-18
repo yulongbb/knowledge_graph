@@ -26,11 +26,13 @@ export class ApplicationComponent extends PageBase {
   name = '';
   category = '';
   description= '';
+  keyword = '';  // 添加keyword属性
   selected!: Application;
   type = 'add';
   loading = true;
   categories: string[] = [];
   pinnedApplications: Application[] = [];
+  checkedRows: any[] = []; // 添加checkedRows属性
 
   index = 1;
   size = 15;
@@ -159,6 +161,53 @@ export class ApplicationComponent extends PageBase {
     }
     this.query.filter = [{ field: 'description', value: this.description, operation: 'like' }];
     this.tableCom.change(1);
+  }
+
+  // 添加搜索方法
+  search(keyword: string) {
+    this.loading = true;
+    this.query = {};
+    if (keyword && keyword.trim()) {
+      this.query.filter = [
+        { field: 'name', value: keyword, operation: 'like' }
+      ];
+    }
+    this.index = 1;
+    this.tableCom.change(1);
+  }
+
+  // 添加重置搜索方法
+  resetSearch() {
+    this.keyword = '';
+    this.query = {};
+    this.index = 1;
+    this.loading = false;
+    this.tableCom.change(1);
+  }
+
+  // 添加复选框变更处理方法
+  setCheckedRows(checked: boolean, row: any) {
+    if (checked) {
+      if (!this.checkedRows.some((x) => x.id === row.id)) {
+        this.checkedRows.push(row);
+      }
+    } else {
+      if (this.checkedRows.some((x) => x.id === row.id)) {
+        let index = this.checkedRows.findIndex((x) => x.id === row.id);
+        this.checkedRows.splice(index, 1);
+      }
+    }
+  }
+
+  headCheckboxChange(headCheckbox: any) {
+    const checked = headCheckbox.checkbox['checked'];
+    for (let row of headCheckbox.rows) {
+      this.setCheckedRows(checked, row);
+    }
+  }
+
+  bodyCheckboxChange(row: any) {
+    this.setCheckedRows(row['checked'], row);
   }
 
   action(type: string, item?: any) {

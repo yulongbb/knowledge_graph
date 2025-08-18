@@ -393,6 +393,14 @@ export class EntityComponent extends PageBase {
     this.index = 1; // 重置到第一页
     this.tableCom.change(this.index);
   }
+
+  // 添加重置搜索方法
+  resetSearch() {
+    this.keyword = '';
+    this.query = {};
+    this.index = 1;
+    this.tableCom.change(1);
+  }
 }
 
 interface Label {
