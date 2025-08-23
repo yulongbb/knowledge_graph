@@ -53,30 +53,73 @@ app-header {
 
       &:hover {
         color: $--x-primary;
-        background-color: rgba(24, 144, 255, 0.06);
-        border-color: rgba(24, 144, 255, 0.2);
+        background-color: transparent;
+        border-color: transparent;
       }
 
       &.active {
         color: $--x-primary;
-        background-color: rgba(24, 144, 255, 0.1);
-        border-color: $--x-primary;
+        background-color: transparent;
+        border-color: transparent;
         position: relative;
-        
+        // 去除底部横线
         &::after {
-          content: '';
-          position: absolute;
-          bottom: -1px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 50%;
-          height: 2px;
-          background: $--x-primary;
-          border-radius: 1px;
+          display: none;
         }
 
         &:hover {
-          background-color: rgba(24, 144, 255, 0.12);
+          background-color: transparent;
+        }
+      }
+    }
+
+    .more-menu {
+      position: relative;
+      cursor: pointer;
+
+      x-icon {
+        margin-right: 0.25rem;
+      }
+
+      .more-dropdown {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        min-width: 14rem; // 调大宽度
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e8e8e8;
+        z-index: 1001;
+        padding: 0.25rem 0;
+        animation: dropdownFadeIn 0.18s cubic-bezier(.4, 0, .2, 1);
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          padding: 0.75rem 1.25rem;
+          color: #333;
+          cursor: pointer;
+          font-size: 0.95rem;
+          transition: background 0.18s, color 0.18s;
+
+          x-icon {
+            margin-right: 0.5rem;
+          }
+
+          &:hover {
+            background: #f0f7ff;
+            color: $--x-primary;
+          }
+
+          &.active {
+            color: $--x-primary;
+            background: rgba(24, 144, 255, 0.08);
+          }
+        }
+
+        .dropdown-item + .dropdown-item {
+          border-top: 1px solid #f0f0f0;
         }
       }
     }

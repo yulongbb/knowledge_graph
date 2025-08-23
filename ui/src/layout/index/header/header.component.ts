@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, HostListener } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, HostListener, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
@@ -15,7 +15,7 @@ import { XColorsTheme, XBoolean } from '@ng-nest/ui/core';
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
   settingVisible = false;
   userDropdownVisible = false;
   settingDark: XBoolean = false;
@@ -24,6 +24,13 @@ export class HeaderComponent implements OnInit {
     { id: 'primary', control: 'color-picker', label: '主色' },
     { id: 'dark', control: 'switch', label: '暗黑模式' }
   ];
+
+  @ViewChild('topNav', { static: false }) topNavRef!: ElementRef;
+  @ViewChild('header', { static: false }) headerRef!: ElementRef;
+
+  visibleMenus: any[] = [];
+  overflowMenus: any[] = [];
+  moreMenuVisible = false;
 
   constructor(
     public auth: AuthService,
@@ -41,6 +48,24 @@ export class HeaderComponent implements OnInit {
       this.indexService.setActiveTopMenu(topMenus[0]);
     }
     this.settingDark = this.config.dark;
+
+    setTimeout(() => this.updateMenus(), 0);
+    window.addEventListener('resize', this.updateMenus.bind(this));
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => this.updateMenus(), 0);
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('resize', this.updateMenus.bind(this));
+  }
+
+  updateMenus() {
+    const menus = this.indexService.topMenus || [];
+    // 默认显示前5个菜单
+    this.visibleMenus = menus.slice(0, 5);
+    this.overflowMenus = menus.slice(5);
   }
 
   // 监听全局点击事件，关闭下拉菜单
@@ -50,6 +75,9 @@ export class HeaderComponent implements OnInit {
     const dropdown = target.closest('.user-dropdown');
     if (!dropdown && this.userDropdownVisible) {
       this.userDropdownVisible = false;
+    }
+    if (this.moreMenuVisible) {
+      this.moreMenuVisible = false;
     }
   }
 
@@ -74,6 +102,7 @@ export class HeaderComponent implements OnInit {
         this.router.navigate([`/index/${menu.router}`]);
       }
     }
+    this.moreMenuVisible = false;
   }
 
   /**
@@ -81,6 +110,41 @@ export class HeaderComponent implements OnInit {
    */
   toggleUserDropdown() {
     this.userDropdownVisible = !this.userDropdownVisible;
+  }
+
+  toggleMoreMenu(event: MouseEvent) {
+    event.stopPropagation();
+    this.moreMenuVisible = !this.moreMenuVisible;
+  }
+
+  onMoreMenuClick(menu: any) {
+    // 替换主菜单最后一个为当前选中的更多菜单
+    if (this.visibleMenus.length > 0) {
+      // 找到当前菜单在overflowMenus中的索引
+      const idx = this.overflowMenus.findIndex(m => m.id === menu.id);
+      if (idx !== -1) {
+        // 移出主菜单最后一个
+        const movedOut = this.visibleMenus.pop();
+        // 移入当前选中的更多菜单
+        this.visibleMenus.push(menu);
+        // overflowMenus替换为移出的菜单
+        this.overflowMenus.splice(idx, 1, movedOut);
+      }
+    }
+    this.indexService.setActiveTopMenu(menu);
+    // 跳转逻辑
+    const subMenus = this.indexService.menus.filter(m => m.pid === menu.id);
+    if (subMenus.length > 0) {
+      const firstSubMenu = subMenus[0];
+      if (firstSubMenu.router && firstSubMenu.router !== '$') {
+        this.router.navigate([`/index/${firstSubMenu.router}`]);
+      }
+    } else {
+      if (menu.router && menu.router !== '$') {
+        this.router.navigate([`/index/${menu.router}`]);
+      }
+    }
+    this.moreMenuVisible = false;
   }
 
   /**

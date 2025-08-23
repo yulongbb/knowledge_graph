@@ -1,15 +1,30 @@
-<div class="logo">
+<div #header class="logo">
   <!-- <img src="assets/img/logo/logo-48x48.png" /> -->
   <span class="title">知识图谱可视化</span>
 </div>
 
-<nav class="top-nav">
-  <div class="nav-item" 
-       *ngFor="let menu of indexService.topMenus"
+<nav #topNav class="top-nav">
+  <div class="nav-item"
+       *ngFor="let menu of visibleMenus"
        [class.active]="indexService.activeTopMenu?.id === menu.id"
        (click)="onTopMenuClick(menu)">
     <x-icon *ngIf="menu.icon" [type]="menu.icon"></x-icon>
     <span>{{ menu.label }}</span>
+  </div>
+  <div class="nav-item more-menu"
+       *ngIf="overflowMenus.length > 0"
+       (click)="toggleMoreMenu($event)">
+    <x-icon type="ado-more"></x-icon>
+    <span>更多</span>
+    <div class="more-dropdown" *ngIf="moreMenuVisible">
+      <div class="dropdown-item"
+           *ngFor="let menu of overflowMenus"
+           [class.active]="indexService.activeTopMenu?.id === menu.id"
+           (click)="onMoreMenuClick(menu)">
+        <x-icon *ngIf="menu.icon" [type]="menu.icon"></x-icon>
+        <span>{{ menu.label }}</span>
+      </div>
+    </div>
   </div>
 </nav>
 
