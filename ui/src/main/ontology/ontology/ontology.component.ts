@@ -22,7 +22,7 @@ export class OntologyComponent extends PageBase {
   keyword = ''; // 添加keyword属性
   columns: XTableColumn[] = [
     { id: 'checked', label: '', rowChecked: false, headChecked: true, type: 'checkbox', width: 60 }, // 添加checkbox列
-    { id: 'actions', label: '操作', width: 120, right: 0 },
+    { id: 'actions', label: '操作', }, // 优化操作列宽度
     { id: 'id', label: 'ID', width: 120 },
     { id: 'name', label: '名称', flex: 1 },
     { id: 'label', label: '标签', flex: 1 },

@@ -5,10 +5,10 @@ import { ShareModule } from 'src/share/share.module';
 import { NgNestModule } from 'src/share/ng-nest.module';
 import { AuToolModule } from 'src/share/tool/tool.module';
 import { AuAdaptionModule } from 'src/share/adaption/adaption.module';
-import { 
-  XButtonModule, 
-  XInputModule, 
-  XTableModule, 
+import {
+  XButtonModule,
+  XInputModule,
+  XTableModule,
   XCardModule,
   XFormModule,
   XLoadingModule,
@@ -19,14 +19,13 @@ import { NamespaceDetailComponent } from './namespace-detail/namespace-detail.co
 
 const routes = [
   { path: '', component: SceneComponent, data: { title: '命名空间管理' } },
-    { path: ':type', component: NamespaceDetailComponent },
+  { path: ':type', component: NamespaceDetailComponent },
   { path: ':type/:id', component: NamespaceDetailComponent }
 ];
 
 @NgModule({
-  declarations: [SceneComponent, NamespaceDetailComponent,
-  ],
-  imports: [ 
+  declarations: [SceneComponent, NamespaceDetailComponent],
+  imports: [
     CommonModule,
     ShareModule,
     NgNestModule,

@@ -1,12 +1,12 @@
 @import '../index.param';
 
 app-content {
-  height: calc(100% - #{$tabs-height + $crumb-height}); // 计算实际可用高度
-  width: calc(100% - #{$sider-width}); // 计算实际可用宽度
+  height: calc(100%); // 计算实际可用高度
+  width: calc(100%); // 计算实际可用宽度
   overflow: hidden; // 改为hidden，防止页面级滚动
   position: absolute;
-  top: $tabs-height + $crumb-height;
-  left: $sider-width;
+  top: 0;
+  left: 0;
   transition: all $transition-duration;
   display: block;
   

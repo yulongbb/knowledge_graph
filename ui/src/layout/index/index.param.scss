@@ -68,7 +68,7 @@ $transition-duration: 0.3s;
 // 菜单样式
 @mixin silder {
   li {
-    margin: 2px 8px;
+    margin: 0;
     
     a {
       padding: 0.5rem 0.75rem;
